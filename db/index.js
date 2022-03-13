@@ -3,10 +3,13 @@ const pgp = require("pg-promise")();
 
 const connectionConfig = {
     connectionString: process.env.DATABASE_URL,
-    ssl: {
-        require: true,
-        rejectUnauthorized: false,
-    },
+    ssl:
+        process.env.NODE_ENV !== "development"
+            ? {
+                  require: true,
+                  rejectUnauthorized: false,
+              }
+            : false,
 };
 
 const connection = pgp(connectionConfig);
