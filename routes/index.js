@@ -7,6 +7,10 @@ router.get("/", (req, res, next) => {
     res.render("index", { title: "CSC 667 Express" });
 });
 
+router.get("/registration", (req, res, next) => {
+    res.render("registration", { title: "Registration Page" });
+});
+
 router.get("/dbtest", async (request, response, next) => {
     const baseSQL = `SELECT * FROM USERS;`;
 
