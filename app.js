@@ -3,6 +3,8 @@ const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
+const { create } = require("express-handlebars");
+// const handlebars = require("express-handlebars");
 
 if (process.env.NODE_ENV === "development") {
     require("dotenv").config();
@@ -16,9 +18,25 @@ const testRouter = require("./routes/test");
 
 const app = express();
 
+const hbs = create({
+    layoutsDir: path.join(__dirname, "views/layouts"),
+    partialsDir: path.join(__dirname, "views/partials"),
+    extname: ".hbs",
+    defaultLayout: "layout",
+    // helpers: {
+    //     emptyObject: (obj) => {
+    //         return !(
+    //             obj.constructor === Object && Object.keys(obj).length == 0
+    //         );
+    //     },
+    // },
+});
+
+app.engine("hbs", hbs.engine);
+
 // view engine setup
-app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "hbs");
+app.set("views", path.join(__dirname, "views"));
 
 app.use(logger("dev"));
 app.use(express.json());
