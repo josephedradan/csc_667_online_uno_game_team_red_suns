@@ -33,7 +33,7 @@
                     20</a></li>
         </ul>
     </div>
-    <div class="col-span-3 justify-center">
+    {{! <div class="col-span-3 justify-center">
         <h2 class="rounded-sm px-3 py-3">Login</h2>
         <form
             action="/users/login"
@@ -58,5 +58,21 @@
             />
             <button>Login</button>
         </form>
+    </div> }}
+    {{!-- {{#if logged}} --}}
+    <div
+        class="col-span-3 card bg-white flex flex-col items-center justify-center p-4 shadow-lg rounded-2xl"
+    >
+        <img class="w-50 h-50" src="/images/face.webp" alt="sum ting wong" />
+        <div>Username: {{username}}</div>
+        <div>Info1: </div>
+        <div>Info2: </div>
+        <div>Info3: </div>
+        <div class="w-full mt-8">
+            <button
+                class="bg-blue-500 py-2 px-2 hover:bg-blue-600 text-white w-full font-semibold rounded-lg shadow-lg"
+            >Edit Profile</button>
+        </div>
     </div>
+    {{!-- {{/if}} --}}
 </div>
