@@ -23,7 +23,8 @@
         "nodemon": "^2.0.15",
         "pg-promise": "^10.11.1",
         "sequelize": "^6.17.0",
-        "sequelize-cli": "^6.4.1"
+        "sequelize-cli": "^6.4.1", 
+        "tailwindcss": "^3.0.23"
     },
     "devDependencies": {
         "tailwindcss": "^3.0.23"
