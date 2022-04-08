@@ -4,6 +4,7 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const { create } = require("express-handlebars");
+const bodyParser = require("body-parser"); 
 // const handlebars = require("express-handlebars");
 
 if (process.env.NODE_ENV === "development") {

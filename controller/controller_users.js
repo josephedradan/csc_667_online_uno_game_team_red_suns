@@ -4,11 +4,14 @@ function sendUsers(req, res, next) {
     res.send("respond with a resource");
 }
 
-function register(req, res, next) {
+function registerUser(req, res, next) {
     console.log("Hi"); 
+    console.log("req:");
+    console.log(req.body);  
+    res.render("index"); 
 }
 
 controllerUsers.sendUsers = sendUsers; 
-controllerUsers.register = register; 
+controllerUsers.registerUser = registerUser; 
 
-module.exports = controllerUsers; 
+module.exports = controllerUsers
