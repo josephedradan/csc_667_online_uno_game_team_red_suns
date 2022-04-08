@@ -3,7 +3,10 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const bcrypt = require('bcrypt'); 
 
-function getuserByUsername(username) {
+//the connection to the db
+const db = require("../db/index");
+
+async function getuserByUsername(username) {
     /*
     TODO: Implement, this needs to query the database and return a user object {user.username, user.password}
     */

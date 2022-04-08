@@ -3,6 +3,12 @@ controllerUsers = {}
 function sendUsers(req, res, next) {
     res.send("respond with a resource");
 }
-controllerUsers.sendUsers = sendUsers
 
-module.exports = controllerUsers
+function register(req, res, next) {
+    console.log("Hi"); 
+}
+
+controllerUsers.sendUsers = sendUsers; 
+controllerUsers.register = register; 
+
+module.exports = controllerUsers; 

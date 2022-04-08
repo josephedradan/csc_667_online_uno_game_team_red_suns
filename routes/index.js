@@ -8,7 +8,7 @@ const controllerIndex = require("../controller/controller_index");
 
 router.get("/", controllerIndex.renderIndex);
 
-router.get("/registration", controllerIndex.renderIndex);
+router.get("/registration", controllerIndex.renderRegistration);
 
 router.get("/dbtest", controllerIndex.testDB);
 
