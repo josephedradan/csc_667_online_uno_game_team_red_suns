@@ -8,11 +8,11 @@ function renderIndex(req, res, next) {
 
 controllerIndex.renderIndex = renderIndex
 
-function register(req, res, next) {
+function renderRegistration(req, res, next) {
     res.render("registration", {title: "Registration Page"});
 }
 
-controllerIndex.register = register
+controllerIndex.renderRegistration = renderRegistration
 
 async function testDB(request, response, next) {
     const baseSQL = `SELECT * FROM USERS;`;
