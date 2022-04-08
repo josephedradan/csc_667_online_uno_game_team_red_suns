@@ -1,27 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db/index");
+const controllerIndex = require("../controller/controller_index");
 
 /* GET home page. */
-router.get("/", (req, res, next) => {
-    res.render("index", { title: "CSC 667 Express" });
-});
 
-router.get("/registration", (req, res, next) => {
-    res.render("registration", { title: "Registration Page" });
-});
 
-router.get("/dbtest", async (request, response, next) => {
-    const baseSQL = `SELECT * FROM USERS;`;
+router.get("/", controllerIndex.renderIndex);
 
-    let rows = await db.any(baseSQL);
-    if (!rows) {
-        // throw error here. need error class to generate logs.
-    }
-    // add further logic here.
-    // console.log(rows);
-    response.json(rows);
-});
+router.get("/registration", controllerIndex.renderIndex);
+
+router.get("/dbtest", controllerIndex.testDB);
+
 
 // router.get("/", (request, response) => {
 //     db.any(

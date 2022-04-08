@@ -1,12 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
-router.get("/", function (req, res, next) {
-    res.render("pregame_lobby", { title: "Pre-game Lobby" });
-});
+const controllerGames = require("../controller/controller_games")
 
-router.get("/testGame", function (req, res, next) {
-    res.render("game_lobby", { title: "Game Lobby" });
-});
+router.get("/", controllerGames.renderPreGameLobby);
+
+router.get("/renderTestGame", controllerGames.renderPreGameLobby);
 
 module.exports = router;

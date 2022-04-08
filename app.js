@@ -10,12 +10,11 @@ if (process.env.NODE_ENV === "development") {
     require("dotenv").config();
 }
 
-// const db = require("./db/index");
+// const db = require("./db/testDB");
 
-const indexRouter = require("./routes/index");
-const usersRouter = require("./routes/users");
-const testRouter = require("./routes/test");
-const gameRouter = require("./routes/games");
+const routes = require("./routes/routes");
+
+/*############################## Settings ##############################*/
 
 const app = express();
 
@@ -45,10 +44,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/", indexRouter);
-app.use("/users", usersRouter);
-app.use("/tests", testRouter);
-app.use("/games", gameRouter);
+app.use("/", routes);
+
+
+/*############################## Error Handling ##############################*/
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -65,5 +64,6 @@ app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render("error");
 });
+
 
 module.exports = app;

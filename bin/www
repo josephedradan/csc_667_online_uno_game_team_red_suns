@@ -9,11 +9,11 @@ var debug = require('debug')('application:server');
 var http = require('http');
 
 /**
- * Get port from environment and store in Express.
+ * Get PORT from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+var PORT = normalizePort(process.env.PORT || '3000');
+app.set('port', PORT);
 
 /**
  * Create HTTP server.
@@ -22,15 +22,28 @@ app.set('port', port);
 var server = http.createServer(app);
 
 /**
- * Listen on provided port, on all network interfaces.
+ * Listen on provided PORT, on all network interfaces.
  */
 
-server.listen(port);
+server.listen(PORT, (err) => {
+  // TODO: CLEAN UP AND FIX FOR PRODUCTION
+  if (err) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log("On Development mode...")
+    }
+
+    console.log(err);
+    return;
+  }
+
+  console.log(`Server listening on port: ${PORT}`);
+});
+
 server.on('error', onError);
 server.on('listening', onListening);
 
 /**
- * Normalize a port into a number, string, or false.
+ * Normalize a PORT into a number, string, or false.
  */
 
 function normalizePort(val) {
@@ -42,7 +55,7 @@ function normalizePort(val) {
   }
 
   if (port >= 0) {
-    // port number
+    // PORT number
     return port;
   }
 
@@ -58,9 +71,9 @@ function onError(error) {
     throw error;
   }
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  var bind = typeof PORT === 'string'
+    ? 'Pipe ' + PORT
+    : 'Port ' + PORT;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
@@ -85,6 +98,6 @@ function onListening() {
   var addr = server.address();
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
-    : 'port ' + addr.port;
+    : 'PORT ' + addr.port;
   debug('Listening on ' + bind);
 }
