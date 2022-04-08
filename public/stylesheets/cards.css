@@ -271,7 +271,8 @@
     display: flex;
     align-content: center;
     justify-content: center;
-    height: 220px;
+    flex-basis: max-content;
+    height: 200px;
 }
 
 .cardWrapper {
@@ -280,17 +281,24 @@
     margin-top: auto;
     margin-bottom: auto;
     position: relative;
-    height: 178px;
-    transition-property: width, height;
+    height: 100%;
+    transition-property: width;
     transition-duration: 0.05s;
     transition-timing-function: ease-in-out;
     width: 10%;
-    /*pointer-events: none;*/
+    max-width: 116px;
 }
 
-.cardWrapper .unoCard {
+.cards .cardWrapper .unoCard {
     left: 0;
-    pointer-events: auto;
+    bottom: 0px;
+}
+
+.cards.playerDeck .cardWrapper .unoCard {
+    transition-property: transform;
+    transition-duration: 0.05s;
+    transition-timing-function: ease-in-out;
+    transform: translateY(0%);
 }
 
 .cardWrapper:last-child,
@@ -299,8 +307,8 @@
     overflow: visible;
 }
 
-.cards.playerDeck .cardWrapper:hover {
-    height: 220px;
+.cards.playerDeck .cardWrapper:hover .unoCard {
+    transform: translateY(-20%);
 }
 
 .northPlayer {
