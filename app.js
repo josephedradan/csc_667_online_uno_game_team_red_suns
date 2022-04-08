@@ -18,7 +18,7 @@ if (process.env.NODE_ENV === "development") {
 
 // const db = require("./db/testDB");
 
-const databaseSequelize = require('./models/database_sequelize');
+const databaseSequelize = require('./config/database_sequelize');
 const handlerPassport = require('./controller/handler_passport');
 
 const routes = require("./routes/routes");

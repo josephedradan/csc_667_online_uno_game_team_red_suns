@@ -43,7 +43,4 @@ Object.keys(databaseSequelize).forEach(modelName => {
     }
 });
 
-databaseSequelize.sequelize = sequelize;
-databaseSequelize.Sequelize = Sequelize;
-
-module.exports = databaseSequelize;
+module.exports = sequelize;

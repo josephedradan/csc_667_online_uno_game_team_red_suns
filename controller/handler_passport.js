@@ -53,7 +53,7 @@ const to = require('await-to-js').default;
 
 const LocalStrategy = require('passport-local').Strategy;
 
-const engineUser = require('./engine_user');
+const Account = require('../models/engine_account');
 const debugPrinter = require('../util/debug_printer');
 const handlerPassword = require('./handler_password');
 
@@ -83,7 +83,7 @@ const INVALID_LOGIN = 'Password/Username is invalid';
  * @returns {Promise<*>}
  */
 async function authenticateUser(username, password, doneCallback) {
-    const user = await engineUser.getUserByUsername(username);
+    const user = await Account.getUserByUsername(username);
 
     // Invalid username
     if (user === null) {
@@ -205,25 +205,25 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
             Reference:
                 https://stackoverflow.com/questions/27637609/understanding-passport-serialize-deserialize
      */
-    passport.deserializeUser(async (username, done) => {
-        // if (process.env.NODE_ENV === 'development') {
-        //     debugPrinter.printDebug(`initializePassport deserializeUser ${username}`);
-        // }
+    passport.deserializeUser(async (username, doneCallBack) => {
+        if (process.env.NODE_ENV === 'development') {
+            debugPrinter.printDebug(`initializePassport deserializeUser ${username}`);
+        }
 
         // Get the userAndUserInformation via username
-        const [error, userAndUserInformation] = await to(engineUser.getUserAndUserInformationByUsername(username));
+        const [error, userAndUserInformation] = await to(Account.getUserAndUserInformationByUsername(username));
 
         // If userAndUserInformation exists
         if (userAndUserInformation !== null) {
             // What ever data is sent to the second parameter of this function will be stored in req.user
-            done(
+            doneCallBack(
                 error, // error
                 userAndUserInformation, // req.user
                 {message: `${userAndUserInformation.username} was successfully logged in`}, // info
             );
         } else {
             // If getting userAndUserInformation is unsuccessful, then req.user will be null
-            done(
+            doneCallBack(
                 error, // error
                 null, // req.user
                 {message: 'Error happened in passport.deserializeUser'}, // info
