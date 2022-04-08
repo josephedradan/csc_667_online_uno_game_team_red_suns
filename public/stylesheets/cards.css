@@ -40,6 +40,7 @@
     position: absolute;
     top: 50%;
     left: 50%;
+    text-align: center;
     transform: translate(-50%, -50%);
     background:#ffffff;
     width: 90%;
@@ -56,9 +57,11 @@
   
   .unoCard.flipped .mark::after{
     content: "UNO";
+    font-style: normal;
     display:inline-block;
     position: absolute;
     font-size: 47%;
+    height: auto;
     font-family: 'Cabin', sans-serif;
     font-weight: 900;
     background: none;
@@ -108,29 +111,30 @@
        0px  -0px 0 #ffffff;
   }
 
-.unoCard:before,
-.unoCard:after {
+.unoCard::before,
+.unoCard::after {
+    font-style: italic;
     display: inline-block;
     position: absolute;
     line-height: 0;
-    font-size: 20px;
+    font-size: 20%;
     color: #ffffff;
     text-shadow: 1px 1px 0 #000000, -1px -1px 0 #000000, -1px 1px 0 #000000,
         1px -1px 0 #000000, 1px 0 0 #000000, -1px 0 0 #000000, 0 -1px 0 #000000,
         0 1px 0 #000000, 2px 2px 0 #000000;
 }
 
-.unoCard:before {
+.unoCard::before {
     top: 15px;
     left: 10px;
 }
-.unoCard:after {
+.unoCard::after {
     bottom: 15px;
     right: 10px;
     -webkit-transform: rotate(180deg);
 }
 
-.unoCard.blue {
+.unoCard.blue, .unoCard.blue .mark::after {
     color: #0063b3;
 }
 
@@ -138,7 +142,7 @@
     background: #0063b3;
 }
 
-.unoCard.green {
+.unoCard.green, .unoCard.green .mark::after {
     color: #18a849;
 }
 
@@ -146,7 +150,7 @@
     background: #18a849;
 }
 
-.unoCard.red {
+.unoCard.red, .unoCard.red .mark::after {
     color: #c72a18;
 }
 
@@ -154,7 +158,7 @@
     background: #c72a18;
 }
 
-.unoCard.yellow {
+.unoCard.yellow, .unoCard.yellow .mark::after {
     color: #e6ca1e;
 }
 
@@ -162,101 +166,143 @@
     background: #e6ca1e;
 }
 
-.unoCard.num-0:before,
-.unoCard.num-0:after {
+.unoCard .mark::after {
+    background: none;
+    vertical-align: middle;
+    position: absolute;
+    font-style: italic;
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    transform: translate(-65%, -50%);
+    height: auto;
+    margin: auto;
+}
+
+.unoCard.num-0::before,
+.unoCard.num-0::after,
+.unoCard.num-0 .mark::after {
     content: "0";
 }
 
-.unoCard.num-1:before,
-.unoCard.num-1:after {
+.unoCard.num-1::before,
+.unoCard.num-1::after,
+.unoCard.num-1 .mark::after {
     content: "1";
 }
 
-.unoCard.num-2:before,
-.unoCard.num-2:after {
+.unoCard.num-2::before,
+.unoCard.num-2::after,
+.unoCard.num-2 .mark::after {
     content: "2";
 }
 
-.unoCard.num-3:before,
-.unoCard.num-3:after {
+.unoCard.num-3::before,
+.unoCard.num-3::after,
+.unoCard.num-3 .mark::after {
     content: "3";
 }
 
-.unoCard.num-4:before,
-.unoCard.num-4:after {
+.unoCard.num-4::before,
+.unoCard.num-4::after,
+.unoCard.num-4 .mark::after {
     content: "4";
 }
 
-.unoCard.num-5:before,
-.unoCard.num-5:after {
+.unoCard.num-5::before,
+.unoCard.num-5::after,
+.unoCard.num-5 .mark::after {
     content: "5";
 }
 
-.unoCard.num-6:before,
-.unoCard.num-6:after {
+.unoCard.num-6::before,
+.unoCard.num-6::after,
+.unoCard.num-6 .mark::after {
     content: "6";
 }
 
-.unoCard.num-7:before,
-.unoCard.num-7:after {
+.unoCard.num-7::before,
+.unoCard.num-7::after,
+.unoCard.num-7 .mark::after {
     content: "7";
 }
 
-.unoCard.num-8:before,
-.unoCard.num-8:after {
+.unoCard.num-8::before,
+.unoCard.num-8::after,
+.unoCard.num-8 .mark::after {
     content: "8";
 }
 
-.unoCard.num-9:before,
-.unoCard.num-9:after {
+.unoCard.num-9::before,
+.unoCard.num-9::after,
+.unoCard.num-9 .mark::after {
     content: "9";
 }
 
-.unoCard.num-6 .mark:after,
-.unoCard.num-9 .mark:after {
-    display: block;
-    content: "";
-    position: relative;
-    top: -25px;
-    left: 5px;
-    width: 80%;
-    border: 1px solid #000000;
-    height: 4px;
-    box-shadow: 1px 1px 0 #000000;
+.unoCard.skip::before,
+.unoCard.skip::after,
+.unoCard.skip .mark::after {
+    content: "⊘";
+    font-style: normal;
 }
-.unoCard.num-6.blue .mark:after,
-.unoCard.num-9.blue .mark:after {
-    background: #0063b3;
+
+.unoCard.skip .mark::after {
+    transform: translate(-53%, -52%);
+    font-size: 80%;
 }
-.unoCard.num-6.green .mark:after,
-.unoCard.num-9.green .mark:after {
-    background: #18a849;
+
+.unoCard.num-6 .mark::after,
+.unoCard.num-9 .mark::after,
+.unoCard.num-6::before,
+.unoCard.num-6::after,
+.unoCard.num-9::before,
+.unoCard.num-9::after {
+    text-decoration: underline;
+    text-underline-offset: 5%;
+    text-decoration-thickness: 8%;
 }
-.unoCard.num-6.red .mark:after,
-.unoCard.num-9.red .mark:after {
-    background: #c72a18;
-}
-.unoCard.num-6.yellow .mark:after,
-.unoCard.num-9.yellow .mark:after {
-    background: #e6ca1e;
+
+.unoCard.num-6 .mark::after,
+.unoCard.num-9 .mark::after {
+    transform: translate(-65%, -55%);
 }
 
 .cards {
     display: flex;
     align-content: center;
+    justify-content: center;
+    height: 220px;
 }
 
 .cardWrapper {
-    overflow: hidden;
+    /*overflow: hidden;*/
     background: none;
     margin-top: auto;
     margin-bottom: auto;
+    position: relative;
+    height: 178px;
+    transition-property: width, height;
+    transition-duration: 0.05s;
+    transition-timing-function: ease-in-out;
+    width: 10%;
+    /*pointer-events: none;*/
+}
+
+.cardWrapper .unoCard {
+    left: 0;
+    pointer-events: auto;
 }
 
 .cardWrapper:last-child,
 .cards.playerDeck .cardWrapper:hover {
+    width: 116px;
     overflow: visible;
 }
+
+.cards.playerDeck .cardWrapper:hover {
+    height: 220px;
+}
+
 .northPlayer {
     transform: rotate(180deg);
 }
