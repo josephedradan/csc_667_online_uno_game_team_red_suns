@@ -65,9 +65,6 @@ const REQ_BODY_FIELD_NAMES = {
 
 const handlerPassport = {};
 
-// Not used
-const INVALID_LOGIN = 'Password/Username is invalid';
-
 /**
  * Get the user to be Authenticated based on the username and password given
  *
@@ -102,7 +99,8 @@ async function authenticateUser(username, password, doneCallback) {
 
     try {
         // If password is valid by comparing password from the req to the password in the db
-        if (await handlerPassword.compare(password, user.password)) {
+        if (await handlerPassword.compare(password, user.password)) { // TODO, FIXME: CHANGE .password TO MATCH THE DB equivalent if there is an error
+            throw 'REMOVE THIS THROW IF THE DB NAMING IS CORRECT AND YOU HAVE CORRECTED user.password IF NECESSARY'
             // This doneCallback will attach the user object to req
             return doneCallback(
                 null, // error (This must be null to allow the 3rd argument (info) to pass)
@@ -171,9 +169,9 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
                 https://stackoverflow.com/questions/27637609/understanding-passport-serialize-deserialize
      */
     passport.serializeUser((user, done) => {
-        // if (process.env.NODE_ENV === 'development') {
-        //     debugPrinter.printDebug('initializePassport serializeUser');
-        // }
+        if (process.env.NODE_ENV === 'development') {
+            debugPrinter.printDebug('initializePassport serializeUser');
+        }
         /*
         Put the key (user.username) inside the passport of the session.
         It can be accessed via req.session.passport.user
@@ -206,12 +204,13 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
                 https://stackoverflow.com/questions/27637609/understanding-passport-serialize-deserialize
      */
     passport.deserializeUser(async (username, doneCallBack) => {
+        throw 'REMOVE THIS THROW IF THE DB NAMING IS CORRECT AND YOU HAVE CORRECTED user.username IF NECESSARY'
         if (process.env.NODE_ENV === 'development') {
             debugPrinter.printDebug(`initializePassport deserializeUser ${username}`);
         }
 
         // Get the userAndUserInformation via username
-        const [error, userAndUserInformation] = await to(Account.getAccount(username));
+        const [error, userAndUserInformation] = await to(Account.getAccountAndAccountStatistics(username));
 
         // If userAndUserInformation exists
         if (userAndUserInformation !== null) {
