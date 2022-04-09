@@ -10,7 +10,7 @@ Reference:
  */
 
 const passport = require('passport');
-const debugPrinter = require('../utils/debug_printer');
+const debugPrinter = require('../util/debug_printer');
 
 const middlewarePassport = {};
 
@@ -98,6 +98,8 @@ function callbackCustomWrapper(req, res, next) {
             It's a very bad idea to tell the user what they failed on when they login, it is a security risk
          */
         if (!user) {
+
+            // FIXME: REPLACE THIS REST API VERSION WITH THE NORMAL WAY
             // Unsuccessful login response
             res.status(403)
                 .json({
@@ -116,6 +118,8 @@ function callbackCustomWrapper(req, res, next) {
                 if (errorPassportLogin) {
                     next(errorPassportLogin);
                 } else {
+
+                    // FIXME: REPLACE THIS REST API VERSION WITH THE NORMAL WAY
                     // Successful login response
                     res.status(200)
                         .json({
@@ -145,7 +149,7 @@ function authenticate(strategy) {
         // This is the actual passport.authenticate
         const middlewarePassportAuthenticate = passport.authenticate(
             strategy,
-            callbackCustomWrapper(req, res, next),
+            callbackCustomWrapper(req, res, next), // This function should respond to the user if they have successfully logged in or not
             next,
         );
 

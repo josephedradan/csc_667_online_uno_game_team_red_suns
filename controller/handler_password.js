@@ -3,7 +3,7 @@ Handle password related stuff
 
  */
 
-const bcrypt = require('bcryptjs'); // Do not use the module bcrypt because it is slower
+const bcrypt = require('bcrypt');
 
 const BCRYPT_SALT_ROUNDS = 10;
 

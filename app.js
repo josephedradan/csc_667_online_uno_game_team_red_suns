@@ -44,7 +44,7 @@ const ConnectSessionSequelize = require('connect-session-sequelize')(
 
 // A express session store using sequelize made using connect-session-sequelize (a wrapper object)
 const sequelizeExpressSessionStore = new ConnectSessionSequelize({
-    db: databaseSequelize.sequelize,
+    db: databaseSequelize,
 });
 /*############################## express-session ##############################*/
 

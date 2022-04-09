@@ -211,7 +211,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
         }
 
         // Get the userAndUserInformation via username
-        const [error, userAndUserInformation] = await to(Account.getUserAndUserInformationByUsername(username));
+        const [error, userAndUserInformation] = await to(Account.getAccount(username));
 
         // If userAndUserInformation exists
         if (userAndUserInformation !== null) {
