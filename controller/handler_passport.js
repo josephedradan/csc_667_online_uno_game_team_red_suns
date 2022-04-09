@@ -53,7 +53,7 @@ const to = require('await-to-js').default;
 
 const LocalStrategy = require('passport-local').Strategy;
 
-const Account = require('../models/engine_account');
+const Account = require('./engine_account');
 const debugPrinter = require('../util/debug_printer');
 const handlerPassword = require('./handler_password');
 

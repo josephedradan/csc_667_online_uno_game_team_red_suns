@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../db/index");
 const controllerIndex = require("../controller/controller_index");
+const middlewareAuthentication = require("../middleware/middleware_authentication");
 
 /* GET home page. */
 
@@ -12,6 +13,7 @@ router.get("/registration", controllerIndex.renderRegistration);
 
 router.get("/dbtest", controllerIndex.testDB);
 
+router.post("/login", middlewareAuthentication.authenticate('local')); // FIXME: THE LOGIN IS RESTFUL
 
 // router.get("/", (request, response) => {
 //     db.any(

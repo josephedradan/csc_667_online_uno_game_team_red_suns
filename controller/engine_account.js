@@ -32,7 +32,7 @@ Reference:
  */
 const engineAccount = {}
 
-const sequelize = require("../config/database_sequelize")
+const sequelize = require("../models")
 
 // TODO: REMOVE THIS COMMENT IF THE FUNCTION BELOW HAS BEEN TESTED AND WORKS
 async function getAccountAndAccountStatisticsByUsername(username) {

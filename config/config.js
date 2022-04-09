@@ -1,3 +1,8 @@
+/*
+
+WARNING:
+    DO NOT CHANGE THE NAME OF THIS FILE OR YOU WILL BREAK MIGRATIONS
+ */
 require("dotenv").config();
 module.exports = {
 

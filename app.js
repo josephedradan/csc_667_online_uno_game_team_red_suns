@@ -1,3 +1,34 @@
+/*
+
+Notes:
+    Automatically generate your Sequelize models from an existing database
+        IMPORTANT NOTE:
+            FOR THIS PROJECT, WE DO NOT USE MODELS WHEN EXECUTING QUERIES.
+            QUERIES IN THIS PROJECT MUST BE MADE WITH RAW SQL QUERIES IN CODE...
+            THEREFORE, YOU SHOULD IGNORE THE Notes BELOW.
+
+            ALSO, THE MODELS FOLDER SHOULD TECHNICALLY BE IGNORED
+
+        Notes:
+            1. Make sure that you delete an unrelated or unnecessary tables in your db
+            2. npm install -D sequelize-auto
+            3. Mimic the example on your db
+
+        Reference:
+            Sequelize-Auto
+                Notes:
+                    npm package to make sequelize models from an existing database
+
+                Reference:
+                    https://www.npmjs.com/package/sequelize-auto
+
+Reference:
+    Models and Migrations
+        Notes:
+            Model: The structure of a table in the DB
+            Migration: Modifies the structure of the DB by adding and removing tables
+
+ */
 const createError = require("http-errors");
 const express = require("express");
 const passport = require('passport');
@@ -18,8 +49,9 @@ if (process.env.NODE_ENV === "development") {
 
 // const db = require("./db/testDB");
 
-const databaseSequelize = require('./config/database_sequelize');
+const databaseSequelize = require('./models');
 const handlerPassport = require('./controller/handler_passport');
+const debugPrinter = require("./util/debug_printer");
 
 const routes = require("./routes/routes");
 
@@ -44,8 +76,38 @@ const ConnectSessionSequelize = require('connect-session-sequelize')(
 
 // A express session store using sequelize made using connect-session-sequelize (a wrapper object)
 const sequelizeExpressSessionStore = new ConnectSessionSequelize({
-    db: databaseSequelize,
+    db: databaseSequelize.sequelize,
 });
+
+// Check if you can connect to the database
+databaseSequelize.sequelize.authenticate()
+    .then(() => {
+        debugPrinter.printBackendGreen('Database Connected');
+    })
+    .catch((err) => {
+        debugPrinter.printError(err);
+    });
+
+// Sync the database models if not exists
+
+/*
+
+Reference:
+    Model synchronization
+        Notes:
+            User.sync() - This creates the table if it doesn't exist (and does nothing if it already exists)
+
+            User.sync({ force: true }) - This creates the table, dropping it first if it already existed
+
+            User.sync({ alter: true }) - This checks what is the current state of the table in the database
+            (which columns it has, what are their data types, etc), and then performs the necessary changes
+            in the table to make it match the model.
+
+        Reference:
+            https://sequelize.org/docs/v6/core-concepts/model-basics/#model-synchronization
+ */
+// databaseSequelize.sequelize.sync({alter: true});
+
 /*############################## express-session ##############################*/
 
 app.use(
