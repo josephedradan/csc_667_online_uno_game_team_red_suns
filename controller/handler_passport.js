@@ -108,8 +108,8 @@ async function authenticateUser(username, password, doneCallback) {
                 {message: 'Success'}, // info
             );
         }
-        // If password is invalid
 
+        // If password is invalid
         return doneCallback(
             null, // error (This must be null to allow the 3rd argument (info) to pass)
             false, // user
@@ -125,7 +125,7 @@ async function authenticateUser(username, password, doneCallback) {
 }
 
 /**
- * Configure passport to use a custom local strategy
+ * Configure passport to use a custom local strategy by giving it custom functions to use
  *
  * Reference:
  *      Simple Passport Local Authentication w/ React & Node.js
@@ -192,8 +192,8 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
         to deal with that value, then the backend developer must then call the correct done function call. For example,
         if serializeUser had put a username in the done function, then the first argument of deserializeUser will contain the username.
 
-        ** This function is called everytime a request is made to the backend WHEN THE USER IS ALREADY LOGGED IN.
-        *** THIS FUNCTION IS RESPONSIBLE FOR PUTTING INFORMATION INTO req.user
+        ** This function is called every time a request is made to the backend WHEN THE USER IS ALREADY LOGGED IN.
+        *** THIS FUNCTION IS RESPONSIBLE FOR GIVING INFORMATION TO THE CALLBACK. THE CALLBACK SHOULD THEN ADD THAT INFORMATION TO req.user
 
         Can access user stuff from the req via:
             req.user
@@ -217,15 +217,22 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
             // What ever data is sent to the second parameter of this function will be stored in req.user
             doneCallBack(
                 error, // error
-                userAndUserInformation, // req.user
-                {message: `${userAndUserInformation.username} was successfully logged in`}, // info
+                /*
+                The below is the stuff that will be stored in req.user.
+                The adding of the below stuff to req.user should happen through a successful req.logIn call (req.logIn is added by passport.js automatically).
+                The function req.logIn should technically be called within the body of this callback.
+                The below stuff may also lead to problematic/inconsistent attribute/property/value attaining if it does not use a good naming convention
+                For example, USER_NAME, USERNAME, userName, etc... may not conform to this project's coding style.
+                 */
+                userAndUserInformation,
+                { message: `${userAndUserInformation.username} was successfully logged in` }, // Additional info to be sent
             );
         } else {
             // If getting userAndUserInformation is unsuccessful, then req.user will be null
             doneCallBack(
                 error, // error
-                null, // req.user
-                {message: 'Error happened in passport.deserializeUser'}, // info
+                null, // Stuff that will be stored in req.user. Since it's null, the callback should handle it appropriately
+                { message: 'Error happened in passport.deserializeUser' }, // Additional info to be sent
             );
         }
     });

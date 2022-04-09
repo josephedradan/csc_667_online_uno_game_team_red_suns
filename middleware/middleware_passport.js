@@ -60,7 +60,7 @@ function callbackCustomWrapper(req, res, next) {
     Use this if you are not using passport.authenticate('local')
 
     Notes:
-        This is the done_callback given to getUserToAuthenticate inside of passport_config
+        This is the doneCallBack given to deserializeUser inside of handler_passport
 
         * The actual logging in is done by req.logIn call
 
@@ -85,19 +85,19 @@ function callbackCustomWrapper(req, res, next) {
                     https://stackoverflow.com/a/35455255/9133458
 
     */
-    function callbackCustom(err, user, info) {
+    function callbackCustom(err, attributesAddedToReqUser, info) {
         // Standard error checking (error happened from 0
         if (err) {
             return next(err);
         }
 
         /*
-        If user was not found by the passport strategy
+        If attributesAddedToReqUser was not found by the passport strategy
 
         Notes:
             It's a very bad idea to tell the user what they failed on when they login, it is a security risk
          */
-        if (!user) {
+        if (!attributesAddedToReqUser) {
 
             // FIXME: REPLACE THIS REST API VERSION WITH THE NORMAL WAY
             // Unsuccessful login response
@@ -105,16 +105,28 @@ function callbackCustomWrapper(req, res, next) {
                 .json({
                     status: 'failed',
                     message: 'Password/Username is invalid', // If you care about security
-                    // message: info.message, // If you don't care about security
+                    // message: info.message, // If you don't care about security use this instead of the above
                 });
-        } else { // If user was found by the passport strategy
+        } else { // If attributesAddedToReqUser was found by the passport strategy
             /*
             Login
                 Notes:
-                    This is the actual login, this will put the user in the session (express-session).
+                    This is the actual login, this will put the attributesAddedToReqUser in the session (express-session).
                     This function comes from the passport package
+
+                Reference:
+                    Log In
+                        Notes:
+                            "When the login operation completes, user (attributesAddedToReqUser) will be assigned to req.user"
+
+                            Note: passport.authenticate() middleware invokes req.login() automatically.
+                            This function is primarily used when users sign up, during which req.login()
+                            can be invoked to automatically log in the newly registered user.
+
+                        Reference:
+                            https://www.passportjs.org/concepts/authentication/login/
             */
-            req.logIn(user, async (errorPassportLogin) => {
+            req.logIn(attributesAddedToReqUser, async (errorPassportLogin) => {
                 if (errorPassportLogin) {
                     next(errorPassportLogin);
                 } else {
