@@ -30,7 +30,10 @@ Reference:
             https://www.youtube.com/watch?v=jtVk2iUytGE
 
  */
-const engineAccount = {}
+
+// FIXME: SHOULD WE PROPAGATE ERROR OR NO?
+
+const dbEngine = {}
 
 const sequelize = require("../models")
 
@@ -56,7 +59,7 @@ async function getAccountAndAccountStatisticsByUsername(username) {
 
 }
 
-engineAccount.getAccountAndAccountStatisticsByUsername = getAccountAndAccountStatisticsByUsername
+dbEngine.getAccountAndAccountStatisticsByUsername = getAccountAndAccountStatisticsByUsername
 
 // TODO: REMOVE THIS COMMENT IF THE FUNCTION BELOW HAS BEEN TESTED AND WORKS
 async function getAccountByUsername(username){
@@ -77,6 +80,6 @@ async function getAccountByUsername(username){
         return null
     }
 }
-engineAccount.getAccountByUsername = getAccountByUsername
+dbEngine.getAccountByUsername = getAccountByUsername
 
-module.exports = engineAccount
+module.exports = dbEngine

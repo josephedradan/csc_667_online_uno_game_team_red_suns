@@ -1,5 +1,6 @@
 /*
-This file creates models
+This file creates the sequelize object based on db specified in config/config.js
+This file also adds the models from where this file is located into the databaseSequelize object
 
 Notes:
     This file is auto generated via the below command.
@@ -53,7 +54,7 @@ if (currentEnvConfig.use_env_variable) {
         currentEnvConfig);
 }
 
-// Register models in the same dir as this file
+// Register models in the same dir as this file and add them to databaseSequelize
 fs.readdirSync(__dirname)
     .filter(file => {
         return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
