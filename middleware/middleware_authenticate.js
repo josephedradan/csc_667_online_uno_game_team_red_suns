@@ -1,6 +1,15 @@
 /*
-This file contains middleware that is related to middlewarePassport. Basically, this middleware is responsible for allowing
-and denying access to other middleware.
+This file contains middleware that can check if a user is authenticated or can authenticate the user.
+Basically, this middleware is responsible for allowing and denying access to other middleware and login the user.
+
+Notes:
+    Middleware:
+        checkAuthenticated
+            Check if the user is authenticated (logged in)
+        checkUnauthenticated
+            Check if the user is not authenticated (not logged in)
+        authenticate
+            Login the user and store their information in their session
 
 Reference:
     Node.js Passport Login System Tutorial
@@ -56,13 +65,13 @@ middlewarePassport.checkUnauthenticated = async (req, res, next) => {
 
 function callbackCustomWrapper(req, res, next) {
     /*
-    Custom passport callback.
+    function to return a custom passport callback.
     Use this if you are not using passport.authenticate('local')
 
     Notes:
         This is the doneCallBack given to deserializeUser inside of handler_passport
 
-        * The actual logging in is done by req.logIn call
+        * The actual logging in is done by the req.logIn call
 
     Reference:
             Passport authentication with JWT: How can I change passport's default unauthorized response to my custom response?
@@ -92,14 +101,15 @@ function callbackCustomWrapper(req, res, next) {
         }
 
         /*
-        If attributesAddedToReqUser was not found by the passport strategy
+        If attributesAddedToReqUser was not given by the passport strategy.
+        The strategy should have returned information that should be added req.user
 
         Notes:
             It's a very bad idea to tell the user what they failed on when they login, it is a security risk
          */
         if (!attributesAddedToReqUser) {
 
-            // FIXME: REPLACE THIS REST API VERSION WITH THE NORMAL WAY
+            // FIXME: REPLACE THIS REST API VERSION WITH THE NORMAL WAY OR MAKE THIS FUNCTION CALL next()
             // Unsuccessful login response
             res.status(403)
                 .json({
@@ -107,21 +117,27 @@ function callbackCustomWrapper(req, res, next) {
                     message: 'Password/Username is invalid', // If you care about security
                     // message: info.message, // If you don't care about security use this instead of the above
                 });
-        } else { // If attributesAddedToReqUser was found by the passport strategy
+        } else {
             /*
+            If null was given by the passport strategy.
+
             Login
                 Notes:
-                    This is the actual login, this will put the attributesAddedToReqUser in the session (express-session).
-                    This function comes from the passport package
+                    This is the actual login, this will put the attributesAddedToReqUser in req.user and put req.user in
+                    the session (express-session).
+                    The req.login function comes from the passport package.
 
                 Reference:
                     Log In
                         Notes:
-                            "When the login operation completes, user (attributesAddedToReqUser) will be assigned to req.user"
+                            "Passport exposes a login() function on req (also aliased as logIn()) that can be used to
+                            establish a login session."
 
-                            Note: passport.authenticate() middleware invokes req.login() automatically.
+                            "When the login operation completes, user (attributesAddedToReqUser) will be assigned to req.user."
+
+                            "Note: passport.authenticate() middleware invokes req.login() automatically.
                             This function is primarily used when users sign up, during which req.login()
-                            can be invoked to automatically log in the newly registered user.
+                            can be invoked to automatically log in the newly registered user."
 
                         Reference:
                             https://www.passportjs.org/concepts/authentication/login/
@@ -131,7 +147,7 @@ function callbackCustomWrapper(req, res, next) {
                     next(errorPassportLogin);
                 } else {
 
-                    // FIXME: REPLACE THIS REST API VERSION WITH THE NORMAL WAY
+                    // FIXME: REPLACE THIS REST API VERSION WITH THE NORMAL WAY OR MAKE THIS FUNCTION CALL next()
                     // Successful login response
                     res.status(200)
                         .json({

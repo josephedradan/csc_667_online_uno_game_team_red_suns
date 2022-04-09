@@ -72,7 +72,7 @@ const handlerPassport = {};
  *      username and password are taken from the request body (req.body.username, req.body.password).
  *      It knows to use "username" and "password" based on the naming given from REQ_BODY_FIELD_NAMES that you setup.
  *
- *      This function is custom made and specifically made for the local strategy given to the passport package
+ *      This function is custom-made and specifically made for the local strategy given to the passport package
  *
  * @param username
  * @param password
@@ -154,7 +154,8 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
         "Passport uses serializeUser function to persist user data (after successful authentication) into session."
 
         * Basically, determine what data of the user object should be stored in the session from user.
-        Once a piece of data has been selected and passed to the done function, it will then be passed into req.session.passport.user (Note that req.session.passport.user is a key value pair).
+        Once a piece of data has been selected and passed to the doneCallBack function,
+        it will then be passed into req.session.passport.user (Note that req.session.passport.user is a key value pair).
         The data that was passed into the cookie will then be USED by passport.deserializeUser automatically once the user makes
         another request to the backend.
 
@@ -168,7 +169,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
             Reference:
                 https://stackoverflow.com/questions/27637609/understanding-passport-serialize-deserialize
      */
-    passport.serializeUser((user, done) => {
+    passport.serializeUser((user, doneCallBack) => {
         if (process.env.NODE_ENV === 'development') {
             debugPrinter.printDebug('initializePassport serializeUser');
         }
@@ -176,15 +177,15 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
         Put the key (user.username) inside the passport of the session.
         It can be accessed via req.session.passport.user
          */
-        done(null, user.username);
+        doneCallBack(null, user.username);
     });
 
     /*
-    Validate the cookie's key from the client AND ADD PROPERTIES TO THE REQ
+    Validate the cookie's key from the client AND ADD ATTRIBUTES/PROPERTIES TO THE REQ which should be in req.user
 
     Notes:
         "The first argument of deserializeUser corresponds to the key of the user object that was given to the done
-        function"
+        function (doneCallBack)"
 
         "Function deserializeUser is used to retrieve user data from session."
 
@@ -209,26 +210,26 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
             debugPrinter.printDebug(`initializePassport deserializeUser ${username}`);
         }
 
-        // Get the userAndUserInformation via username
-        const [error, userAndUserInformation] = await to(Account.getAccountAndAccountStatistics(username));
+        // Get the accountAndAccountStatistics via username
+        const [error, accountAndAccountStatistics] = await to(Account.getAccountAndAccountStatisticsByUsername(username));
 
-        // If userAndUserInformation exists
-        if (userAndUserInformation !== null) {
+        // If accountAndAccountStatistics exists
+        if (accountAndAccountStatistics !== null) {
             // What ever data is sent to the second parameter of this function will be stored in req.user
             doneCallBack(
                 error, // error
                 /*
-                The below is the stuff that will be stored in req.user.
-                The adding of the below stuff to req.user should happen through a successful req.logIn call (req.logIn is added by passport.js automatically).
+                accountAndAccountStatistics is the stuff that will be stored in req.user.
+                The adding of accountAndAccountStatistics to req.user should happen through a successful req.logIn call (req.logIn is added by passport.js automatically).
                 The function req.logIn should technically be called within the body of this callback.
-                The below stuff may also lead to problematic/inconsistent attribute/property/value attaining if it does not use a good naming convention
-                For example, USER_NAME, USERNAME, userName, etc... may not conform to this project's coding style.
+                accountAndAccountStatistics may also lead to problematic/inconsistent attribute/property/value attaining if it does not use a good naming convention.
+                For example, attributes/properties with naming conventions such as USER_NAME, USERNAME, userName, etc... may not conform to this project's coding style.
                  */
-                userAndUserInformation,
-                { message: `${userAndUserInformation.username} was successfully logged in` }, // Additional info to be sent
+                accountAndAccountStatistics,
+                { message: `${accountAndAccountStatistics.username} was successfully logged in` }, // Additional info to be sent
             );
         } else {
-            // If getting userAndUserInformation is unsuccessful, then req.user will be null
+            // If getting accountAndAccountStatistics is unsuccessful, then req.user will be null or undefined
             doneCallBack(
                 error, // error
                 null, // Stuff that will be stored in req.user. Since it's null, the callback should handle it appropriately
