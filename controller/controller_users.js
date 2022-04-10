@@ -1,8 +1,5 @@
-const db = require("../db");
-const bcrypt = require("bcrypt"); 
-
 controllerUsers = {}
-
+const Account = require("../controller/db_engine"); 
 function sendUsers(req, res, next) {
     res.send("respond with a resource");
 }
@@ -21,42 +18,12 @@ function registerUser(req, res, next) {
         //TODO: add frontend alert messages to the client. 
         console.log("Improper username, follow 'https://stackoverflow.com/questions/46453307/the-ideal-username-and-password-regex-validation'"); 
         res.render("registration"); 
-    } else if(password.match(regExpPassword) === null && password!== confirm_password) {
+    } else if(password.match(regExpPassword) === null && password !== confirm_password) {
         //TODO: add frontend alert messages to the client. 
         console.log("Improper password, follow 'https://stackoverflow.com/questions/46453307/the-ideal-username-and-password-regex-validation'");
         res.render("registration");
     } else {
-
-
-        function insertUser(username, password) {
-            //TODO: insert user into the database. 
-
-            bcrypt.genSalt(10, (err, salt) => {
-                bcrypt.hash(password, salt, async (err, hash) => {
-                    if(err) {
-                        console.log("err in hashing"); 
-                        return; 
-                    }
-                    // Store hash in your password DB.
-                    console.log(username + ":" + hash + ":" + password);
-                    await db.any(
-                        `
-                        INSERT INTO public."Account"(
-                            username, password)
-                        VALUES ('${username}', '${hash}');
-                
-                        INSERT INTO public."Account Statistics"(
-                            "num_Wins", "num_Loss")
-                        VALUES (0, 0);
-                        `
-                    )
-
-
-                });
-            })
-        }
-        
-        insertUser(username, password); 
+        Account.insertAccount(username, password); 
         res.render("index"); 
 
     }

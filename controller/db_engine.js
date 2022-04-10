@@ -35,7 +35,10 @@ Reference:
 
 const dbEngine = {}
 
-const sequelize = require("../models")
+//const { mergeDefaults } = require("sequelize/types/utils");
+const sequelize = require("../models");
+const db = require("../db"); 
+const passwordHandler = require("./handler_password"); 
 
 // TODO: REMOVE THIS COMMENT IF THE FUNCTION BELOW HAS BEEN TESTED AND WORKS
 async function getAccountAndAccountStatisticsByUsername(username) {
@@ -81,5 +84,22 @@ async function getAccountByUsername(username){
     }
 }
 dbEngine.getAccountByUsername = getAccountByUsername
+
+
+async function insertAccount(username, password) {
+    const hashedPassword = passwordHandler.hash(password)
+    await db.any(
+        `
+        INSERT INTO public."Account"(
+            username, password)
+        VALUES ('${username}', '${hashedPassword}');
+
+        INSERT INTO public."Account Statistics"(
+            "num_wins", "num_loss")
+        VALUES (0, 0);
+        `
+    )
+}
+dbEngine.insertAccount = insertAccount; 
 
 module.exports = dbEngine
