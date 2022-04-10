@@ -1,4 +1,6 @@
 const db = require("../db/index");
+const dbEngine = require("./db_engine");
+const passwordHandler = require("./handler_password");
 
 
 async function logOut(req, res, next) {
@@ -15,10 +17,11 @@ async function logOut(req, res, next) {
     res
         .status(200)
         .clearCookie('connect.sid')
-        .json({
-            status: 'success',
-            message: `${username} has logged out`,
-        });
+        // .json({
+        //     status: 'success',
+        //     message: `${username} has logged out`,
+        // })
+        .render("index");
 }
 
 /* ############################################################################################################## */
@@ -29,14 +32,48 @@ controllerIndex.renderIndex = (req, res, next) => {
     res.render("index", {title: "CSC 667 Express"})
 }
 
+controllerIndex.renderRegistration = async (req, res, next) => {
 
-controllerIndex.renderRegistration = (req, res, next) => {
-    res.render("registration", {title: "Registration Page"});
+    console.log("-------In controller_index.registerUser()-------");
+    console.log("req:");
+    console.log(req.body);
+
+    const {
+        username,
+        password,
+        confirm_password
+    } = req.body;
+
+    // TODO: VALIDATION IS ALREADY HANDLED BY MIDDLEWARE
+    // //backend validation;
+    // const regExpUsername = /^(?![_ -])(?:(?![_ -]{2})[\w -]){5,16}(?<![_ -])$/;
+    // const regExpPassword = /^(?:(?=.*?\p{N})(?=.*?[\p{S}\p{P} ])(?=.*?\p{Lu})(?=.*?\p{Ll}))[^\p{C}]{8,16}$/;
+    //
+    // if(username.match(regExpUsername) === null) {
+    //     //TODO: add frontend alert messages to the client.
+    //     console.log("Improper username, follow 'https://stackoverflow.com/questions/46453307/the-ideal-username-and-password-regex-validation'");
+    //     res.render("registration", {title: "Registration Page"});
+    // } else if(password.match(regExpPassword) === null && password !== confirm_password) {
+    //     //TODO: add frontend alert messages to the client.
+    //     console.log("Improper password, follow 'https://stackoverflow.com/questions/46453307/the-ideal-username-and-password-regex-validation'");
+    //     res.render("registration", {title: "Registration Page"});
+    // } else {
+    //     Account.insertAccount(username, password);
+    //     res.render("index");
+    // }
+
+    const hashedPassword = await passwordHandler.hash(password)
+
+    await dbEngine.insertAccount(username, hashedPassword);
+
+    res.render("index");
+
+
 }
 
 
 // FIXME: REMOVE ME ONCE DONE OR MOVE ME
-controllerIndex.testDB = async (request, response, next) => {
+controllerIndex.testDB = async (req, res, next) => {
     const baseSQL = `SELECT * FROM USERS;`;
 
     let rows = await db.any(baseSQL);
@@ -45,7 +82,7 @@ controllerIndex.testDB = async (request, response, next) => {
     }
     // add further logic here.
     // console.log(rows);
-    response.json(rows);
+    res.json(rows);
 }
 
 /**
@@ -59,15 +96,7 @@ controllerIndex.testDB = async (request, response, next) => {
  * @returns {Promise<void>}
  */
 controllerIndex.login = async (req, res, next) => {
-    /*
-    The functionality of this function has been moved to middleware_passport.js to allow for
-    different strategies for logging in to be supported.
-    This function now has no purpose and will never be called as middleware_passport.js will call res
-    meaning any next() to this function is not possible.
-    Therefore, anything in this function should not work.
-     */
-
-    console.log('NO ONE WILL SEE THIS MESSAGE.');
+    res.render("index");
 };
 
 /**

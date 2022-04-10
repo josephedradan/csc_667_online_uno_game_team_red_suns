@@ -5,7 +5,7 @@ const routerUsers = express.Router();
 
 /* GET users listing. */
 // routerUsers.get("/", controllerUsers.getUsers); // FIXME: website.com/users/ ?????
-// routerUsers.post("/registration", controllerUsers.registerUser); // FIXME: website.com/users/registration ?????
+// routerUsers.post("/registration", controllerUsers.registerUser); // FIXME: Why website.com/users/registration ?????
 
 // FIXME: website.com/users/users/bob
 // FIXME: website.com/users/users/joe

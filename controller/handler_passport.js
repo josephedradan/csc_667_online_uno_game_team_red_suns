@@ -53,7 +53,7 @@ const to = require('await-to-js').default;
 
 const LocalStrategy = require('passport-local').Strategy;
 
-const Account = require('./db_engine_sequelize');
+const dbEngine = require('./db_engine');
 const debugPrinter = require('../util/debug_printer');
 const handlerPassword = require('./handler_password');
 
@@ -80,8 +80,10 @@ const handlerPassport = {};
  * @returns {Promise<*>}
  */
 async function authenticateUser(username, password, doneCallback) {
-    const data = await Account.getAccountByUsername(username);
-    const user = data[0]; 
+    const data = await dbEngine.getAccountByUsername(username);
+
+    const user = data[0];
+
     console.log("in authenticateUsers")
     console.log(user);
 
@@ -102,7 +104,7 @@ async function authenticateUser(username, password, doneCallback) {
 
     try {
         // If password is valid by comparing password from the req to the password in the db
-        console.log("form information; " + username + " : " + password); 
+        console.log("form information; " + username + " : " + password);
         if (await handlerPassword.compare(password, await user.password)) { // TODO, FIXME: CHANGE .password TO MATCH THE DB equivalent if there is an error
             // This doneCallback will attach the user object to req
             return doneCallback(
@@ -214,7 +216,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
         }
 
         // Get the accountAndAccountStatistics via username
-        const [error, accountAndAccountStatistics] = await to(Account.getAccountAndAccountStatisticsByUsername(username));
+        const [error, accountAndAccountStatistics] = await to(dbEngine.getAccountAndAccountStatisticsByUsername(username));
 
         // If accountAndAccountStatistics exists
         if (accountAndAccountStatistics !== null) {

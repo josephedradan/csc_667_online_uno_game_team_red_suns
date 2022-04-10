@@ -32,13 +32,14 @@ Reference:
  */
 
 // FIXME: SHOULD WE PROPAGATE ERROR OR NO?
+// FIXME: INCONSISTENCY IN NAMING AND IN DB RAW QUERY WRITER
 
 const dbEngine = {}
 
 //const { mergeDefaults } = require("sequelize/types/utils");
 const sequelize = require("../models");
-const db = require("../db"); 
-const passwordHandler = require("./handler_password"); 
+const db = require("../db");
+const passwordHandler = require("./handler_password");
 
 // TODO: REMOVE THIS COMMENT IF THE FUNCTION BELOW HAS BEEN TESTED AND WORKS
 dbEngine.getAccountAndAccountStatisticsByUsername = async (username) => {
@@ -64,12 +65,8 @@ dbEngine.getAccountAndAccountStatisticsByUsername = async (username) => {
 
 
 async function getAccountByUsername(username){
-<<<<<<< HEAD:controller/db_engine_sequelize.js
-=======
-    //throw "DON'T BOTHER CALLING THIS FUNCTION UNLESS THE DB NAMING IS GOOD AND THAT YOU FIXED THIS QUERY CORRESPONDINGLY"
->>>>>>> bed1657ad70faefc0ee9298e24d27d0dca018b52:controller/db_engine.js
     try {
-        
+
         console.log("in Account.getAccountByUsername")
         return await db.any(
             `SELECT account.username, account.password, account.account_id 
@@ -79,7 +76,7 @@ async function getAccountByUsername(username){
         const [results, metadata] = await sequelize.query(
             `
             SELECT *
-            FROM Account 
+            FROM Account
             WHERE Username = _username
             `,
             {
@@ -93,10 +90,9 @@ async function getAccountByUsername(username){
         return null
     }
 }
+dbEngine.getAccountByUsername = getAccountByUsername;
 
-
-async function insertAccount(username, password) {
-    const hashedPassword = await passwordHandler.hash(password)
+async function insertAccount(username, password) { // FIXME UNSAFE AND NOT EXPLICIT IF FUNCTION WAS SUCCESSFUL
     await db.any(
         `
         INSERT INTO public."Account"(
@@ -109,23 +105,6 @@ async function insertAccount(username, password) {
         `
     )
 }
-dbEngine.insertAccount = insertAccount; 
-
-
-async function insertAccount(username, password) {
-    const hashedPassword = await passwordHandler.hash(password)
-    await db.any(
-        `
-        INSERT INTO public."Account"(
-            username, password)
-        VALUES ('${username}', '${hashedPassword}');
-
-        INSERT INTO public."Account Statistics"(
-            "num_wins", "num_loss")
-        VALUES (0, 0);
-        `
-    )
-}
-dbEngine.insertAccount = insertAccount; 
+dbEngine.insertAccount = insertAccount;
 
 module.exports = dbEngine

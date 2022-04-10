@@ -65,7 +65,7 @@ joiSchemas.SCHEMA_ACCOUNT_REGISTRATION = Joi.object()
             }),
 
         // Reference to the key 'password'
-        password_confirmation: Joi.string()
+        confirm_password: Joi.string()
             .required()
             .valid(Joi.ref('password'))
             .messages({
@@ -101,16 +101,16 @@ joiSchemas.SCHEMA_ACCOUNT_REGISTRATION = Joi.object()
         //     }),
 
         // Email
-        email: Joi.string()
-            .regex(emailRegex)
-            .required()
-            .messages({
-                'string.pattern.base': 'email does not follow format',
-                // 'string.empty': 'email must not be empty',
-            }),
+        // email: Joi.string()
+        //     .regex(emailRegex)
+        //     .required()
+        //     .messages({
+        //         'string.pattern.base': 'email does not follow format',
+        //         // 'string.empty': 'email must not be empty',
+        //     }),
 
     })
-    .with('password', 'password_confirmation');
+    .with('password', 'confirm_password');
 
 joiSchemas.SCHEMA_ACCOUNT_LOGIN = Joi.object()
     .keys({

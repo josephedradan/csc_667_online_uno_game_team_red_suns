@@ -37,10 +37,13 @@ middlewarePassport.checkAuthenticated = async (req, res, next) => {
 
         next();
     } else {
-        res.json({
-            status: 'failed',
-            message: 'User must be logged in to use this feature',
-        });
+
+        res.render("index");
+
+        // res.json({
+        //     status: 'failed',
+        //     message: 'User must be logged in to use this feature',
+        // });
     }
 };
 
@@ -56,10 +59,13 @@ middlewarePassport.checkUnauthenticated = async (req, res, next) => {
     if (req.isUnauthenticated()) {
         next();
     } else {
-        res.json({
-            status: 'failed',
-            message: `${req.user.username} you are logged in, you must not be logged in to use this feature`,
-        });
+
+        res.render("index");
+
+        // res.json({
+        //     status: 'failed',
+        //     message: `${req.user.username} you are logged in, you must not be logged in to use this feature`,
+        // });
     }
 };
 
@@ -111,12 +117,13 @@ function callbackCustomWrapper(req, res, next) {
 
             // FIXME: REPLACE THIS REST API VERSION WITH THE NORMAL WAY OR MAKE THIS FUNCTION CALL next()
             // Unsuccessful login response
-            res.status(403)
-                .json({
-                    status: 'failed',
-                    message: 'Password/Username is invalid', // If you care about security
-                    // message: info.message, // If you don't care about security use this instead of the above
-                });
+            // res.status(403)
+            //     .json({
+            //         status: 'failed',
+            //         message: 'Password/Username is invalid', // If you care about security
+            //         // message: info.message, // If you don't care about security use this instead of the above
+            //     });
+
 
         } else {
             /*
@@ -150,13 +157,15 @@ function callbackCustomWrapper(req, res, next) {
 
                     // FIXME: REPLACE THIS REST API VERSION WITH THE NORMAL WAY OR MAKE THIS FUNCTION CALL next()
                     // Successful login response
-                    res.status(200)
-                        .json({
-                            status: 'success',
-                            message: 'You have successful login!',
-                            user_id: req.user.user_id,
-                            username: req.user.username,
-                        });
+                    // res.status(200)
+                    //     .json({
+                    //         status: 'success',
+                    //         message: 'You have successful login!',
+                    //         user_id: req.user.user_id,
+                    //         username: req.user.username,
+                    //     });
+
+                    next()
                 }
             });
         }
@@ -176,8 +185,9 @@ function callbackCustomWrapper(req, res, next) {
 function authenticate(strategy) {
     function middlewarePassportAuthenticatePseudo(req, res, next) {
         // This is the actual passport.authenticate
-        console.log("in middlewareauth.authenticate"); 
-        console.log(req.body); 
+        console.log("in middlewareauth.authenticate");
+        console.log(req.body);
+
         const middlewarePassportAuthenticate = passport.authenticate(
             strategy,
             callbackCustomWrapper(req, res, next), // This function should respond to the user if they have successfully logged in or not
