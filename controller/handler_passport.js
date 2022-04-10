@@ -82,7 +82,7 @@ const handlerPassport = {};
 async function authenticateUser(username, password, doneCallback) {
     const user = await Account.getAccountByUsername(username);
     console.log("in authenticateUsers")
-    console.log(user); 
+    console.log(user);
 
     // Invalid username
     if (user === null) {
@@ -102,8 +102,7 @@ async function authenticateUser(username, password, doneCallback) {
     try {
         // If password is valid by comparing password from the req to the password in the db
         console.log("form information; " + username + " : " + password); 
-        if (await handlerPassword.compare(password, user.password)) { // TODO, FIXME: CHANGE .password TO MATCH THE DB equivalent if there is an error
-            throw 'REMOVE THIS THROW IF THE DB NAMING IS CORRECT AND YOU HAVE CORRECTED user.password IF NECESSARY'
+        if (await handlerPassword.compare(password, await user[0].password)) { // TODO, FIXME: CHANGE .password TO MATCH THE DB equivalent if there is an error
             // This doneCallback will attach the user object to req
             return doneCallback(
                 null, // error (This must be null to allow the 3rd argument (info) to pass)
