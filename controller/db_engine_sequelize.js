@@ -64,6 +64,10 @@ dbEngine.getAccountAndAccountStatisticsByUsername = async (username) => {
 
 
 async function getAccountByUsername(username){
+<<<<<<< HEAD:controller/db_engine_sequelize.js
+=======
+    //throw "DON'T BOTHER CALLING THIS FUNCTION UNLESS THE DB NAMING IS GOOD AND THAT YOU FIXED THIS QUERY CORRESPONDINGLY"
+>>>>>>> bed1657ad70faefc0ee9298e24d27d0dca018b52:controller/db_engine.js
     try {
         
         console.log("in Account.getAccountByUsername")
@@ -89,6 +93,23 @@ async function getAccountByUsername(username){
         return null
     }
 }
+
+
+async function insertAccount(username, password) {
+    const hashedPassword = await passwordHandler.hash(password)
+    await db.any(
+        `
+        INSERT INTO public."Account"(
+            username, password)
+        VALUES ('${username}', '${hashedPassword}');
+
+        INSERT INTO public."Account Statistics"(
+            "num_wins", "num_loss")
+        VALUES (0, 0);
+        `
+    )
+}
+dbEngine.insertAccount = insertAccount; 
 
 
 async function insertAccount(username, password) {
