@@ -25,6 +25,7 @@
         "express-session": "^1.17.2",
         "hbs": "^4.2.0",
         "http-errors": "~1.6.3",
+        "joi": "^17.6.0",
         "moment": "^2.29.2",
         "morgan": "~1.9.1",
         "nodemon": "^2.0.15",
