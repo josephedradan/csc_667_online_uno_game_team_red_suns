@@ -66,8 +66,15 @@ dbEngine.getAccountAndAccountStatisticsByUsername = getAccountAndAccountStatisti
 
 // TODO: REMOVE THIS COMMENT IF THE FUNCTION BELOW HAS BEEN TESTED AND WORKS
 async function getAccountByUsername(username){
-    throw "DON'T BOTHER CALLING THIS FUNCTION UNLESS THE DB NAMING IS GOOD AND THAT YOU FIXED THIS QUERY CORRESPONDINGLY"
+    //throw "DON'T BOTHER CALLING THIS FUNCTION UNLESS THE DB NAMING IS GOOD AND THAT YOU FIXED THIS QUERY CORRESPONDINGLY"
     try {
+        
+        console.log("in Account.getAccountByUsername")
+        return await db.any(
+            `SELECT account.username, account.password, account.account_id 
+            FROM public."Account" account WHERE account.username = '${username}';`
+        )
+        /*
         const [results, metadata] = await sequelize.query(
             `
             SELECT *
@@ -79,7 +86,9 @@ async function getAccountByUsername(username){
             }
         );
         return results
+        */
     } catch (error) {
+        console.log(error)
         return null
     }
 }
@@ -87,7 +96,7 @@ dbEngine.getAccountByUsername = getAccountByUsername
 
 
 async function insertAccount(username, password) {
-    const hashedPassword = passwordHandler.hash(password)
+    const hashedPassword = await passwordHandler.hash(password)
     await db.any(
         `
         INSERT INTO public."Account"(

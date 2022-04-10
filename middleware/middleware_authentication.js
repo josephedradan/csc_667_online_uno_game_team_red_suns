@@ -175,6 +175,8 @@ function callbackCustomWrapper(req, res, next) {
 function authenticate(strategy) {
     function middlewarePassportAuthenticatePseudo(req, res, next) {
         // This is the actual passport.authenticate
+        console.log("in middlewareauth.authenticate"); 
+        console.log(req.body); 
         const middlewarePassportAuthenticate = passport.authenticate(
             strategy,
             callbackCustomWrapper(req, res, next), // This function should respond to the user if they have successfully logged in or not
