@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const db = require("../db");
 const bcrypt = require("bcrypt");
 
@@ -5,6 +6,11 @@ controllerUsers = {}
 
 // FIXME INCONSISTENT NAMING FOR DB TABLE Account AND FUNCTION NAME User
 controllerUsers.getUsers = (req, res, next) => {
+=======
+controllerUsers = {}
+const Account = require("../controller/db_engine"); 
+function sendUsers(req, res, next) {
+>>>>>>> bed1657ad70faefc0ee9298e24d27d0dca018b52
     res.send("respond with a resource");
 }
 
@@ -22,6 +28,7 @@ controllerUsers.registerUser = (req, res, next) => {
     const regExpUsername = /^(?![_ -])(?:(?![_ -]{2})[\w -]){5,16}(?<![_ -])$/;
     const regExpPassword = /^(?:(?=.*?\p{N})(?=.*?[\p{S}\p{P} ])(?=.*?\p{Lu})(?=.*?\p{Ll}))[^\p{C}]{8,16}$/;
 
+<<<<<<< HEAD
     if (username.match(regExpUsername) === null) {
         //TODO: add frontend alert messages to the client.
         console.log("Improper username, follow 'https://stackoverflow.com/questions/46453307/the-ideal-username-and-password-regex-validation'");
@@ -63,6 +70,19 @@ controllerUsers.registerUser = (req, res, next) => {
 
         insertUser(username, password);
         res.render("index");
+=======
+    if(username.match(regExpUsername) === null) {
+        //TODO: add frontend alert messages to the client. 
+        console.log("Improper username, follow 'https://stackoverflow.com/questions/46453307/the-ideal-username-and-password-regex-validation'"); 
+        res.render("registration"); 
+    } else if(password.match(regExpPassword) === null && password !== confirm_password) {
+        //TODO: add frontend alert messages to the client. 
+        console.log("Improper password, follow 'https://stackoverflow.com/questions/46453307/the-ideal-username-and-password-regex-validation'");
+        res.render("registration");
+    } else {
+        Account.insertAccount(username, password); 
+        res.render("index"); 
+>>>>>>> bed1657ad70faefc0ee9298e24d27d0dca018b52
 
     }
 

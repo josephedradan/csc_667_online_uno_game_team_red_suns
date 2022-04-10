@@ -25,9 +25,18 @@ Notes:
 Reference:
     Models and Migrations
         Notes:
-            Model: The structure of a table in the DB
-            Migration: Modifies the structure of the DB by adding and removing tables
+            Model: Class representation of a DB column
+            Migration: A migration is the database table schema. You can modify the structure of the DB by adding and removing tables
 
+        Reference:
+            https://quick-adviser.com/what-is-the-difference-between-migration-and-model/
+            https://www.duringthedrive.com/2017/05/06/models-migrations-sequelize-node/
+
+    How to auto generate migrations with Sequelize CLI from Sequelize models?
+        Notes:
+            Migrations
+        Reference:
+            https://stackoverflow.com/questions/27835801/how-to-auto-generate-migrations-with-sequelize-cli-from-sequelize-models
  */
 const createError = require("http-errors");
 const express = require("express");
@@ -164,7 +173,7 @@ app.set("views", path.join(__dirname, "views"));
 
 app.use(logger("dev"));
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 

@@ -18,7 +18,7 @@ const handlerPassword = {};
 async function hash(password) {
     const salt = await bcrypt.genSalt(BCRYPT_SALT_ROUNDS);
 
-    return bcrypt.hash(password, salt);
+    return await bcrypt.hash(password, salt);
 }
 
 handlerPassword.hash = hash;
@@ -35,7 +35,8 @@ handlerPassword.hash = hash;
  * @returns {Promise<Boolean>}
  */
 async function compare(passwordHashed, passwordNormal) {
-    return bcrypt.compare(passwordHashed, passwordNormal);
+    console.log("inside compare; " + passwordHashed + " : " + passwordNormal); 
+    return await bcrypt.compare(passwordHashed, passwordNormal);
 }
 
 handlerPassword.compare = compare;

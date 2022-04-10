@@ -35,7 +35,10 @@ Reference:
 
 const dbEngine = {}
 
-const sequelize = require("../models")
+//const { mergeDefaults } = require("sequelize/types/utils");
+const sequelize = require("../models");
+const db = require("../db"); 
+const passwordHandler = require("./handler_password"); 
 
 // TODO: REMOVE THIS COMMENT IF THE FUNCTION BELOW HAS BEEN TESTED AND WORKS
 dbEngine.getAccountAndAccountStatisticsByUsername = async (username) => {
@@ -59,10 +62,16 @@ dbEngine.getAccountAndAccountStatisticsByUsername = async (username) => {
 
 }
 
-// TODO: REMOVE THIS COMMENT IF THE FUNCTION BELOW HAS BEEN TESTED AND WORKS
-dbEngine.getAccountByUsername = async (username) => {
-    throw "DON'T BOTHER CALLING THIS FUNCTION UNLESS THE DB NAMING IS GOOD AND THAT YOU FIXED THIS QUERY CORRESPONDINGLY"
+
+async function getAccountByUsername(username){
     try {
+        
+        console.log("in Account.getAccountByUsername")
+        return await db.any(
+            `SELECT account.username, account.password, account.account_id 
+            FROM public."Account" account WHERE account.username = '${username}';`
+        )
+        /*
         const [results, metadata] = await sequelize.query(
             `
             SELECT *
@@ -74,9 +83,28 @@ dbEngine.getAccountByUsername = async (username) => {
             }
         );
         return results
+        */
     } catch (error) {
+        console.log(error)
         return null
     }
 }
+
+
+async function insertAccount(username, password) {
+    const hashedPassword = await passwordHandler.hash(password)
+    await db.any(
+        `
+        INSERT INTO public."Account"(
+            username, password)
+        VALUES ('${username}', '${hashedPassword}');
+
+        INSERT INTO public."Account Statistics"(
+            "num_wins", "num_loss")
+        VALUES (0, 0);
+        `
+    )
+}
+dbEngine.insertAccount = insertAccount; 
 
 module.exports = dbEngine

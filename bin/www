@@ -1,5 +1,16 @@
 #!/usr/bin/env node
 
+/*
+
+Reference:
+    Express.js - app.listen vs server.listen
+        Notes:
+            server.listen gives you more control and use can use https because app.listen returns http.
+
+        Reference:
+            https://stackoverflow.com/questions/17696801/express-js-app-listen-vs-server-listen
+ */
+
 /**
  * Module dependencies.
  */
@@ -25,17 +36,17 @@ const server = http.createServer(app);
  */
 
 server.listen(PORT, (err) => {
-  // TODO: CLEAN UP AND FIX FOR PRODUCTION
-  if (err) {
-    if (process.env.NODE_ENV === 'development') {
-      console.log("On Development mode...")
+    // TODO: CLEAN UP AND FIX FOR PRODUCTION
+    if (err) {
+        if (process.env.NODE_ENV === 'development') {
+            console.log("On Development mode...")
+        }
+
+        console.log(err);
+        return;
     }
 
-    console.log(err);
-    return;
-  }
-
-  console.log(`Server listening on port: ${PORT}`);
+    console.log(`Server listening on port: ${PORT}`);
 });
 
 server.on('error', onError);
@@ -46,19 +57,19 @@ server.on('listening', onListening);
  */
 
 function normalizePort(val) {
-  const port = parseInt(val, 10);
+    const port = parseInt(val, 10);
 
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
 
-  if (port >= 0) {
-    // PORT number
-    return port;
-  }
+    if (port >= 0) {
+        // PORT number
+        return port;
+    }
 
-  return false;
+    return false;
 }
 
 /**
@@ -66,27 +77,27 @@ function normalizePort(val) {
  */
 
 function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
 
-  var bind = typeof PORT === 'string'
-    ? 'Pipe ' + PORT
-    : 'Port ' + PORT;
+    var bind = typeof PORT === 'string'
+        ? 'Pipe ' + PORT
+        : 'Port ' + PORT;
 
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    default:
-      throw error;
-  }
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            console.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
 }
 
 /**
@@ -94,9 +105,9 @@ function onError(error) {
  */
 
 function onListening() {
-  const address = server.address();
-  const bind = typeof address === 'string'
-    ? 'pipe ' + address
-    : 'PORT ' + address.port;
-  debug('Listening on ' + bind);
+    const address = server.address();
+    const bind = typeof address === 'string'
+        ? 'pipe ' + address
+        : 'PORT ' + address.port;
+    debug('Listening on ' + bind);
 }
