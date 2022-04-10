@@ -53,7 +53,7 @@ const to = require('await-to-js').default;
 
 const LocalStrategy = require('passport-local').Strategy;
 
-const dbEngine = require('./db_engine');
+const Account = require('./db_engine');
 const debugPrinter = require('../util/debug_printer');
 const handlerPassword = require('./handler_password');
 
@@ -80,10 +80,8 @@ const handlerPassport = {};
  * @returns {Promise<*>}
  */
 async function authenticateUser(username, password, doneCallback) {
-    const data = await dbEngine.getAccountByUsername(username);
-
-    const user = data[0];
-
+    const data = await Account.getAccountAndAccountStatisticsByUsername(username);
+    const user = data[0]; 
     console.log("in authenticateUsers")
     console.log(user);
 
@@ -104,7 +102,7 @@ async function authenticateUser(username, password, doneCallback) {
 
     try {
         // If password is valid by comparing password from the req to the password in the db
-        console.log("form information; " + username + " : " + password);
+        console.log("form information; " + username + " : " + password); 
         if (await handlerPassword.compare(password, await user.password)) { // TODO, FIXME: CHANGE .password TO MATCH THE DB equivalent if there is an error
             // This doneCallback will attach the user object to req
             return doneCallback(
@@ -210,16 +208,22 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
                 https://stackoverflow.com/questions/27637609/understanding-passport-serialize-deserialize
      */
     passport.deserializeUser(async (username, doneCallBack) => {
-        throw 'REMOVE THIS THROW IF THE DB NAMING IS CORRECT AND YOU HAVE CORRECTED user.username IF NECESSARY'
         if (process.env.NODE_ENV === 'development') {
             debugPrinter.printDebug(`initializePassport deserializeUser ${username}`);
         }
 
         // Get the accountAndAccountStatistics via username
-        const [error, accountAndAccountStatistics] = await to(dbEngine.getAccountAndAccountStatisticsByUsername(username));
+        let [error, accountAndAccountStatistics] = await to(Account.getAccountByUsername(username));
+        
+        accountAndAccountStatistics = accountAndAccountStatistics[0]
+
+        console.log(accountAndAccountStatistics)
+        debugPrinter.printDebug(`END`);
+
 
         // If accountAndAccountStatistics exists
         if (accountAndAccountStatistics !== null) {
+            debugPrinter.printBackendGreen(`GOOD`);
             // What ever data is sent to the second parameter of this function will be stored in req.user
             doneCallBack(
                 error, // error
@@ -234,6 +238,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
                 { message: `${accountAndAccountStatistics.username} was successfully logged in` }, // Additional info to be sent
             );
         } else {
+            debugPrinter.printBackendRed(`BAD`);
             // If getting accountAndAccountStatistics is unsuccessful, then req.user will be null or undefined
             doneCallBack(
                 error, // error

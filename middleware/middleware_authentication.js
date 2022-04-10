@@ -105,7 +105,8 @@ function callbackCustomWrapper(req, res, next) {
         if (err) {
             return next(err);
         }
-
+        debugPrinter.printBackendMagenta(attributesAddedToReqUser)
+        debugPrinter.printBackendGreen(info)
         /*
         If attributesAddedToReqUser was not given by the passport strategy.
         The strategy should have returned information that should be added req.user
@@ -117,12 +118,12 @@ function callbackCustomWrapper(req, res, next) {
 
             // FIXME: REPLACE THIS REST API VERSION WITH THE NORMAL WAY OR MAKE THIS FUNCTION CALL next()
             // Unsuccessful login response
-            // res.status(403)
-            //     .json({
-            //         status: 'failed',
-            //         message: 'Password/Username is invalid', // If you care about security
-            //         // message: info.message, // If you don't care about security use this instead of the above
-            //     });
+            res.status(403)
+                .json({
+                    status: 'failed',
+                    message: 'Password/Username is invalid', // If you care about security
+                    // message: info.message, // If you don't care about security use this instead of the above
+                });
 
 
         } else {
@@ -164,6 +165,7 @@ function callbackCustomWrapper(req, res, next) {
                     //         user_id: req.user.user_id,
                     //         username: req.user.username,
                     //     });
+                    
 
                     next()
                 }

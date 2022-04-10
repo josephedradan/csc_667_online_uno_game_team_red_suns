@@ -5,14 +5,19 @@ const db = require("../../db");
 const controllerIndex = require("../../controller/controller_index");
 const middlewareAuthentication = require("../../middleware/middleware_authentication");
 const middlewareValidation = require("../../middleware/middleware_validation");
+const { func } = require("joi");
 
 /* GET home page. */
 
 routerIndex.get("/", controllerIndex.renderIndex);
+routerIndex.get("/registration", (req, res, next) => {
+    res.render("registration"); 
+}); 
+
 
 routerIndex.post(
     "/login",
-    middlewareAuthentication.checkUnauthenticated, // Check if not logged in
+    // middlewareAuthentication.checkUnauthenticated, // Check if not logged in
     middlewareValidation.validateAccountLogin,
     middlewareAuthentication.authenticate('local'),
     controllerIndex.login,

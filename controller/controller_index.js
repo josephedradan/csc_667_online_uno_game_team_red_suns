@@ -2,6 +2,7 @@ const db = require("../db/index");
 const dbEngine = require("./db_engine");
 const passwordHandler = require("./handler_password");
 
+const debugPrinter = require('../util/debug_printer');
 
 async function logOut(req, res, next) {
     // Get username (It will not exist in the session once you logout)
@@ -34,7 +35,7 @@ controllerIndex.renderIndex = (req, res, next) => {
 
 controllerIndex.renderRegistration = async (req, res, next) => {
 
-    console.log("-------In controller_index.registerUser()-------");
+    debugPrinter.printBackendGreen("-------In controller_index.registerUser()-------");
     console.log("req:");
     console.log(req.body);
 
@@ -96,7 +97,10 @@ controllerIndex.testDB = async (req, res, next) => {
  * @returns {Promise<void>}
  */
 controllerIndex.login = async (req, res, next) => {
-    res.render("index");
+    console.log("TEST")
+    
+    res.render("index", req.user);
+    // res.json(req.user)
 };
 
 /**

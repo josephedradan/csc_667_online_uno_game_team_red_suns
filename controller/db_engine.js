@@ -41,25 +41,35 @@ const sequelize = require("../models");
 const db = require("../db");
 const passwordHandler = require("./handler_password");
 
+// const { QueryTypes } = require('sequelize');
+
 // TODO: REMOVE THIS COMMENT IF THE FUNCTION BELOW HAS BEEN TESTED AND WORKS
 dbEngine.getAccountAndAccountStatisticsByUsername = async (username) => {
-    throw "DON'T BOTHER CALLING THIS FUNCTION UNLESS THE DB NAMING IS GOOD AND THAT YOU FIXED THIS QUERY CORRESPONDINGLY"
-    try {
-        const [results, metadata] = await sequelize.query(
-            `
-            SELECT * 
-            FROM Account
-            LEFT JOIN AccountStatistics ON Account.Account_ID=AccountStatistics.Statistic_ID
-            WHERE Username = $_username
-            `,
-            {
-                bind: {_username: username}
-            }
-        );
-        return results
-    } catch (error) {
-        return null
-    }
+    // try {
+    //     const [results, metadata] = await sequelize.query(
+    //         `
+    //         SELECT * 
+    //         FROM "Account" account
+    //         LEFT JOIN "Account Statistics" statistics ON account.account_id=statistics.statistic_id
+    //         WHERE Username = $_username
+    //         `,
+    //         {
+    //             bind: {_username: username},
+    //             plain: true, 
+    //             // type: QueryTypes.SELECT
+    //         }
+    //     );
+    //     return results
+    // } catch (error) {
+    //     return null
+    // }
+
+    return await db.any(
+        ` SELECT * 
+                FROM "Account" account
+                LEFT JOIN "Account Statistics" statistics ON account.account_id=statistics.statistic_id
+                WHERE Username = '${username}';`
+    )
 
 }
 
@@ -97,7 +107,7 @@ async function insertAccount(username, password) { // FIXME UNSAFE AND NOT EXPLI
         `
         INSERT INTO public."Account"(
             username, password)
-        VALUES ('${username}', '${hashedPassword}');
+        VALUES ('${username}', '${password}');
 
         INSERT INTO public."Account Statistics"(
             "num_wins", "num_loss")
