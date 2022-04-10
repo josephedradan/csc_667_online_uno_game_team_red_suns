@@ -1,15 +1,15 @@
 const express = require('express');
 
-const indexRouter = require("./index");
-const usersRouter = require("./users");
-const testRouter = require("./tests");
-const gameRouter = require("./games");
+const indexRouter = require("./routes/index");
+const usersRouter = require("./routes/users");
+const testRouter = require("./routes/test");
+const gameRouter = require("./routes/games");
 
 const router = express.Router();
 
 router.use("/", indexRouter);
 router.use("/users", usersRouter);
-router.use("/tests", testRouter);
 router.use("/games", gameRouter);
+router.use("/test", testRouter);
 
 module.exports = router;

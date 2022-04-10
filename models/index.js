@@ -42,7 +42,8 @@ if (currentEnvConfig.use_env_variable) {
     // Create sequelize object based on environment variable
     sequelize = new Sequelize(
         process.env[currentEnvConfig.use_env_variable],
-        currentEnvConfig);
+        currentEnvConfig
+    );
 
 } else {
 
@@ -51,7 +52,8 @@ if (currentEnvConfig.use_env_variable) {
         currentEnvConfig.database,
         currentEnvConfig.username,
         currentEnvConfig.password,
-        currentEnvConfig);
+        currentEnvConfig
+    );
 }
 
 // Register models in the same dir as this file and add them to databaseSequelize

@@ -1,12 +1,12 @@
 const db = require("../db");
-const dbEngine = require("./db_engine");
+const dbEngine = require("./db_engine_sequelize");
 
 contollerIndex = {}
 
-async function testDB(req, res, next) {
+contollerIndex.testDB = async (req, res, next) => {
     await db
         .any(
-            `INSERT INTO test_table ("testString") VALUES ('Hello at $ {Date.now()}')`
+            `INSERT INTO test_table ("testString") VALUES ('Hello at ${Date.now()}')`
         )
         .then((_) => db.any(`SELECT * FROM test_table`))
         .then((results) => res.json(results))
@@ -16,9 +16,8 @@ async function testDB(req, res, next) {
         });
 }
 
-contollerIndex.testDB = testDB
 
-async function testDBSequelizeRaw(req, res, next) {
+contollerIndex.testDBSequelizeRaw = async (req, res, next) => {
     try {
 
         const username = req.params.username;
@@ -28,8 +27,6 @@ async function testDBSequelizeRaw(req, res, next) {
         next(error)
     }
 }
-
-contollerIndex.testDBSequelizeRaw = testDBSequelizeRaw
 
 
 module.exports = contollerIndex

@@ -38,7 +38,7 @@ const dbEngine = {}
 const sequelize = require("../models")
 
 // TODO: REMOVE THIS COMMENT IF THE FUNCTION BELOW HAS BEEN TESTED AND WORKS
-async function getAccountAndAccountStatisticsByUsername(username) {
+dbEngine.getAccountAndAccountStatisticsByUsername = async (username) => {
     throw "DON'T BOTHER CALLING THIS FUNCTION UNLESS THE DB NAMING IS GOOD AND THAT YOU FIXED THIS QUERY CORRESPONDINGLY"
     try {
         const [results, metadata] = await sequelize.query(
@@ -59,10 +59,8 @@ async function getAccountAndAccountStatisticsByUsername(username) {
 
 }
 
-dbEngine.getAccountAndAccountStatisticsByUsername = getAccountAndAccountStatisticsByUsername
-
 // TODO: REMOVE THIS COMMENT IF THE FUNCTION BELOW HAS BEEN TESTED AND WORKS
-async function getAccountByUsername(username){
+dbEngine.getAccountByUsername = async (username) => {
     throw "DON'T BOTHER CALLING THIS FUNCTION UNLESS THE DB NAMING IS GOOD AND THAT YOU FIXED THIS QUERY CORRESPONDINGLY"
     try {
         const [results, metadata] = await sequelize.query(
@@ -80,6 +78,5 @@ async function getAccountByUsername(username){
         return null
     }
 }
-dbEngine.getAccountByUsername = getAccountByUsername
 
 module.exports = dbEngine

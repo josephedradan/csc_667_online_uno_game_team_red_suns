@@ -43,7 +43,7 @@ const joiSchemas = {};
 Joi Scheme used to validate users that register
 
  */
-joiSchemas.SCHEMA_USER_REGISTRATION = Joi.object()
+joiSchemas.SCHEMA_ACCOUNT_REGISTRATION = Joi.object()
     .keys({
         // Username based on regex pattern
         username: Joi.string()
@@ -135,7 +135,7 @@ joiSchemas.SCHEMA_ACCOUNT_LOGIN = Joi.object()
 
     });
 
-joiSchemas.SCHEMA_ACOUNT_UPDATE = Joi.object()
+joiSchemas.SCHEMA_ACCOUNT_UPDATE = Joi.object()
     .keys({
         // // Username based on regex pattern
         // username: Joi.string()

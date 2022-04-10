@@ -72,9 +72,11 @@ function wrapperPrinter(functionGiven) {
         //     console.log(typeof log(item);
         // });
 
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NODE_ENV === "development") { // TODO: SHOULD development SEE console.log STUFF?
             functionGiven(...args);
         }
+
+        // functionGiven(...args);
     };
 }
 

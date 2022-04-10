@@ -117,6 +117,7 @@ function callbackCustomWrapper(req, res, next) {
                     message: 'Password/Username is invalid', // If you care about security
                     // message: info.message, // If you don't care about security use this instead of the above
                 });
+
         } else {
             /*
             If null was given by the passport strategy.
