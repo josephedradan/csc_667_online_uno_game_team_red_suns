@@ -68,7 +68,7 @@
         </div>
         <div class="col-span-1"></div>
         <div class="col-span-1 cards westPlayer">
-             <div class="cardWrapper">
+            <div class="cardWrapper">
                 <div class="unoCard flipped">
                     <span class="inner">
                         <span class="mark"></span>
@@ -133,7 +133,7 @@
             </div>
         </div>
 
-        <div class="flex content-center items-center justify-center col-span-1">
+        <div class="flex items-center content-center justify-center col-span-1">
             <div class="cardWrapper">
                 <div class="unoCard flipped">
                     <span class="inner">
@@ -156,7 +156,7 @@
         </div>
 
         <div class="col-span-1 cards eastPlayer">
-             <div class="cardWrapper">
+            <div class="cardWrapper">
                 <div class="unoCard flipped">
                     <span class="inner">
                         <span class="mark"></span>
@@ -285,14 +285,23 @@
                     </span>
                 </div>
             </div>
+            <div class="cardWrapper">
+                <div class="unoCard reverse blue">
+                    <span class="inner">
+                        <span class="mark"></span>
+                    </span>
+                </div>
+            </div>
         </div>
         <div class="col-span-1"></div>
     </div>
-    <div class="flex flex-col space-y-2 col-span-2 h-[calc(100vh_-_112px)] p-2 bg-slate-200">
-        <div class="flex flex-row text-black font-bold">
-            <p class="text-center w-full">Chat</p>
+    <div
+        class="flex flex-col space-y-2 col-span-2 h-[calc(100vh_-_112px)] p-2 bg-slate-200"
+    >
+        <div class="flex flex-row font-bold text-black">
+            <p class="w-full text-center">Chat</p>
         </div>
-        <div class="overflow-y-auto grow p-2 bg-white">
+        <div class="p-2 overflow-y-auto bg-white grow">
 
             <div class="p-2">
                 <span class="font-bold text-sky-700">Eric: </span>
@@ -386,14 +395,14 @@
         </div>
         <div class="flex flex-row">
             <textarea
-                class="resize-none w-full p-2"
+                class="w-full p-2 resize-none"
                 name=""
                 height="100%"
                 id=""
                 placeholder="Talk Smack"
             ></textarea>
             <button
-                class="bg-sky-500 hover:bg-sky-700 text-white font-bold py-2 px-4 h-24 w-32"
+                class="w-32 h-24 px-4 py-2 font-bold text-white bg-sky-500 hover:bg-sky-700"
             >
                 Send
             </button>
