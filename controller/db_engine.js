@@ -67,7 +67,7 @@ dbEngine.getAccountAndAccountStatisticsByUsername = async (username) => {
     return await db.any(
         ` SELECT * 
                 FROM "Account" account
-                LEFT JOIN "Account Statistics" statistics ON account.account_id=statistics.statistic_id
+                LEFT JOIN "AccountStatistic" statistics ON account.account_id=statistics.statistic_id
                 WHERE Username = '${username}';`
     )
 
@@ -109,7 +109,7 @@ async function insertAccount(username, password) { // FIXME UNSAFE AND NOT EXPLI
             username, password)
         VALUES ('${username}', '${password}');
 
-        INSERT INTO public."Account Statistics"(
+        INSERT INTO public."AccountStatistic"(
             "num_wins", "num_loss")
         VALUES (0, 0);
         `

@@ -68,7 +68,9 @@ middlewareValidation.validateAccountRegistration = async (req, res, next) => {
     await validateCommon(req, res, next,
         joiSchemas.SCHEMA_ACCOUNT_REGISTRATION,
         registrationValidationCallBackError,
-        'ERROR IN validateAccountRegistration');
+        'ERROR IN validateAccountRegistration'); 
+    console.log("here"); 
+    next(); 
 };
 
 

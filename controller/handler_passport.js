@@ -80,12 +80,13 @@ const handlerPassport = {};
  * @returns {Promise<*>}
  */
 async function authenticateUser(username, password, doneCallback) {
-    const data = await Account.getAccountAndAccountStatisticsByUsername(username);
-    const user = data[0]; 
-    console.log("in authenticateUsers")
-    console.log(user);
 
-    // Invalid username
+    try {
+        const data = await Account.getAccountAndAccountStatisticsByUsername(username);
+        const user = data[0]; 
+        console.log("in authenticateUsers")
+        console.log(user);
+         // Invalid username
     if (user === null) {
         return doneCallback(
             null, // error (This must be null to allow the 3rd argument (info) to pass)
@@ -125,6 +126,11 @@ async function authenticateUser(username, password, doneCallback) {
         }
         return doneCallback(error);
     }
+    } catch (err) {
+        console.log("failure to query getAccountAndAccountStatisticsByUsername"); 
+        console.log(err); 
+    }
+
 }
 
 /**

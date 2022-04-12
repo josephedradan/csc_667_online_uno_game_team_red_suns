@@ -44,31 +44,15 @@ controllerIndex.renderRegistration = async (req, res, next) => {
         password,
         confirm_password
     } = req.body;
-
-    // TODO: VALIDATION IS ALREADY HANDLED BY MIDDLEWARE
-    // //backend validation;
-    // const regExpUsername = /^(?![_ -])(?:(?![_ -]{2})[\w -]){5,16}(?<![_ -])$/;
-    // const regExpPassword = /^(?:(?=.*?\p{N})(?=.*?[\p{S}\p{P} ])(?=.*?\p{Lu})(?=.*?\p{Ll}))[^\p{C}]{8,16}$/;
-    //
-    // if(username.match(regExpUsername) === null) {
-    //     //TODO: add frontend alert messages to the client.
-    //     console.log("Improper username, follow 'https://stackoverflow.com/questions/46453307/the-ideal-username-and-password-regex-validation'");
-    //     res.render("registration", {title: "Registration Page"});
-    // } else if(password.match(regExpPassword) === null && password !== confirm_password) {
-    //     //TODO: add frontend alert messages to the client.
-    //     console.log("Improper password, follow 'https://stackoverflow.com/questions/46453307/the-ideal-username-and-password-regex-validation'");
-    //     res.render("registration", {title: "Registration Page"});
-    // } else {
-    //     Account.insertAccount(username, password);
-    //     res.render("index");
-    // }
-
-    const hashedPassword = await passwordHandler.hash(password)
-
-    await dbEngine.insertAccount(username, hashedPassword);
-
-    res.render("index");
-
+    
+    try {
+        const hashedPassword = await passwordHandler.hash(password)
+        await dbEngine.insertAccount(username, hashedPassword);
+        res.render("index");
+    } catch(err) {
+        console.log("Failure to insert user onto the database."); 
+        console.log(err); 
+    }
 
 }
 
