@@ -51,16 +51,15 @@
     line-height: 1.4;
 }
 
-/* TODO: Eric I need help with the wild card here! */
-.unoCard.wild > .inner > .mark {
+.unoCard.wild > .inner > .wildMark {
     display: inline-block;
     vertical-align: middle;
     position: absolute;
     top: 50%;
-    left: 50%;
+    left: 53%;
     text-align: center;
     transform: skewX(-11deg) translate(-65%, -49%);
-    background: #ffffff;
+    /* background: #000000; */
     width: 90%;
     height: 85%;
     margin: 0;
@@ -171,7 +170,7 @@
 }
 
 .wildCard {
-    width: 50%;
+    width: 48%;
     height: 50%;
     float: left;
     /* transform: rotate(27deg); */
