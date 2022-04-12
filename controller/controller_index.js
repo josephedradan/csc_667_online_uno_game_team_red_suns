@@ -46,9 +46,9 @@ controllerIndex.renderRegistration = async (req, res, next) => {
     } = req.body;
     
     try {
-        const hashedPassword = await passwordHandler.hash(password)
+        const hashedPassword = await passwordHandler.hash(password); 
         await dbEngine.insertAccount(username, hashedPassword);
-        res.render("index");
+        res.render("index"); 
     } catch(err) {
         console.log("Failure to insert user onto the database."); 
         console.log(err); 

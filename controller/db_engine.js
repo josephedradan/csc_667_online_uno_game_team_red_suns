@@ -40,79 +40,55 @@ const dbEngine = {}
 const sequelize = require("../models");
 const db = require("../db");
 const passwordHandler = require("./handler_password");
+const debugPrinter = require("../util/debug_printer"); 
 
 // const { QueryTypes } = require('sequelize');
 
-// TODO: REMOVE THIS COMMENT IF THE FUNCTION BELOW HAS BEEN TESTED AND WORKS
-dbEngine.getAccountAndAccountStatisticsByUsername = async (username) => {
-    // try {
-    //     const [results, metadata] = await sequelize.query(
-    //         `
-    //         SELECT * 
-    //         FROM "Account" account
-    //         LEFT JOIN "Account Statistics" statistics ON account.account_id=statistics.statistic_id
-    //         WHERE Username = $_username
-    //         `,
-    //         {
-    //             bind: {_username: username},
-    //             plain: true, 
-    //             // type: QueryTypes.SELECT
-    //         }
-    //     );
-    //     return results
-    // } catch (error) {
-    //     return null
-    // }
-
+async function getAccountAndAccountStatisticsByUsername(username) {
+    debugPrinter.printBackendBlue("calling dbEngine.getAccountAndAccountStatisticsByUsername()"); 
     return await db.any(
-        ` SELECT * 
-                FROM "Account" account
-                LEFT JOIN "AccountStatistic" statistics ON account.account_id=statistics.statistic_id
-                WHERE Username = '${username}';`
+        `
+        SELECT * 
+                    FROM "Account" account
+                    LEFT JOIN "AccountStatistic" statistics ON account.account_id=statistics.statistic_id
+                    WHERE Username = $1 
+        `, 
+        [
+            username
+        ]
     )
-
 }
-
+dbEngine.getAccountAndAccountStatisticsByUsername = getAccountAndAccountStatisticsByUsername; 
 
 async function getAccountByUsername(username){
-    try {
-
-        console.log("in Account.getAccountByUsername")
-        return await db.any(
-            `SELECT account.username, account.password, account.account_id 
-            FROM public."Account" account WHERE account.username = '${username}';`
-        )
-        /*
-        const [results, metadata] = await sequelize.query(
-            `
-            SELECT *
-            FROM Account
-            WHERE Username = _username
-            `,
-            {
-                bind: {_username: username}
-            }
-        );
-        return results
-        */
-    } catch (error) {
-        console.log(error)
-        return null
-    }
+    debugPrinter.printBackendBlue("in dbEngine.getAccountByUsername()"); 
+    return await db.any(
+        `SELECT account.username, account.password, account.account_id 
+        FROM public."Account" account WHERE account.username = $1;`, 
+        [
+            username
+        ]
+    )
+    
 }
 dbEngine.getAccountByUsername = getAccountByUsername;
 
-async function insertAccount(username, password) { // FIXME UNSAFE AND NOT EXPLICIT IF FUNCTION WAS SUCCESSFUL
+async function insertAccount(username, password) { 
+    debugPrinter.printBackendBlue("in dbEngine.insertAccount()"); 
     await db.any(
         `
         INSERT INTO public."Account"(
             username, password)
-        VALUES ('${username}', '${password}');
+        VALUES ($1, $2);
 
         INSERT INTO public."AccountStatistic"(
             "num_wins", "num_loss")
         VALUES (0, 0);
-        `
+        `, 
+        [
+            username, 
+            password
+        ]
     )
 }
 dbEngine.insertAccount = insertAccount;
