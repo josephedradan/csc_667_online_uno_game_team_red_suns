@@ -227,7 +227,6 @@
     border-radius: 0% 0% 0% 100%;
 }
 /* For wild4 card */
-
 .unoCard > .inner > .mark::after {
     background: none;
     vertical-align: middle;
@@ -327,10 +326,20 @@
 }
 
 .unoCard.wild4::before,
-.unoCard.wild4::after,
 .unoCard.wild4::after {
     content: "+4";
     font-style: normal;
+}
+
+.unoCard.plus2::before,
+.unoCard.plus2::after,
+.unoCard.plus2 .mark::after {
+    content: "+2";
+    font-style: italic;
+}
+
+.unoCard.plus2 > .inner > .mark::after {
+    font-size: 80%;
 }
 
 .unoCard.num-6 > .inner > .mark::after,
