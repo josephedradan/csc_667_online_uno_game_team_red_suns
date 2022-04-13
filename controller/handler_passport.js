@@ -83,7 +83,7 @@ async function authenticateUser(username, password, doneCallback) {
 
     try {
         const data = await Account.getAccountAndAccountStatisticsByUsername(username);
-        const user = data[0]; 
+        const user = data[0];
         console.log("in authenticateUsers")
         console.log(user);
          // Invalid username
@@ -103,7 +103,7 @@ async function authenticateUser(username, password, doneCallback) {
 
     try {
         // If password is valid by comparing password from the req to the password in the db
-        console.log("form information; " + username + " : " + password); 
+        console.log("form information; " + username + " : " + password);
         if (await handlerPassword.compare(password, await user.password)) { // TODO, FIXME: CHANGE .password TO MATCH THE DB equivalent if there is an error
             // This doneCallback will attach the user object to req
             return doneCallback(
@@ -127,8 +127,8 @@ async function authenticateUser(username, password, doneCallback) {
         return doneCallback(error);
     }
     } catch (err) {
-        console.log("failure to query getAccountAndAccountStatisticsByUsername"); 
-        console.log(err); 
+        console.log("failure to query getAccountAndAccountStatisticsByUsername");
+        console.log(err);
     }
 
 }
@@ -157,7 +157,8 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
     passport.use(localStrategy);
 
     /*
-    Store username in the passport of the session (Store cookie in browser)
+    Second parameter of the callback function is saved in the session which is then later used to retrieve the whole
+    object via deserializeUser. Basically, the second argument of the callback is stored in the session.
 
     Notes:
         "Passport uses serializeUser function to persist user data (after successful authentication) into session."
@@ -220,7 +221,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
 
         // Get the accountAndAccountStatistics via username
         let [error, accountAndAccountStatistics] = await to(Account.getAccountByUsername(username));
-        
+
         accountAndAccountStatistics = accountAndAccountStatistics[0]
 
         console.log(accountAndAccountStatistics)
