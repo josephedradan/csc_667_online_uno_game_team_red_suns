@@ -35,8 +35,10 @@ middlewarePassport.checkAuthenticated = async (req, res, next) => {
     if (req.isAuthenticated()) {
         // console.log(req); // May or may not be undefined if user is not authenticated
 
+        debugPrinter.printError("FUCK")
         next();
     } else {
+        debugPrinter.printError("FUCK 2")
 
         res.render("index");
 
@@ -165,7 +167,7 @@ function callbackCustomWrapper(req, res, next) {
                     //         user_id: req.user.user_id,
                     //         username: req.user.username,
                     //     });
-                    
+
 
                     next()
                 }
@@ -203,5 +205,9 @@ function authenticate(strategy) {
 }
 
 middlewarePassport.authenticate = authenticate;
+
+
+
+
 
 module.exports = middlewarePassport;

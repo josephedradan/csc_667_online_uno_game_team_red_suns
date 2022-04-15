@@ -29,47 +29,6 @@ async function logOut(req, res, next) {
 
 const controllerIndex = {}
 
-controllerIndex.renderIndex = (req, res, next) => {
-    res.render("index", {title: "CSC 667 Express"})
-}
-
-controllerIndex.renderRegistration = async (req, res, next) => {
-
-    debugPrinter.printBackendGreen("-------In controller_index.registerUser()-------");
-    console.log("req:");
-    console.log(req.body);
-
-    const {
-        username,
-        password,
-        confirm_password
-    } = req.body;
-    
-    try {
-        const hashedPassword = await passwordHandler.hash(password); 
-        await dbEngine.insertAccount(username, hashedPassword);
-        res.render("index"); 
-    } catch(err) {
-        console.log("Failure to insert user onto the database."); 
-        console.log(err); 
-    }
-
-}
-
-
-// FIXME: REMOVE ME ONCE DONE OR MOVE ME
-controllerIndex.testDB = async (req, res, next) => {
-    const baseSQL = `SELECT * FROM USERS;`;
-
-    let rows = await db.any(baseSQL);
-    if (!rows) {
-        // throw error here. need error class to generate logs.
-    }
-    // add further logic here.
-    // console.log(rows);
-    res.json(rows);
-}
-
 /**
  * Login user based on the passport package
  *
@@ -80,12 +39,13 @@ controllerIndex.testDB = async (req, res, next) => {
  * @param next
  * @returns {Promise<void>}
  */
-controllerIndex.login = async (req, res, next) => {
-    console.log("TEST")
-    
-    res.render("index", req.user);
-    // res.json(req.user)
-};
+async function login(req, res, next) {
+    debugPrinter.printMiddleware(login.name);
+
+    res.redirect("/");
+}
+
+controllerIndex.login = login
 
 /**
  * Log out user based on the passport package
@@ -99,7 +59,9 @@ controllerIndex.login = async (req, res, next) => {
  * @param next
  * @returns {Promise<void>}
  */
-controllerIndex.logout = async (req, res, next) => {
+async function logout(req, res, next) {
+    debugPrinter.printMiddleware(logout.name);
+
     // if (process.env.NODE_ENV === 'development') {
     //     debugPrinter.printMiddleware('Logout');
     //     debugPrinter.printFunction(
@@ -112,6 +74,60 @@ controllerIndex.logout = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-};
+}
+;
+controllerIndex.logout = logout
+
+async function renderIndex(req, res, next) {
+    debugPrinter.printMiddleware(renderIndex.name);
+
+    debugPrinter.printBackendBlue(req.user)
+
+    res.render("index", req.user)
+}
+
+controllerIndex.renderIndex = renderIndex
+
+async function renderRegistration(req, res, next) {
+    debugPrinter.printFunction(renderRegistration.name);
+
+    console.log("req:");
+    console.log(req.body);
+
+    const {
+        username,
+        password,
+        confirm_password
+    } = req.body;
+
+    try {
+        const hashedPassword = await passwordHandler.hash(password);
+        await dbEngine.insertAccount(username, hashedPassword);
+        res.redirect("/");
+
+    } catch (err) {
+        console.log("Failure to insert user onto the database.");
+        console.log(err);
+    }
+
+}
+
+controllerIndex.renderRegistration = renderRegistration
+
+// FIXME: REMOVE ME ONCE DONE OR MOVE ME
+async function testDB(req, res, next) {
+    const baseSQL = `SELECT * FROM USERS;`;
+
+    let rows = await db.any(baseSQL);
+    if (!rows) {
+        // throw error here. need error class to generate logs.
+    }
+    // add further logic here.
+    // console.log(rows);
+    res.json(rows);
+}
+
+controllerIndex.testDB = testDB
+
 
 module.exports = controllerIndex;
