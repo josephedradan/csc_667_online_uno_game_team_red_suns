@@ -7,6 +7,7 @@ const gameRouter = require("./routes/games");
 
 const router = express.Router();
 
+
 router.use("/", indexRouter);
 router.use("/users", usersRouter);
 router.use("/games", gameRouter);

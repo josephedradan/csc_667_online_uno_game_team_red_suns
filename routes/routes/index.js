@@ -11,8 +11,8 @@ const { func } = require("joi");
 
 routerIndex.get("/", controllerIndex.renderIndex);
 routerIndex.get("/registration", (req, res, next) => {
-    res.render("registration"); 
-}); 
+    res.render("registration");
+});
 
 
 routerIndex.post(

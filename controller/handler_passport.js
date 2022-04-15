@@ -82,7 +82,7 @@ const handlerPassport = {};
 async function authenticateUser(username, password, doneCallback) {
 
     try {
-        const data = await Account.getAccountAndAccountStatisticsByUsername(username);
+        const data = await Account.getAccountByUsername(username);
         const user = data[0];
         console.log("in authenticateUsers")
         console.log(user);
@@ -215,22 +215,19 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
                 https://stackoverflow.com/questions/27637609/understanding-passport-serialize-deserialize
      */
     passport.deserializeUser(async (username, doneCallBack) => {
-        if (process.env.NODE_ENV === 'development') {
-            debugPrinter.printDebug(`initializePassport deserializeUser ${username}`);
-        }
+        // if (process.env.NODE_ENV === 'development') {
+        //     debugPrinter.printDebug(`initializePassport deserializeUser ${username}`);
+        // }
 
         // Get the accountAndAccountStatistics via username
-        let [error, accountAndAccountStatistics] = await to(Account.getAccountByUsername(username));
+        let [error, accountAndAccountStatistics] = await to(Account.getAccountAndAccountStatisticsByUsername(username));
 
         accountAndAccountStatistics = accountAndAccountStatistics[0]
-
-        console.log(accountAndAccountStatistics)
-        debugPrinter.printDebug(`END`);
 
 
         // If accountAndAccountStatistics exists
         if (accountAndAccountStatistics !== null) {
-            debugPrinter.printBackendGreen(`GOOD`);
+
             // What ever data is sent to the second parameter of this function will be stored in req.user
             doneCallBack(
                 error, // error
@@ -245,7 +242,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
                 { message: `${accountAndAccountStatistics.username} was successfully logged in` }, // Additional info to be sent
             );
         } else {
-            debugPrinter.printBackendRed(`BAD`);
+
             // If getting accountAndAccountStatistics is unsuccessful, then req.user will be null or undefined
             doneCallBack(
                 error, // error

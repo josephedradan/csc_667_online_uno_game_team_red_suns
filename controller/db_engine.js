@@ -39,42 +39,41 @@ const dbEngine = {}
 //const { mergeDefaults } = require("sequelize/types/utils");
 const sequelize = require("../models");
 const db = require("../db");
-const passwordHandler = require("./handler_password");
-const debugPrinter = require("../util/debug_printer"); 
+const debugPrinter = require("../util/debug_printer");
 
 // const { QueryTypes } = require('sequelize');
 
 async function getAccountAndAccountStatisticsByUsername(username) {
-    debugPrinter.printBackendBlue("calling dbEngine.getAccountAndAccountStatisticsByUsername()"); 
+    debugPrinter.printFunction(getAccountAndAccountStatisticsByUsername.name);
     return await db.any(
         `
         SELECT * 
                     FROM "Account" account
                     LEFT JOIN "AccountStatistic" statistics ON account.account_id=statistics.statistic_id
                     WHERE Username = $1 
-        `, 
+        `,
         [
             username
         ]
     )
 }
-dbEngine.getAccountAndAccountStatisticsByUsername = getAccountAndAccountStatisticsByUsername; 
+dbEngine.getAccountAndAccountStatisticsByUsername = getAccountAndAccountStatisticsByUsername;
 
 async function getAccountByUsername(username){
-    debugPrinter.printBackendBlue("in dbEngine.getAccountByUsername()"); 
+    debugPrinter.printFunction(getAccountByUsername.name);
     return await db.any(
         `SELECT account.username, account.password, account.account_id 
-        FROM public."Account" account WHERE account.username = $1;`, 
+        FROM public."Account" account WHERE account.username = $1;`,
         [
             username
         ]
     )
-    
+
 }
 dbEngine.getAccountByUsername = getAccountByUsername;
 
-async function insertAccount(username, password) { 
-    debugPrinter.printBackendBlue("in dbEngine.insertAccount()"); 
+async function insertAccount(username, password) {
+    debugPrinter.printFunction(insertAccount.name);
     await db.any(
         `
         INSERT INTO public."Account"(
@@ -84,9 +83,9 @@ async function insertAccount(username, password) {
         INSERT INTO public."AccountStatistic"(
             "num_wins", "num_loss")
         VALUES (0, 0);
-        `, 
+        `,
         [
-            username, 
+            username,
             password
         ]
     )
