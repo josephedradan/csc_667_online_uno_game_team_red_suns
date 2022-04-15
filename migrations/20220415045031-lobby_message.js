@@ -8,38 +8,36 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    return await queryInterface.createTable("AccountStatistic", {
-
-      statistic_id: {
+     return await queryInterface.createTable("LobbyMessage", {
+      
+      message_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true
       }, 
 
-      num_wins: {
+      player_id: {
         type: Sequelize.INTEGER, 
-        defaultValue: 0
+        allowNull: false, 
+        references: { model: 'Player', key: 'player_id' }
       }, 
 
-      num_loss: {
-        type: Sequelize.INTEGER, 
-        default: 0
-      }, 
-
-
-      date_joined: {
-        type: Sequelize.DATE, 
-        defaultValue: Sequelize.literal("NOW()"),
+      message: {
+        type: Sequelize.TEXT, 
         allowNull: false
       }, 
 
-      account_id: {
-        type: Sequelize.INTEGER, 
-        references: { model: 'Account', key: 'account_id' }, 
-        unique: true
-      }
+      date_sent: {
+        type: Sequelize.DATE, 
+        defaultValue: Sequelize.NOW
+      }, 
 
-    }); 
+      lobby_id: {
+        type: Sequelize.INTEGER, 
+        allowNull: false, 
+        references: { model: 'Lobby', key: 'lobby_id' }
+      }
+  });
   },
 
   async down (queryInterface, Sequelize) {
@@ -49,6 +47,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    return queryInterface.dropTable("AccountStatistic"); 
+    return await queryInterface.dropTable('LobbyMessages');
   }
 };
