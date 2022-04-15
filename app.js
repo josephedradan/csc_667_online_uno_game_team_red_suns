@@ -117,37 +117,7 @@ Reference:
  */
 // databaseSequelize.sequelize.sync({alter: true});
 
-/*############################## express-session ##############################*/
 
-app.use(
-    expressSession({
-        secret: "SOME SECRET", // TODO: MOVE THIS TO A FILE OR SOMETHING
-        resave: false, // Resave when nothing is changed
-        saveUninitialized: false, // Save empty value in the session
-        store: sequelizeExpressSessionStore, // Use the Store made from connect-session-sequelize
-        cookie: {
-            httpOnly: false,
-            //     secure: true, // THIS REQUIRES THAT THE CONNECTION IS SECURE BY USING HTTPS (https://github.com/expressjs/session#cookiesecure)
-            //     maxAge: 86400, // 1 Week long cookie
-        },
-    }),
-);
-
-// Sync the express sessions table (If the table does not exist in the database, then this will create it)
-sequelizeExpressSessionStore.sync();
-
-/*############################## passport ##############################*/
-// Config passport
-handlerPassport.configurePassportLocalStrategy(passport);
-
-// In a Connect or Express-based application, passport.initialize() middleware is required to initialize Passport.
-app.use(passport.initialize()); // Initialize password middleware
-
-/*
-If your application uses persistent login sessions, passport.session() middleware must also be used.
-(Serialize and deserialize. Persist the login)
-*/
-app.use(passport.session());
 
 /*############################## Handle Bars ##############################*/
 
@@ -176,6 +146,40 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+/*############################## express-session (Must be placed after hsb to prevent unnecessary db calls) ##############################*/
+
+app.use(
+    expressSession({
+        secret: "SOME SECRET", // TODO: MOVE THIS TO A FILE OR SOMETHING
+        resave: false, // Resave when nothing is changed
+        saveUninitialized: false, // Save empty value in the session
+        store: sequelizeExpressSessionStore, // Use the Store made from connect-session-sequelize
+        cookie: {
+            httpOnly: false,
+            //     secure: true, // THIS REQUIRES THAT THE CONNECTION IS SECURE BY USING HTTPS (https://github.com/expressjs/session#cookiesecure)
+            //     maxAge: 86400, // 1 Week long cookie
+        },
+    }),
+);
+
+// Sync the express sessions table (If the table does not exist in the database, then this will create it)
+sequelizeExpressSessionStore.sync();
+
+/*############################## passport (Must be placed after hsb to prevent unnecessary db calls) ##############################*/
+// Config passport
+handlerPassport.configurePassportLocalStrategy(passport);
+
+// In a Connect or Express-based application, passport.initialize() middleware is required to initialize Passport.
+app.use(passport.initialize()); // Initialize password middleware
+
+/*
+If your application uses persistent login sessions, passport.session() middleware must also be used.
+(Serialize and deserialize. Persist the login)
+*/
+app.use(passport.session());
+
+/*############################## routes ##############################*/
 
 app.use("/", routes);
 

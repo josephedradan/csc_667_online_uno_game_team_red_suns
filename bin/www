@@ -17,6 +17,7 @@ Reference:
 const app = require('../app');
 const debug = require('debug')('application:server');
 const http = require('http');
+const socketAPI = require("../socket_api");
 
 /**
  * Get PORT from environment and store in Express.
@@ -111,3 +112,7 @@ function onListening() {
         : 'PORT ' + address.port;
     debug('Listening on ' + bind);
 }
+
+/*############################## socket.io ##############################*/
+
+socketAPI.io.attach(server);
