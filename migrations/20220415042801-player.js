@@ -18,8 +18,7 @@ module.exports = {
       
       lobby_id: {
         type: Sequelize.INTEGER, 
-        allowNull: false, 
-        references: { model: 'Lobby', key: 'lobby_id' }
+        allowNull: false
       }, 
 
       is_host: {
