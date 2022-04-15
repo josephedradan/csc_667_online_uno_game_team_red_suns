@@ -8,6 +8,37 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
+    return await queryInterface.createTable("Player", {
+      
+      player_id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      }, 
+      
+      lobby_id: {
+        type: Sequelize.INTEGER, 
+        allowNull: false, 
+        references: { model: 'Lobby', key: 'lobby_id' }
+      }, 
+
+      is_host: {
+        type: Sequelize.BOOLEAN, 
+        default: false 
+      }, 
+
+      is_out_of_game: {
+        type: Sequelize.BOOLEAN,
+        default: false
+      }, 
+
+      account_id: {
+        type: Sequelize.INTEGER, 
+        allowNull: false,
+        references: { model: 'Account', key: 'account_id' }, 
+      }
+
+    })
   },
 
   async down (queryInterface, Sequelize) {
@@ -17,5 +48,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
+    return await queryInterface.dropTable('Player');
   }
 };
