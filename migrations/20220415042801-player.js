@@ -15,11 +15,6 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true
       }, 
-      
-      lobby_id: {
-        type: Sequelize.INTEGER, 
-        allowNull: false
-      }, 
 
       is_host: {
         type: Sequelize.BOOLEAN, 
