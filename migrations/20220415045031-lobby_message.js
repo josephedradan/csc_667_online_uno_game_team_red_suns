@@ -13,7 +13,7 @@ module.exports = {
       message_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: true
       }, 
 
       player_id: {

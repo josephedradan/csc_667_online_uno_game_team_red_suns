@@ -13,7 +13,7 @@ module.exports = {
       player_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: true
       }, 
       
       lobby_id: {

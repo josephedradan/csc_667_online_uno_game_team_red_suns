@@ -13,7 +13,7 @@ module.exports = {
       statistic_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: true
       }, 
 
       num_wins: {
