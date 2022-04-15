@@ -38,7 +38,7 @@ module.exports = {
         references: { model: 'Account', key: 'account_id' }, 
       }
 
-    })
+    }); 
   },
 
   async down (queryInterface, Sequelize) {
