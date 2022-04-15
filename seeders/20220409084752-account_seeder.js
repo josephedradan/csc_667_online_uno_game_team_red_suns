@@ -21,6 +21,8 @@ Reference:
  */
 'use strict';
 
+const passwordHandler = require("../controller/handler_password"); 
+
 module.exports = {
     async up(queryInterface, Sequelize) {
         /**
@@ -32,6 +34,24 @@ module.exports = {
          *   isBetaMember: false
          * }], {});
          */
+        return await queryInterface.bulkInsert('Account', [
+            {
+                username: "EddyYun123", 
+                password: await passwordHandler.hash("YunYun123!")
+            }, 
+            {
+                username: "JosephEdredan321", 
+                password: await passwordHandler.hash("EddyYeti321!")
+            }, 
+            {
+                username: "EricFalk567", 
+                password: await passwordHandler.hash("FalkyWalky567!")
+            }, 
+            {
+                username: "JohnSanJose891", 
+                password: await passwordHandler.hash("NoWayJose891!")
+            }
+        ]); 
     },
 
     async down(queryInterface, Sequelize) {
@@ -41,5 +61,7 @@ module.exports = {
          * Example:
          * await queryInterface.bulkDelete('People', null, {});
          */
+
+        return await queryInterface.bulkDelete('Account', null, {});
     }
 };

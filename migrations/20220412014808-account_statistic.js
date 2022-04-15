@@ -35,6 +35,7 @@ module.exports = {
 
       account_id: {
         type: Sequelize.INTEGER, 
+        autoIncrement: true,
         references: { model: 'Account', key: 'account_id' }, 
         unique: true
       }
