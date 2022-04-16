@@ -4,79 +4,47 @@ const passwordHandler = require("./handler_password");
 
 const debugPrinter = require('../util/debug_printer');
 
-async function logOut(req, res, next) {
-    // Get username (It will not exist in the session once you logout)
-    const {username} = req.user;
-
-    // Will log out user (this functionality is handled by the passport package)
-    req.logOut();
-
-    // Remove the session of the user
-    req.session.destroy();
-
-    // Clear the users cookies
-    res
-        .status(200)
-        .clearCookie('connect.sid')
-        // .json({
-        //     status: 'success',
-        //     message: `${username} has logged out`,
-        // })
-        .render("index");
-}
-
 /* ############################################################################################################## */
 
 const controllerIndex = {}
 
 /**
- * Login user based on the passport package
+ * Log in user. Actual login is handled by passport middleware
  *
  * Notes:
- *      *** The actual login of the user is handled by the middleware passport.authenticate('local')
+ *      Any additional stuff related to logging in should be placed here
+ *
  * @param req
  * @param res
  * @param next
  * @returns {Promise<void>}
  */
-async function login(req, res, next) {
-    debugPrinter.printMiddleware(login.name);
+async function logIn(req, res, next) {
+    debugPrinter.printMiddleware(logIn.name);
 
     res.redirect("/");
 }
 
-controllerIndex.login = login
+controllerIndex.logIn = logIn
 
 /**
- * Log out user based on the passport package
+ * Log out user. Actual log out is handled by passport middleware
  *
- * Reference:
- *      Log Out
- *          Reference:
- *              http://www.passportjs.org/docs/logout/
+ * Notes:
+ *      Any additional stuff related to logging out should be placed here
+ *
  * @param req
  * @param res
  * @param next
  * @returns {Promise<void>}
  */
-async function logout(req, res, next) {
-    debugPrinter.printMiddleware(logout.name);
+async function logOut(req, res, next) {
+    debugPrinter.printMiddleware(logOut.name);
 
-    // if (process.env.NODE_ENV === 'development') {
-    //     debugPrinter.printMiddleware('Logout');
-    //     debugPrinter.printFunction(
-    //         `${req.route.stack[0].method}: ${req.route.path}`,
-    //     );
-    // }
-    try {
-        // Log out user
-        await logOut(req, res, next);
-    } catch (error) {
-        next(error);
-    }
+    res.redirect("/")
 }
-;
-controllerIndex.logout = logout
+
+controllerIndex.logOut = logOut
 
 async function renderIndex(req, res, next) {
     debugPrinter.printMiddleware(renderIndex.name);
@@ -107,12 +75,12 @@ async function renderRegistration(req, res, next) {
         // TODO: CHECK IF THE USERNAME ALREADY EXISTS AND SHIT
 
         debugPrinter.printBackendGreen("REDIRECTING")
-        res.redirect("/");
 
     } catch (err) {
         console.log("Failure to insert user onto the database.");
         console.log(err);
     }
+    res.redirect("/");
 
 }
 

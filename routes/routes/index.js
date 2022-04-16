@@ -3,8 +3,8 @@ const routerIndex = express.Router();
 const db = require("../../db");
 
 const controllerIndex = require("../../controller/controller_index");
-const middlewareAuthentication = require("../../middleware/middleware_authentication");
-const middlewareValidationReqBody = require("../../middleware/middleware_validation_req_body");
+const middlewareAuthenticationPassport = require("../../middleware/middleware_authentication_passport");
+const middlewareValidationJoi = require("../../middleware/middleware_validation_joi");
 const { func } = require("joi");
 
 /* GET home page. */
@@ -17,22 +17,23 @@ routerIndex.get("/registration", (req, res, next) => {
 
 
 routerIndex.post(
-    "/login",
-    // middlewareAuthentication.checkUnauthenticated, // Check if not logged in
-    middlewareValidationReqBody.validateAccountLogin,
-    middlewareAuthentication.authenticate('local'),
-    controllerIndex.login,
+    "/logIn",
+    middlewareAuthenticationPassport.checkUnauthenticated, // Check if not logged in
+    middlewareValidationJoi.validateAccountLogin, // Validate req.body
+    middlewareAuthenticationPassport.authenticate('local'), // Log in user via passport
+    controllerIndex.logIn, // Do additional log in behavior
 );
 
 routerIndex.post(
-    '/logout',
-    middlewareAuthentication.checkAuthenticated, // Check if logged in
-    controllerIndex.logout,
+    '/logOut',
+    middlewareAuthenticationPassport.checkAuthenticated, // Check if logged in
+    middlewareAuthenticationPassport.logOut, // Log out user via passport
+    controllerIndex.logOut, // Do additional log out behavior
 );
 
 routerIndex.post(
     "/registration",
-    middlewareValidationReqBody.validateAccountRegistration,
+    middlewareValidationJoi.validateAccountRegistration,
     controllerIndex.renderRegistration
 );
 

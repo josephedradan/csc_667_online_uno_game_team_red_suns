@@ -1,6 +1,31 @@
 /*
 This file is responsible for setting up the settings used by the passport package
 
+IMPORTANT NOTES:
+    HOW THIS WORKS:
+        If the user logs in:
+            1. verifyCallback is called first (Assuming successful login)
+                Something (we'll call X) should have been called to the database to get something about the user such as their username
+            2. serializeUser is called second
+                X (which will be username in this case) will be then added to the session (this will be used as an identifier)
+            3. deserializeUser is called third (This call should have been called via req.logIn which should be in middleware_authentication_passport)
+                X is used again to identify who the user is, but the identification should be used to get more information about the user
+                which would then be added to req.user
+            4. Standard login behavior happens and the cookie is sent back
+
+        If the user makes a requests that are not static and is logged in:
+            1. User sends the cookie they have been given by us
+            2. deserializeUser is called
+                This behavior should be similar to the deserializeUser stated prior, but we use the cookie to get X
+            3. The behavior of the request should happen and req.user should have info about the user
+
+        If the user logs out:
+            1. Same behavior as (request that is not static and is logged in),
+                but req.logOut should be called after which should be in middleware_authentication_passport
+                and the session is deleted along with the cookie on the client side
+
+        If the user makes a requests that are not static and is NOT logged in:
+            No function related to passport should be called
 Notes:
     passport.js is just middleware for authentication
 
@@ -15,11 +40,12 @@ Reference:
         Notes:
             In depth understanding of the passport package
 
-            The "done" callback is the function that you pass the results of the authentication to.
-            In this file the "done" callback is called "doneCallback"
+            The "done" callback (doneCallback) in verifyCallback is the callback that should have been given to
+            the passport.authenticate() function (this function should be located in middleware_authentication_passport)
 
         Reference:
             https://www.youtube.com/watch?v=xMEOT9J0IvI
+            https://youtu.be/xMEOT9J0IvI?t=1147
 
     Passport Local Strategy Usage (Node + Passport + Express)
         Notes:
@@ -58,7 +84,7 @@ const debugPrinter = require('../util/debug_printer');
 const handlerPassword = require('./handler_password');
 
 // These are the fields that passport will look for in req.body
-const REQ_BODY_FIELD_NAMES = {
+const REQ_BODY_FIELD_NAMES_TO_LOOK_FOR = {
     usernameField: 'username',
     passwordField: 'password',
 };
@@ -66,66 +92,70 @@ const REQ_BODY_FIELD_NAMES = {
 const handlerPassport = {};
 
 /**
- * Get the user to be Authenticated based on the username and password given
+ * Given 2 fields from req.body specified by REQ_BODY_FIELD_NAMES_TO_LOOK_FOR, try to log in the user.
+ *
+ * IMPORTANT NOTES:
+ *      THIS FUNCTION IS NOT EXPLICITLY CALLED IN THE BACKEND, PASSPORT AUTOMATICALLY CALLS THIS.
  *
  * Notes:
  *      username and password are taken from the request body (req.body.username, req.body.password).
- *      It knows to use "username" and "password" based on the naming given from REQ_BODY_FIELD_NAMES that you setup.
+ *      It knows to use "username" and "password" based on the naming given from REQ_BODY_FIELD_NAMES_TO_LOOK_FOR that you set up.
  *
- *      This function is custom-made and specifically made for the local strategy given to the passport package
+ *      This function is custom-made and specifically made for the local strategy.
  *
  * @param username
  * @param password
  * @param doneCallback
  * @returns {Promise<*>}
  */
-async function authenticateUser(username, password, doneCallback) {
+async function verifyCallback(username, password, doneCallback) {
+    debugPrinter.printFunction(verifyCallback.name);
 
     try {
         const data = await Account.getAccountByUsername(username);
-        const user = data[0];
-        console.log("in authenticateUsers")
-        console.log(user);
-         // Invalid username
-    if (user === null) {
-        return doneCallback(
-            null, // error (This must be null to allow the 3rd argument (info) to pass)
-            false, // user
-            {message: 'Invalid username'}, // info
-        );
-    }
 
-    // if (process.env.NODE_ENV === 'development') {
-    //     debugPrinter.printWarning(`HIT authenticateUser ${user}`);
-    //     console.log(user);
-    //     debugPrinter.printWarning(`HIT Password ${user.password}`);
-    // }
+        const user = data[0]; // First user
 
-    try {
-        // If password is valid by comparing password from the req to the password in the db
-        console.log("form information; " + username + " : " + password);
-        if (await handlerPassword.compare(password, await user.password)) { // TODO, FIXME: CHANGE .password TO MATCH THE DB equivalent if there is an error
-            // This doneCallback will attach the user object to req
+        // Invalid username
+        if (user === null) {
             return doneCallback(
                 null, // error (This must be null to allow the 3rd argument (info) to pass)
-                user, // user
-                {message: 'Success'}, // info
+                false, // user
+                {message: 'Invalid username'}, // info
             );
         }
 
-        // If password is invalid
-        return doneCallback(
-            null, // error (This must be null to allow the 3rd argument (info) to pass)
-            false, // user
-            {message: 'Invalid password'}, // info
-        );
-    } catch (error) {
-        if (process.env.NODE_ENV === 'development') {
-            console.log('authenticateUser Error');
-            console.log(error);
+        // if (process.env.NODE_ENV === 'development') {
+        //     debugPrinter.printWarning(`HIT verifyCallback ${user}`);
+        //     console.log(user);
+        //     debugPrinter.printWarning(`HIT Password ${user.password}`);
+        // }
+
+        try {
+            // If password is valid by comparing password from the req to the password in the db
+            console.log("form information; " + username + " : " + password);
+            if (await handlerPassword.compare(password, await user.password)) {
+                // This doneCallback will attach the user object to req
+                return doneCallback(
+                    null, // error (This must be null to allow the 3rd argument (info) to pass)
+                    user, // user
+                    {message: 'Success'}, // info
+                );
+            }
+
+            // If password is invalid
+            return doneCallback(
+                null, // error (This must be null to allow the 3rd argument (info) to pass)
+                false, // user
+                {message: 'Invalid password'}, // info
+            );
+        } catch (error) {
+            if (process.env.NODE_ENV === 'development') {
+                console.log('verifyCallback Error');
+                console.log(error);
+            }
+            return doneCallback(error);
         }
-        return doneCallback(error);
-    }
     } catch (err) {
         console.log("failure to query getAccountAndAccountStatisticsByUsername");
         console.log(err);
@@ -134,7 +164,12 @@ async function authenticateUser(username, password, doneCallback) {
 }
 
 /**
- * Configure passport to use a custom local strategy by giving it custom functions to use
+ * 1. Configure passport to use a custom local strategy via
+ *      passport.use(localStrategy);
+ *
+ * 2. Configure passport when using express sessions via
+ *      passport.serializeUser
+ *      passport.deserializeUser
  *
  * Reference:
  *      Simple Passport Local Authentication w/ React & Node.js
@@ -149,8 +184,8 @@ async function authenticateUser(username, password, doneCallback) {
  */
 handlerPassport.configurePassportLocalStrategy = (passport) => {
     const localStrategy = new LocalStrategy(
-        REQ_BODY_FIELD_NAMES,
-        authenticateUser,
+        REQ_BODY_FIELD_NAMES_TO_LOOK_FOR,
+        verifyCallback,
     );
 
     // Apply what local strategy to use
@@ -159,6 +194,10 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
     /*
     Second parameter of the callback function is saved in the session which is then later used to retrieve the whole
     object via deserializeUser. Basically, the second argument of the callback is stored in the session.
+
+    IMPORTANT NOTES:
+        THIS FUNCTION IS ONLY CALLED WHEN LOGGING IN AND THAT THE LOGIN IS VALID.
+        THIS FUNCTION IS NOT EXPLICITLY CALLED IN THE BACKEND, PASSPORT AUTOMATICALLY CALLS THIS.
 
     Notes:
         "Passport uses serializeUser function to persist user data (after successful authentication) into session."
@@ -169,8 +208,6 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
         The data that was passed into the cookie will then be USED by passport.deserializeUser automatically once the user makes
         another request to the backend.
 
-        *** THIS FUNCTION IS ONLY CALLED WHEN LOGGING IN AND THAT THE LOGIN IS VALID
-
         The thing stored in the session can be accessed via:
             req.session.passport.user
 
@@ -180,9 +217,8 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
                 https://stackoverflow.com/questions/27637609/understanding-passport-serialize-deserialize
      */
     passport.serializeUser((user, doneCallBack) => {
-        if (process.env.NODE_ENV === 'development') {
-            debugPrinter.printDebug('initializePassport serializeUser');
-        }
+        debugPrinter.printFunction("serializeUser");
+
         /*
         Put the key (user.username) inside the passport of the session.
         It can be accessed via req.session.passport.user
@@ -192,6 +228,10 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
 
     /*
     Validate the cookie's key from the client AND ADD ATTRIBUTES/PROPERTIES TO THE REQ which should be in req.user
+
+    IMPORTANT NOTES:
+        THIS FUNCTION IS AUTOMATICALLY CALLED ON EVERY REQUEST IF CLIENT SENDS THE EXPRESS SESSION COOKIE.
+        THIS FUNCTION IS NOT EXPLICITLY CALLED IN THE BACKEND, PASSPORT AUTOMATICALLY CALLS THIS.
 
     Notes:
         "The first argument of deserializeUser corresponds to the key of the user object that was given to the done
@@ -215,6 +255,8 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
                 https://stackoverflow.com/questions/27637609/understanding-passport-serialize-deserialize
      */
     passport.deserializeUser(async (username, doneCallBack) => {
+        debugPrinter.printFunction("deserializeUser");
+
         // if (process.env.NODE_ENV === 'development') {
         //     debugPrinter.printDebug(`initializePassport deserializeUser ${username}`);
         // }
@@ -223,7 +265,6 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
         let [error, accountAndAccountStatistics] = await to(Account.getAccountAndAccountStatisticsByUsername(username));
 
         accountAndAccountStatistics = accountAndAccountStatistics[0]
-
 
         // If accountAndAccountStatistics exists
         if (accountAndAccountStatistics !== null) {
@@ -239,7 +280,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
                 For example, attributes/properties with naming conventions such as USER_NAME, USERNAME, userName, etc... may not conform to this project's coding style.
                  */
                 accountAndAccountStatistics,
-                { message: `${accountAndAccountStatistics.username} was successfully logged in` }, // Additional info to be sent
+                {message: `${accountAndAccountStatistics.username} was successfully logged in`}, // Additional info to be sent
             );
         } else {
 
@@ -247,7 +288,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
             doneCallBack(
                 error, // error
                 null, // Stuff that will be stored in req.user. Since it's null, the callback should handle it appropriately
-                { message: 'Error happened in passport.deserializeUser' }, // Additional info to be sent
+                {message: 'Error happened in passport.deserializeUser'}, // Additional info to be sent
             );
         }
     });

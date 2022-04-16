@@ -1,6 +1,6 @@
 /*
 This file contains middleware that can check if a user is authenticated or can authenticate the user.
-Basically, this middleware is responsible for allowing and denying access to other middleware and login the user.
+Basically, this middleware is responsible for allowing and denying access to other middleware and logIn the user.
 
 Notes:
     Middleware:
@@ -32,15 +32,12 @@ const middlewarePassport = {};
  * @returns {Promise<*>}
  */
 middlewarePassport.checkAuthenticated = async (req, res, next) => {
-    if (req.isAuthenticated()) {
-        // console.log(req); // May or may not be undefined if user is not authenticated
+    debugPrinter.printMiddleware(middlewarePassport.checkAuthenticated.name)
 
-        debugPrinter.printError("FUCK")
+    if (req.isAuthenticated()) {
         next();
     } else {
-        debugPrinter.printError("FUCK 2")
-
-        res.render("index");
+        res.redirect("/");
 
         // res.json({
         //     status: 'failed',
@@ -58,11 +55,12 @@ middlewarePassport.checkAuthenticated = async (req, res, next) => {
  * @returns {Promise<*>}
  */
 middlewarePassport.checkUnauthenticated = async (req, res, next) => {
+    debugPrinter.printMiddleware(middlewarePassport.checkUnauthenticated.name)
+
     if (req.isUnauthenticated()) {
         next();
     } else {
-
-        res.render("index");
+        res.redirect("/");
 
         // res.json({
         //     status: 'failed',
@@ -71,13 +69,27 @@ middlewarePassport.checkUnauthenticated = async (req, res, next) => {
     }
 };
 
+/**
+ * This function should respond to the user if they have successfully logged in or not
+ *
+ * IMPORTANT NOTES:
+ *      This function is the callback given to verifyCallback which should be in handler_passport
+ *
+ * Notes:
+ *      The purpose of this function is to propagate the next function
+ *      Use this if you are not using passport.authenticate('local')
+ *
+ * @param req
+ * @param res
+ * @param next
+ * @returns {(function(*, *, *): (*|undefined))|*}
+ */
 function callbackCustomWrapper(req, res, next) {
-    /*
-    function to return a custom passport callback.
-    Use this if you are not using passport.authenticate('local')
+    debugPrinter.printFunction(callbackCustomWrapper.name)
 
+    /*
     Notes:
-        This is the doneCallBack given to deserializeUser inside of handler_passport
+        The below is the doneCallBack given to verifyCallback inside of handler_passport
 
         * The actual logging in is done by the req.logIn call
 
@@ -103,7 +115,9 @@ function callbackCustomWrapper(req, res, next) {
 
     */
     function callbackCustom(err, attributesAddedToReqUser, info) {
-        // Standard error checking (error happened from 0
+        debugPrinter.printFunction(callbackCustom.name)
+
+        // Standard error checking (error should have come from the custom verifyCallback call most likely in handler_passport)
         if (err) {
             return next(err);
         }
@@ -111,15 +125,15 @@ function callbackCustomWrapper(req, res, next) {
         debugPrinter.printBackendGreen(info)
         /*
         If attributesAddedToReqUser was not given by the passport strategy.
-        The strategy should have returned information that should be added req.user
+        The strategy should have returned information that should be added to req.user
 
         Notes:
-            It's a very bad idea to tell the user what they failed on when they login, it is a security risk
+            It's a very bad idea to tell the user what they failed on when they log in, it is a security risk
          */
         if (!attributesAddedToReqUser) {
 
             // FIXME: REPLACE THIS REST API VERSION WITH THE NORMAL WAY OR MAKE THIS FUNCTION CALL next()
-            // Unsuccessful login response
+            // Unsuccessful logIn response
             res.status(403)
                 .json({
                     status: 'failed',
@@ -134,36 +148,38 @@ function callbackCustomWrapper(req, res, next) {
 
             Login
                 Notes:
-                    This is the actual login, this will put the attributesAddedToReqUser in req.user and put req.user in
+                    This is the actual logIn, this will put the attributesAddedToReqUser in req.user and put req.user in
                     the session (express-session).
-                    The req.login function comes from the passport package.
+                    The req.logIn function comes from the passport package.
 
                 Reference:
                     Log In
                         Notes:
-                            "Passport exposes a login() function on req (also aliased as logIn()) that can be used to
-                            establish a login session."
+                            "Passport exposes a logIn() function on req (also aliased as logIn()) that can be used to
+                            establish a logIn session."
 
-                            "When the login operation completes, user (attributesAddedToReqUser) will be assigned to req.user."
+                            "When the logIn operation completes, user (attributesAddedToReqUser) will be assigned to req.user."
 
-                            "Note: passport.authenticate() middleware invokes req.login() automatically.
-                            This function is primarily used when users sign up, during which req.login()
+                            "Note: passport.authenticate() middleware invokes req.logIn() automatically.
+                            This function is primarily used when users sign up, during which req.logIn()
                             can be invoked to automatically log in the newly registered user."
 
                         Reference:
                             https://www.passportjs.org/concepts/authentication/login/
             */
             req.logIn(attributesAddedToReqUser, async (errorPassportLogin) => {
+                debugPrinter.printFunction("req.logIn")
+
                 if (errorPassportLogin) {
                     next(errorPassportLogin);
                 } else {
 
                     // FIXME: REPLACE THIS REST API VERSION WITH THE NORMAL WAY OR MAKE THIS FUNCTION CALL next()
-                    // Successful login response
+                    // Successful logIn response
                     // res.status(200)
                     //     .json({
                     //         status: 'success',
-                    //         message: 'You have successful login!',
+                    //         message: 'You have successful logIn!',
                     //         user_id: req.user.user_id,
                     //         username: req.user.username,
                     //     });
@@ -187,14 +203,14 @@ function callbackCustomWrapper(req, res, next) {
  * @returns {middlewarePassportAuthenticatePseudo}
  */
 function authenticate(strategy) {
-    function middlewarePassportAuthenticatePseudo(req, res, next) {
-        // This is the actual passport.authenticate
-        console.log("in middlewareauth.authenticate");
-        console.log(req.body);
+    debugPrinter.printMiddleware(authenticate.name)
 
+    function middlewarePassportAuthenticatePseudo(req, res, next) {
+
+        // Calling passport.authenticate()
         const middlewarePassportAuthenticate = passport.authenticate(
             strategy,
-            callbackCustomWrapper(req, res, next), // This function should respond to the user if they have successfully logged in or not
+            callbackCustomWrapper(req, res, next),
             next,
         );
 
@@ -206,8 +222,38 @@ function authenticate(strategy) {
 
 middlewarePassport.authenticate = authenticate;
 
+/**
+ * Log out user based on the passport package
+ *
+ * Reference:
+ *      Log Out
+ *          Reference:
+ *              http://www.passportjs.org/docs/logout/
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<void>}
+ */
+async function logOut(req, res, next) {
 
+    // Get username (It will not exist in the session once you log out)
+    const {username} = req.user;
 
+    // Will log out user (this functionality is handled by the passport package)
+    req.logOut();
+
+    // Remove the session of the user
+    req.session.destroy((err) => {
+        if (err) {
+            next(err)
+        } else {
+            res.clearCookie('connect.sid')
+            next();
+        }
+    });
+
+}
+middlewarePassport.logOut = logOut;
 
 
 module.exports = middlewarePassport;

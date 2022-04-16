@@ -76,12 +76,10 @@ async function insertAccount(username, password) {
     debugPrinter.printFunction(insertAccount.name);
     await db.any(
         `
-        INSERT INTO public."Account"(
-            username, password)
+        INSERT INTO public."Account"(username, password)
         VALUES ($1, $2);
 
-        INSERT INTO public."AccountStatistic"(
-            "num_wins", "num_loss")
+        INSERT INTO public."AccountStatistic"( "num_wins", "num_loss")
         VALUES (0, 0);
         `,
         [
