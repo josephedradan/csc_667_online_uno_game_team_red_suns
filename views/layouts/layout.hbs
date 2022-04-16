@@ -8,6 +8,10 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/javascripts/rule_modal.js"></script>
+    {{#if registration}}
+    <link rel="stylesheet" href="/stylesheets/registration_validation.css">
+    <script src="/javascripts/registration_validation.js" defer></script>
+    {{/if}}
   </head>
   <body>
     {{> header}}

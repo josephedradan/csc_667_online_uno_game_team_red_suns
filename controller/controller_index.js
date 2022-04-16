@@ -2,11 +2,11 @@ const db = require("../db/index");
 const dbEngine = require("./db_engine");
 const passwordHandler = require("./handler_password");
 
-const debugPrinter = require('../util/debug_printer');
+const debugPrinter = require("../util/debug_printer");
 
 /* ############################################################################################################## */
 
-const controllerIndex = {}
+const controllerIndex = {};
 
 /**
  * Log in user. Actual login is handled by passport middleware
@@ -25,7 +25,7 @@ async function logIn(req, res, next) {
     res.redirect("/");
 }
 
-controllerIndex.logIn = logIn
+controllerIndex.logIn = logIn;
 
 /**
  * Log out user. Actual log out is handled by passport middleware
@@ -41,55 +41,50 @@ controllerIndex.logIn = logIn
 async function logOut(req, res, next) {
     debugPrinter.printMiddleware(logOut.name);
 
-    res.redirect("/")
+    res.redirect("/");
 }
 
-controllerIndex.logOut = logOut
+controllerIndex.logOut = logOut;
 
 async function renderIndex(req, res, next) {
     debugPrinter.printMiddleware(renderIndex.name);
 
-    debugPrinter.printBackendBlue(req.user)
+    debugPrinter.printBackendBlue(req.user);
 
-    res.render("index", req.user)
+    res.render("index", req.user);
 }
 
-controllerIndex.renderIndex = renderIndex
+controllerIndex.renderIndex = renderIndex;
 
 /**
  *
  * @returns {Promise<[{},{}]>}
  */
 async function x() {
-    return [{}, {}]
+    return [{}, {}];
 }
 
 async function renderRegistration(req, res, next) {
-    res.render("registration");
+    res.render("registration", { title: "registration", registration: true });
 }
 
-controllerIndex.renderRegistration = renderRegistration
+controllerIndex.renderRegistration = renderRegistration;
 
 async function registration(req, res, next) {
     debugPrinter.printMiddleware(registration.name);
 
     debugPrinter.printDebug(req.body);
 
-    const {
-        username,
-        password,
-        confirm_password
-    } = req.body;
+    const { username, password, confirm_password } = req.body;
 
     try {
-
         // Check if username already exists
-        let existingAccount = await dbEngine.getAccountByUsername(username)
+        let existingAccount = await dbEngine.getAccountByUsername(username);
 
         if (existingAccount) {
             res.json({
-                status: 'failed',
-                message: 'Username already exists',
+                status: "failed",
+                message: "Username already exists",
                 redirect: null,
             });
         }
@@ -97,32 +92,35 @@ async function registration(req, res, next) {
         else {
             const hashedPassword = await passwordHandler.hash(password);
 
-            let account = await dbEngine.createAccount(username, hashedPassword);
+            let account = await dbEngine.createAccount(
+                username,
+                hashedPassword
+            );
 
-            debugPrinter.printBackendBlue(account)
+            debugPrinter.printBackendBlue(account);
 
-            let accountStatistic = await dbEngine.creatAccountStatistic(account.account_id);
-            debugPrinter.printBackendMagenta(accountStatistic)
+            let accountStatistic = await dbEngine.creatAccountStatistic(
+                account.account_id
+            );
+            debugPrinter.printBackendMagenta(accountStatistic);
 
-            debugPrinter.printBackendGreen(existingAccount)
+            debugPrinter.printBackendGreen(existingAccount);
             res.json({
-                status: 'success',
+                status: "success",
                 message: `'Account ${account.username}'`,
                 redirect: "/",
             });
         }
 
-        debugPrinter.printBackendGreen("REDIRECTING")
-
+        debugPrinter.printBackendGreen("REDIRECTING");
     } catch (err) {
         console.log("Failure to insert user onto the database.");
         console.log(err);
-        next(err)
+        next(err);
     }
-
 }
 
-controllerIndex.registration = registration
+controllerIndex.registration = registration;
 
 // FIXME: REMOVE ME ONCE DONE OR MOVE ME
 async function testDB(req, res, next) {
@@ -137,7 +135,6 @@ async function testDB(req, res, next) {
     res.json(rows);
 }
 
-controllerIndex.testDB = testDB
-
+controllerIndex.testDB = testDB;
 
 module.exports = controllerIndex;
