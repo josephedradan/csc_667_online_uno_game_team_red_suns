@@ -1,52 +1,59 @@
 'use strict';
 
 module.exports = {
-  async up (queryInterface, Sequelize) {
-    /**
-     * Add altering commands here.
-     *
-     * Example:
-     * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
-     */
-     await queryInterface.createTable("Lobby", {
-      
-      lobby_id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-      }, 
+    async up(queryInterface, Sequelize) {
+        /**
+         * Add altering commands here.
+         *
+         * Example:
+         * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
+         */
+        await queryInterface.createTable("Lobby", {
 
-      is_in_game: {
-        type: Sequelize.BOOLEAN, 
-        default: false
-      }, 
+            lobby_id: {
+                type: Sequelize.INTEGER,
+                primaryKey: true,
+                autoIncrement: true,
+            },
 
-      current_player_id: {
-        type: Sequelize.INTEGER, 
-        references: { model: 'Player', key: 'player_id' }
-      },
+            is_in_game: {
+                type: Sequelize.BOOLEAN,
+                defaultValue: false,
+            },
 
-      host_id: {
-        type: Sequelize.INTEGER, 
-        allowNull: false, 
-        references: { model: 'Player', key: 'player_id' }
-      }
-    });
-    
-    return await queryInterface.addColumn('Player', 'lobby_id', { 
-        type: Sequelize.INTEGER, 
-        allowNull: false, 
-        references: { model: 'Lobby', key: 'lobby_id' }
-    }); 
-  },
+            current_player_id: {
+                type: Sequelize.INTEGER,
+                references: {model: 'Player', key: 'player_id'},
+            },
 
-  async down (queryInterface, Sequelize) {
-    /**
-     * Add reverting commands here.
-     *
-     * Example:
-     * await queryInterface.dropTable('users');
-     */
-    return await queryInterface.dropTable('Lobby');
-  }
+            host_id: {
+                type: Sequelize.INTEGER,
+                references: {model: 'Player', key: 'player_id'},
+                allowNull: false,
+                unique: true,
+            }
+        });
+
+        // Odd return
+        return await queryInterface.addColumn('Player', 'lobby_id', {
+            type: Sequelize.INTEGER,
+            references: {model: 'Lobby', key: 'lobby_id'},
+            allowNull: false,
+        });
+    },
+
+    async down(queryInterface, Sequelize) {
+        /**
+         * Add reverting commands here.
+         *
+         * Example:
+         * await queryInterface.dropTable('users');
+         */
+        await queryInterface.removeColumn(
+            'Player',
+            'lobby_id'
+        );
+
+        return await queryInterface.dropTable('Lobby');
+    }
 };

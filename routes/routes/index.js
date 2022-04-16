@@ -5,15 +5,15 @@ const db = require("../../db");
 const controllerIndex = require("../../controller/controller_index");
 const middlewareAuthenticationPassport = require("../../middleware/middleware_authentication_passport");
 const middlewareValidationJoi = require("../../middleware/middleware_validation_joi");
-const { func } = require("joi");
 
 /* GET home page. */
 
 routerIndex.get("/", controllerIndex.renderIndex);
 
-routerIndex.get("/registration", (req, res, next) => {
-    res.render("registration");
-});
+routerIndex.get(
+    "/registration",
+    controllerIndex.renderRegistration
+);
 
 
 routerIndex.post(
@@ -34,7 +34,7 @@ routerIndex.post(
 routerIndex.post(
     "/registration",
     middlewareValidationJoi.validateAccountRegistration,
-    controllerIndex.renderRegistration
+    controllerIndex.registration
 );
 
 // FIXME: THIS IS TEMPORARY, REMOVE THIS WHEN DONE

@@ -56,10 +56,24 @@ async function renderIndex(req, res, next) {
 
 controllerIndex.renderIndex = renderIndex
 
-async function renderRegistration(req, res, next) {
-    debugPrinter.printMiddleware(renderRegistration.name);
+/**
+ *
+ * @returns {Promise<[{},{}]>}
+ */
+async function x() {
+    return [{}, {}]
+}
 
-    debugPrinter.printDebug(req.user);
+async function renderRegistration(req, res, next) {
+    res.render("registration");
+}
+
+controllerIndex.renderRegistration = renderRegistration
+
+async function registration(req, res, next) {
+    debugPrinter.printMiddleware(registration.name);
+
+    debugPrinter.printDebug(req.body);
 
     const {
         username,
@@ -68,23 +82,47 @@ async function renderRegistration(req, res, next) {
     } = req.body;
 
     try {
-        const hashedPassword = await passwordHandler.hash(password);
-        await dbEngine.insertAccount(username, hashedPassword);
 
+        // Check if username already exists
+        let existingAccount = await dbEngine.getAccountByUsername(username)
 
-        // TODO: CHECK IF THE USERNAME ALREADY EXISTS AND SHIT
+        if (existingAccount) {
+            res.json({
+                status: 'failed',
+                message: 'Username already exists',
+                redirect: null,
+            });
+        }
+        // Create new account
+        else {
+            const hashedPassword = await passwordHandler.hash(password);
+
+            let account = await dbEngine.createAccount(username, hashedPassword);
+
+            debugPrinter.printBackendBlue(account)
+
+            let accountStatistic = await dbEngine.creatAccountStatistic(account.account_id);
+            debugPrinter.printBackendMagenta(accountStatistic)
+
+            debugPrinter.printBackendGreen(existingAccount)
+            res.json({
+                status: 'success',
+                message: `'Account ${account.username}'`,
+                redirect: "/",
+            });
+        }
 
         debugPrinter.printBackendGreen("REDIRECTING")
 
     } catch (err) {
         console.log("Failure to insert user onto the database.");
         console.log(err);
+        next(err)
     }
-    res.redirect("/");
 
 }
 
-controllerIndex.renderRegistration = renderRegistration
+controllerIndex.registration = registration
 
 // FIXME: REMOVE ME ONCE DONE OR MOVE ME
 async function testDB(req, res, next) {

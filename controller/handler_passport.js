@@ -5,18 +5,20 @@ IMPORTANT NOTES:
     HOW THIS WORKS:
         If the user logs in:
             1. verifyCallback is called first (Assuming successful login)
-                Something (we'll call X) should have been called to the database to get something about the user such as their username
+                The user logging in should become verified
+                The login should have been called to get something in the database such as their username, we'll call username X in this case
             2. serializeUser is called second
-                X (which will be username in this case) will be then added to the session (this will be used as an identifier)
+                X (which should be username) will be then added to the session (this will be used as an identifier)
             3. deserializeUser is called third (This call should have been called via req.logIn which should be in middleware_authentication_passport)
                 X is used again to identify who the user is, but the identification should be used to get more information about the user
                 which would then be added to req.user
-            4. Standard login behavior happens and the cookie is sent back
+            4. Standard login behavior should happen, req.user should have stuff in it, and the cookie is sent back
 
         If the user makes a requests that are not static and is logged in:
             1. User sends the cookie they have been given by us
             2. deserializeUser is called
-                This behavior should be similar to the deserializeUser stated prior, but we use the cookie to get X
+                This behavior should be similar to the deserializeUser stated prior, but we use the cookie to get X which
+                would then be used to add stuff to req.user
             3. The behavior of the request should happen and req.user should have info about the user
 
         If the user logs out:
@@ -112,33 +114,31 @@ async function verifyCallback(username, password, doneCallback) {
     debugPrinter.printFunction(verifyCallback.name);
 
     try {
-        const data = await Account.getAccountByUsername(username);
-
-        const user = data[0]; // First user
+        const account = await Account.getAccountByUsername(username);
 
         // Invalid username
-        if (user === null) {
+        if (account === null) {
             return doneCallback(
                 null, // error (This must be null to allow the 3rd argument (info) to pass)
-                false, // user
+                false, // account
                 {message: 'Invalid username'}, // info
             );
         }
 
         // if (process.env.NODE_ENV === 'development') {
-        //     debugPrinter.printWarning(`HIT verifyCallback ${user}`);
-        //     console.log(user);
-        //     debugPrinter.printWarning(`HIT Password ${user.password}`);
+        //     debugPrinter.printWarning(`HIT verifyCallback ${account}`);
+        //     console.log(account);
+        //     debugPrinter.printWarning(`HIT Password ${account.password}`);
         // }
 
         try {
             // If password is valid by comparing password from the req to the password in the db
             console.log("form information; " + username + " : " + password);
-            if (await handlerPassword.compare(password, await user.password)) {
-                // This doneCallback will attach the user object to req
+            if (await handlerPassword.compare(password, await account.password)) {
+                // This doneCallback will attach the account object to req
                 return doneCallback(
                     null, // error (This must be null to allow the 3rd argument (info) to pass)
-                    user, // user
+                    account, // account
                     {message: 'Success'}, // info
                 );
             }
@@ -146,7 +146,7 @@ async function verifyCallback(username, password, doneCallback) {
             // If password is invalid
             return doneCallback(
                 null, // error (This must be null to allow the 3rd argument (info) to pass)
-                false, // user
+                false, // account
                 {message: 'Invalid password'}, // info
             );
         } catch (error) {
@@ -263,8 +263,6 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
 
         // Get the accountAndAccountStatistics via username
         let [error, accountAndAccountStatistics] = await to(Account.getAccountAndAccountStatisticsByUsername(username));
-
-        accountAndAccountStatistics = accountAndAccountStatistics[0]
 
         // If accountAndAccountStatistics exists
         if (accountAndAccountStatistics !== null) {

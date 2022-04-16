@@ -43,51 +43,107 @@ const debugPrinter = require("../util/debug_printer");
 
 // const { QueryTypes } = require('sequelize');
 
+/**
+ * Notes:
+ *      Should return a list of objects
+ *
+ * @param username
+ * @returns {Promise<any[]>}
+ */
 async function getAccountAndAccountStatisticsByUsername(username) {
     debugPrinter.printFunction(getAccountAndAccountStatisticsByUsername.name);
-    return await db.any(
+    let result = await db.any(
         `
         SELECT * 
-                    FROM "Account" account
-                    LEFT JOIN "AccountStatistic" statistics ON account.account_id=statistics.statistic_id
-                    WHERE Username = $1 
+        FROM "Account" account
+        LEFT JOIN "AccountStatistic" statistics ON account.account_id=statistics.statistic_id
+        WHERE Username = $1 
         `,
         [
             username
         ]
     )
+    return result[0]
 }
+
 dbEngine.getAccountAndAccountStatisticsByUsername = getAccountAndAccountStatisticsByUsername;
 
-async function getAccountByUsername(username){
+/**
+ * Example:
+ *      [ { username: 'joseph1', password: 'sdfsd', account_id: 8 } ]
+ *
+ * @param username
+ * @returns {Promise<any>}
+ */
+async function getAccountByUsername(username) {
     debugPrinter.printFunction(getAccountByUsername.name);
-    return await db.any(
-        `SELECT account.username, account.password, account.account_id 
-        FROM public."Account" account WHERE account.username = $1;`,
+    let result = await db.any(
+        `
+        SELECT account.username, account.password, account.account_id 
+        FROM public."Account" AS account 
+        WHERE account.username = $1;
+        `,
         [
             username
         ]
     )
 
+    return result[0] // Should be an object returned
 }
+
 dbEngine.getAccountByUsername = getAccountByUsername;
 
-async function insertAccount(username, password) {
-    debugPrinter.printFunction(insertAccount.name);
-    await db.any(
-        `
-        INSERT INTO public."Account"(username, password)
-        VALUES ($1, $2);
 
-        INSERT INTO public."AccountStatistic"( "num_wins", "num_loss")
-        VALUES (0, 0);
+/**
+ *
+ * @param username
+ * @param password
+ * @returns {Promise<any[]>}
+ */
+async function createAccount(username, password) {
+    debugPrinter.printFunction(createAccount.name);
+    let result = await db.any(
+        `
+        INSERT INTO "Account" (username, password)
+        VALUES ($1, $2)
+        RETURNING account_id, username, password;
         `,
         [
             username,
             password
         ]
     )
+
+    return result[0] // Should be the new object
+
 }
-dbEngine.insertAccount = insertAccount;
+
+dbEngine.createAccount = createAccount;
+
+/**
+ * Create account statistic given account_id, will return statistic_id
+ *
+ * @param account_id
+ * @returns {Promise<any[]>}
+ */
+async function creatAccountStatistic(account_id) {
+    debugPrinter.printFunction(creatAccountStatistic.name);
+    let result = await db.any(
+        `
+
+        INSERT INTO "AccountStatistic" (statistic_id, num_wins, num_loss)
+        VALUES ($1, 0, 0)
+        RETURNING statistic_id, num_wins, num_loss, date_joined;
+        `,
+        [
+            account_id
+        ]
+    )
+
+    return result[0] // Should be the new object
+}
+
+
+dbEngine.creatAccountStatistic = creatAccountStatistic;
 
 module.exports = dbEngine
