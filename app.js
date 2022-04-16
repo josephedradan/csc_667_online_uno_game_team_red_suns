@@ -71,6 +71,12 @@ Setup and Settings
  */
 const app = express();
 
+app.use(logger("dev"));
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, "public")));
+
 /*############################## connect-session-sequelize ##############################*/
 
 /*
@@ -140,12 +146,6 @@ app.engine("hbs", hbs.engine);
 // view engine setup
 app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
-
-app.use(logger("dev"));
-app.use(express.json());
-app.use(express.urlencoded({extended: true}));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
 
 /*############################## express-session (Must be placed after hsb to prevent unnecessary db calls) ##############################*/
 

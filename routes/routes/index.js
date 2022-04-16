@@ -4,12 +4,13 @@ const db = require("../../db");
 
 const controllerIndex = require("../../controller/controller_index");
 const middlewareAuthentication = require("../../middleware/middleware_authentication");
-const middlewareValidation = require("../../middleware/middleware_validation");
+const middlewareValidationReqBody = require("../../middleware/middleware_validation_req_body");
 const { func } = require("joi");
 
 /* GET home page. */
 
 routerIndex.get("/", controllerIndex.renderIndex);
+
 routerIndex.get("/registration", (req, res, next) => {
     res.render("registration");
 });
@@ -18,7 +19,7 @@ routerIndex.get("/registration", (req, res, next) => {
 routerIndex.post(
     "/login",
     // middlewareAuthentication.checkUnauthenticated, // Check if not logged in
-    middlewareValidation.validateAccountLogin,
+    middlewareValidationReqBody.validateAccountLogin,
     middlewareAuthentication.authenticate('local'),
     controllerIndex.login,
 );
@@ -31,7 +32,7 @@ routerIndex.post(
 
 routerIndex.post(
     "/registration",
-    middlewareValidation.validateAccountRegistration,
+    middlewareValidationReqBody.validateAccountRegistration,
     controllerIndex.renderRegistration
 );
 

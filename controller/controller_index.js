@@ -89,10 +89,9 @@ async function renderIndex(req, res, next) {
 controllerIndex.renderIndex = renderIndex
 
 async function renderRegistration(req, res, next) {
-    debugPrinter.printFunction(renderRegistration.name);
+    debugPrinter.printMiddleware(renderRegistration.name);
 
-    console.log("req:");
-    console.log(req.body);
+    debugPrinter.printDebug(req.user);
 
     const {
         username,
@@ -103,6 +102,11 @@ async function renderRegistration(req, res, next) {
     try {
         const hashedPassword = await passwordHandler.hash(password);
         await dbEngine.insertAccount(username, hashedPassword);
+
+
+        // TODO: CHECK IF THE USERNAME ALREADY EXISTS AND SHIT
+
+        debugPrinter.printBackendGreen("REDIRECTING")
         res.redirect("/");
 
     } catch (err) {
