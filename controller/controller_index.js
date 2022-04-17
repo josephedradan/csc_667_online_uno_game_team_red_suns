@@ -50,7 +50,7 @@ async function renderIndex(req, res, next) {
     debugPrinter.printMiddleware(renderIndex.name);
     debugPrinter.printBackendBlue(req.user);
 
-    res.render("index", {user: req.user});
+    res.render("index");
 }
 
 controllerIndex.renderIndex = renderIndex;

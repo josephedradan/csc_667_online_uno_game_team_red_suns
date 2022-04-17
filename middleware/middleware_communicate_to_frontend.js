@@ -18,6 +18,8 @@ Reference:
 
  */
 
+let middlewareCommunicateToFrontend = {}
+
 /**
  * Add a message (which in this case should be an object) so the frontend can deal with it
  * Notes:
@@ -29,10 +31,28 @@ Reference:
  * @param res
  * @param next
  */
-function middlewareMessage(req, res, next) {
+async function middlewareMessage(req, res, next) {
     res.locals.message = req.session.message;
     delete req.session.message;
     next();
 }
 
-module.exports = middlewareMessage;
+middlewareCommunicateToFrontend.middlewareMessage = middlewareMessage
+
+/**
+ * Persist req.user from passport to res.locals.user
+ *
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<void>}
+ */
+async function middlewarePersistUser(req, res, next) {
+    res.locals.user = req.user;
+    next()
+}
+
+middlewareCommunicateToFrontend.middlewarePersistUser = middlewarePersistUser
+
+
+module.exports = middlewareCommunicateToFrontend;

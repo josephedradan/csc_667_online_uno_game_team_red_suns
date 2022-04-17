@@ -60,7 +60,7 @@ if (process.env.NODE_ENV === "development") {
 
 const databaseSequelize = require('./models');
 const handlerPassport = require('./controller/handler_passport');
-const middlewareMessage = require('./middleware/middleware_message')
+const middlewareCommunicateToFrontend = require('./middleware/middleware_communicate_to_frontend')
 
 const debugPrinter = require("./util/debug_printer");
 
@@ -205,9 +205,10 @@ If your application uses persistent logIn sessions, passport.session() middlewar
 */
 app.use(passport.session());
 
-/*############################## Middleware Message (Custom middleware) ##############################*/
+/*############################## Middleware Message (Custom middlewares) ##############################*/
 
-app.use(middlewareMessage);
+app.use(middlewareCommunicateToFrontend.middlewareMessage);
+app.use(middlewareCommunicateToFrontend.middlewarePersistUser);
 
 /*############################## DEBUGGING ##############################*/
 
