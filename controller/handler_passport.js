@@ -116,8 +116,10 @@ async function verifyCallback(username, password, doneCallback) {
     try {
         const account = await Account.getAccountByUsername(username);
 
+        debugPrinter.printDebug(account)
+
         // Invalid username
-        if (account === null) {
+        if (account === null || account === undefined) {
             return doneCallback(
                 null, // error (This must be null to allow the 3rd argument (info) to pass)
                 false, // account
@@ -203,7 +205,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
         "Passport uses serializeUser function to persist user data (after successful authentication) into session."
 
         * Basically, determine what data of the user object should be stored in the session from user.
-        Once a piece of data has been selected and passed to the doneCallBack function,
+        Once a piece of data has been selected and passed to the doneCallback function,
         it will then be passed into req.session.passport.user (Note that req.session.passport.user is a key value pair).
         The data that was passed into the cookie will then be USED by passport.deserializeUser automatically once the user makes
         another request to the backend.
@@ -216,14 +218,14 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
             Reference:
                 https://stackoverflow.com/questions/27637609/understanding-passport-serialize-deserialize
      */
-    passport.serializeUser((user, doneCallBack) => {
+    passport.serializeUser((user, doneCallback) => {
         debugPrinter.printFunction("serializeUser");
 
         /*
         Put the key (user.username) inside the passport of the session.
         It can be accessed via req.session.passport.user
          */
-        doneCallBack(null, user.username);
+        doneCallback(null, user.username);
     });
 
     /*
@@ -235,7 +237,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
 
     Notes:
         "The first argument of deserializeUser corresponds to the key of the user object that was given to the done
-        function (doneCallBack)"
+        function (doneCallback)"
 
         "Function deserializeUser is used to retrieve user data from session."
 
@@ -254,7 +256,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
             Reference:
                 https://stackoverflow.com/questions/27637609/understanding-passport-serialize-deserialize
      */
-    passport.deserializeUser(async (username, doneCallBack) => {
+    passport.deserializeUser(async (username, doneCallback) => {
         debugPrinter.printFunction("deserializeUser");
 
         // if (process.env.NODE_ENV === 'development') {
@@ -268,7 +270,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
         if (accountAndAccountStatistics !== null) {
 
             // What ever data is sent to the second parameter of this function will be stored in req.user
-            doneCallBack(
+            doneCallback(
                 error, // error
                 /*
                 accountAndAccountStatistics is the stuff that will be stored in req.user.
@@ -283,7 +285,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
         } else {
 
             // If getting accountAndAccountStatistics is unsuccessful, then req.user will be null or undefined
-            doneCallBack(
+            doneCallback(
                 error, // error
                 null, // Stuff that will be stored in req.user. Since it's null, the callback should handle it appropriately
                 {message: 'Error happened in passport.deserializeUser'}, // Additional info to be sent

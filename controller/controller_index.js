@@ -48,10 +48,9 @@ controllerIndex.logOut = logOut;
 
 async function renderIndex(req, res, next) {
     debugPrinter.printMiddleware(renderIndex.name);
-
     debugPrinter.printBackendBlue(req.user);
 
-    res.render("index", req.user);
+    res.render("index", {user: req.user});
 }
 
 controllerIndex.renderIndex = renderIndex;
@@ -65,7 +64,7 @@ async function x() {
 }
 
 async function renderRegistration(req, res, next) {
-    res.render("registration", { title: "registration", registration: true });
+    res.render("registration", {title: "registration", registration: true});
 }
 
 controllerIndex.renderRegistration = renderRegistration;
@@ -75,18 +74,20 @@ async function registration(req, res, next) {
 
     debugPrinter.printDebug(req.body);
 
-    const { username, password, confirm_password } = req.body;
+    const {username, password, confirm_password} = req.body;
 
     try {
         // Check if username already exists
         let existingAccount = await dbEngine.getAccountByUsername(username);
 
         if (existingAccount) {
-            res.json({
-                status: "failed",
+
+            req.session.message = {
+                status: "failure",
                 message: "Username already exists",
-                redirect: null,
-            });
+            }
+
+            res.redirect('back')
         }
         // Create new account
         else {
@@ -103,38 +104,23 @@ async function registration(req, res, next) {
                 account.account_id
             );
             debugPrinter.printBackendMagenta(accountStatistic);
-
             debugPrinter.printBackendGreen(existingAccount);
-            res.json({
+
+            req.session.message = {
                 status: "success",
-                message: `'Account ${account.username}'`,
-                redirect: "/",
-            });
+                message: `Account "${account.username}" was created`,
+            }
+            res.redirect('/')
         }
 
         debugPrinter.printBackendGreen("REDIRECTING");
     } catch (err) {
-        console.log("Failure to insert user onto the database.");
-        console.log(err);
+        debugPrinter.printError(`ERROR FROM ${registration.name}`)
         next(err);
     }
 }
 
 controllerIndex.registration = registration;
 
-// FIXME: REMOVE ME ONCE DONE OR MOVE ME
-async function testDB(req, res, next) {
-    const baseSQL = `SELECT * FROM USERS;`;
-
-    let rows = await db.any(baseSQL);
-    if (!rows) {
-        // throw error here. need error class to generate logs.
-    }
-    // add further logic here.
-    // console.log(rows);
-    res.json(rows);
-}
-
-controllerIndex.testDB = testDB;
 
 module.exports = controllerIndex;

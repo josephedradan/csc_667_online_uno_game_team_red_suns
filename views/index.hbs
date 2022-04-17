@@ -34,7 +34,7 @@
             </li>
         </ul>
     </div>
-    {{#unless username}}
+    {{#unless user.username}}
         <div class="justify-center col-span-3">
             <h2 class="px-3 py-3">Login</h2>
             <form
@@ -80,16 +80,16 @@
                 alt="sum ting wong"
             />
             <div class="font-mono text-lg text-center text-gray-800">Username:
-                {{username}}</div>
+                {{user.username}}</div>
             {{!-- <div>Info1: {{account_id}}</div> --}}
             {{!-- <div>Info2: {{password}}</div> --}}
             {{!-- <div>Info3: {{statistic_id}}</div> --}}
             <div class="font-mono text-lg text-center text-gray-800">Current
                 Wins:
-                {{num_wins}}</div>
+                {{user.num_wins}}</div>
             <div class="font-mono text-lg text-center text-gray-800">Current
                 Losses:
-                {{num_loss}}</div>
+                {{user.num_loss}}</div>
             {{!-- <div>Info6: {{date_joined}}</div> --}}
             <div class="w-full mt-8">
                 <button

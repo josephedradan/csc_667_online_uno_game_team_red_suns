@@ -23,7 +23,7 @@ async function validateCommon(
     res,
     next,
     schema,
-    validationCallBackError,
+    callbackValidationError,
     _backendErrorMessage
 ) {
     // Values returned from validating key/value pairs form req.body call
@@ -49,7 +49,7 @@ async function validateCommon(
 
     if (error) {
         // If there was a validation error, respond with the validation error
-        validationCallBackError(req, res, next);
+        callbackValidationError(req, res, next, error);
     } else {
         // Otherwise, go to the next middleware
         next();
@@ -58,11 +58,13 @@ async function validateCommon(
 
 const middlewareValidation = {};
 
-function registrationValidationCallBackError(req, res, next) {
-    res.render("registration", {
-        title: "Registration Page",
-        registration: true,
-    });
+function callbackValidationErrorCommon(req, res, next, error) {
+    req.session.message = {
+        status: "failure",
+        message: error
+    }
+
+    res.redirect('back')
 }
 
 /**
@@ -79,14 +81,10 @@ middlewareValidation.validateAccountRegistration = async (req, res, next) => {
         res,
         next,
         joiSchemas.SCHEMA_ACCOUNT_REGISTRATION,
-        registrationValidationCallBackError,
+        callbackValidationErrorCommon,
         "ERROR IN validateAccountRegistration"
     );
 };
-
-function loginValidationCallBackError(req, res, next) {
-    res.render("index");
-}
 
 /**
  *  Middleware to validate req.body used when logging in using the joi package
@@ -101,7 +99,7 @@ middlewareValidation.validateAccountLogin = async (req, res, next) => {
         res,
         next,
         joiSchemas.SCHEMA_ACCOUNT_LOGIN,
-        loginValidationCallBackError,
+        callbackValidationErrorCommon,
         "ERROR IN validateAccountLogin"
     );
 };
@@ -112,6 +110,7 @@ middlewareValidation.validateAccountUpdate = async (req, res, next) => {
         res,
         next,
         joiSchemas.SCHEMA_ACCOUNT_UPDATE,
+        callbackValidationErrorCommon,
         "ERROR IN validateAccountUpdate"
     );
 };

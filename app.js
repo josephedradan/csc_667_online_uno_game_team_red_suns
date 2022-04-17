@@ -60,6 +60,8 @@ if (process.env.NODE_ENV === "development") {
 
 const databaseSequelize = require('./models');
 const handlerPassport = require('./controller/handler_passport');
+const middlewareMessage = require('./middleware/middleware_message')
+
 const debugPrinter = require("./util/debug_printer");
 
 const routes = require("./routes/routes");
@@ -124,6 +126,14 @@ Reference:
 // databaseSequelize.sequelize.sync({alter: true});
 
 
+app.use((req, res, next) => {
+    if (process.env.NODE_ENV === "development") {
+        debugPrinter.printMiddleware("DEBUGGING MIDDLEWARE")
+        debugPrinter.printDebug(req.body)
+    }
+
+    next()
+})
 
 /*############################## Handle Bars ##############################*/
 
@@ -149,11 +159,36 @@ app.set("views", path.join(__dirname, "views"));
 
 /*############################## express-session (Must be placed after hsb to prevent unnecessary db calls) ##############################*/
 
+/*
+
+Reference:
+    When to use saveUninitialized and resave in express-session
+        Notes:
+            "If during the lifetime of the request the session object isn't modified then, at the end of the request
+            and when saveUninitialized is false, the (still empty, because unmodified) session object will
+            not be stored in the session store.
+
+            The reasoning behind this is that this will prevent a lot of empty session objects being stored in the
+            session store. Since there's nothing useful to store, the session is "forgotten" at the end of the request.
+
+            ...
+
+            About resave: this may have to be enabled for session stores that don't support the "touch" command. What
+            this does is tell the session store that a particular session is still active, which is necessary because
+            some stores will delete idle (unused) sessions after some time.
+
+            If a session store driver doesn't implement the touch command, then you should enable resave so that even
+            when a session wasn't changed during a request, it is still updated in the store (thereby marking it active).
+            "
+
+        Reference:
+            https://stackoverflow.com/questions/40381401/when-to-use-saveuninitialized-and-resave-in-express-session
+ */
 app.use(
     expressSession({
         secret: "SOME SECRET", // TODO: MOVE THIS TO A FILE OR SOMETHING
-        resave: false, // Resave when nothing is changed
-        saveUninitialized: false, // Save empty value in the session
+        resave: false, // Rewrite/Resave the res.session.cookie on every request (THIS OPTION MUST BE SET TO TRUE DUE TO THE BACKEND NOT BEING RESTFUL)
+        saveUninitialized: false, // Allow saving empty/non modified session objects in session store (THIS OPTION MUST BE SET TO TRUE DUE TO THE BACKEND NOT BEING RESTFUL)
         store: sequelizeExpressSessionStore, // Use the Store made from connect-session-sequelize
         cookie: {
             httpOnly: false,
@@ -178,6 +213,10 @@ If your application uses persistent logIn sessions, passport.session() middlewar
 (Serialize and deserialize. Persist the logIn)
 */
 app.use(passport.session());
+
+/*############################## Middleware Message (Custom middleware) ##############################*/
+
+app.use(middlewareMessage);
 
 /*############################## routes ##############################*/
 
