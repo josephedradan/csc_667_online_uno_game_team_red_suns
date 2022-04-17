@@ -47,7 +47,7 @@
                     for="username"
                 >Username</label>
                 <input
-                    class="flex px-3 py-3 rounded-lg"
+                    class="flex px-3 py-3 rounded-lg w-96"
                     type="text"
                     name="username"
                     placeholder="Enter username"
@@ -59,7 +59,7 @@
                 >Password</label>
                 <!-- FIXME: VERY UNSAFE -->
                 <input
-                    class="flex px-3 py-3 rounded-lg"
+                    class="flex px-3 py-3 rounded-lg w-96"
                     type="password"
                     name="password"
                     placeholder="Enter password"
@@ -93,8 +93,10 @@
             {{!-- <div>Info6: {{date_joined}}</div> --}}
             <div class="w-full mt-8">
                 <button
+                    {{! We can add this to the game or user or index.  }}
+                    formaction="/createGame"
                     class="w-full px-2 py-2 font-semibold text-white bg-blue-500 rounded-lg shadow-lg hover:bg-blue-600"
-                >Edit Profile
+                >Create Game
                 </button>
             </div>
 

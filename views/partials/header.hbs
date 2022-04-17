@@ -1,105 +1,101 @@
 <header>
-    <nav
-        class="flex items-center justify-between w-screen p-2 mx-auto bg-slate-300"
-    >
-        <div>
-            <img
-                class="object-contain h-24"
-                src="/images/UNO_Logo.webp"
-                alt="uno_image"
-            />
-        </div>
-        <ul class="flex">
-            <li class="mr-6">
-                <a class="hover:text-blue-800" href="/">Home</a>
-            </li>
+    <nav class="bg-white border-gray-200 px-2 sm:px-4 py-2.5 rounded">
+        <div
+            class="container flex flex-wrap items-center justify-between mx-auto"
+        >
+            <div>
+                <img
+                    class="object-contain h-12"
+                    src="/images/UNO_Logo.webp"
+                    alt="uno_image"
+                />
+            </div>
+            <ul class="flex">
+                <li class="mr-6">
+                    <a class="hover:text-blue-800" href="/">Home</a>
+                </li>
 
-            <li class="mr-6">
-                <button
-                    class="hover:text-blue-800"
-                    id="rules-btn"
-                >Rules</button>
-                <div
-                    id="overlay"
-                    class="fixed inset-0 z-10 flex items-center justify-center hidden bg-black bg-opacity-50"
-                >
+                <li class="mr-6">
+                    <button
+                        class="hover:text-blue-800"
+                        id="rules-btn"
+                    >Rules</button>
                     <div
-                        class="max-w-sm px-2 py-1 bg-gray-200 rounded shadow-xl"
+                        id="overlay"
+                        class="fixed inset-0 z-10 flex items-center justify-center hidden bg-black bg-opacity-50"
                     >
-                        <div class="flex items-center justify-between">
-                            <h2 class="text-2xl font-bold">Rules</h2>
-                            <svg
-                                id="close-btn"
-                                class="w-6 h-6 p-1 rounded-full cursor-pointer hover:bg-gray-300"
-                                id="close-modal"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                            >
-                                <path
-                                    fill-rule="evenodd"
-                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                    clip-rule="evenodd"
-                                ></path>
-                            </svg>
-                        </div>
-                        <div class="mt-2">
-                            <p>1. Seven cards are dealt to each player</p>
-                            <p>2. The top card of the remaining deck is filled
-                                over and set aside to begind the discard pile.</p>
-                            <p>3. The player to the dealer's left palys first
-                                unless the first card on the discard pile is an
-                                action or Wild card</p>
-                            <p>4. On a player's turn, they must do one of the
-                                following</p>
-                            <ul>
-                                <li>a) play one card matching the discard in
-                                    color, number, or symbol</li>
-                                <li>b) play a Wild card, or a playable Wild Draw
-                                    Four card (restriction applied)</li>
-                                <li>c) draw the top card from the deck, then
-                                    play it if possible</li>
-                            </ul>
+                        <div
+                            class="max-w-sm px-2 py-1 bg-gray-200 rounded shadow-xl"
+                        >
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-2xl font-bold">Rules</h2>
+                                <svg
+                                    id="close-btn"
+                                    class="w-6 h-6 p-1 rounded-full cursor-pointer hover:bg-gray-300"
+                                    id="close-modal"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                        clip-rule="evenodd"
+                                    ></path>
+                                </svg>
+                            </div>
+                            <div class="mt-2">
+                                <p>1. Seven cards are dealt to each player</p>
+                                <p>2. The top card of the remaining deck is
+                                    filled over and set aside to begind the
+                                    discard pile.</p>
+                                <p>3. The player to the dealer's left palys
+                                    first unless the first card on the discard
+                                    pile is an action or Wild card</p>
+                                <p>4. On a player's turn, they must do one of
+                                    the following</p>
+                                <ul>
+                                    <li>a) play one card matching the discard in
+                                        color, number, or symbol</li>
+                                    <li>b) play a Wild card, or a playable Wild
+                                        Draw Four card (restriction applied)</li>
+                                    <li>c) draw the top card from the deck, then
+                                        play it if possible</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </li>
+                </li>
 
-            <li class="mr-6">
-                <a class="hover:text-blue-800" href="/registration">Register</a>
-            </li>
+                <li class="mr-6">
+                    <a
+                        class="hover:text-blue-800"
+                        href="/registration"
+                    >Register</a>
+                </li>
 
-            <li class="relative inline-block mr-6 dropdown">
-                <button
-                    class="inline-flex items-center w-16 text-gray-700 bg-gray-300 rounded"
-                >
-                    <span class="mr-1">Setting</span>
-                    <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
-                        <path
-                            d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
-                        ></path>
-                    </svg>
-                </button>
-                <ul class="absolute hidden pt-1 text-gray-700 dropdown-menu">
-                    <li class="">
-                        <a
-                            class="block px-4 py-2 whitespace-no-wrap bg-gray-200 rounded-t hover:bg-gray-400"
-                            href="#"
-                        >Setting option 1</a>
-                    </li>
-                    <li class="">
-                        <a
-                            class="block px-4 py-2 whitespace-no-wrap bg-gray-200 hover:bg-gray-400"
-                            href="#"
-                        >Setting option 2</a>
-                    </li>
-                    <li class="">
-                        <a
-                            class="block px-4 py-2 whitespace-no-wrap bg-gray-200 rounded-b hover:bg-gray-400"
-                            href="#"
-                        >Dark Mode</a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+                <li class="relative inline-block mr-6 dropdown">
+                    <button
+                        class="inline-flex items-center w-16 text-gray-700 rounded"
+                    >
+                        <span class="mr-1">Setting</span>
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                            <path
+                                d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
+                            ></path>
+                        </svg>
+                    </button>
+                    <ul
+                        class="absolute hidden pt-1 text-gray-700 dropdown-menu"
+                    >
+                        <li class="">
+                            <a
+                                class="block px-4 py-2 whitespace-no-wrap bg-gray-200 rounded-b hover:bg-gray-400"
+                                href="#"
+                            >Dark Mode</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
     </nav>
 </header>
