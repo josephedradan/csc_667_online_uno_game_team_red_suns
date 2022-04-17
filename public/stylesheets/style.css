@@ -38,10 +38,14 @@ body {
     position: fixed;
     left: 50%;
     top: 10%;
+    width: 300px;
+    height: 120px;
     transform: translate(-50%, 0);
     z-index: 9999;
-    background: grey;
+    background: #d3d3d3;
+    border: white solid 2px;
     border-radius: 5px;
     text-align: center;
     padding: 10px;
+    color: black;
 }
