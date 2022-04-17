@@ -12,17 +12,15 @@
     <link rel="stylesheet" href="/stylesheets/registration_validation.css">
     <script src="/javascripts/registration_validation.js" defer></script>
     {{/if}}
+    <script src="/javascripts/flash_message.js" defer></script>
   </head>
   <body>
 <!-- FIXME: redesign the message -->
-    {{#if message}}
-        <div class="alert" role="alert" style="background: #bee5eb">
-                <b>{{message.status}}</b>
-                <br>
-                <b>{{message.message}}</b>
-        </div>
-    {{/if}}
+    
     {{> header}}
+
+
+    {{> flashmessage}}
 
     {{{body}}}
   </body>
