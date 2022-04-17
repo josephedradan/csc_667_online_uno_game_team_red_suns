@@ -37,8 +37,6 @@ routerIndex.post(
     controllerIndex.registration
 );
 
-// FIXME: THIS IS TEMPORARY, REMOVE THIS WHEN DONE
-routerIndex.get("/dbtest", controllerIndex.testDB); // FIXME, THIS WILL CRASH UNLESS THE DB EXISTS
 
 
 module.exports = routerIndex;

@@ -32,17 +32,19 @@ const middlewarePassport = {};
  * @returns {Promise<*>}
  */
 middlewarePassport.checkAuthenticated = async (req, res, next) => {
-    debugPrinter.printMiddleware(middlewarePassport.checkAuthenticated.name)
+    debugPrinter.printMiddleware("checkAuthenticated")
 
     if (req.isAuthenticated()) {
         next();
     } else {
-        res.redirect("/");
 
-        // res.json({
-        //     status: 'failed',
-        //     message: 'User must be logged in to use this feature',
-        // });
+        req.session.message = {
+            status: 'failure',
+            message: 'User must be logged in to use this feature',
+        }
+
+        res.redirect("back");
+
     }
 };
 
@@ -55,17 +57,18 @@ middlewarePassport.checkAuthenticated = async (req, res, next) => {
  * @returns {Promise<*>}
  */
 middlewarePassport.checkUnauthenticated = async (req, res, next) => {
-    debugPrinter.printMiddleware(middlewarePassport.checkUnauthenticated.name)
+    debugPrinter.printMiddleware("checkUnauthenticated")
 
     if (req.isUnauthenticated()) {
         next();
     } else {
-        res.redirect("/");
 
-        // res.json({
-        //     status: 'failed',
-        //     message: `${req.user.username} you are logged in, you must not be logged in to use this feature`,
-        // });
+        req.session.message = {
+            status: 'failure',
+            message: `${req.user.username} you are logged in, you must not be logged in to use this feature`,
+        }
+
+        res.redirect("back");
     }
 };
 
@@ -89,7 +92,7 @@ function callbackCustomWrapper(req, res, next) {
 
     /*
     Notes:
-        The below is the doneCallBack given to verifyCallback inside of handler_passport
+        The below is the doneCallback given to verifyCallback inside of handler_passport
 
         * The actual logging in is done by the req.logIn call
 
@@ -121,8 +124,10 @@ function callbackCustomWrapper(req, res, next) {
         if (err) {
             return next(err);
         }
-        debugPrinter.printBackendMagenta(attributesAddedToReqUser)
-        debugPrinter.printBackendGreen(info)
+        debugPrinter.printBackendGreen("attributesAddedToReqUser")
+        debugPrinter.printBackendBlue(attributesAddedToReqUser)
+        debugPrinter.printBackendGreen("info")
+        debugPrinter.printBackendBlue(info)
         /*
         If attributesAddedToReqUser was not given by the passport strategy.
         The strategy should have returned information that should be added to req.user
@@ -132,15 +137,13 @@ function callbackCustomWrapper(req, res, next) {
          */
         if (!attributesAddedToReqUser) {
 
-            // FIXME: REPLACE THIS REST API VERSION WITH THE NORMAL WAY OR MAKE THIS FUNCTION CALL next()
             // Unsuccessful logIn response
-            res.status(403)
-                .json({
-                    status: 'failed',
-                    message: 'Password/Username is invalid', // If you care about security
-                    // message: info.message, // If you don't care about security use this instead of the above
-                });
 
+            req.session.message = {
+                status: 'failure',
+                message: 'Password/Username is invalid', // If you care about security
+            }
+            res.redirect('back')
 
         } else {
             /*
@@ -174,16 +177,13 @@ function callbackCustomWrapper(req, res, next) {
                     next(errorPassportLogin);
                 } else {
 
-                    // FIXME: REPLACE THIS REST API VERSION WITH THE NORMAL WAY OR MAKE THIS FUNCTION CALL next()
                     // Successful logIn response
-                    // res.status(200)
-                    //     .json({
-                    //         status: 'success',
-                    //         message: 'You have successful logIn!',
-                    //         user_id: req.user.user_id,
-                    //         username: req.user.username,
-                    //     });
-
+                    req.session.message = {
+                        status: 'success',
+                        message: `${req.user.username} has logged in`,
+                        // user_id: req.user.user_id,
+                        // username: req.user.username,
+                    };
 
                     next()
                 }
@@ -253,6 +253,7 @@ async function logOut(req, res, next) {
     });
 
 }
+
 middlewarePassport.logOut = logOut;
 
 
