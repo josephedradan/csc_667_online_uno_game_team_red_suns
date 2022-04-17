@@ -17,12 +17,6 @@ module.exports = {
 
             },
 
-            // Redundant
-            // is_host: {
-            //     type: Sequelize.BOOLEAN,
-            //     defaultValue: false
-            // },
-
             is_out_of_game: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false,
