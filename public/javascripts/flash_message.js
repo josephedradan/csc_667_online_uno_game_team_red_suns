@@ -15,5 +15,5 @@ const fadeOutFlashMessage = (msg) => {
 
 const flash_message = document.getElementById("flash-message");
 if (flash_message) {
-    // fadeOutFlashMessage(flash_message);
+    fadeOutFlashMessage(flash_message);
 }
