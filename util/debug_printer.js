@@ -46,7 +46,7 @@ colors.setTheme(
     {
         error: ['white', 'bgRed'],
         success: ['white', 'bgGreen'],
-        request: ['white', 'bgCyan'],
+        request: ['black', 'bgCyan'],
         warning: ['black', 'bgYellow'],
         debug: ['white', 'bgBlue'],
         middleware: ['white', 'bgMagenta'],

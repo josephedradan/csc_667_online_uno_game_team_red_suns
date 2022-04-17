@@ -32,7 +32,7 @@ const middlewarePassport = {};
  * @returns {Promise<*>}
  */
 middlewarePassport.checkAuthenticated = async (req, res, next) => {
-    debugPrinter.printMiddleware(middlewarePassport.checkAuthenticated.name)
+    debugPrinter.printMiddleware("checkAuthenticated")
 
     if (req.isAuthenticated()) {
         next();
@@ -57,7 +57,7 @@ middlewarePassport.checkAuthenticated = async (req, res, next) => {
  * @returns {Promise<*>}
  */
 middlewarePassport.checkUnauthenticated = async (req, res, next) => {
-    debugPrinter.printMiddleware(middlewarePassport.checkUnauthenticated.name)
+    debugPrinter.printMiddleware("checkUnauthenticated")
 
     if (req.isUnauthenticated()) {
         next();
@@ -124,8 +124,10 @@ function callbackCustomWrapper(req, res, next) {
         if (err) {
             return next(err);
         }
-        debugPrinter.printBackendMagenta(attributesAddedToReqUser)
-        debugPrinter.printBackendGreen(info)
+        debugPrinter.printBackendGreen("attributesAddedToReqUser")
+        debugPrinter.printBackendBlue(attributesAddedToReqUser)
+        debugPrinter.printBackendGreen("info")
+        debugPrinter.printBackendBlue(info)
         /*
         If attributesAddedToReqUser was not given by the passport strategy.
         The strategy should have returned information that should be added to req.user

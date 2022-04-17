@@ -126,15 +126,6 @@ Reference:
 // databaseSequelize.sequelize.sync({alter: true});
 
 
-app.use((req, res, next) => {
-    if (process.env.NODE_ENV === "development") {
-        debugPrinter.printMiddleware("DEBUGGING MIDDLEWARE")
-        debugPrinter.printDebug(req.body)
-    }
-
-    next()
-})
-
 /*############################## Handle Bars ##############################*/
 
 const hbs = create({
@@ -217,6 +208,26 @@ app.use(passport.session());
 /*############################## Middleware Message (Custom middleware) ##############################*/
 
 app.use(middlewareMessage);
+
+/*############################## DEBUGGING ##############################*/
+
+app.use((req, res, next) => {
+    if (process.env.NODE_ENV === "development") {
+        debugPrinter.printRequest("--- DEBUGGING MIDDLEWARE START ---")
+
+        debugPrinter.printBackendGreen("req.url")
+        debugPrinter.printDebug(req.url)
+        debugPrinter.printBackendGreen("req.body")
+        debugPrinter.printDebug(req.body)
+        debugPrinter.printBackendGreen("req.user")
+        debugPrinter.printDebug(req.user)
+
+        debugPrinter.printRequest("--- DEBUGGING MIDDLEWARE END ---")
+
+    }
+
+    next()
+})
 
 /*############################## routes ##############################*/
 
