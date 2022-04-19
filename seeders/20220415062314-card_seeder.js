@@ -42,7 +42,6 @@ function seedAllCards() {
   cards = cards.concat(generateColoredSpecialCards()); 
   cards = cards.concat(generateSpecialCards())
 
-  console.log(cards);
   return cards; 
 }
 

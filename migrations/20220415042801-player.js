@@ -14,7 +14,6 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 primaryKey: true,
                 autoIncrement: true,
-
             },
 
             is_out_of_game: {
