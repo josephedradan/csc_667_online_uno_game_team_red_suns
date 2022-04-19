@@ -36,7 +36,8 @@
     "pg-promise": "^10.11.1",
     "sequelize": "^6.18.0",
     "socket.io": "^4.4.1",
-    "tailwindcss": "^3.0.23"
+    "tailwindcss": "^3.0.23", 
+    "colors": "^1.4.0"
   },
   "devDependencies": {
     "colors": "^1.4.0",
