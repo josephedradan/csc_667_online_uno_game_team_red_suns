@@ -1,1 +1,1 @@
-web: rm -rf node_modules package-lock.json && npm install && npm start
+web: rm -rf node_modules package-lock.json && npm install && npm run start
