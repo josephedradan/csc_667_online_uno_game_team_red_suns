@@ -14,6 +14,7 @@ module.exports = {
             statistic_id: {
                 type: Sequelize.INTEGER,
                 references: {model: 'Account', key: 'account_id'},
+                autoIncrement: true,
                 allowNull: false,
                 unique: true,
             },
