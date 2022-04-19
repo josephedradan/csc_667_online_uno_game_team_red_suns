@@ -37,7 +37,7 @@ Reference:
 
  */
 const moment = require('moment');
-// const colors = require('colors');
+const colors = require('colors');
 
 // Getting the time
 
