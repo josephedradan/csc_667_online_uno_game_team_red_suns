@@ -38,11 +38,13 @@ Reference:
         Reference:
             https://stackoverflow.com/questions/27835801/how-to-auto-generate-migrations-with-sequelize-cli-from-sequelize-models
  */
+
+const {app, io} = require("./server")
+
 const createError = require("http-errors");
 const express = require("express");
 const passport = require('passport');
 
-const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const {create} = require("express-handlebars");
@@ -55,29 +57,28 @@ if (process.env.NODE_ENV === "development") {
     require("dotenv").config();
 }
 
-
 // const db = require("./db/testDB");
 
-const databaseSequelize = require('./models');
-const handlerPassport = require('./controller/handler_passport');
-const middlewareCommunicateToFrontend = require('./middleware/middleware_communicate_to_frontend')
+const databaseSequelize = require('../models');
+const handlerPassport = require('../controller/handler_passport');
+const middlewareCommunicateToFrontend = require('../middleware/middleware_communicate_to_frontend')
 
-const debugPrinter = require("./util/debug_printer");
+const debugPrinter = require("../util/debug_printer");
 
-const routes = require("./routes/routes");
+const routes = require("../routes/routes");
+const constants = require("./constants");
 
 /*
 ##############################################################################################################
 Setup and Settings
 ##############################################################################################################
  */
-const app = express();
 
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(constants.dirPublic));
 
 /*############################## connect-session-sequelize ##############################*/
 
@@ -129,8 +130,8 @@ Reference:
 /*############################## Handle Bars ##############################*/
 
 const hbs = create({
-    layoutsDir: path.join(__dirname, "views/layouts"),
-    partialsDir: path.join(__dirname, "views/partials"),
+    layoutsDir: constants.dirLayouts ,
+    partialsDir: constants.dirPartials,
     extname: ".hbs",
     defaultLayout: "layout",
     // helpers: {
@@ -146,7 +147,7 @@ app.engine("hbs", hbs.engine);
 
 // view engine setup
 app.set("view engine", "hbs");
-app.set("views", path.join(__dirname, "views"));
+app.set("views", constants.dirViews);
 
 /*############################## express-session (Must be placed after hsb to prevent unnecessary db calls) ##############################*/
 
@@ -235,11 +236,8 @@ app.use((req, res, next) => {
 app.use("/", routes);
 
 
-/*
-##############################################################################################################
-Error Handling
-##############################################################################################################
- */
+/*############################## Error handling ##############################*/
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     next(createError(404));
