@@ -50,6 +50,53 @@ const debugPrinter = require("../util/debug_printer");
  * @param username
  * @returns {Promise<any[]>}
  */
+async function getGetCardTableOnColor(color) {
+    // Acceptable values: blue, green, yellow, red
+    debugPrinter.printFunction(getGetCardTableOnColor.name)
+    let result = await db.any(
+        `
+        SELECT card_id, type, content, color
+	    FROM "Card" WHERE color = $1;
+        `, 
+        [
+            color
+        ]
+    )
+    return result;
+}
+
+dbEngine.getGetCardTableOnColor = getGetCardTableOnColor; 
+
+
+async function getCardTableOnType(type) {
+    // Acceptable values: NUMBER, SPECIAL
+    debugPrinter.printFunction(getCardTableOnType.name)
+    let result = await db.any(
+        `
+        SELECT card_id, type, content, color
+	    FROM "Card" WHERE type = $1;
+        `, 
+        [
+            type
+        ]
+    )
+    return result;
+}
+
+dbEngine.getCardTableOnType =  getCardTableOnType; 
+
+async function getAllPlayableCardInfo() {
+    debugPrinter.printFunction(getAllPlayableCardInfo.name)
+    let result = await db.any(
+        `
+        SELECT * FROM "Card"
+        `
+    )
+    return result; 
+}
+
+dbEngine.getAllPlayableCardInfo = getAllPlayableCardInfo; 
+
 async function getAccountAndAccountStatisticsByUsername(username) {
     debugPrinter.printFunction(getAccountAndAccountStatisticsByUsername.name);
     let result = await db.any(
@@ -80,7 +127,7 @@ async function getAccountByUsername(username) {
     let result = await db.any(
         `
         SELECT account.username, account.password, account.account_id 
-        FROM public."Account" AS account 
+        FROM "Account" AS account 
         WHERE account.username = $1;
         `,
         [
@@ -142,7 +189,6 @@ async function creatAccountStatistic(account_id) {
 
     return result[0] // Should be the new object
 }
-
 
 dbEngine.creatAccountStatistic = creatAccountStatistic;
 
