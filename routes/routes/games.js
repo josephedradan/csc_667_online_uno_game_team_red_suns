@@ -12,4 +12,8 @@ routerGames.get("/renderTestGame",
     middlewareAuthenticationPassport.checkAuthenticated, 
     controllerGames.renderTestGame);
 
+routerGames.get("/makeDeck", 
+    middlewareAuthenticationPassport.checkAuthenticated, 
+    controllerGames.renderTestMakeDeck); 
+
 module.exports = routerGames;

@@ -11,4 +11,13 @@ controllerGames.renderTestGame = (req, res, next) =>{
     res.render("game_lobby", {title: "Game Lobby"});
 }
 
+controllerGames.renderTestMakeDeck = (req, res, next) => {
+    /**
+     * This is just a test to envoke a function that makes a deck in public/javascript
+     */
+
+    
+    res.render("index");
+}
+
 module.exports = controllerGames
