@@ -37,11 +37,21 @@ Reference:
 const dbEngine = {};
 
 // const { mergeDefaults } = require("sequelize/types/utils");
-const sequelize = require('../models');
-const db = require('../db');
+const { sequelize } = require('../models');
+const db = require('../db/index');
 const debugPrinter = require('../util/debug_printer');
 
 // const { QueryTypes } = require('sequelize');
+
+async function sequelizeGetUsers() {
+    const [results, metadata] = await sequelize.query('SELECT * FROM "User"');
+
+    return results;
+}
+
+dbEngine.sequelizeGetUsers = sequelizeGetUsers;
+
+/* #################################################################################################### */
 
 /**
  * Notes:
@@ -110,7 +120,6 @@ async function getUserAndUserStatisticsByUsername(username) {
             username,
         ],
     );
-    debugPrinter.printBackendRed(result);
 
     return result[0];
 }

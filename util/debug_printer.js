@@ -56,6 +56,9 @@ colors.setTheme(
         backend_blue: ['white', 'bgBlue', 'italic'],
         backend_green: ['white', 'bgGreen', 'italic'],
         backend_magenta: ['white', 'bgMagenta', 'italic'],
+        backend_white: ['black', 'bgWhite', 'italic'],
+        backend_cyan: ['black', 'bgCyan', 'italic'],
+        backend_yellow: ['black', 'bgYellow', 'italic'],
 
     },
 );
@@ -141,6 +144,15 @@ const debugPrinter = {
     }),
     printBackendMagenta: wrapperPrinter((input) => {
         printer(input, 'backend_magenta');
+    }),
+    printBackendWhite: wrapperPrinter((input) => {
+        printer(input, 'backend_white');
+    }),
+    printBackendCyan: wrapperPrinter((input) => {
+        printer(input, 'backend_cyan');
+    }),
+    printBackendYellow: wrapperPrinter((input) => {
+        printer(input, 'backend_yellow');
     }),
 };
 

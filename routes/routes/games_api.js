@@ -10,5 +10,4 @@ routerGamesAPI.use(middlewareValidationGameLogic.checkIfPlayerCanDoAction);
 
 routerGamesAPI.post('playCard');
 
-
 module.exports = routerGamesAPI;

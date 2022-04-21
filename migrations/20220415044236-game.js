@@ -19,17 +19,17 @@ module.exports = {
                 defaultValue: false,
             },
 
-            current_player_id: { // current player whos in turn to play/draw etc. a card. 
+            current_player_id: { // current player whos in turn to play/draw etc. a card.
                 type: Sequelize.INTEGER,
                 references: { model: 'Player', key: 'player_id' },
-                allowNull: true
+                allowNull: true,
             },
 
-            host_id: { // host of game. 
+            host_id: { // host of game.
                 type: Sequelize.INTEGER,
                 references: { model: 'Player', key: 'player_id' },
                 allowNull: false,
-                unique: true
+                unique: true,
             },
         });
 

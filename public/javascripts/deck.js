@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * // shuffle a new deck for every game
 function newDeck() {
     const tempDeck = [];
@@ -36,10 +36,10 @@ function newDeck() {
     }
     return tempDeck;
 }
- * 
- * 
+ *
+ *
 Number cards, a breakdown:
-0 – 1 card for each color, so 4 in total 
+0 – 1 card for each color, so 4 in total
 1 – 2 cards for each color, so 8 in total
 2 – 2 cards for each color, so 8 in total
 3 – 2 cards for each color, so 8 in total
@@ -57,11 +57,11 @@ Number cards, a breakdown:
 13 * 8 + 4 = 108 total cards
 */
 
-//Pull the data for the numbered cards for the following colors; red, blue, yellow, green
-//  make copies of those cards per color following the instructions above. 
-//Pull the black cards and make their copies based on instruction above. 
-//Shuffle the new deck and insert them in the CardState Table and Card. 
+// Pull the data for the numbered cards for the following colors; red, blue, yellow, green
+//  make copies of those cards per color following the instructions above.
+// Pull the black cards and make their copies based on instruction above.
+// Shuffle the new deck and insert them in the CardState Table and Card.
 
 /**
- * TODO: Make the Deck first and shulffe them. 
+ * TODO: Make the Deck first and shulffe them.
  */

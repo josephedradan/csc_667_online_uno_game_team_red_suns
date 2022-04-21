@@ -39,7 +39,6 @@ const socket_io = require('socket.io');
 const debug = require('debug')('application:serverHttp');
 
 const debugPrinter = require('../util/debug_printer');
-
 // const socketAPI = require("./socket_api");
 
 /*
@@ -49,13 +48,6 @@ Setup and Settings
  */
 
 const connectionContainer = {};
-
-const PORT = normalizePort(process.env.PORT || '3000');
-
-/* ############################## Express ############################## */
-
-const app = express();
-connectionContainer.app = app;
 
 /**
  * Normalize a PORT into a number, string, or false.
@@ -77,6 +69,12 @@ function normalizePort(val) {
     return false;
 }
 
+const PORT = normalizePort(process.env.PORT || '3000');
+
+/* ############################## Express ############################## */
+const app = express();
+connectionContainer.app = app;
+
 /**
  * Get PORT from environment and store in Express.
  */
@@ -95,22 +93,22 @@ connectionContainer.serverHttp = serverHttp;
 /**
  * Listen on provided PORT, on all network interfaces.
  */
-const initDeck = require("../controller/controller_test").initializeDrawStack; 
+const initDeck = require('../controller/controller_test').initializeDrawStack;
 
-
-serverHttp.listen(PORT, (err) => {
+serverHttp.listen(PORT, async (err) => {
     if (err) {
         console.log(err);
         return;
     }
 
     if (process.env.NODE_ENV === 'development') {
-        debugPrinter.printRequest('--- SERVER START UP START ---');
+        debugPrinter.printBackendWhite('--- SERVER START UP START ---');
+
         debugPrinter.printBackendBlue('On Development mode...');
         debugPrinter.printBackendBlue(`Server listening on port: ${PORT}`);
         debugPrinter.printBackendBlue(`process.env.DATABASE_URL: ${process.env.DATABASE_URL}`);
 
-        debugPrinter.printRequest('--- SERVER START UP END ---');
+        debugPrinter.printBackendWhite('--- SERVER START UP END ---');
     }
 });
 

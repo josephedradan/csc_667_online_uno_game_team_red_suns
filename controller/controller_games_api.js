@@ -2,14 +2,15 @@
 Handle all the game api calls
 
  */
-const dbEngine = require("../controller/db_engine"); 
+const dbEngine = require('./db_engine');
+
 const controllerGamesAPI = {};
 
 controllerGamesAPI.initializeDrawStack = async () => {
-    let newDeck = []; 
-    const coloredNumCards = await dbEngine.getCardTableOnType('NUMBER'); 
-    const blackWildCards = await dbEngine.getCardTableOnType('SPECIAL'); 
-}
+    const newDeck = [];
+    const coloredNumCards = await dbEngine.getCardTableOnType('NUMBER');
+    const blackWildCards = await dbEngine.getCardTableOnType('SPECIAL');
+};
 
 async function playCard(req, res, next) {
     // TODO VALIDATE IF USER IS IN THAT GAME

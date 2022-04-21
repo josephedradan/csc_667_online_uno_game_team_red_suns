@@ -18,7 +18,7 @@ module.exports = {
 
             display_name: {
                 type: Sequelize.STRING,
-                allowNull: false
+                allowNull: false,
             },
 
             username: {

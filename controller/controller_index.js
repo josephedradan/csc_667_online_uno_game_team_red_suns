@@ -74,7 +74,9 @@ async function registration(req, res, next) {
 
     debugPrinter.printDebug(req.body);
 
-    const { username, display_name, password, confirm_password } = req.body;
+    const {
+        username, display_name, password, confirm_password,
+    } = req.body;
 
     try {
         // Check if username already exists

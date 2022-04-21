@@ -6,6 +6,6 @@ const controllerTest = require('../../controller/controller_test');
 
 routerTest.get('/', controllerTest.testDB);
 routerTest.get('/:username', controllerTest.testDBSequelizeRaw);
-routerTest.get('/testInitDeck', controllerTest.initializeDrawStack); 
+routerTest.get('/testInitDeck', controllerTest.initializeDrawStack);
 
 module.exports = routerTest;

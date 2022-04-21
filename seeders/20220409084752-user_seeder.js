@@ -36,22 +36,27 @@ module.exports = {
         return await queryInterface.bulkInsert('User', [
             {
                 username: 'EddyYun123',
-                display_name:"EddyYun",
+                display_name: 'EddyYun',
                 password: await passwordHandler.hash('YunYun123!'),
             },
             {
                 username: 'JosephEdredan321',
-                display_name: "JosephE", 
+                display_name: 'JosephE',
                 password: await passwordHandler.hash('EddyYeti321!'),
             },
             {
+                username: 'joseph1',
+                display_name: 'JosephE2',
+                password: await passwordHandler.hash('Test123!'),
+            },
+            {
                 username: 'EricFalk567',
-                display_name:"EricFalk",
+                display_name: 'EricFalk',
                 password: await passwordHandler.hash('FalkyWalky567!'),
             },
             {
                 username: 'JohnSanJose891',
-                display_name:"JohnSanJose",
+                display_name: 'JohnSanJose',
                 password: await passwordHandler.hash('NoWayJose891!'),
             },
         ]);

@@ -13,7 +13,7 @@ module.exports = {
                 primaryKey: true,
                 autoIncrement: true,
             },
-            
+
             // What the card state is tied to
             game_id: {
                 type: Sequelize.INTEGER,

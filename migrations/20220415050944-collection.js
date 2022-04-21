@@ -22,7 +22,7 @@ module.exports = {
             player_id: { // This may or may not exist (If type is HAND then this will not be null)
                 type: Sequelize.INTEGER,
                 references: { model: 'Player', key: 'player_id' },
-                allowNull: true
+                allowNull: true,
             },
 
         });

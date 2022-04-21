@@ -9,12 +9,13 @@ const connectionConfig = {
     ssl:
         process.env.NODE_ENV !== 'development' ? {
             require: true,
-            rejectUnauthorized: true,
+            rejectUnauthorized: false,
         } : false,
 };
 
-const connection = pgp(connectionConfig);
+const db = pgp(connectionConfig);
+// const db = pgp(connectionConfig);
 
-// const connection = pgp(process.env.DATABASE_URL);
+// const db = pgp('postgres://postgres:root@localhost:5432/csc667-db');
 
-module.exports = connection;
+module.exports = db;

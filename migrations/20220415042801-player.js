@@ -20,9 +20,9 @@ module.exports = {
             },
 
             seat_index: {
-                type: Sequelize.INTEGER, 
+                type: Sequelize.INTEGER,
                 allowNull: false,
-            }, 
+            },
 
             account_id: {
                 type: Sequelize.INTEGER,

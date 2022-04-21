@@ -13,19 +13,19 @@ module.exports = {
                 primaryKey: true,
                 autoIncrement: true,
             },
-            
+
             index: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
-            
+
             // What type of card it is
-            card_info_id: {  
+            card_info_id: {
                 type: Sequelize.INTEGER,
                 references: { model: 'CardInfo', key: 'card_info_id' },
                 allowNull: false,
             },
-            
+
             // Where this card is in
             collection_id: {
                 type: Sequelize.INTEGER,

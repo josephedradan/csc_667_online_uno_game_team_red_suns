@@ -39,10 +39,20 @@ Reference:
             https://stackoverflow.com/questions/27835801/how-to-auto-generate-migrations-with-sequelize-cli-from-sequelize-models
  */
 
+const dotenv = require('dotenv');
+
+dotenv.config(); // This must be at the top of all before any imports
+
+// eslint-disable-next-line import/order
+const constants = require('./constants');
+
+// eslint-disable-next-line import/order
+const connectionContainer = require('./server');
+
 const {
     app,
     io,
-} = require('./server');
+} = connectionContainer;
 
 const express = require('express');
 const passport = require('passport');
@@ -54,14 +64,15 @@ const cookieParser = require('cookie-parser');
 const { create } = require('express-handlebars');
 // const handlebars = require("express-handlebars");
 
+// eslint-disable-next-line import/order
+const db = require('../db');
+// const databaseSequelize = require('../models');
+
 const expressSession = require('express-session');
 
-const ConnectSessionSequelize = require('connect-session-sequelize')(
-    expressSession.Store,
-);
+const connectPGSimple = require('connect-pg-simple');
+// const connectSessionSequelize = require('connect-session-sequelize');
 
-const constants = require('./constants');
-const databaseSequelize = require('../models');
 const handlerPassport = require('../controller/handler_passport'); // WARNING: MAKE SURE THAT THIS IMPORT IS BEFORE ANY USAGE OF ANY PASSPORT FUNCTIONALITY
 
 const middlewareCommunicateToFrontend = require('../middleware/middleware_communicate_to_frontend');
@@ -69,13 +80,6 @@ const middlewareCommunicateToFrontend = require('../middleware/middleware_commun
 const routes = require('../routes/routes');
 
 const debugPrinter = require('../util/debug_printer');
-
-if (process.env.NODE_ENV === 'development') {
-    require('dotenv')
-        .config();
-}
-
-// const db = require("./db/testDB");
 
 /*
 ##############################################################################################################
@@ -97,20 +101,21 @@ Connect express-session when using Sequelize
 https://www.npmjs.com/package/connect-session-sequelize
 
  */
+// const ConnectSessionSequelize = connectSessionSequelize(expressSession.Store);
 
 // A express session store using sequelize made using connect-session-sequelize (a wrapper object)
-const sequelizeExpressSessionStore = new ConnectSessionSequelize({
-    db: databaseSequelize.sequelize,
-});
+// const sequelizeExpressSessionStore = new ConnectSessionSequelize({
+//     db: databaseSequelize.sequelize,
+// });
 
 // Check if you can connect to the database
-databaseSequelize.sequelize.authenticate()
-    .then(() => {
-        debugPrinter.printBackendGreen('Database Connected');
-    })
-    .catch((err) => {
-        debugPrinter.printError(err);
-    });
+// databaseSequelize.sequelize.authenticate()
+//     .then(() => {
+//         debugPrinter.printBackendGreen('Database Connected');
+//     })
+//     .catch((err) => {
+//         debugPrinter.printError(err);
+//     });
 
 // Sync the database models if not exists
 
@@ -132,14 +137,41 @@ Reference:
  */
 // databaseSequelize.sequelize.sync({alter: true});
 
+/* ############################## connect-pg-simple ############################## */
+/*
+Connect PG Simple
+
+Notes:
+    Setting up the Session Store object for the express-sessions
+
+Reference:
+    Connect PG Simple
+        Notes:
+            Go to the url for options for the pgSessionStore
+        Reference:
+            https://www.npmjs.com/package/connect-pg-simple
+
+    Connect-pg-simple express: Failed to prune sessions: relation "session" does not exist. PostgreSQL
+        Notes:
+            If you get the above error, then go here
+        Reference:
+            https://stackoverflow.com/a/71285712
+ */
+const PGSessionStore = connectPGSimple(expressSession);
+
+const pgSessionStore = new PGSessionStore({
+    createTableIfMissing: true,
+    pgPromise: db,
+    tableName: 'Sessions',
+});
+
 /* ############################## Handle Bars ############################## */
 
 const hbs = create({
     layoutsDir: constants.dirLayouts,
     partialsDir: constants.dirPartials,
     extname: '.hbs',
-    defaultLayout: 'layout',
-    // helpers: {
+    defaultLayout: 'layout', // helpers: {
     //     emptyObject: (obj) => {
     //         return !(
     //             obj.constructor === Object && Object.keys(obj).length == 0
@@ -182,21 +214,23 @@ Reference:
             https://stackoverflow.com/questions/40381401/when-to-use-saveuninitialized-and-resave-in-express-session
  */
 app.use(
-    expressSession({
-        secret: 'SOME SECRET', // TODO: MOVE THIS TO A FILE OR SOMETHING
-        resave: false, // Rewrite/Resave the res.session.cookie on every request (THIS OPTION MUST BE SET TO TRUE DUE TO THE BACKEND NOT BEING RESTFUL)
-        saveUninitialized: false, // Allow saving empty/non modified session objects in session store (THIS OPTION MUST BE SET TO TRUE DUE TO THE BACKEND NOT BEING RESTFUL)
-        store: sequelizeExpressSessionStore, // Use the Store made from connect-session-sequelize
-        cookie: {
-            httpOnly: false,
-            //     secure: true, // THIS REQUIRES THAT THE CONNECTION IS SECURE BY USING HTTPS (https://github.com/expressjs/session#cookiesecure)
-            //     maxAge: 86400, // 1 Week long cookie
+    expressSession(
+        {
+            secret: 'SOME SECRET', // TODO: MOVE THIS TO A FILE OR SOMETHING
+            resave: false, // Rewrite/Resave the res.session.cookie on every request (THIS OPTION MUST BE SET TO TRUE DUE TO THE BACKEND NOT BEING RESTFUL)
+            saveUninitialized: false, // Allow saving empty/non modified session objects in session store (THIS OPTION MUST BE SET TO TRUE DUE TO THE BACKEND NOT BEING RESTFUL)
+            // store: sequelizeExpressSessionStore, // Use the Store made from connect-session-sequelize
+            store: pgSessionStore,
+            cookie: {
+                httpOnly: false, //     secure: true, // THIS REQUIRES THAT THE CONNECTION IS SECURE BY USING HTTPS (https://github.com/expressjs/session#cookiesecure)
+                //     maxAge: 86400, // 1 Week long cookie
+            },
         },
-    }),
+    ),
 );
 
 // Sync the express sessions table (If the table does not exist in the database, then this will create it)
-sequelizeExpressSessionStore.sync();
+// sequelizeExpressSessionStore.sync();
 
 /* ############################## passport (Must be placed after hsb to prevent unnecessary db calls) ############################## */
 // Config passport
@@ -220,7 +254,7 @@ app.use(middlewareCommunicateToFrontend.middlewarePersistUser);
 
 app.use((req, res, next) => {
     if (process.env.NODE_ENV === 'development') {
-        debugPrinter.printRequest('--- DEBUGGING MIDDLEWARE START ---');
+        debugPrinter.printBackendYellow('--- DEBUGGING MIDDLEWARE START ---');
 
         debugPrinter.printBackendGreen('req.url');
         debugPrinter.printDebug(req.url);
@@ -229,7 +263,7 @@ app.use((req, res, next) => {
         debugPrinter.printBackendGreen('req.user');
         debugPrinter.printDebug(req.user);
 
-        debugPrinter.printRequest('--- DEBUGGING MIDDLEWARE END ---');
+        debugPrinter.printBackendYellow('--- DEBUGGING MIDDLEWARE END ---');
     }
 
     next();

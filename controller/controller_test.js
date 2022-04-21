@@ -1,20 +1,19 @@
 const db = require('../db');
 const dbEngine = require('./db_engine');
 
-controllerIndex = {};
+const controllerTest = {};
 
-controllerIndex.initializeDrawStack = async (req, res, next) => {
-    let newDeck = []; 
-    const coloredNumCards = await dbEngine.getCardTableOnType('NUMBER'); 
-    const blackWildCards = await dbEngine.getCardTableOnType('SPECIAL'); 
-    console.log(coloredNumCards); 
-    console.log(blackWildCards); 
+controllerTest.initializeDrawStack = async (req, res, next) => {
+    const newDeck = [];
+    const coloredNumCards = await dbEngine.getCardTableOnType('NUMBER');
+    const blackWildCards = await dbEngine.getCardTableOnType('SPECIAL');
+    console.log(coloredNumCards);
+    console.log(blackWildCards);
 
-    res.render("index"); 
-}
+    res.render('index');
+};
 
-
-controllerIndex.testDB = async (req, res, next) => {
+controllerTest.testDB = async (req, res, next) => {
     await db
         .any(
             `INSERT INTO test_table ("testString") VALUES ('Hello at ${Date.now()}')`,
@@ -27,7 +26,7 @@ controllerIndex.testDB = async (req, res, next) => {
         });
 };
 
-controllerIndex.testDBSequelizeRaw = async (req, res, next) => {
+controllerTest.testDBSequelizeRaw = async (req, res, next) => {
     try {
         const { username } = req.params;
         res.json(dbEngine.getUserByUsername(username));
@@ -36,4 +35,4 @@ controllerIndex.testDBSequelizeRaw = async (req, res, next) => {
     }
 };
 
-module.exports = controllerIndex;
+module.exports = controllerTest;

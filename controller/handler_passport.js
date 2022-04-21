@@ -112,13 +112,9 @@ const handlerPassport = {};
  */
 async function verifyCallback(username, password, doneCallback) {
     debugPrinter.printFunction(verifyCallback.name);
-    debugPrinter.printFunction(username);
-    debugPrinter.printFunction(password);
 
     try {
         const account = await dbEngine.getUserByUsername(username);
-
-        debugPrinter.printDebug(account);
 
         // Invalid username
         if (account === null || account === undefined) {
@@ -265,9 +261,9 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
         // }
 
         // Get the userAndUserStatistics via username
-        const [error, userAndUserStatistics] = await to(Account.getUserAndUserStatisticsByUsername(username));
+        const [error, userAndUserStatistics] = await to(dbEngine.getUserAndUserStatisticsByUsername(username));
 
-        debugPrinter.printSuccess(userAndUserStatistics);
+        // debugPrinter.printSuccess(userAndUserStatistics);
 
         // If userAndUserStatistics exists
         if (userAndUserStatistics !== null) {
