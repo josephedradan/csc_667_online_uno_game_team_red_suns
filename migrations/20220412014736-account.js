@@ -1,6 +1,4 @@
-'use strict';
-
-const {allow} = require("joi");
+const { allow } = require('joi');
 
 module.exports = {
     async up(queryInterface, Sequelize) {
@@ -10,7 +8,7 @@ module.exports = {
          * Example:
          * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
          */
-        return await queryInterface.createTable("Account", {
+        return await queryInterface.createTable('Account', {
 
             account_id: {
                 type: Sequelize.INTEGER,
@@ -27,7 +25,7 @@ module.exports = {
             password: {
                 type: Sequelize.STRING,
                 allowNull: false,
-            }
+            },
 
         });
     },
@@ -40,5 +38,5 @@ module.exports = {
          * await queryInterface.dropTable('users');
          */
         return queryInterface.dropTable('Account');
-    }
+    },
 };

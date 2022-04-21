@@ -1,8 +1,8 @@
-const db = require("../db/index");
-const dbEngine = require("./db_engine");
-const passwordHandler = require("./handler_password");
+const db = require('../db/index');
+const dbEngine = require('./db_engine');
+const passwordHandler = require('./handler_password');
 
-const debugPrinter = require("../util/debug_printer");
+const debugPrinter = require('../util/debug_printer');
 
 /* ############################################################################################################## */
 
@@ -22,7 +22,7 @@ const controllerIndex = {};
 async function logIn(req, res, next) {
     debugPrinter.printMiddleware(logIn.name);
 
-    res.redirect("/");
+    res.redirect('/');
 }
 
 controllerIndex.logIn = logIn;
@@ -41,7 +41,7 @@ controllerIndex.logIn = logIn;
 async function logOut(req, res, next) {
     debugPrinter.printMiddleware(logOut.name);
 
-    res.redirect("/");
+    res.redirect('/');
 }
 
 controllerIndex.logOut = logOut;
@@ -50,7 +50,7 @@ async function renderIndex(req, res, next) {
     debugPrinter.printMiddleware(renderIndex.name);
     debugPrinter.printBackendBlue(req.user);
 
-    res.render("index");
+    res.render('index');
 }
 
 controllerIndex.renderIndex = renderIndex;
@@ -64,7 +64,7 @@ async function x() {
 }
 
 async function renderRegistration(req, res, next) {
-    res.render("registration", {title: "registration", registration: true});
+    res.render('registration', { title: 'registration', registration: true });
 }
 
 controllerIndex.renderRegistration = renderRegistration;
@@ -74,53 +74,51 @@ async function registration(req, res, next) {
 
     debugPrinter.printDebug(req.body);
 
-    const {username, password, confirm_password} = req.body;
+    const { username, password, confirm_password } = req.body;
 
     try {
         // Check if username already exists
-        let existingAccount = await dbEngine.getAccountByUsername(username);
+        const existingAccount = await dbEngine.getAccountByUsername(username);
 
         if (existingAccount) {
-
             req.session.message = {
-                status: "failure",
-                message: "Username already exists",
-            }
+                status: 'failure',
+                message: 'Username already exists',
+            };
 
-            res.redirect('back')
+            res.redirect('back');
         }
         // Create new account
         else {
             const hashedPassword = await passwordHandler.hash(password);
 
-            let account = await dbEngine.createAccount(
+            const account = await dbEngine.createAccount(
                 username,
-                hashedPassword
+                hashedPassword,
             );
 
             debugPrinter.printBackendBlue(account);
 
-            let accountStatistic = await dbEngine.creatAccountStatistic(
-                account.account_id
+            const accountStatistic = await dbEngine.creatAccountStatistic(
+                account.account_id,
             );
             debugPrinter.printBackendMagenta(accountStatistic);
             debugPrinter.printBackendGreen(existingAccount);
 
             req.session.message = {
-                status: "success",
+                status: 'success',
                 message: `Account "${account.username}" was created`,
-            }
-            res.redirect('/')
+            };
+            res.redirect('/');
         }
 
-        debugPrinter.printBackendGreen("REDIRECTING");
+        debugPrinter.printBackendGreen('REDIRECTING');
     } catch (err) {
-        debugPrinter.printError(`ERROR FROM ${registration.name}`)
+        debugPrinter.printError(`ERROR FROM ${registration.name}`);
         next(err);
     }
 }
 
 controllerIndex.registration = registration;
-
 
 module.exports = controllerIndex;

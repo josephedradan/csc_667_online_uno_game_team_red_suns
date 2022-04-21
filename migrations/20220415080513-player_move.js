@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = {
     async up(queryInterface, Sequelize) {
         /**
@@ -8,7 +6,8 @@ module.exports = {
          * Example:
          * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
          */
-        return await queryInterface.createTable('PlayerMove',
+        return await queryInterface.createTable(
+            'PlayerMove',
             {
 
                 move_id: {
@@ -18,7 +17,7 @@ module.exports = {
                 },
                 time_exec: {
                     type: Sequelize.DATE, // going to have to parse this for the time
-                    defaultValue: Sequelize.literal("NOW()"),
+                    defaultValue: Sequelize.literal('NOW()'),
                 },
 
                 move: {
@@ -29,24 +28,24 @@ module.exports = {
                 card_id: {
                     type: Sequelize.INTEGER,
                     allowNull: false,
-                    references: {model: 'Card', key: 'card_id'},
+                    references: { model: 'Card', key: 'card_id' },
                 },
 
                 player_id: {
                     type: Sequelize.INTEGER,
                     allowNull: false,
-                    references: {model: 'Player', key: 'player_id'},
+                    references: { model: 'Player', key: 'player_id' },
                 },
 
                 lobby_id: {
                     type: Sequelize.INTEGER,
                     allowNull: false,
-                    references: {model: 'Lobby', key: 'lobby_id'},
+                    references: { model: 'Lobby', key: 'lobby_id' },
                 },
 
-            });
+            },
+        );
     },
-
 
     async down(queryInterface, Sequelize) {
         /**
@@ -56,5 +55,5 @@ module.exports = {
          * await queryInterface.dropTable('users');
          */
         return await queryInterface.dropTable('PlayerMove');
-    }
+    },
 };

@@ -32,19 +32,17 @@ const middlewarePassport = {};
  * @returns {Promise<*>}
  */
 middlewarePassport.checkAuthenticated = async (req, res, next) => {
-    debugPrinter.printMiddleware("checkAuthenticated")
+    debugPrinter.printMiddleware('checkAuthenticated');
 
     if (req.isAuthenticated()) {
         next();
     } else {
-
         req.session.message = {
             status: 'failure',
             message: 'User must be logged in to use this feature',
-        }
+        };
 
-        res.redirect("back");
-
+        res.redirect('back');
     }
 };
 
@@ -57,18 +55,17 @@ middlewarePassport.checkAuthenticated = async (req, res, next) => {
  * @returns {Promise<*>}
  */
 middlewarePassport.checkUnauthenticated = async (req, res, next) => {
-    debugPrinter.printMiddleware("checkUnauthenticated")
+    debugPrinter.printMiddleware('checkUnauthenticated');
 
     if (req.isUnauthenticated()) {
         next();
     } else {
-
         req.session.message = {
             status: 'failure',
             message: `${req.user.username} you are logged in, you must not be logged in to use this feature`,
-        }
+        };
 
-        res.redirect("back");
+        res.redirect('back');
     }
 };
 
@@ -88,7 +85,7 @@ middlewarePassport.checkUnauthenticated = async (req, res, next) => {
  * @returns {(function(*, *, *): (*|undefined))|*}
  */
 function callbackCustomWrapper(req, res, next) {
-    debugPrinter.printFunction(callbackCustomWrapper.name)
+    debugPrinter.printFunction(callbackCustomWrapper.name);
 
     /*
     Notes:
@@ -118,16 +115,16 @@ function callbackCustomWrapper(req, res, next) {
 
     */
     function callbackCustom(err, attributesAddedToReqUser, info) {
-        debugPrinter.printFunction(callbackCustom.name)
+        debugPrinter.printFunction(callbackCustom.name);
 
         // Standard error checking (error should have come from the custom verifyCallback call most likely in handler_passport)
         if (err) {
             return next(err);
         }
-        debugPrinter.printBackendGreen("attributesAddedToReqUser")
-        debugPrinter.printBackendBlue(attributesAddedToReqUser)
-        debugPrinter.printBackendGreen("info")
-        debugPrinter.printBackendBlue(info)
+        debugPrinter.printBackendGreen('attributesAddedToReqUser');
+        debugPrinter.printBackendBlue(attributesAddedToReqUser);
+        debugPrinter.printBackendGreen('info');
+        debugPrinter.printBackendBlue(info);
         /*
         If attributesAddedToReqUser was not given by the passport strategy.
         The strategy should have returned information that should be added to req.user
@@ -136,15 +133,13 @@ function callbackCustomWrapper(req, res, next) {
             It's a very bad idea to tell the user what they failed on when they log in, it is a security risk
          */
         if (!attributesAddedToReqUser) {
-
             // Unsuccessful logIn response
 
             req.session.message = {
                 status: 'failure',
                 message: 'Password/Username is invalid', // If you care about security
-            }
-            res.redirect('back')
-
+            };
+            res.redirect('back');
         } else {
             /*
             If null was given by the passport strategy.
@@ -171,12 +166,11 @@ function callbackCustomWrapper(req, res, next) {
                             https://www.passportjs.org/concepts/authentication/login/
             */
             req.logIn(attributesAddedToReqUser, async (errorPassportLogin) => {
-                debugPrinter.printFunction("req.logIn")
+                debugPrinter.printFunction('req.logIn');
 
                 if (errorPassportLogin) {
                     next(errorPassportLogin);
                 } else {
-
                     // Successful logIn response
                     req.session.message = {
                         status: 'success',
@@ -185,7 +179,7 @@ function callbackCustomWrapper(req, res, next) {
                         // username: req.user.username,
                     };
 
-                    next()
+                    next();
                 }
             });
         }
@@ -203,10 +197,9 @@ function callbackCustomWrapper(req, res, next) {
  * @returns {middlewarePassportAuthenticatePseudo}
  */
 function authenticate(strategy) {
-    debugPrinter.printMiddleware(authenticate.name)
+    debugPrinter.printMiddleware(authenticate.name);
 
     function middlewarePassportAuthenticatePseudo(req, res, next) {
-
         // Calling passport.authenticate()
         const middlewarePassportAuthenticate = passport.authenticate(
             strategy,
@@ -235,9 +228,8 @@ middlewarePassport.authenticate = authenticate;
  * @returns {Promise<void>}
  */
 async function logOut(req, res, next) {
-
     // Get username (It will not exist in the session once you log out)
-    const {username} = req.user;
+    const { username } = req.user;
 
     // Will log out user (this functionality is handled by the passport package)
     req.logOut();
@@ -245,16 +237,14 @@ async function logOut(req, res, next) {
     // Remove the session of the user
     req.session.destroy((err) => {
         if (err) {
-            next(err)
+            next(err);
         } else {
-            res.clearCookie('connect.sid')
+            res.clearCookie('connect.sid');
             next();
         }
     });
-
 }
 
 middlewarePassport.logOut = logOut;
-
 
 module.exports = middlewarePassport;

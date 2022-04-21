@@ -1,23 +1,23 @@
-const express = require("express");
-const routerIndex = express.Router();
-const db = require("../../db");
+const express = require('express');
 
-const controllerIndex = require("../../controller/controller_index");
-const middlewareAuthenticationPassport = require("../../middleware/middleware_authentication_passport");
-const middlewareValidationJoi = require("../../middleware/middleware_validation_joi");
+const routerIndex = express.Router();
+const db = require('../../db');
+
+const controllerIndex = require('../../controller/controller_index');
+const middlewareAuthenticationPassport = require('../../middleware/middleware_authentication_passport');
+const middlewareValidationJoi = require('../../middleware/middleware_validation_joi');
 
 /* GET home page. */
 
-routerIndex.get("/", controllerIndex.renderIndex);
+routerIndex.get('/', controllerIndex.renderIndex);
 
 routerIndex.get(
-    "/registration",
-    controllerIndex.renderRegistration
+    '/registration',
+    controllerIndex.renderRegistration,
 );
 
-
 routerIndex.post(
-    "/logIn",
+    '/logIn',
     middlewareAuthenticationPassport.checkUnauthenticated, // Check if not logged in
     middlewareValidationJoi.validateAccountLogin, // Validate req.body
     middlewareAuthenticationPassport.authenticate('local'), // Log in user via passport
@@ -32,11 +32,9 @@ routerIndex.post(
 );
 
 routerIndex.post(
-    "/registration",
+    '/registration',
     middlewareValidationJoi.validateAccountRegistration,
-    controllerIndex.registration
+    controllerIndex.registration,
 );
-
-
 
 module.exports = routerIndex;

@@ -1,19 +1,30 @@
-const express = require("express");
+const express = require('express');
+
 const routerGames = express.Router();
+const routerGamesAPI = require('./games_api');
 
-const controllerGames = require("../../controller/controller_games"); 
-const middlewareAuthenticationPassport = require("../../middleware/middleware_authentication_passport");
+const middlewareAuthenticationPassport = require('../../middleware/middleware_authentication_passport');
 
-routerGames.get("/", 
-    middlewareAuthenticationPassport.checkAuthenticated, 
-    controllerGames.renderPreGameLobby);
+const controllerGames = require('../../controller/controller_games');
 
-routerGames.get("/renderTestGame", 
-    middlewareAuthenticationPassport.checkAuthenticated, 
-    controllerGames.renderTestGame);
+// Need to be logged in to access any route past this point
+routerGames.use(middlewareAuthenticationPassport.checkAuthenticated);
 
-routerGames.get("/makeDeck", 
-    middlewareAuthenticationPassport.checkAuthenticated, 
-    controllerGames.renderTestMakeDeck); 
+routerGames.use('/api', routerGamesAPI);
+
+routerGames.get(
+    '/',
+    controllerGames.renderPreGameLobby,
+);
+
+routerGames.get(
+    '/renderTestGame',
+    controllerGames.renderTestGame,
+);
+
+// routerGames.get(
+//     '/makeDeck',
+//     controllerGames.renderTestMakeDeck,
+// );
 
 module.exports = routerGames;

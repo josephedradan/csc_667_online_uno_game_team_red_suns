@@ -2,13 +2,13 @@
 Simple constants file
  */
 
+const path = require('path');
 
-const path = require("path");
-let constants = {}
+const constants = {};
 
-constants.dirLayouts = path.join(__dirname, "../views/layouts")
-constants.dirPartials = path.join(__dirname, "../views/partials")
-constants.dirViews = path.join(__dirname, "../views")
-constants.dirPublic = path.join(__dirname, "../public")
+constants.dirLayouts = path.join(__dirname, '../views/layouts');
+constants.dirPartials = path.join(__dirname, '../views/partials');
+constants.dirViews = path.join(__dirname, '../views');
+constants.dirPublic = path.join(__dirname, '../public');
 
-module.exports = constants
+module.exports = constants;

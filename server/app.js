@@ -39,34 +39,44 @@ Reference:
             https://stackoverflow.com/questions/27835801/how-to-auto-generate-migrations-with-sequelize-cli-from-sequelize-models
  */
 
-const {app, io} = require("./server")
+const {
+    app,
+    io,
+} = require('./server');
 
-const createError = require("http-errors");
-const express = require("express");
+const express = require('express');
 const passport = require('passport');
 
-const cookieParser = require("cookie-parser");
-const logger = require("morgan");
-const {create} = require("express-handlebars");
+const logger = require('morgan');
+
+const createError = require('http-errors');
+const cookieParser = require('cookie-parser');
+const { create } = require('express-handlebars');
 // const handlebars = require("express-handlebars");
 
 const expressSession = require('express-session');
 
+const ConnectSessionSequelize = require('connect-session-sequelize')(
+    expressSession.Store,
+);
 
-if (process.env.NODE_ENV === "development") {
-    require("dotenv").config();
+const constants = require('./constants');
+const databaseSequelize = require('../models');
+const handlerPassport = require('../controller/handler_passport');
+
+const debugPrinter = require('../util/debug_printer');
+
+const middlewareCommunicateToFrontend = require('../middleware/middleware_communicate_to_frontend');
+
+const routes = require('../routes/routes');
+
+
+if (process.env.NODE_ENV === 'development') {
+    require('dotenv')
+        .config();
 }
 
 // const db = require("./db/testDB");
-
-const databaseSequelize = require('../models');
-const handlerPassport = require('../controller/handler_passport');
-const middlewareCommunicateToFrontend = require('../middleware/middleware_communicate_to_frontend')
-
-const debugPrinter = require("../util/debug_printer");
-
-const routes = require("../routes/routes");
-const constants = require("./constants");
 
 /*
 ##############################################################################################################
@@ -74,13 +84,13 @@ Setup and Settings
 ##############################################################################################################
  */
 
-app.use(logger("dev"));
+app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(constants.dirPublic));
 
-/*############################## connect-session-sequelize ##############################*/
+/* ############################## connect-session-sequelize ############################## */
 
 /*
 Connect express-session when using Sequelize
@@ -88,9 +98,6 @@ Connect express-session when using Sequelize
 https://www.npmjs.com/package/connect-session-sequelize
 
  */
-const ConnectSessionSequelize = require('connect-session-sequelize')(
-    expressSession.Store,
-);
 
 // A express session store using sequelize made using connect-session-sequelize (a wrapper object)
 const sequelizeExpressSessionStore = new ConnectSessionSequelize({
@@ -126,14 +133,13 @@ Reference:
  */
 // databaseSequelize.sequelize.sync({alter: true});
 
-
-/*############################## Handle Bars ##############################*/
+/* ############################## Handle Bars ############################## */
 
 const hbs = create({
-    layoutsDir: constants.dirLayouts ,
+    layoutsDir: constants.dirLayouts,
     partialsDir: constants.dirPartials,
-    extname: ".hbs",
-    defaultLayout: "layout",
+    extname: '.hbs',
+    defaultLayout: 'layout',
     // helpers: {
     //     emptyObject: (obj) => {
     //         return !(
@@ -143,13 +149,13 @@ const hbs = create({
     // },
 });
 
-app.engine("hbs", hbs.engine);
+app.engine('hbs', hbs.engine);
 
 // view engine setup
-app.set("view engine", "hbs");
-app.set("views", constants.dirViews);
+app.set('view engine', 'hbs');
+app.set('views', constants.dirViews);
 
-/*############################## express-session (Must be placed after hsb to prevent unnecessary db calls) ##############################*/
+/* ############################## express-session (Must be placed after hsb to prevent unnecessary db calls) ############################## */
 
 /*
 
@@ -178,7 +184,7 @@ Reference:
  */
 app.use(
     expressSession({
-        secret: "SOME SECRET", // TODO: MOVE THIS TO A FILE OR SOMETHING
+        secret: 'SOME SECRET', // TODO: MOVE THIS TO A FILE OR SOMETHING
         resave: false, // Rewrite/Resave the res.session.cookie on every request (THIS OPTION MUST BE SET TO TRUE DUE TO THE BACKEND NOT BEING RESTFUL)
         saveUninitialized: false, // Allow saving empty/non modified session objects in session store (THIS OPTION MUST BE SET TO TRUE DUE TO THE BACKEND NOT BEING RESTFUL)
         store: sequelizeExpressSessionStore, // Use the Store made from connect-session-sequelize
@@ -193,7 +199,7 @@ app.use(
 // Sync the express sessions table (If the table does not exist in the database, then this will create it)
 sequelizeExpressSessionStore.sync();
 
-/*############################## passport (Must be placed after hsb to prevent unnecessary db calls) ##############################*/
+/* ############################## passport (Must be placed after hsb to prevent unnecessary db calls) ############################## */
 // Config passport
 handlerPassport.configurePassportLocalStrategy(passport);
 
@@ -206,55 +212,52 @@ If your application uses persistent logIn sessions, passport.session() middlewar
 */
 app.use(passport.session());
 
-/*############################## Middleware Message (Custom middlewares) ##############################*/
+/* ############################## Middleware Message (Custom middlewares) ############################## */
 
 app.use(middlewareCommunicateToFrontend.middlewareMessage);
 app.use(middlewareCommunicateToFrontend.middlewarePersistUser);
 
-/*############################## DEBUGGING ##############################*/
+/* ############################## DEBUGGING ############################## */
 
 app.use((req, res, next) => {
-    if (process.env.NODE_ENV === "development") {
-        debugPrinter.printRequest("--- DEBUGGING MIDDLEWARE START ---")
+    if (process.env.NODE_ENV === 'development') {
+        debugPrinter.printRequest('--- DEBUGGING MIDDLEWARE START ---');
 
-        debugPrinter.printBackendGreen("req.url")
-        debugPrinter.printDebug(req.url)
-        debugPrinter.printBackendGreen("req.body")
-        debugPrinter.printDebug(req.body)
-        debugPrinter.printBackendGreen("req.user")
-        debugPrinter.printDebug(req.user)
+        debugPrinter.printBackendGreen('req.url');
+        debugPrinter.printDebug(req.url);
+        debugPrinter.printBackendGreen('req.body');
+        debugPrinter.printDebug(req.body);
+        debugPrinter.printBackendGreen('req.user');
+        debugPrinter.printDebug(req.user);
 
-        debugPrinter.printRequest("--- DEBUGGING MIDDLEWARE END ---")
-
+        debugPrinter.printRequest('--- DEBUGGING MIDDLEWARE END ---');
     }
 
-    next()
-})
+    next();
+});
 
-/*############################## routes ##############################*/
+/* ############################## routes ############################## */
 
-app.use("/", routes);
+app.use('/', routes);
 
-
-/*############################## Error handling ##############################*/
+/* ############################## Error handling ############################## */
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
     next(createError(404));
 });
 
 // error handler
-app.use(function (err, req, res, next) {
-    debugPrinter.printError(err)
+app.use((err, req, res, next) => {
+    debugPrinter.printError(err);
 
     // set locals, only providing error in development
     res.locals.message = err.message;
-    res.locals.error = req.app.get("env") === "development" ? err : {};
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
     // render the error page
     res.status(err.status || 500);
-    res.render("error");
+    res.render('error');
 });
-
 
 module.exports = app;

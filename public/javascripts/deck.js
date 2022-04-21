@@ -31,8 +31,8 @@ function newDeck() {
     // generate wild cards 4 each.
     for (let i = 0; i < 4; i++) {
         // tempDeck.push(new Card("black", wilds[0]), new Card("black", wilds[1]));
-        tempDeck.push(new Card("black", wilds[0]));
-        tempDeck.push(new Card("black", wilds[1]));
+        tempDeck.push(new Card('black', wilds[0]));
+        tempDeck.push(new Card('black', wilds[1]));
     }
     return tempDeck;
 }

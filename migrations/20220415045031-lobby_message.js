@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = {
     async up(queryInterface, Sequelize) {
         /**
@@ -8,17 +6,17 @@ module.exports = {
          * Example:
          * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
          */
-        return await queryInterface.createTable("LobbyMessage", {
+        return await queryInterface.createTable('LobbyMessage', {
 
             message_id: {
                 type: Sequelize.INTEGER,
                 primaryKey: true,
-                autoIncrement: true
+                autoIncrement: true,
             },
 
             player_id: {
                 type: Sequelize.INTEGER,
-                references: {model: 'Player', key: 'player_id'},
+                references: { model: 'Player', key: 'player_id' },
                 allowNull: false,
                 unique: true,
             },
@@ -30,15 +28,15 @@ module.exports = {
 
             date_sent: {
                 type: Sequelize.DATE,
-                defaultValue: Sequelize.literal("NOW()"),
+                defaultValue: Sequelize.literal('NOW()'),
             },
 
             lobby_id: {
                 type: Sequelize.INTEGER,
-                references: {model: 'Lobby', key: 'lobby_id'},
+                references: { model: 'Lobby', key: 'lobby_id' },
                 allowNull: false,
                 unique: true,
-            }
+            },
         });
     },
 
@@ -50,5 +48,5 @@ module.exports = {
          * await queryInterface.dropTable('users');
          */
         return await queryInterface.dropTable('LobbyMessage');
-    }
+    },
 };

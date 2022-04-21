@@ -34,12 +34,12 @@ Reference:
 // FIXME: SHOULD WE PROPAGATE ERROR OR NO?
 // FIXME: INCONSISTENCY IN NAMING AND IN DB RAW QUERY WRITER
 
-const dbEngine = {}
+const dbEngine = {};
 
-//const { mergeDefaults } = require("sequelize/types/utils");
-const sequelize = require("../models");
-const db = require("../db");
-const debugPrinter = require("../util/debug_printer");
+// const { mergeDefaults } = require("sequelize/types/utils");
+const sequelize = require('../models');
+const db = require('../db');
+const debugPrinter = require('../util/debug_printer');
 
 // const { QueryTypes } = require('sequelize');
 
@@ -52,54 +52,53 @@ const debugPrinter = require("../util/debug_printer");
  */
 async function getGetCardTableOnColor(color) {
     // Acceptable values: blue, green, yellow, red
-    debugPrinter.printFunction(getGetCardTableOnColor.name)
-    let result = await db.any(
+    debugPrinter.printFunction(getGetCardTableOnColor.name);
+    const result = await db.any(
         `
         SELECT card_id, type, content, color
-	    FROM "Card" WHERE color = $1;
-        `, 
+        FROM "Card" WHERE color = $1;
+        `,
         [
-            color
-        ]
-    )
+            color,
+        ],
+    );
     return result;
 }
 
-dbEngine.getGetCardTableOnColor = getGetCardTableOnColor; 
-
+dbEngine.getGetCardTableOnColor = getGetCardTableOnColor;
 
 async function getCardTableOnType(type) {
     // Acceptable values: NUMBER, SPECIAL
-    debugPrinter.printFunction(getCardTableOnType.name)
-    let result = await db.any(
+    debugPrinter.printFunction(getCardTableOnType.name);
+    const result = await db.any(
         `
         SELECT card_id, type, content, color
-	    FROM "Card" WHERE type = $1;
-        `, 
+        FROM "Card" WHERE type = $1;
+        `,
         [
-            type
-        ]
-    )
+            type,
+        ],
+    );
     return result;
 }
 
-dbEngine.getCardTableOnType =  getCardTableOnType; 
+dbEngine.getCardTableOnType = getCardTableOnType;
 
 async function getAllPlayableCardInfo() {
-    debugPrinter.printFunction(getAllPlayableCardInfo.name)
-    let result = await db.any(
+    debugPrinter.printFunction(getAllPlayableCardInfo.name);
+    const result = await db.any(
         `
         SELECT * FROM "Card"
-        `
-    )
-    return result; 
+        `,
+    );
+    return result;
 }
 
-dbEngine.getAllPlayableCardInfo = getAllPlayableCardInfo; 
+dbEngine.getAllPlayableCardInfo = getAllPlayableCardInfo;
 
 async function getAccountAndAccountStatisticsByUsername(username) {
     debugPrinter.printFunction(getAccountAndAccountStatisticsByUsername.name);
-    let result = await db.any(
+    const result = await db.any(
         `
         SELECT * 
         FROM "Account" account
@@ -107,10 +106,10 @@ async function getAccountAndAccountStatisticsByUsername(username) {
         WHERE Username = $1 
         `,
         [
-            username
-        ]
-    )
-    return result[0]
+            username,
+        ],
+    );
+    return result[0];
 }
 
 dbEngine.getAccountAndAccountStatisticsByUsername = getAccountAndAccountStatisticsByUsername;
@@ -124,22 +123,32 @@ dbEngine.getAccountAndAccountStatisticsByUsername = getAccountAndAccountStatisti
  */
 async function getAccountByUsername(username) {
     debugPrinter.printFunction(getAccountByUsername.name);
-    let result = await db.any(
+    debugPrinter.printFunction(username);
+    debugPrinter.printSuccess('FUCK1');
+
+    // const result2 = await db.any(`
+    //     SELECT *
+    //     FROM "Account"
+    // `);
+    // debugPrinter.printSuccess('FUCK2');
+    // debugPrinter.printBackendRed(result2);
+
+    const result = await db.any(
         `
         SELECT account.username, account.password, account.account_id 
         FROM "Account" AS account 
         WHERE account.username = $1;
         `,
         [
-            username
-        ]
-    )
+            username,
+        ],
+    );
 
-    return result[0] // Should be an object returned
+    debugPrinter.printBackendRed(result);
+    return result[0]; // Should be an object returned
 }
 
 dbEngine.getAccountByUsername = getAccountByUsername;
-
 
 /**
  *
@@ -149,7 +158,7 @@ dbEngine.getAccountByUsername = getAccountByUsername;
  */
 async function createAccount(username, password) {
     debugPrinter.printFunction(createAccount.name);
-    let result = await db.any(
+    const result = await db.any(
         `
         INSERT INTO "Account" (username, password)
         VALUES ($1, $2)
@@ -157,12 +166,11 @@ async function createAccount(username, password) {
         `,
         [
             username,
-            password
-        ]
-    )
+            password,
+        ],
+    );
 
-    return result[0] // Should be the new object
-
+    return result[0]; // Should be the new object
 }
 
 dbEngine.createAccount = createAccount;
@@ -175,7 +183,7 @@ dbEngine.createAccount = createAccount;
  */
 async function creatAccountStatistic(account_id) {
     debugPrinter.printFunction(creatAccountStatistic.name);
-    let result = await db.any(
+    const result = await db.any(
         `
 
         INSERT INTO "AccountStatistic" (statistic_id, num_wins, num_loss)
@@ -183,13 +191,13 @@ async function creatAccountStatistic(account_id) {
         RETURNING statistic_id, num_wins, num_loss, date_joined;
         `,
         [
-            account_id
-        ]
-    )
+            account_id,
+        ],
+    );
 
-    return result[0] // Should be the new object
+    return result[0]; // Should be the new object
 }
 
 dbEngine.creatAccountStatistic = creatAccountStatistic;
 
-module.exports = dbEngine
+module.exports = dbEngine;

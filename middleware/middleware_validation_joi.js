@@ -13,10 +13,10 @@ Reference:
             https://joi.dev/api/?v=17.4.2#anywarningcode-context
 
 */
-const to = require("await-to-js").default;
+const to = require('await-to-js').default;
 
-const joiSchemas = require("../controller/joi_schemas");
-const debugPrinter = require("../util/debug_printer");
+const joiSchemas = require('../controller/joi_schemas');
+const debugPrinter = require('../util/debug_printer');
 
 async function validateCommon(
     req,
@@ -24,7 +24,7 @@ async function validateCommon(
     next,
     schema,
     callbackValidationError,
-    _backendErrorMessage
+    _backendErrorMessage,
 ) {
     // Values returned from validating key/value pairs form req.body call
 
@@ -60,11 +60,11 @@ const middlewareValidation = {};
 
 function callbackValidationErrorCommon(req, res, next, error) {
     req.session.message = {
-        status: "failure",
-        message: error
-    }
+        status: 'failure',
+        message: error,
+    };
 
-    res.redirect('back')
+    res.redirect('back');
 }
 
 /**
@@ -82,7 +82,7 @@ middlewareValidation.validateAccountRegistration = async (req, res, next) => {
         next,
         joiSchemas.SCHEMA_ACCOUNT_REGISTRATION,
         callbackValidationErrorCommon,
-        "ERROR IN validateAccountRegistration"
+        'ERROR IN validateAccountRegistration',
     );
 };
 
@@ -100,7 +100,7 @@ middlewareValidation.validateAccountLogin = async (req, res, next) => {
         next,
         joiSchemas.SCHEMA_ACCOUNT_LOGIN,
         callbackValidationErrorCommon,
-        "ERROR IN validateAccountLogin"
+        'ERROR IN validateAccountLogin',
     );
 };
 
@@ -111,7 +111,7 @@ middlewareValidation.validateAccountUpdate = async (req, res, next) => {
         next,
         joiSchemas.SCHEMA_ACCOUNT_UPDATE,
         callbackValidationErrorCommon,
-        "ERROR IN validateAccountUpdate"
+        'ERROR IN validateAccountUpdate',
     );
 };
 
