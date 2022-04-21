@@ -19,6 +19,11 @@ module.exports = {
                 defaultValue: false,
             },
 
+            seat_index: {
+                type: Sequelize.INTEGER, 
+                allowNull: false,
+            }, 
+
             account_id: {
                 type: Sequelize.INTEGER,
                 references: { model: 'User', key: 'user_id' },
