@@ -44,12 +44,13 @@ const {
     io,
 } = require('./server');
 
-const createError = require('http-errors');
 const express = require('express');
 const passport = require('passport');
 
-const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+
+const createError = require('http-errors');
+const cookieParser = require('cookie-parser');
 const { create } = require('express-handlebars');
 // const handlebars = require("express-handlebars");
 
@@ -60,14 +61,15 @@ const ConnectSessionSequelize = require('connect-session-sequelize')(
 );
 
 const constants = require('./constants');
-
-const routes = require('../routes/routes');
-const middlewareCommunicateToFrontend = require('../middleware/middleware_communicate_to_frontend');
-
-const handlerPassport = require('../controller/handler_passport');
 const databaseSequelize = require('../models');
+const handlerPassport = require('../controller/handler_passport');
 
 const debugPrinter = require('../util/debug_printer');
+
+const middlewareCommunicateToFrontend = require('../middleware/middleware_communicate_to_frontend');
+
+const routes = require('../routes/routes');
+
 
 if (process.env.NODE_ENV === 'development') {
     require('dotenv')

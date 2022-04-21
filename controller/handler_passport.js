@@ -112,6 +112,8 @@ const handlerPassport = {};
  */
 async function verifyCallback(username, password, doneCallback) {
     debugPrinter.printFunction(verifyCallback.name);
+    debugPrinter.printFunction(username);
+    debugPrinter.printFunction(password);
 
     try {
         const account = await Account.getAccountByUsername(username);

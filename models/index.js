@@ -1,23 +1,17 @@
 /*
 This file creates the sequelize object based on db specified in config/config.js
 This file also adds the models from where this file is located into the databaseSequelize object
-
 Notes:
     This file is auto generated via the below command.
         npx sequelize-cli init
-
     The comments in this file are not auto generated.
-
     Don't do drastic changes to this file unless you know what you are doing
-
 Reference:
     Node Sequelize tutorial with Postgres | Sequelize migrations and seed data
         Notes:
             Tutorial on Sequelize migrations and more
-
         Reference:
             https://www.youtube.com/watch?v=Eu-h3iUk45o
-
     Sequelize Migrations
         Notes:
             How to do migrations with Sequelize
@@ -42,8 +36,6 @@ if (currentEnvConfig.use_env_variable) {
         process.env[currentEnvConfig.use_env_variable],
         currentEnvConfig,
     );
-
-    console.log(currentEnvConfig);
 } else {
     // Create sequelize object based on raw values in the current environment config settings in the json object
     sequelize = new Sequelize(
@@ -63,11 +55,12 @@ fs.readdirSync(__dirname)
         databaseSequelize[model.name] = model;
     });
 
-Object.keys(databaseSequelize).forEach((modelName) => {
-    if (databaseSequelize[modelName].associate) {
-        databaseSequelize[modelName].associate(databaseSequelize);
-    }
-});
+Object.keys(databaseSequelize)
+    .forEach((modelName) => {
+        if (databaseSequelize[modelName].associate) {
+            databaseSequelize[modelName].associate(databaseSequelize);
+        }
+    });
 
 databaseSequelize.sequelize = sequelize;
 databaseSequelize.Sequelize = Sequelize;

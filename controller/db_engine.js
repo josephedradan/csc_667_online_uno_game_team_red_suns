@@ -123,6 +123,16 @@ dbEngine.getAccountAndAccountStatisticsByUsername = getAccountAndAccountStatisti
  */
 async function getAccountByUsername(username) {
     debugPrinter.printFunction(getAccountByUsername.name);
+    debugPrinter.printFunction(username);
+    debugPrinter.printSuccess('FUCK1');
+
+    // const result2 = await db.any(`
+    //     SELECT *
+    //     FROM "Account"
+    // `);
+    // debugPrinter.printSuccess('FUCK2');
+    // debugPrinter.printBackendRed(result2);
+
     const result = await db.any(
         `
         SELECT account.username, account.password, account.account_id 
@@ -134,6 +144,7 @@ async function getAccountByUsername(username) {
         ],
     );
 
+    debugPrinter.printBackendRed(result);
     return result[0]; // Should be an object returned
 }
 

@@ -9,7 +9,7 @@ const connectionConfig = {
     ssl:
         process.env.NODE_ENV !== 'development' ? {
             require: true,
-            rejectUnauthorized: false,
+            rejectUnauthorized: true,
         } : false,
 };
 

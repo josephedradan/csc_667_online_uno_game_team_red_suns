@@ -64,7 +64,7 @@ connectionContainer.app = app;
 function normalizePort(val) {
     const port = parseInt(val, 10);
 
-    if (isNaN(port)) {
+    if (Number.isNaN(port)) {
         // named pipe
         return val;
     }
@@ -104,6 +104,8 @@ serverHttp.listen(PORT, (err) => {
 
     if (process.env.NODE_ENV === 'development') {
         debugPrinter.printRequest('--- SERVER START UP START ---');
+
+        // debugPrinter.printSuccess(dbEngine.getAccountByUsername('JosephEdredan321'));
 
         debugPrinter.printBackendBlue('On Development mode...');
         debugPrinter.printBackendBlue(`Server listening on port: ${PORT}`);
