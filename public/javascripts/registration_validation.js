@@ -1,4 +1,5 @@
 const username = document.getElementById("username");
+// const display_name = document.getElementById("display_name");
 const password = document.getElementById("password");
 const confirm_password = document.getElementById("confirm_password");
 const registration_submit = document.getElementById("registration_submit");
@@ -14,6 +15,8 @@ username.addEventListener("input", (e) => {
             username,
             "Username can't have a number as first character."
         );
+    } else if (username.value.match(/[$&+,:;=?@#|'<>.^*()%!-]/)) {
+        setErrorFor(username, "Username can't have special character.");
     } else if (username.value.length < 3) {
         setErrorFor(username, "Username can't be less than 3 characters.");
     } else if (hasWhiteSpace(username.value)) {
