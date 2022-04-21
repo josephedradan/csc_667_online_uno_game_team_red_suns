@@ -116,7 +116,7 @@ async function verifyCallback(username, password, doneCallback) {
     debugPrinter.printFunction(password);
 
     try {
-        const account = await Account.getAccountByUsername(username);
+        const account = await Account.getUserByUsername(username);
 
         debugPrinter.printDebug(account);
 
@@ -161,7 +161,7 @@ async function verifyCallback(username, password, doneCallback) {
             return doneCallback(error);
         }
     } catch (err) {
-        console.log('failure to query getAccountAndAccountStatisticsByUsername');
+        console.log('failure to query getUserAndUserStatisticsByUsername');
         console.log(err);
     }
 }
@@ -265,7 +265,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
         // }
 
         // Get the accountAndAccountStatistics via username
-        const [error, accountAndAccountStatistics] = await to(Account.getAccountAndAccountStatisticsByUsername(username));
+        const [error, accountAndAccountStatistics] = await to(Account.getUserAndUserStatisticsByUsername(username));
 
         // If accountAndAccountStatistics exists
         if (accountAndAccountStatistics !== null) {
