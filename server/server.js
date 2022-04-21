@@ -95,7 +95,7 @@ connectionContainer.serverHttp = serverHttp;
 /**
  * Listen on provided PORT, on all network interfaces.
  */
-const initDeck = require("../controller/controller_games_api").initializeDrawStack; 
+const initDeck = require("../controller/controller_test").initializeDrawStack; 
 
 
 serverHttp.listen(PORT, (err) => {
@@ -106,10 +106,6 @@ serverHttp.listen(PORT, (err) => {
 
     if (process.env.NODE_ENV === 'development') {
         debugPrinter.printRequest('--- SERVER START UP START ---');
-
-        // Yeeehaaaw test area. 
-        initDeck(); 
-
         debugPrinter.printBackendBlue('On Development mode...');
         debugPrinter.printBackendBlue(`Server listening on port: ${PORT}`);
         debugPrinter.printBackendBlue(`process.env.DATABASE_URL: ${process.env.DATABASE_URL}`);

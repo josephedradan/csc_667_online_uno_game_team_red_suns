@@ -81,7 +81,7 @@ const to = require('await-to-js').default;
 
 const LocalStrategy = require('passport-local').Strategy;
 
-const Account = require('./db_engine');
+const dbEngine = require('./db_engine');
 const debugPrinter = require('../util/debug_printer');
 const handlerPassword = require('./handler_password');
 
@@ -116,7 +116,11 @@ async function verifyCallback(username, password, doneCallback) {
     debugPrinter.printFunction(password);
 
     try {
+<<<<<<< HEAD
+        const account = await dbEngine.g(username);
+=======
         const account = await Account.getUserByUsername(username);
+>>>>>>> d8a72d1c368f8fd3eb9d7a42d6e593cf8a88c92d
 
         debugPrinter.printDebug(account);
 
