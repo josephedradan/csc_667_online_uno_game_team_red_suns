@@ -45,13 +45,11 @@ const debugPrinter = require('../util/debug_printer');
 
 /**
  * Notes:
- *      Should return a list of objects
- *
+ *      Acceptable values: blue, green, yellow, red
  * @param username
  * @returns {Promise<any[]>}
  */
 async function getGetCardTableOnColor(color) {
-    // Acceptable values: blue, green, yellow, red
     debugPrinter.printFunction(getGetCardTableOnColor.name);
     const result = await db.any(
         `
@@ -67,8 +65,13 @@ async function getGetCardTableOnColor(color) {
 
 dbEngine.getGetCardTableOnColor = getGetCardTableOnColor;
 
+/**
+ * Notes:
+ *      Acceptable values: NUMBER, SPECIAL
+ * @param type
+ * @returns {Promise<any[]>}
+ */
 async function getCardTableOnType(type) {
-    // Acceptable values: NUMBER, SPECIAL
     debugPrinter.printFunction(getCardTableOnType.name);
     const result = await db.any(
         `
@@ -123,16 +126,6 @@ dbEngine.getAccountAndAccountStatisticsByUsername = getAccountAndAccountStatisti
  */
 async function getAccountByUsername(username) {
     debugPrinter.printFunction(getAccountByUsername.name);
-    debugPrinter.printFunction(username);
-    debugPrinter.printSuccess('FUCK1');
-
-    // const result2 = await db.any(`
-    //     SELECT *
-    //     FROM "Account"
-    // `);
-    // debugPrinter.printSuccess('FUCK2');
-    // debugPrinter.printBackendRed(result2);
-
     const result = await db.any(
         `
         SELECT account.username, account.password, account.account_id 
@@ -144,7 +137,6 @@ async function getAccountByUsername(username) {
         ],
     );
 
-    debugPrinter.printBackendRed(result);
     return result[0]; // Should be an object returned
 }
 
