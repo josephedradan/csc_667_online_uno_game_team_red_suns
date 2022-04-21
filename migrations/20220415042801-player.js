@@ -4,35 +4,28 @@ module.exports = {
          * Add altering commands here.
          *
          * Example:
-         * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
+         * await queryInterface.createTable('users', { id: Sequelize.DataTypes.INTEGER });
          */
-        return await queryInterface.createTable('Player', {
+        return queryInterface.createTable('Player', {
 
+            // One to many relationship allowing for 1 user to play multiple games vua player_id
             player_id: {
-                type: Sequelize.INTEGER,
+                type: Sequelize.DataTypes.INTEGER,
                 primaryKey: true,
                 autoIncrement: true,
+                allowNull: false,
+                unique: true,
                 onDelete: 'CASCADE',
             },
 
-            in_game: {
-                type: Sequelize.BOOLEAN,
-                defaultValue: false,
-            },
-
-            seat_index: {
-                type: Sequelize.INTEGER,
-                allowNull: false,
-            },
-
             user_id: {
-                type: Sequelize.INTEGER,
+                type: Sequelize.DataTypes.INTEGER,
                 references: {
                     model: 'User',
                     key: 'user_id',
                 },
                 allowNull: false,
-                unique: false,
+                unique: false, // Allow 1 user to play in multiple games
             },
 
         });
@@ -45,6 +38,6 @@ module.exports = {
          * Example:
          * await queryInterface.dropTable('users');
          */
-        return await queryInterface.dropTable('Player');
+        return queryInterface.dropTable('Player');
     },
 };

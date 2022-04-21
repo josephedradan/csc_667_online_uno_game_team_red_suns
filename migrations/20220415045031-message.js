@@ -4,21 +4,23 @@ module.exports = {
          * Add altering commands here.
          *
          * Example:
-         * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
+         * await queryInterface.createTable('users', { id: Sequelize.DataTypes.INTEGER });
          */
-        return await queryInterface.createTable('GameMessage', {
+        return queryInterface.createTable('Message', {
 
             message_id: {
-                type: Sequelize.INTEGER,
+                type: Sequelize.DataTypes.INTEGER,
                 primaryKey: true,
                 autoIncrement: true,
-            },
-
-            player_id: { // who sent it
-                type: Sequelize.INTEGER,
-                references: { model: 'Player', key: 'player_id' },
                 allowNull: false,
                 unique: true,
+            },
+
+            player_id: {
+                type: Sequelize.DataTypes.INTEGER,
+                references: { model: 'Player', key: 'player_id' },
+                allowNull: false,
+                unique: false, // Allows a user to send multiple messages
             },
 
             message: { // what was sent
@@ -32,10 +34,10 @@ module.exports = {
             },
 
             game_id: {
-                type: Sequelize.INTEGER,
+                type: Sequelize.DataTypes.INTEGER,
                 references: { model: 'Game', key: 'game_id' },
                 allowNull: false,
-                unique: true,
+                unique: false, // Allows for multiple messages for a game
             },
         });
     },
@@ -47,6 +49,6 @@ module.exports = {
          * Example:
          * await queryInterface.dropTable('users');
          */
-        return await queryInterface.dropTable('GameMessage');
+        return queryInterface.dropTable('GameMessage');
     },
 };

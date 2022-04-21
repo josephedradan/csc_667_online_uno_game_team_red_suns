@@ -1,19 +1,19 @@
-const username = document.getElementById("username");
+const username = document.getElementById('username');
 // const display_name = document.getElementById("display_name");
-const password = document.getElementById("password");
-const confirm_password = document.getElementById("confirm_password");
-const registration_submit = document.getElementById("registration_submit");
-const registration_form = document.getElementById("registration_form");
+const password = document.getElementById('password');
+const confirm_password = document.getElementById('confirm_password');
+const registration_submit = document.getElementById('registration_submit');
+const registration_form = document.getElementById('registration_form');
 
-let toggle_enable_button = new Array(3).fill(false);
+const toggle_enable_button = new Array(3).fill(false);
 
-username.addEventListener("input", (e) => {
-    if (username.value === "") {
+username.addEventListener('input', (e) => {
+    if (username.value === '') {
         setErrorFor(username, "Username can't be empty.");
-    } else if (username.value[0] >= "0" && username.value[0] <= "9") {
+    } else if (username.value[0] >= '0' && username.value[0] <= '9') {
         setErrorFor(
             username,
-            "Username can't have a number as first character."
+            "Username can't have a number as first character.",
         );
     } else if (username.value.match(/[$&+,:;=?@#|'<>.^*()%!-]/)) {
         setErrorFor(username, "Username can't have special character.");
@@ -30,20 +30,20 @@ username.addEventListener("input", (e) => {
     toggle_enable_button[0] = false;
 });
 
-password.addEventListener("input", (e) => {
-    if (password.value === "") {
+password.addEventListener('input', (e) => {
+    if (password.value === '') {
         setErrorFor(password, "Password can't be blank.");
     } else if (password.value.length < 8 || password.value.length > 16) {
         setErrorFor(
             password,
-            "Password must be between 8 to 16 characters long."
+            'Password must be between 8 to 16 characters long.',
         );
     } else if (!password.value.match(/[A-Z]/)) {
-        setErrorFor(password, "Password must have a capital letter.");
+        setErrorFor(password, 'Password must have a capital letter.');
     } else if (!password.value.match(/[0-9]/)) {
-        setErrorFor(password, "Password must have a number.");
+        setErrorFor(password, 'Password must have a number.');
     } else if (!password.value.match(/[$&+,:;=?@#|'<>.^*()%!-]/)) {
-        setErrorFor(password, "Password must have a special character.");
+        setErrorFor(password, 'Password must have a special character.');
     } else {
         setSuccessFor(password);
         toggle_enable_button[1] = true;
@@ -52,8 +52,8 @@ password.addEventListener("input", (e) => {
     toggle_enable_button[1] = false;
 });
 
-confirm_password.addEventListener("input", (e) => {
-    if (confirm_password === "") {
+confirm_password.addEventListener('input', (e) => {
+    if (confirm_password === '') {
         setErrorFor(confirm_password, "Confirm password can't be blank.");
     } else if (password.value !== confirm_password.value) {
         setErrorFor(confirm_password, "Passwords don't match.");
@@ -65,30 +65,30 @@ confirm_password.addEventListener("input", (e) => {
     toggle_enable_button[2] = false;
 });
 
-registration_form.addEventListener("change", (e) => {
+registration_form.addEventListener('change', (e) => {
     console.log(toggle_enable_button);
     if (toggle_enable_button.every((e) => e === true)) {
-        registration_submit.removeAttribute("disabled");
+        registration_submit.removeAttribute('disabled');
     }
 });
 
 // extra safe guard to prevent users from removing disabled tag
-registration_submit.addEventListener("click", (e) => {
+registration_submit.addEventListener('click', (e) => {
     if (!toggle_enable_button.every((e) => e === true)) e.preventDefault();
 });
 
 // display error
 function setErrorFor(input, message) {
     const form_control = input.parentElement;
-    const small = form_control.querySelector("small");
-    form_control.className = "form-validation error";
+    const small = form_control.querySelector('small');
+    form_control.className = 'form-validation error';
     small.innerText = message;
 }
 
 // display success
 function setSuccessFor(input) {
     const form_control = input.parentElement;
-    form_control.className = "form-validation success";
+    form_control.className = 'form-validation success';
 }
 
 function isCapital(name) {
@@ -96,5 +96,5 @@ function isCapital(name) {
 }
 
 function hasWhiteSpace(str) {
-    return str.indexOf(" ") >= 0;
+    return str.indexOf(' ') >= 0;
 }

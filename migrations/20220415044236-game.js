@@ -4,42 +4,47 @@ module.exports = {
          * Add altering commands here.
          *
          * Example:
-         * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
+         * await queryInterface.createTable('users', { id: Sequelize.DataTypes.INTEGER });
          */
-        await queryInterface.createTable('Game', {
+        return queryInterface.createTable('Game', {
 
             game_id: {
-                type: Sequelize.INTEGER,
+                type: Sequelize.DataTypes.INTEGER,
                 primaryKey: true,
                 autoIncrement: true,
+                allowNull: false,
+                unique: false,
                 onDelete: 'CASCADE',
             },
 
+            // Is the game being played or is it in lobby
             active: {
-                type: Sequelize.BOOLEAN,
+                type: Sequelize.DataTypes.BOOLEAN,
                 defaultValue: false,
             },
 
-            current_player_id: { // current player whos in turn to play/draw etc. a card.
-                type: Sequelize.INTEGER,
-                references: { model: 'Player', key: 'player_id' },
+            // Current player's turn determined by the player_id
+            current_player_id: {
+                type: Sequelize.DataTypes.INTEGER,
+                references: {
+                    model: 'Player',
+                    key: 'player_id',
+                },
                 allowNull: true,
+                unique: true, // Enforce rule to prevent the same player from playing in multiple games
             },
 
-            host_id: { // host of game.
-                type: Sequelize.INTEGER,
-                references: { model: 'Player', key: 'player_id' },
-                allowNull: true,
-                unique: false,
-            },
         });
 
-        // Odd return
-        return await queryInterface.addColumn('Player', 'game_id', {
-            type: Sequelize.INTEGER,
-            references: { model: 'Game', key: 'game_id' },
-            allowNull: false,
-        });
+        // // Odd return
+        // return queryInterface.addColumn('Player', 'game_id', {
+        //     type: Sequelize.DataTypes.INTEGER,
+        //     references: {
+        //         model: 'Game',
+        //         key: 'game_id',
+        //     },
+        //     allowNull: false,
+        // });
     },
 
     async down(queryInterface, Sequelize) {
@@ -49,11 +54,11 @@ module.exports = {
          * Example:
          * await queryInterface.dropTable('users');
          */
-        await queryInterface.removeColumn(
-            'Player',
-            'game_id',
-        );
+        // await queryInterface.removeColumn(
+        //     'Player',
+        //     'game_id',
+        // );
 
-        return await queryInterface.dropTable('Game');
+        return queryInterface.dropTable('Game');
     },
 };

@@ -6,29 +6,20 @@ module.exports = {
          * Example:
          * await queryInterface.createTable('users', { id: Sequelize.DataTypes.INTEGER });
          */
-        return queryInterface.createTable('UserStatistic', {
 
-            // user_id is a foreign key not a primary key
-            user_id: {
+        return queryInterface.createTable('CollectionInfo', {
+
+            collection_info_id: {
                 type: Sequelize.DataTypes.INTEGER,
-                references: { model: 'User', key: 'user_id' },
+                primaryKey: true,
+                autoIncrement: true,
                 allowNull: false,
                 unique: true,
             },
 
-            num_wins: {
-                type: Sequelize.DataTypes.INTEGER,
-                defaultValue: 0,
-            },
-
-            num_loss: {
-                type: Sequelize.DataTypes.INTEGER,
-                defaultValue: 0,
-            },
-
-            date_joined: {
-                type: Sequelize.DATE,
-                defaultValue: Sequelize.literal('NOW()'),
+            // Where this card is in
+            type: {
+                type: Sequelize.DataTypes.STRING, // DRAW || PLAY || HAND
                 allowNull: false,
             },
 
@@ -42,6 +33,6 @@ module.exports = {
          * Example:
          * await queryInterface.dropTable('users');
          */
-        return queryInterface.dropTable('UserStatistic');
+        return queryInterface.dropTable('CollectionInfo');
     },
 };

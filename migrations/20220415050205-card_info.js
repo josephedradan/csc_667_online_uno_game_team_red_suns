@@ -4,28 +4,30 @@ module.exports = {
          * Add altering commands here.
          *
          * Example:
-         * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
+         * await queryInterface.createTable('users', { id: Sequelize.DataTypes.INTEGER });
          */
         return await queryInterface.createTable('CardInfo', {
 
             card_info_id: {
-                type: Sequelize.INTEGER,
+                type: Sequelize.DataTypes.INTEGER,
                 primaryKey: true,
                 autoIncrement: true,
+                allowNull: false,
+                unique: true,
             },
 
             type: {
-                type: Sequelize.STRING,
+                type: Sequelize.DataTypes.STRING,
                 allowNull: false,
             },
 
             content: {
-                type: Sequelize.STRING,
+                type: Sequelize.DataTypes.STRING,
                 allowNull: false,
             },
 
             color: {
-                type: Sequelize.STRING,
+                type: Sequelize.DataTypes.STRING,
                 allowNull: false,
             },
 
@@ -39,6 +41,6 @@ module.exports = {
          * Example:
          * await queryInterface.dropTable('users');
          */
-        return await queryInterface.dropTable('CardInfo');
+        return queryInterface.dropTable('CardInfo');
     },
 };
