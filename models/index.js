@@ -42,6 +42,8 @@ if (currentEnvConfig.use_env_variable) {
         process.env[currentEnvConfig.use_env_variable],
         currentEnvConfig,
     );
+
+    console.log(currentEnvConfig);
 } else {
     // Create sequelize object based on raw values in the current environment config settings in the json object
     sequelize = new Sequelize(
