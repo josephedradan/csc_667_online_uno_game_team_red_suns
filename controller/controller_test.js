@@ -36,4 +36,4 @@ controllerIndex.testDBSequelizeRaw = async (req, res, next) => {
     }
 };
 
-module.exports = crontollerIndex;
+module.exports = controllerIndex;
