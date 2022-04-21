@@ -49,7 +49,8 @@ async function validateCommon(
 
     if (error) {
         // If there was a validation error, respond with the validation error
-        callbackValidationError(req, res, next, error);
+        debugPrinter.printBackendRed(error);
+        callbackValidationError(req, res, next, error.message);
     } else {
         // Otherwise, go to the next middleware
         next();
@@ -75,7 +76,9 @@ function callbackValidationErrorCommon(req, res, next, error) {
  * @param next
  * @returns {Promise<void>}
  */
-middlewareValidation.validateAccountRegistration = async (req, res, next) => {
+async function validateAccountRegistration(req, res, next) {
+    debugPrinter.printFunction(validateAccountRegistration.name);
+
     await validateCommon(
         req,
         res,
@@ -84,7 +87,8 @@ middlewareValidation.validateAccountRegistration = async (req, res, next) => {
         callbackValidationErrorCommon,
         'ERROR IN validateAccountRegistration',
     );
-};
+}
+middlewareValidation.validateAccountRegistration = validateAccountRegistration;
 
 /**
  *  Middleware to validate req.body used when logging in using the joi package
@@ -93,7 +97,9 @@ middlewareValidation.validateAccountRegistration = async (req, res, next) => {
  * @param next
  * @returns {Promise<void>}
  */
-middlewareValidation.validateAccountLogin = async (req, res, next) => {
+async function validateAccountLogin(req, res, next) {
+    debugPrinter.printFunction(validateAccountLogin.name);
+
     await validateCommon(
         req,
         res,
@@ -102,9 +108,12 @@ middlewareValidation.validateAccountLogin = async (req, res, next) => {
         callbackValidationErrorCommon,
         'ERROR IN validateAccountLogin',
     );
-};
+}
+middlewareValidation.validateAccountLogin = validateAccountLogin;
 
-middlewareValidation.validateAccountUpdate = async (req, res, next) => {
+async function validateAccountUpdate(req, res, next) {
+    debugPrinter.printFunction(validateAccountUpdate.name);
+
     await validateCommon(
         req,
         res,
@@ -113,6 +122,6 @@ middlewareValidation.validateAccountUpdate = async (req, res, next) => {
         callbackValidationErrorCommon,
         'ERROR IN validateAccountUpdate',
     );
-};
-
+}
+middlewareValidation.validateAccountUpdate = validateAccountUpdate;
 module.exports = middlewareValidation;

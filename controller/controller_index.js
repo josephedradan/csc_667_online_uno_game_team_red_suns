@@ -95,23 +95,23 @@ async function registration(req, res, next) {
         else {
             const hashedPassword = await passwordHandler.hash(password);
 
-            const account = await dbEngine.createAccount(
+            const user = await dbEngine.createUser(
                 username,
-                display_name,
                 hashedPassword,
+                display_name,
             );
 
-            debugPrinter.printBackendBlue(account);
+            debugPrinter.printBackendBlue(user);
 
-            const accountStatistic = await dbEngine.createUserStatistic(
-                account.account_id,
+            const userStatistic = await dbEngine.createUserStatistic(
+                user.user_id,
             );
-            debugPrinter.printBackendMagenta(accountStatistic);
+            debugPrinter.printBackendMagenta(userStatistic);
             debugPrinter.printBackendGreen(existingAccount);
 
             req.session.message = {
                 status: 'success',
-                message: `Account "${account.username}" was created`,
+                message: `Account "${user.username}" was created`,
             };
             res.redirect('/');
         }

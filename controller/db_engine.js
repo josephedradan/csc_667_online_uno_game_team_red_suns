@@ -158,25 +158,25 @@ dbEngine.getUserByUsername = getUserByUsername;
  * @param password
  * @returns {Promise<any[]>}
  */
-async function createUser(username, display_name, password) {
+async function createUser(username, password, display_name) {
     debugPrinter.printFunction(createUser.name);
     const result = await db.any(
         `
-        INSERT INTO "User" (display_name, username, password)
-        VALUES ($1, $2)
-        RETURNING user_id, display_name, username, password;
+        INSERT INTO "User" (username, password, display_name)
+        VALUES ($1, $2, $3)
+        RETURNING user_id, username, password, display_name;
         `,
         [
-            display_name,
             username,
             password,
+            display_name,
         ],
     );
 
     return result[0]; // Should be the new object
 }
 
-dbEngine.createAccount = createUser;
+dbEngine.createUser = createUser;
 
 /**
  * Create account statistic given user_id, will return statistic_id
@@ -188,7 +188,6 @@ async function createUserStatistic(user_id) {
     debugPrinter.printFunction(createUserStatistic.name);
     const result = await db.any(
         `
-
         INSERT INTO "UserStatistic" (statistic_id, num_wins, num_loss)
         VALUES ($1, 0, 0)
         RETURNING statistic_id, num_wins, num_loss, date_joined;
