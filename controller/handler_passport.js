@@ -264,26 +264,28 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
         //     debugPrinter.printDebug(`initializePassport deserializeUser ${username}`);
         // }
 
-        // Get the accountAndAccountStatistics via username
-        const [error, accountAndAccountStatistics] = await to(Account.getUserAndUserStatisticsByUsername(username));
+        // Get the userAndUserStatistics via username
+        const [error, userAndUserStatistics] = await to(Account.getUserAndUserStatisticsByUsername(username));
 
-        // If accountAndAccountStatistics exists
-        if (accountAndAccountStatistics !== null) {
+        debugPrinter.printSuccess(userAndUserStatistics);
+
+        // If userAndUserStatistics exists
+        if (userAndUserStatistics !== null) {
             // What ever data is sent to the second parameter of this function will be stored in req.user
             doneCallback(
                 error, // error
                 /*
-                accountAndAccountStatistics is the stuff that will be stored in req.user.
-                The adding of accountAndAccountStatistics to req.user should happen through a successful req.logIn call (req.logIn is added by passport.js automatically).
+                userAndUserStatistics is the stuff that will be stored in req.user.
+                The adding of userAndUserStatistics to req.user should happen through a successful req.logIn call (req.logIn is added by passport.js automatically).
                 The function req.logIn should technically be called within the body of this callback.
-                accountAndAccountStatistics may also lead to problematic/inconsistent attribute/property/value attaining if it does not use a good naming convention.
+                userAndUserStatistics may also lead to problematic/inconsistent attribute/property/value attaining if it does not use a good naming convention.
                 For example, attributes/properties with naming conventions such as USER_NAME, USERNAME, userName, etc... may not conform to this project's coding style.
                  */
-                accountAndAccountStatistics,
-                { message: `${accountAndAccountStatistics.username} was successfully logged in` }, // Additional info to be sent
+                userAndUserStatistics,
+                { message: `${userAndUserStatistics.username} was successfully logged in` }, // Additional info to be sent
             );
         } else {
-            // If getting accountAndAccountStatistics is unsuccessful, then req.user will be null or undefined
+            // If getting userAndUserStatistics is unsuccessful, then req.user will be null or undefined
             doneCallback(
                 error, // error
                 null, // Stuff that will be stored in req.user. Since it's null, the callback should handle it appropriately

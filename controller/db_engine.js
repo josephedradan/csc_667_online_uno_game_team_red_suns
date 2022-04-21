@@ -97,18 +97,21 @@ dbEngine.getAllPlayableCardInfo = getAllPlayableCardInfo;
 
 async function getUserAndUserStatisticsByUsername(username) {
     debugPrinter.printFunction(getUserAndUserStatisticsByUsername.name);
+
     const result = await db.any(
         `
         SELECT * 
-        FROM "User" AS "user"
+        FROM public."User" AS "user"
         LEFT JOIN "UserStatistic" AS "statistics" 
-        "user".user_id="statistics".statistic_id
+        ON "user".user_id="statistics".statistic_id
         WHERE "user".username = $1; 
         `,
         [
             username,
         ],
     );
+    debugPrinter.printBackendRed(result);
+
     return result[0];
 }
 
