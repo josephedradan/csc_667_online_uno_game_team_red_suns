@@ -1,13 +1,13 @@
 const controllerGames = {};
 
 controllerGames.renderPreGameLobby = (req, res, next) => {
-    console.log("MAIN TSET JOSEPH");
-    res.render("lobby", { title: "Lobby" });
+    console.log('MAIN TSET JOSEPH');
+    res.render('lobby', { title: 'Lobby' });
 };
 
 controllerGames.renderTestGame = (req, res, next) => {
-    console.log("TEST GAME");
-    res.render("game_lobby", { title: "Game Lobby" });
+    console.log('TEST GAME');
+    res.render('game_lobby', { title: 'Game Lobby' });
 };
 
 module.exports = controllerGames;

@@ -33,55 +33,29 @@ Reference:
  */
 
 const http = require('http');
-const express = require("express");
-const socket_io = require("socket.io");
+const express = require('express');
+const socket_io = require('socket.io');
 
 const debug = require('debug')('application:serverHttp');
 
-const debugPrinter = require("../util/debug_printer");
+const debugPrinter = require('../util/debug_printer');
 
 // const socketAPI = require("./socket_api");
 
-
-/**
- * Event listener for HTTP serverHttp "listening" event.
+/*
+##############################################################################################################
+Setup and Settings
+##############################################################################################################
  */
 
-function onListening() {
-    const address = serverHttp.address();
-    const bind = typeof address === 'string'
-        ? 'pipe ' + address
-        : 'PORT ' + address.port;
-    debug('Listening on ' + bind);
-}
+const connectionContainer = {};
 
-/**
- * Event listener for HTTP serverHttp "error" event.
- */
+const PORT = normalizePort(process.env.PORT || '3000');
 
-function onError(error) {
-    if (error.syscall !== 'listen') {
-        throw error;
-    }
+/* ############################## Express ############################## */
 
-    var bind = typeof PORT === 'string'
-        ? 'Pipe ' + PORT
-        : 'Port ' + PORT;
-
-    // handle specific listen errors with friendly messages
-    switch (error.code) {
-        case 'EACCES':
-            console.error(bind + ' requires elevated privileges');
-            process.exit(1);
-            break;
-        case 'EADDRINUSE':
-            console.error(bind + ' is already in use');
-            process.exit(1);
-            break;
-        default:
-            throw error;
-    }
-}
+const app = express();
+connectionContainer.app = app;
 
 /**
  * Normalize a PORT into a number, string, or false.
@@ -103,35 +77,20 @@ function normalizePort(val) {
     return false;
 }
 
-
-/*
-##############################################################################################################
-Setup and Settings
-##############################################################################################################
- */
-
-let connectionContainer = {}
-
-/*############################## Express ##############################*/
-
-const app = express();
-connectionContainer.app = app
-
 /**
  * Get PORT from environment and store in Express.
  */
 
-const PORT = normalizePort(process.env.PORT || '3000');
 app.set('port', PORT); // app is a callback
 
 /**
  * Create HTTP server.
  */
 
-/*############################## http server ##############################*/
+/* ############################## http server ############################## */
 
 const serverHttp = http.createServer(app);
-connectionContainer.serverHttp = serverHttp
+connectionContainer.serverHttp = serverHttp;
 
 /**
  * Listen on provided PORT, on all network interfaces.
@@ -144,21 +103,64 @@ serverHttp.listen(PORT, (err) => {
     }
 
     if (process.env.NODE_ENV === 'development') {
-        debugPrinter.printBackendMagenta("On Development mode...")
-    }
+        debugPrinter.printRequest('--- SERVER START UP START ---');
 
-    debugPrinter.printBackendMagenta(`Server listening on port: ${PORT}`);
+        debugPrinter.printBackendBlue('On Development mode...');
+        debugPrinter.printBackendBlue(`Server listening on port: ${PORT}`);
+        debugPrinter.printBackendBlue(`process.env.DATABASE_URL: ${process.env.DATABASE_URL}`);
+
+        debugPrinter.printRequest('--- SERVER START UP END ---');
+    }
 });
 
+/**
+ * Event listener for HTTP serverHttp "error" event.
+ */
+
+function onError(error) {
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
+
+    const bind = typeof PORT === 'string'
+        ? `Pipe ${PORT}`
+        : `Port ${PORT}`;
+
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+    case 'EACCES':
+        console.error(`${bind} requires elevated privileges`);
+        process.exit(1);
+        break;
+    case 'EADDRINUSE':
+        console.error(`${bind} is already in use`);
+        process.exit(1);
+        break;
+    default:
+        throw error;
+    }
+}
+
 serverHttp.on('error', onError);
+
+/**
+ * Event listener for HTTP serverHttp "listening" event.
+ */
+
+function onListening() {
+    const address = serverHttp.address();
+    const bind = typeof address === 'string'
+        ? `pipe ${address}`
+        : `PORT ${address.port}`;
+    debug(`Listening on ${bind}`);
+}
+
 serverHttp.on('listening', onListening);
 
+/* ############################## socket.io ############################## */
 
-/*############################## socket.io ##############################*/
+const io = new socket_io.Server(serverHttp);
 
-
-const io = new socket_io.Server(serverHttp)
-
-connectionContainer.io = io
+connectionContainer.io = io;
 
 module.exports = connectionContainer;
