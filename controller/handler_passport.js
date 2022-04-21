@@ -116,11 +116,7 @@ async function verifyCallback(username, password, doneCallback) {
     debugPrinter.printFunction(password);
 
     try {
-<<<<<<< HEAD
-        const account = await dbEngine.g(username);
-=======
-        const account = await Account.getUserByUsername(username);
->>>>>>> d8a72d1c368f8fd3eb9d7a42d6e593cf8a88c92d
+        const account = await dbEngine.getUserByUsername(username);
 
         debugPrinter.printDebug(account);
 
