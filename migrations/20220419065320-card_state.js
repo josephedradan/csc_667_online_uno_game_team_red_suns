@@ -13,21 +13,23 @@ module.exports = {
                 primaryKey: true,
                 autoIncrement: true,
             },
-
+            
             index: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
-
-            card_id: {
+            
+            // What type of card it is
+            card_info_id: {  
                 type: Sequelize.INTEGER,
-                references: { model: 'Card', key: 'card_id' },
+                references: { model: 'CardInfo', key: 'card_info_id' },
                 allowNull: false,
             },
-
-            stack_id: {
+            
+            // Where this card is in
+            collection_id: {
                 type: Sequelize.INTEGER,
-                references: { model: 'Stack', key: 'stack_id' },
+                references: { model: 'Collection', key: 'collection_id' },
                 allowNull: false,
             },
         });

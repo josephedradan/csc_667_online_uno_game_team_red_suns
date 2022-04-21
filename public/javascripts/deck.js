@@ -57,8 +57,6 @@ Number cards, a breakdown:
 13 * 8 + 4 = 108 total cards
 */
 
-const dbEngine = require("../../controller/db_engine"); 
-
 //Pull the data for the numbered cards for the following colors; red, blue, yellow, green
 //  make copies of those cards per color following the instructions above. 
 //Pull the black cards and make their copies based on instruction above. 
@@ -67,15 +65,3 @@ const dbEngine = require("../../controller/db_engine");
 /**
  * TODO: Make the Deck first and shulffe them. 
  */
-const deck = {}
-deck.initializeDrawStack = async () => {
-    let newDeck = []; 
-    const coloredNumCards = await dbEngine.getCardTableOnType('NUMBER'); 
-    const blackWildCards = await dbEngine.getCardTableOnType('SPECIAL'); 
-    console.log(coloredNumCards); 
-    console.log(blackWildCards); 
-
-
-}
-
-module.exports = deck; 

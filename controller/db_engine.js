@@ -50,13 +50,13 @@ const debugPrinter = require('../util/debug_printer');
  * @param username
  * @returns {Promise<any[]>}
  */
-async function getGetCardTableOnColor(color) {
+async function getGetCardInfoTableOnColor(color) {
     // Acceptable values: blue, green, yellow, red
-    debugPrinter.printFunction(getGetCardTableOnColor.name);
+    debugPrinter.printFunction(getGetCardInfoTableOnColor.name);
     const result = await db.any(
         `
-        SELECT card_id, type, content, color
-        FROM "Card" WHERE color = $1;
+        SELECT card_info_id, type, content, color
+        FROM "CardInfo" WHERE color = $1;
         `,
         [
             color,
@@ -65,15 +65,15 @@ async function getGetCardTableOnColor(color) {
     return result;
 }
 
-dbEngine.getGetCardTableOnColor = getGetCardTableOnColor;
+dbEngine.getGetCardTableOnColor = getGetCardInfoTableOnColor;
 
-async function getCardTableOnType(type) {
+async function getCardInfoTableOnType(type) {
     // Acceptable values: NUMBER, SPECIAL
-    debugPrinter.printFunction(getCardTableOnType.name);
+    debugPrinter.printFunction(getCardInfoTableOnType.name);
     const result = await db.any(
         `
-        SELECT card_id, type, content, color
-        FROM "Card" WHERE type = $1;
+        SELECT card_info_id, type, content, color
+        FROM "CardInfo" WHERE type = $1;
         `,
         [
             type,
@@ -82,13 +82,13 @@ async function getCardTableOnType(type) {
     return result;
 }
 
-dbEngine.getCardTableOnType = getCardTableOnType;
+dbEngine.getCardTableOnType = getCardInfoTableOnType;
 
 async function getAllPlayableCardInfo() {
     debugPrinter.printFunction(getAllPlayableCardInfo.name);
     const result = await db.any(
         `
-        SELECT * FROM "Card"
+        SELECT * FROM "CardInfo"
         `,
     );
     return result;
@@ -96,13 +96,13 @@ async function getAllPlayableCardInfo() {
 
 dbEngine.getAllPlayableCardInfo = getAllPlayableCardInfo;
 
-async function getAccountAndAccountStatisticsByUsername(username) {
-    debugPrinter.printFunction(getAccountAndAccountStatisticsByUsername.name);
+async function getUserAndUserStatisticsByUsername(username) {
+    debugPrinter.printFunction(getUserAndUserStatisticsByUsername.name);
     const result = await db.any(
         `
         SELECT * 
-        FROM "Account" account
-        LEFT JOIN "AccountStatistic" statistics ON account.account_id=statistics.statistic_id
+        FROM "User" user
+        LEFT JOIN "UserStatistic" statistics ON user.user_id=statistics.statistic_id
         WHERE Username = $1 
         `,
         [
@@ -112,7 +112,7 @@ async function getAccountAndAccountStatisticsByUsername(username) {
     return result[0];
 }
 
-dbEngine.getAccountAndAccountStatisticsByUsername = getAccountAndAccountStatisticsByUsername;
+dbEngine.getAccountAndAccountStatisticsByUsername = getUserAndUserStatisticsByUsername;
 
 /**
  * Example:
@@ -121,8 +121,8 @@ dbEngine.getAccountAndAccountStatisticsByUsername = getAccountAndAccountStatisti
  * @param username
  * @returns {Promise<any>}
  */
-async function getAccountByUsername(username) {
-    debugPrinter.printFunction(getAccountByUsername.name);
+async function getUserByUsername(username) {
+    debugPrinter.printFunction(getUserByUsername.name);
     debugPrinter.printFunction(username);
     debugPrinter.printSuccess('FUCK1');
 
@@ -135,9 +135,9 @@ async function getAccountByUsername(username) {
 
     const result = await db.any(
         `
-        SELECT account.username, account.password, account.account_id 
-        FROM "Account" AS account 
-        WHERE account.username = $1;
+        SELECT user.username, user.password, user.account_id 
+        FROM "User" AS user 
+        WHERE user.username = $1;
         `,
         [
             username,
@@ -148,7 +148,7 @@ async function getAccountByUsername(username) {
     return result[0]; // Should be an object returned
 }
 
-dbEngine.getAccountByUsername = getAccountByUsername;
+dbEngine.getAccountByUsername = getUserByUsername;
 
 /**
  *
@@ -156,15 +156,16 @@ dbEngine.getAccountByUsername = getAccountByUsername;
  * @param password
  * @returns {Promise<any[]>}
  */
-async function createAccount(username, password) {
-    debugPrinter.printFunction(createAccount.name);
+async function createUser(username, display_name, password) {
+    debugPrinter.printFunction(createUser.name);
     const result = await db.any(
         `
-        INSERT INTO "Account" (username, password)
+        INSERT INTO "User" (display_name, username, password)
         VALUES ($1, $2)
-        RETURNING account_id, username, password;
+        RETURNING user_id, display_name, username, password;
         `,
         [
+            display_name,
             username,
             password,
         ],
@@ -173,7 +174,7 @@ async function createAccount(username, password) {
     return result[0]; // Should be the new object
 }
 
-dbEngine.createAccount = createAccount;
+dbEngine.createAccount = createUser;
 
 /**
  * Create account statistic given account_id, will return statistic_id
@@ -181,12 +182,12 @@ dbEngine.createAccount = createAccount;
  * @param account_id
  * @returns {Promise<any[]>}
  */
-async function creatAccountStatistic(account_id) {
-    debugPrinter.printFunction(creatAccountStatistic.name);
+async function createUserStatistic(account_id) {
+    debugPrinter.printFunction(createUserStatistic.name);
     const result = await db.any(
         `
 
-        INSERT INTO "AccountStatistic" (statistic_id, num_wins, num_loss)
+        INSERT INTO "UserStatistic" (statistic_id, num_wins, num_loss)
         VALUES ($1, 0, 0)
         RETURNING statistic_id, num_wins, num_loss, date_joined;
         `,
@@ -198,6 +199,6 @@ async function creatAccountStatistic(account_id) {
     return result[0]; // Should be the new object
 }
 
-dbEngine.creatAccountStatistic = creatAccountStatistic;
+dbEngine.creatAccountStatistic = createUserStatistic;
 
 module.exports = dbEngine;

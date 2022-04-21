@@ -14,14 +14,14 @@ module.exports = {
                 autoIncrement: true,
             },
 
-            is_out_of_game: {
+            in_game: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false,
             },
 
             account_id: {
                 type: Sequelize.INTEGER,
-                references: { model: 'Account', key: 'account_id' },
+                references: { model: 'User', key: 'user_id' },
                 allowNull: false,
                 unique: true,
             },

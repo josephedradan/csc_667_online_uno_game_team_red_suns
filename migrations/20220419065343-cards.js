@@ -13,11 +13,12 @@ module.exports = {
                 primaryKey: true,
                 autoIncrement: true,
             },
-
-            lobby_id: {
+            
+            // What the card state is tied to
+            game_id: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
-                references: { model: 'Lobby', key: 'lobby_id' },
+                references: { model: 'Game', key: 'game_id' },
             },
 
             card_state_id: {

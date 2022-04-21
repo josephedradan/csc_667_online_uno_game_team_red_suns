@@ -74,7 +74,7 @@ async function registration(req, res, next) {
 
     debugPrinter.printDebug(req.body);
 
-    const { username, password, confirm_password } = req.body;
+    const { username, display_name, password, confirm_password } = req.body;
 
     try {
         // Check if username already exists
@@ -88,12 +88,14 @@ async function registration(req, res, next) {
 
             res.redirect('back');
         }
+
         // Create new account
         else {
             const hashedPassword = await passwordHandler.hash(password);
 
             const account = await dbEngine.createAccount(
                 username,
+                display_name,
                 hashedPassword,
             );
 

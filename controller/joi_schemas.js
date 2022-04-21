@@ -55,6 +55,15 @@ joiSchemas.SCHEMA_ACCOUNT_REGISTRATION = Joi.object()
                 // 'any.required': 'username key is missing from the body',
             }),
 
+        // display_anme based on regex pattern
+        display_name: Joi.string()
+            .regex(nameRegex)
+            .required()
+            .messages({
+                'string.pattern.base': 'display name does not follow format',
+                // 'string.empty': 'firstname must not be empty',
+            }),
+
         // Password based on regex pattern
         password: Joi.string()
             .regex(passwordRegex)
@@ -73,15 +82,6 @@ joiSchemas.SCHEMA_ACCOUNT_REGISTRATION = Joi.object()
                 // 'string.empty': 'password confirmation must not be empty',
             }),
 
-        // // First name based on regex pattern
-        // firstname: Joi.string()
-        //     .regex(nameRegex)
-        //     .required()
-        //     .messages({
-        //         'string.pattern.base': 'firstname does not follow format',
-        //         // 'string.empty': 'firstname must not be empty',
-        //     }),
-        //
         // // Last name based on regex pattern
         // lastname: Joi.string()
         //     .regex(nameRegex)
