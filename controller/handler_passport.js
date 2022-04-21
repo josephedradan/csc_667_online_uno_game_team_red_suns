@@ -116,14 +116,14 @@ async function verifyCallback(username, password, doneCallback) {
     try {
         const account = await Account.getAccountByUsername(username);
 
-        debugPrinter.printDebug(account)
+        debugPrinter.printDebug(account);
 
         // Invalid username
         if (account === null || account === undefined) {
             return doneCallback(
                 null, // error (This must be null to allow the 3rd argument (info) to pass)
                 false, // account
-                {message: 'Invalid username'}, // info
+                { message: 'Invalid username' }, // info
             );
         }
 
@@ -135,13 +135,13 @@ async function verifyCallback(username, password, doneCallback) {
 
         try {
             // If password is valid by comparing password from the req to the password in the db
-            console.log("form information; " + username + " : " + password);
+            console.log(`form information; ${username} : ${password}`);
             if (await handlerPassword.compare(password, await account.password)) {
                 // This doneCallback will attach the account object to req
                 return doneCallback(
                     null, // error (This must be null to allow the 3rd argument (info) to pass)
                     account, // account
-                    {message: 'Success'}, // info
+                    { message: 'Success' }, // info
                 );
             }
 
@@ -149,7 +149,7 @@ async function verifyCallback(username, password, doneCallback) {
             return doneCallback(
                 null, // error (This must be null to allow the 3rd argument (info) to pass)
                 false, // account
-                {message: 'Invalid password'}, // info
+                { message: 'Invalid password' }, // info
             );
         } catch (error) {
             if (process.env.NODE_ENV === 'development') {
@@ -159,10 +159,9 @@ async function verifyCallback(username, password, doneCallback) {
             return doneCallback(error);
         }
     } catch (err) {
-        console.log("failure to query getAccountAndAccountStatisticsByUsername");
+        console.log('failure to query getAccountAndAccountStatisticsByUsername');
         console.log(err);
     }
-
 }
 
 /**
@@ -219,7 +218,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
                 https://stackoverflow.com/questions/27637609/understanding-passport-serialize-deserialize
      */
     passport.serializeUser((user, doneCallback) => {
-        debugPrinter.printFunction("serializeUser");
+        debugPrinter.printFunction('serializeUser');
 
         /*
         Put the key (user.username) inside the passport of the session.
@@ -257,18 +256,17 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
                 https://stackoverflow.com/questions/27637609/understanding-passport-serialize-deserialize
      */
     passport.deserializeUser(async (username, doneCallback) => {
-        debugPrinter.printFunction("deserializeUser");
+        debugPrinter.printFunction('deserializeUser');
 
         // if (process.env.NODE_ENV === 'development') {
         //     debugPrinter.printDebug(`initializePassport deserializeUser ${username}`);
         // }
 
         // Get the accountAndAccountStatistics via username
-        let [error, accountAndAccountStatistics] = await to(Account.getAccountAndAccountStatisticsByUsername(username));
+        const [error, accountAndAccountStatistics] = await to(Account.getAccountAndAccountStatisticsByUsername(username));
 
         // If accountAndAccountStatistics exists
         if (accountAndAccountStatistics !== null) {
-
             // What ever data is sent to the second parameter of this function will be stored in req.user
             doneCallback(
                 error, // error
@@ -280,15 +278,14 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
                 For example, attributes/properties with naming conventions such as USER_NAME, USERNAME, userName, etc... may not conform to this project's coding style.
                  */
                 accountAndAccountStatistics,
-                {message: `${accountAndAccountStatistics.username} was successfully logged in`}, // Additional info to be sent
+                { message: `${accountAndAccountStatistics.username} was successfully logged in` }, // Additional info to be sent
             );
         } else {
-
             // If getting accountAndAccountStatistics is unsuccessful, then req.user will be null or undefined
             doneCallback(
                 error, // error
                 null, // Stuff that will be stored in req.user. Since it's null, the callback should handle it appropriately
-                {message: 'Error happened in passport.deserializeUser'}, // Additional info to be sent
+                { message: 'Error happened in passport.deserializeUser' }, // Additional info to be sent
             );
         }
     });

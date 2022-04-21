@@ -18,7 +18,7 @@ Reference:
 
  */
 
-let middlewareCommunicateToFrontend = {}
+const middlewareCommunicateToFrontend = {};
 
 /**
  * Add a message (which in this case should be an object) so the frontend can deal with it
@@ -37,7 +37,7 @@ async function middlewareMessage(req, res, next) {
     next();
 }
 
-middlewareCommunicateToFrontend.middlewareMessage = middlewareMessage
+middlewareCommunicateToFrontend.middlewareMessage = middlewareMessage;
 
 /**
  * Persist req.user from passport to res.locals.user
@@ -49,10 +49,9 @@ middlewareCommunicateToFrontend.middlewareMessage = middlewareMessage
  */
 async function middlewarePersistUser(req, res, next) {
     res.locals.user = req.user;
-    next()
+    next();
 }
 
-middlewareCommunicateToFrontend.middlewarePersistUser = middlewarePersistUser
-
+middlewareCommunicateToFrontend.middlewarePersistUser = middlewarePersistUser;
 
 module.exports = middlewareCommunicateToFrontend;

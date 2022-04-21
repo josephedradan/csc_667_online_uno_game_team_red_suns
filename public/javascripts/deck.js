@@ -1,6 +1,6 @@
 /**
 Number cards, a breakdown: (excluding black)
-0 – 1 card for each color, so 4 in total 
+0 – 1 card for each color, so 4 in total
 1 – 2 cards for each color, so 8 in total
 2 – 2 cards for each color, so 8 in total
 3 – 2 cards for each color, so 8 in total
@@ -18,9 +18,9 @@ Number cards, a breakdown: (excluding black)
 13 * 8 + 4 = 108 total cards
 */
 const values = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-const colors = ["blue", "red", "green", "yellow"];
-const specials = ["skip", "reverse", "drawTwo"];
-const wilds = ["wild", "wildFour"]; // blacks
+const colors = ['blue', 'red', 'green', 'yellow'];
+const specials = ['skip', 'reverse', 'drawTwo'];
+const wilds = ['wild', 'wildFour']; // blacks
 export default class Deck {
     constructor(cards = newDeck()) {
         this.cards = cards;
@@ -29,8 +29,8 @@ export default class Deck {
     // Apply Fisher - Yates Shuffle
     shuffle() {
         const copy = [];
-        let currentLength = this.cards.length,
-            i;
+        let currentLength = this.cards.length;
+        let i;
         while (currentLength) {
             i = Math.floor(Math.random() * currentLength--);
             copy.push(this.cards.splice(i, 1)[0]);
@@ -76,8 +76,8 @@ function newDeck() {
     // generate wild cards 4 each.
     for (let i = 0; i < 4; i++) {
         // tempDeck.push(new Card("black", wilds[0]), new Card("black", wilds[1]));
-        tempDeck.push(new Card("black", wilds[0]));
-        tempDeck.push(new Card("black", wilds[1]));
+        tempDeck.push(new Card('black', wilds[0]));
+        tempDeck.push(new Card('black', wilds[1]));
     }
     return tempDeck;
 }

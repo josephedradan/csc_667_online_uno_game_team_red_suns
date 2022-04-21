@@ -12,23 +12,16 @@ Reference:
 module.exports = {
     env: {
         browser: true,
+        commonjs: true,
         es2021: true,
+        node: true,
     },
     extends: [
-        'plugin:react/recommended',
-        'airbnb',
-        'eslint:recommended',
+        'airbnb-base',
     ],
     parserOptions: {
-        ecmaFeatures: {
-            jsx: true,
-        },
-        ecmaVersion: 12,
-        sourceType: 'module',
+        ecmaVersion: 'latest',
     },
-    plugins: [
-        'react',
-    ],
     rules: {
         indent: ['error', 4],
         'consistent-return': 0,
@@ -49,14 +42,14 @@ module.exports = {
                 allow: ['_wrapper'],
             },
         ],
-        // camelcase: ['off',
-        //     {
-        //         properties: 'never',
-        //         ignoreDestructuring: true,
-        //         ignoreGlobals: true,
-        //         ignoreImports: true,
-        //     },
-        // ],
+        camelcase: ['off',
+            {
+                properties: 'never',
+                ignoreDestructuring: true,
+                ignoreGlobals: true,
+                ignoreImports: true,
+            },
+        ],
 
     },
 };

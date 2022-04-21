@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = {
     async up(queryInterface, Sequelize) {
         /**
@@ -8,12 +6,12 @@ module.exports = {
          * Example:
          * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
          */
-        return await queryInterface.createTable("AccountStatistic", {
+        return await queryInterface.createTable('AccountStatistic', {
 
             // statistic_id is a foreign key not a primary key
             statistic_id: {
                 type: Sequelize.INTEGER,
-                references: {model: 'Account', key: 'account_id'},
+                references: { model: 'Account', key: 'account_id' },
                 autoIncrement: true,
                 allowNull: false,
                 unique: true,
@@ -31,7 +29,7 @@ module.exports = {
 
             date_joined: {
                 type: Sequelize.DATE,
-                defaultValue: Sequelize.literal("NOW()"),
+                defaultValue: Sequelize.literal('NOW()'),
                 allowNull: false,
             },
 
@@ -45,6 +43,6 @@ module.exports = {
          * Example:
          * await queryInterface.dropTable('users');
          */
-        return queryInterface.dropTable("AccountStatistic");
-    }
+        return queryInterface.dropTable('AccountStatistic');
+    },
 };

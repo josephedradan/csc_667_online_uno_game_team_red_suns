@@ -19,9 +19,8 @@ Reference:
         Reference:
             https://www.youtube.com/watch?v=Eu-h3iUk45o
  */
-'use strict';
 
-const passwordHandler = require("../controller/handler_password"); 
+const passwordHandler = require('../controller/handler_password');
 
 module.exports = {
     async up(queryInterface, Sequelize) {
@@ -36,22 +35,22 @@ module.exports = {
          */
         return await queryInterface.bulkInsert('Account', [
             {
-                username: "EddyYun123", 
-                password: await passwordHandler.hash("YunYun123!")
-            }, 
+                username: 'EddyYun123',
+                password: await passwordHandler.hash('YunYun123!'),
+            },
             {
-                username: "JosephEdredan321", 
-                password: await passwordHandler.hash("EddyYeti321!")
-            }, 
+                username: 'JosephEdredan321',
+                password: await passwordHandler.hash('EddyYeti321!'),
+            },
             {
-                username: "EricFalk567", 
-                password: await passwordHandler.hash("FalkyWalky567!")
-            }, 
+                username: 'EricFalk567',
+                password: await passwordHandler.hash('FalkyWalky567!'),
+            },
             {
-                username: "JohnSanJose891", 
-                password: await passwordHandler.hash("NoWayJose891!")
-            }
-        ]); 
+                username: 'JohnSanJose891',
+                password: await passwordHandler.hash('NoWayJose891!'),
+            },
+        ]);
     },
 
     async down(queryInterface, Sequelize) {
@@ -63,5 +62,5 @@ module.exports = {
          */
 
         return await queryInterface.bulkDelete('Account', null, {});
-    }
+    },
 };

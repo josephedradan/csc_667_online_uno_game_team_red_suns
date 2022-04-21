@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = {
     async up(queryInterface, Sequelize) {
         /**
@@ -8,7 +6,7 @@ module.exports = {
          * Example:
          * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
          */
-        return await queryInterface.createTable("Player", {
+        return await queryInterface.createTable('Player', {
 
             player_id: {
                 type: Sequelize.INTEGER,
@@ -23,10 +21,10 @@ module.exports = {
 
             account_id: {
                 type: Sequelize.INTEGER,
-                references: {model: 'Account', key: 'account_id'},
+                references: { model: 'Account', key: 'account_id' },
                 allowNull: false,
                 unique: true,
-            }
+            },
 
         });
     },
@@ -39,5 +37,5 @@ module.exports = {
          * await queryInterface.dropTable('users');
          */
         return await queryInterface.dropTable('Player');
-    }
+    },
 };

@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = {
     async up(queryInterface, Sequelize) {
         /**
@@ -24,12 +22,12 @@ module.exports = {
             content: {
                 type: Sequelize.STRING,
                 allowNull: false,
-            }, 
+            },
 
             color: {
                 type: Sequelize.STRING,
                 allowNull: false,
-            }
+            },
 
         });
     },
@@ -42,5 +40,5 @@ module.exports = {
          * await queryInterface.dropTable('users');
          */
         return await queryInterface.dropTable('Card');
-    }
+    },
 };

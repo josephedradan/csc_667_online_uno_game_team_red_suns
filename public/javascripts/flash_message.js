@@ -1,19 +1,19 @@
 const fadeOutFlashMessage = (msg) => {
     setTimeout(() => {
         let currentOpacity = 1.0;
-        let timer = setInterval(() => {
+        const timer = setInterval(() => {
             if (currentOpacity < 0.05) {
                 clearInterval(timer);
                 msg.remove();
             }
-            currentOpacity = currentOpacity - 0.05;
+            currentOpacity -= 0.05;
             msg.style.opacity = currentOpacity;
             console.log(msg.style.opacity);
         }, 50);
     }, 2000);
 };
 
-const flash_message = document.getElementById("flash-message");
+const flash_message = document.getElementById('flash-message');
 if (flash_message) {
     fadeOutFlashMessage(flash_message);
 }
