@@ -62,14 +62,13 @@ const ConnectSessionSequelize = require('connect-session-sequelize')(
 
 const constants = require('./constants');
 const databaseSequelize = require('../models');
-const handlerPassport = require('../controller/handler_passport');
-
-const debugPrinter = require('../util/debug_printer');
+const handlerPassport = require('../controller/handler_passport'); // WARNING: MAKE SURE THAT THIS IMPORT IS BEFORE ANY USAGE OF ANY PASSPORT FUNCTIONALITY
 
 const middlewareCommunicateToFrontend = require('../middleware/middleware_communicate_to_frontend');
 
 const routes = require('../routes/routes');
 
+const debugPrinter = require('../util/debug_printer');
 
 if (process.env.NODE_ENV === 'development') {
     require('dotenv')

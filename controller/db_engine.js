@@ -45,8 +45,7 @@ const debugPrinter = require('../util/debug_printer');
 
 /**
  * Notes:
- *      Should return a list of objects
- *
+ *      Acceptable values: blue, green, yellow, red
  * @param username
  * @returns {Promise<any[]>}
  */
@@ -123,16 +122,7 @@ dbEngine.getAccountAndAccountStatisticsByUsername = getUserAndUserStatisticsByUs
  */
 async function getUserByUsername(username) {
     debugPrinter.printFunction(getUserByUsername.name);
-    debugPrinter.printFunction(username);
-    debugPrinter.printSuccess('FUCK1');
-
-    // const result2 = await db.any(`
-    //     SELECT *
-    //     FROM "Account"
-    // `);
-    // debugPrinter.printSuccess('FUCK2');
-    // debugPrinter.printBackendRed(result2);
-
+    
     const result = await db.any(
         `
         SELECT user.username, user.password, user.account_id 
@@ -144,7 +134,6 @@ async function getUserByUsername(username) {
         ],
     );
 
-    debugPrinter.printBackendRed(result);
     return result[0]; // Should be an object returned
 }
 
