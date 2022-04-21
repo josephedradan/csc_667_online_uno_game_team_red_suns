@@ -78,7 +78,7 @@ async function registration(req, res, next) {
 
     try {
         // Check if username already exists
-        const existingAccount = await dbEngine.getAccountByUsername(username);
+        const existingAccount = await dbEngine.getUserByUsername(username);
 
         if (existingAccount) {
             req.session.message = {
@@ -101,7 +101,7 @@ async function registration(req, res, next) {
 
             debugPrinter.printBackendBlue(account);
 
-            const accountStatistic = await dbEngine.creatAccountStatistic(
+            const accountStatistic = await dbEngine.createUserStatistic(
                 account.account_id,
             );
             debugPrinter.printBackendMagenta(accountStatistic);

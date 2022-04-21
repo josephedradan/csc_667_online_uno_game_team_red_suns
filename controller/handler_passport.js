@@ -116,7 +116,11 @@ async function verifyCallback(username, password, doneCallback) {
     debugPrinter.printFunction(password);
 
     try {
+<<<<<<< HEAD
         const account = await dbEngine.g(username);
+=======
+        const account = await Account.getUserByUsername(username);
+>>>>>>> d8a72d1c368f8fd3eb9d7a42d6e593cf8a88c92d
 
         debugPrinter.printDebug(account);
 
@@ -161,7 +165,7 @@ async function verifyCallback(username, password, doneCallback) {
             return doneCallback(error);
         }
     } catch (err) {
-        console.log('failure to query getAccountAndAccountStatisticsByUsername');
+        console.log('failure to query getUserAndUserStatisticsByUsername');
         console.log(err);
     }
 }
@@ -265,7 +269,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
         // }
 
         // Get the accountAndAccountStatistics via username
-        const [error, accountAndAccountStatistics] = await to(Account.getAccountAndAccountStatisticsByUsername(username));
+        const [error, accountAndAccountStatistics] = await to(Account.getUserAndUserStatisticsByUsername(username));
 
         // If accountAndAccountStatistics exists
         if (accountAndAccountStatistics !== null) {

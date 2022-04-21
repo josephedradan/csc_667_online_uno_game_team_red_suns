@@ -100,9 +100,10 @@ async function getUserAndUserStatisticsByUsername(username) {
     const result = await db.any(
         `
         SELECT * 
-        FROM "User" user
-        LEFT JOIN "UserStatistic" statistics ON user.user_id=statistics.statistic_id
-        WHERE Username = $1 
+        FROM "User" AS "user"
+        LEFT JOIN "UserStatistic" AS "statistics" 
+        "user".user_id="statistics".statistic_id
+        WHERE "user".username = $1; 
         `,
         [
             username,
@@ -111,7 +112,7 @@ async function getUserAndUserStatisticsByUsername(username) {
     return result[0];
 }
 
-dbEngine.getAccountAndAccountStatisticsByUsername = getUserAndUserStatisticsByUsername;
+dbEngine.getUserAndUserStatisticsByUsername = getUserAndUserStatisticsByUsername;
 
 /**
  * Example:
@@ -122,12 +123,12 @@ dbEngine.getAccountAndAccountStatisticsByUsername = getUserAndUserStatisticsByUs
  */
 async function getUserByUsername(username) {
     debugPrinter.printFunction(getUserByUsername.name);
-    
+
     const result = await db.any(
         `
-        SELECT user.username, user.password, user.account_id 
-        FROM "User" AS user 
-        WHERE user.username = $1;
+        SELECT "user".username, "user".password, "user".user_id 
+        FROM "User" AS "user" 
+        WHERE "user".username = $1;
         `,
         [
             username,
@@ -137,7 +138,7 @@ async function getUserByUsername(username) {
     return result[0]; // Should be an object returned
 }
 
-dbEngine.getAccountByUsername = getUserByUsername;
+dbEngine.getUserByUsername = getUserByUsername;
 
 /**
  *
@@ -166,12 +167,12 @@ async function createUser(username, display_name, password) {
 dbEngine.createAccount = createUser;
 
 /**
- * Create account statistic given account_id, will return statistic_id
+ * Create account statistic given user_id, will return statistic_id
  *
- * @param account_id
+ * @param user_id
  * @returns {Promise<any[]>}
  */
-async function createUserStatistic(account_id) {
+async function createUserStatistic(user_id) {
     debugPrinter.printFunction(createUserStatistic.name);
     const result = await db.any(
         `
@@ -181,13 +182,13 @@ async function createUserStatistic(account_id) {
         RETURNING statistic_id, num_wins, num_loss, date_joined;
         `,
         [
-            account_id,
+            user_id,
         ],
     );
 
     return result[0]; // Should be the new object
 }
 
-dbEngine.creatAccountStatistic = createUserStatistic;
+dbEngine.createUserStatistic = createUserStatistic;
 
 module.exports = dbEngine;
