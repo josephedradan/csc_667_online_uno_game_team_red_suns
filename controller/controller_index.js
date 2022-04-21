@@ -1,3 +1,4 @@
+const path = require('path');
 const db = require('../db/index');
 const dbEngine = require('./db_engine');
 const passwordHandler = require('./handler_password');
@@ -64,7 +65,10 @@ async function x() {
 }
 
 async function renderRegistration(req, res, next) {
-    res.render('registration', { title: 'registration', registration: true });
+    res.render('registration', {
+        title: 'registration',
+        registration: true,
+    });
 }
 
 controllerIndex.renderRegistration = renderRegistration;
@@ -75,7 +79,10 @@ async function registration(req, res, next) {
     debugPrinter.printDebug(req.body);
 
     const {
-        username, display_name, password, confirm_password,
+        username,
+        display_name,
+        password,
+        confirm_password,
     } = req.body;
 
     try {
@@ -89,10 +96,9 @@ async function registration(req, res, next) {
             };
 
             res.redirect('back');
-        }
+        } else {
+            // Create new account
 
-        // Create new account
-        else {
             const hashedPassword = await passwordHandler.hash(password);
 
             const user = await dbEngine.createUser(
@@ -124,5 +130,15 @@ async function registration(req, res, next) {
 }
 
 controllerIndex.registration = registration;
+
+async function createGame(req, res, next) {
+    const game_id = 0;
+
+    const url_game = path.join('/games', game_id);
+
+    res.redirect(url_game);
+}
+
+controllerIndex.createGame = createGame;
 
 module.exports = controllerIndex;

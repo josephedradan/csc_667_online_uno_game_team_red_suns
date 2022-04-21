@@ -12,6 +12,7 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 primaryKey: true,
                 autoIncrement: true,
+                onDelete: 'CASCADE',
             },
 
             active: {
@@ -28,8 +29,8 @@ module.exports = {
             host_id: { // host of game.
                 type: Sequelize.INTEGER,
                 references: { model: 'Player', key: 'player_id' },
-                allowNull: false,
-                unique: true,
+                allowNull: true,
+                unique: false,
             },
         });
 

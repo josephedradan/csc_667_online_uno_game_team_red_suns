@@ -50,6 +50,6 @@ module.exports = {
                 ignoreImports: true,
             },
         ],
-
+        // 'brace-style': [1, '1tbs', { allowSingleLine: true }],
     },
 };

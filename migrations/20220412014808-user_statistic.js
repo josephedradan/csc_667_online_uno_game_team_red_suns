@@ -6,7 +6,7 @@ module.exports = {
          * Example:
          * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
          */
-        return await queryInterface.createTable('UserStatistic', {
+        return queryInterface.createTable('UserStatistic', {
 
             // statistic_id is a foreign key not a primary key
             statistic_id: {

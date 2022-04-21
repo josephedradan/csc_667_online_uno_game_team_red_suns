@@ -12,6 +12,7 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 primaryKey: true,
                 autoIncrement: true,
+                onDelete: 'CASCADE',
             },
 
             in_game: {
@@ -24,11 +25,14 @@ module.exports = {
                 allowNull: false,
             },
 
-            account_id: {
+            user_id: {
                 type: Sequelize.INTEGER,
-                references: { model: 'User', key: 'user_id' },
+                references: {
+                    model: 'User',
+                    key: 'user_id',
+                },
                 allowNull: false,
-                unique: true,
+                unique: false,
             },
 
         });

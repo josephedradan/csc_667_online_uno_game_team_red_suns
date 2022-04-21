@@ -202,4 +202,16 @@ async function createUserStatistic(user_id) {
 
 dbEngine.createUserStatistic = createUserStatistic;
 
+/* ################################################## Game related stuff ################################################## */
+
+async function createPlayer(user_id) {
+
+}
+dbEngine.createPlayer = createPlayer;
+
+async function createGame(user_id) {
+
+}
+dbEngine.createPlayer = createPlayer;
+
 module.exports = dbEngine;

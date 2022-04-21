@@ -37,4 +37,11 @@ routerIndex.post(
     controllerIndex.registration,
 );
 
+routerIndex.post(
+    '/createGame',
+    middlewareAuthenticationPassport.checkAuthenticated, // Check if logged in
+    controllerIndex.createGame,
+
+);
+
 module.exports = routerIndex;
