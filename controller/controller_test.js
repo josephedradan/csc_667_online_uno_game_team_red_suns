@@ -1,9 +1,20 @@
 const db = require('../db');
 const dbEngine = require('./db_engine');
 
-contollerIndex = {};
+controllerIndex = {};
 
-contollerIndex.testDB = async (req, res, next) => {
+controllerIndex.initializeDrawStack = async (req, res, next) => {
+    let newDeck = []; 
+    const coloredNumCards = await dbEngine.getCardTableOnType('NUMBER'); 
+    const blackWildCards = await dbEngine.getCardTableOnType('SPECIAL'); 
+    console.log(coloredNumCards); 
+    console.log(blackWildCards); 
+
+    res.render("index"); 
+}
+
+
+controllerIndex.testDB = async (req, res, next) => {
     await db
         .any(
             `INSERT INTO test_table ("testString") VALUES ('Hello at ${Date.now()}')`,
@@ -16,7 +27,7 @@ contollerIndex.testDB = async (req, res, next) => {
         });
 };
 
-contollerIndex.testDBSequelizeRaw = async (req, res, next) => {
+controllerIndex.testDBSequelizeRaw = async (req, res, next) => {
     try {
         const { username } = req.params;
         res.json(dbEngine.getAccountByUsername(username));
@@ -25,4 +36,4 @@ contollerIndex.testDBSequelizeRaw = async (req, res, next) => {
     }
 };
 
-module.exports = contollerIndex;
+module.exports = crontollerIndex;
