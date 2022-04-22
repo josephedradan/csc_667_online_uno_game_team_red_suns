@@ -15,8 +15,13 @@ routerGameAPI.post(
 );
 
 routerGameAPI.get(
-    '/drawCArd',
+    '/drawCard',
     controllerGameAPI.getDrawCard,
+);
+
+routerGameAPI.get(
+    '/startGame',
+    controllerGameAPI.getStartGame,
 );
 
 module.exports = routerGameAPI;

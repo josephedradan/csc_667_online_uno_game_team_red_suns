@@ -41,4 +41,15 @@ async function getDrawCard(req, res, next) {
 
 controllerGameAPI.getDrawCard = getDrawCard;
 
+async function getStartGame(req, res, next) {
+    // TODO: SOCKET HERE
+
+    res.json({
+        status: 'success',
+        message: 'game started',
+    });
+}
+
+controllerGameAPI.getStartGame = getStartGame;
+
 module.exports = controllerGameAPI;
