@@ -6,12 +6,12 @@ module.exports = {
          * Example:
          * await queryInterface.createTable('users', { id: Sequelize.DataTypes.INTEGER });
          */
-        return await queryInterface.createTable('CardInfo', {
+        return queryInterface.createTable('CardInfo', {
 
             card_info_id: {
                 type: Sequelize.DataTypes.INTEGER,
                 primaryKey: true,
-                autoIncrement: true,
+                // autoIncrement: true,
                 allowNull: false,
                 unique: true,
             },
@@ -19,16 +19,19 @@ module.exports = {
             type: {
                 type: Sequelize.DataTypes.STRING,
                 allowNull: false,
+                unique: false,
             },
 
             content: {
                 type: Sequelize.DataTypes.STRING,
                 allowNull: false,
+                unique: false,
             },
 
             color: {
                 type: Sequelize.DataTypes.STRING,
                 allowNull: false,
+                unique: false,
             },
 
         });

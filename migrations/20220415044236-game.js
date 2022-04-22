@@ -21,6 +21,8 @@ module.exports = {
             active: {
                 type: Sequelize.DataTypes.BOOLEAN,
                 defaultValue: false,
+                allowNull: false,
+                unique: false,
             },
 
             // Current player's turn determined by the player_id

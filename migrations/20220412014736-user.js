@@ -22,6 +22,7 @@ module.exports = {
             display_name: {
                 type: Sequelize.DataTypes.STRING,
                 allowNull: false,
+                unique: false,
             },
 
             username: {
@@ -33,6 +34,7 @@ module.exports = {
             password: {
                 type: Sequelize.DataTypes.STRING,
                 allowNull: false,
+                unique: false,
             },
 
         });

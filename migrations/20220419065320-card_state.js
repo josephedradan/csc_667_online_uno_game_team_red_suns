@@ -16,12 +16,6 @@ module.exports = {
                 unique: true,
             },
 
-            // Index of the
-            // index: {
-            //     type: Sequelize.DataTypes.INTEGER,
-            //     allowNull: false,
-            // },
-
             // Information about what kind of card this card state is
             card_info_id: {
                 type: Sequelize.DataTypes.INTEGER,
@@ -32,13 +26,6 @@ module.exports = {
                 allowNull: false, // Required
                 unique: false, // False because you can have duplicates of a card in a game as well as this table tracks all the card states throughout all games
             },
-
-            // Where this card is in
-            // collection_id: {
-            //     type: Sequelize.DataTypes.INTEGER,
-            //     references: { model: 'Collection', key: 'collection_id' },
-            //     allowNull: false,
-            // },
 
         });
 

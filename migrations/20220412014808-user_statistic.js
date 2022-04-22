@@ -19,17 +19,22 @@ module.exports = {
             num_wins: {
                 type: Sequelize.DataTypes.INTEGER,
                 defaultValue: 0,
+                allowNull: false,
+                unique: false,
             },
 
             num_loss: {
                 type: Sequelize.DataTypes.INTEGER,
                 defaultValue: 0,
+                allowNull: false,
+                unique: false,
             },
 
             date_joined: {
                 type: Sequelize.DATE,
                 defaultValue: Sequelize.literal('NOW()'),
                 allowNull: false,
+                unique: false,
             },
 
         });

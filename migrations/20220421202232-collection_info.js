@@ -12,7 +12,7 @@ module.exports = {
             collection_info_id: {
                 type: Sequelize.DataTypes.INTEGER,
                 primaryKey: true,
-                autoIncrement: true,
+                // autoIncrement: true,
                 allowNull: false,
                 unique: true,
             },
@@ -21,6 +21,7 @@ module.exports = {
             type: {
                 type: Sequelize.DataTypes.STRING, // DRAW || PLAY || HAND
                 allowNull: false,
+                unique: true,
             },
 
         });

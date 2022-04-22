@@ -34,13 +34,14 @@ module.exports = {
             is_host: {
                 type: Sequelize.DataTypes.BOOLEAN,
                 defaultValue: false,
-
+                unique: false,
             },
 
             // Is the player currently playing the game or is out of the game
             in_game: {
                 type: Sequelize.DataTypes.BOOLEAN,
                 defaultValue: false,
+                unique: false,
             },
 
             // SEAT ORDER IS IMPLIED

@@ -38,7 +38,7 @@ routerIndex.post(
 );
 
 routerIndex.post(
-    '/createGame',
+    '/createGameRow',
     middlewareAuthenticationPassport.checkAuthenticated, // Check if logged in
     controllerIndex.createGame,
 

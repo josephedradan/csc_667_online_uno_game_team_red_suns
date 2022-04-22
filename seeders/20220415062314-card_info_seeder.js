@@ -4,8 +4,18 @@ const colors = ['blue', 'red', 'green', 'yellow', 'black'];
 const NUMBER = 'NUMBER';
 const SPECIAL = 'SPECIAL';
 
+let index = 0;
+
 function generateCard(content, color, type) {
-    return { content, color, type };
+    const row = {
+        card_info_id: index,
+        content,
+        color,
+        type,
+    };
+    index += 1;
+
+    return row;
 }
 
 function generateColoredNumCard(color, _values) {
@@ -15,7 +25,9 @@ function generateColoredNumCard(color, _values) {
 function generateColoredSpecialCards() {
     const retArr = [];
 
+    // eslint-disable-next-line no-plusplus
     for (let i = 0; i < specials.length - 2; i++) {
+        // eslint-disable-next-line no-plusplus
         for (let j = 0; j < colors.length - 1; j++) {
             retArr.push(generateCard(specials[i], colors[j], SPECIAL));
         }
@@ -25,12 +37,24 @@ function generateColoredSpecialCards() {
 }
 
 function generateSpecialCards() {
-    return [{ content: 'wild', color: 'black', type: SPECIAL }, { content: 'wildFour', color: 'black', type: SPECIAL }];
+    return [
+        generateCard(
+            'wild',
+            'black',
+            SPECIAL,
+        ),
+        generateCard(
+            'wildFour',
+            'black',
+            SPECIAL,
+        ),
+    ];
 }
 
 function seedAllCards() {
     let cards = [];
 
+    // eslint-disable-next-line no-plusplus
     for (let i = 0; i < colors.length - 1; i++) {
         cards = cards.concat(generateColoredNumCard(colors[i], values));
     }
@@ -38,30 +62,32 @@ function seedAllCards() {
     cards = cards.concat(generateColoredSpecialCards());
     cards = cards.concat(generateSpecialCards());
 
+    index = 0;
+
     return cards;
 }
 
 module.exports = {
     async up(queryInterface, Sequelize) {
-    /**
-     * Add seed commands here.
-     *
-     * Example:
-     * await queryInterface.bulkInsert('People', [{
-     *   name: 'John Doe',
-     *   isBetaMember: false
-     * }], {});
-    */
+        /**
+         * Add seed commands here.
+         *
+         * Example:
+         * await queryInterface.bulkInsert('People', [{
+         *   name: 'John Doe',
+         *   isBetaMember: false
+         * }], {});
+         */
         return queryInterface.bulkInsert('CardInfo', seedAllCards());
     },
 
     async down(queryInterface, Sequelize) {
-    /**
-     * Add commands to revert seed here.
-     *
-     * Example:
-     * await queryInterface.bulkDelete('People', null, {});
-     */
+        /**
+         * Add commands to revert seed here.
+         *
+         * Example:
+         * await queryInterface.bulkDelete('People', null, {});
+         */
         return queryInterface.bulkDelete('CardInfo', null, {});
     },
 };

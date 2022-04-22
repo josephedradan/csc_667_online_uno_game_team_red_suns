@@ -138,9 +138,8 @@ async function createGame(req, res, next) {
     // Create Players row (for the host)
 
     // Generate literal cards for the game (CardState)
-    // // LINK TO CardInfo
-
-    // Link CardState to Cards
+    // // LINK CardState TO CardInfo
+    // // Link CardState TO Cards
 
     // Create Collection
     // // LINK TO CollectionInfo

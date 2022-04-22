@@ -53,62 +53,6 @@ dbEngine.sequelizeGetUsers = sequelizeGetUsers;
 
 /* #################################################################################################### */
 
-/**
- * Notes:
- *      Acceptable values: blue, green, yellow, red
- * @param username
- * @returns {Promise<any[]>}
- */
-async function getGetCardInfoTableOnColor(color) {
-    debugPrinter.printFunction(getGetCardInfoTableOnColor.name);
-    const result = await db.any(
-        `
-        SELECT card_info_id, type, content, color
-        FROM "CardInfo" WHERE color = $1;
-        `,
-        [
-            color,
-        ],
-    );
-    return result;
-}
-
-dbEngine.getGetCardTableOnColor = getGetCardInfoTableOnColor;
-
-/**
- * Notes:
- *      Acceptable values: NUMBER, SPECIAL
- * @param type
- * @returns {Promise<any[]>}
- */
-async function getCardInfoTableOnType(type) {
-    debugPrinter.printFunction(getCardInfoTableOnType.name);
-    const result = await db.any(
-        `
-        SELECT card_info_id, type, content, color
-        FROM "CardInfo" WHERE type = $1;
-        `,
-        [
-            type,
-        ],
-    );
-    return result;
-}
-
-dbEngine.getCardTableOnType = getCardInfoTableOnType;
-
-async function getAllPlayableCardInfo() {
-    debugPrinter.printFunction(getAllPlayableCardInfo.name);
-    const result = await db.any(
-        `
-        SELECT * FROM "CardInfo"
-        `,
-    );
-    return result;
-}
-
-dbEngine.getAllPlayableCardInfo = getAllPlayableCardInfo;
-
 async function getUserAndUserStatisticsByUsername(username) {
     debugPrinter.printFunction(getUserAndUserStatisticsByUsername.name);
 
@@ -131,7 +75,7 @@ async function getUserAndUserStatisticsByUsername(username) {
 dbEngine.getUserAndUserStatisticsByUsername = getUserAndUserStatisticsByUsername;
 
 /**
- * Example:
+ * Example output:
  *      [ { username: 'joseph1', password: 'sdfsd', account_id: 8 } ]
  *
  * @param username

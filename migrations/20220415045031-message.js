@@ -26,11 +26,14 @@ module.exports = {
             message: { // what was sent
                 type: Sequelize.TEXT,
                 allowNull: false,
+                unique: false,
             },
 
             time_stamp: {
                 type: Sequelize.DATE,
                 defaultValue: Sequelize.literal('NOW()'),
+                allowNull: false,
+                unique: false,
             },
 
             game_id: {
