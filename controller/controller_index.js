@@ -132,6 +132,19 @@ async function registration(req, res, next) {
 controllerIndex.registration = registration;
 
 async function createGame(req, res, next) {
+    // Create Player // ORDER NO MATTER
+    // Crate Game // ORDER NO MATTER
+
+    // Create Players row (for the host)
+
+    // Generate literal cards for the game (CardState)
+    // // LINK TO CardInfo
+
+    // Link CardState to Cards
+
+    // Create Collection
+    // // LINK TO CollectionInfo
+
     const game_id = 0;
 
     const url_game = path.join('/games', game_id);

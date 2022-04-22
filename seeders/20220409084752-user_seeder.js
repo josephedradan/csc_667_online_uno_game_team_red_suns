@@ -33,7 +33,7 @@ module.exports = {
          *   isBetaMember: false
          * }], {});
          */
-        return await queryInterface.bulkInsert('User', [
+        return queryInterface.bulkInsert('User', [
             {
                 username: 'EddyYun123',
                 display_name: 'EddyYun',
@@ -70,6 +70,6 @@ module.exports = {
          * await queryInterface.bulkDelete('People', null, {});
          */
 
-        return await queryInterface.bulkDelete('User', null, {});
+        return queryInterface.bulkDelete('User', null, {});
     },
 };

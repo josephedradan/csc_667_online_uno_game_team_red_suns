@@ -8,26 +8,22 @@ module.exports = {
        */
         return queryInterface.createTable('Collection', {
 
-            // collection_id: {
+            // *** THIS DOES NOT EXIST YET, THIS SHOULD BE CREATED BY THE MIGRATION card_state ***
+            // card_state_id: {
             //     type: Sequelize.DataTypes.INTEGER,
-            //     primaryKey: true,
-            //     autoIncrement: true,
+            //     references: { model: 'CardState', key: 'card_state_id' },
+            //     allowNull: false,
+            //     unique: true,
             // },
 
-            card_state_id: {
-                type: Sequelize.DataTypes.INTEGER,
-                references: { model: 'CardState', key: 'card_state_id' },
-                allowNull: false,
-                unique: true,
-            },
-
+            // *** THIS DOES NOT EXIST YET, THIS SHOULD BE CREATED BY THE MIGRATION collection_info ***
             // Collection info id maps to a row telling you what collection the card state is in
-            collection_info_id: {
-                type: Sequelize.DataTypes.INTEGER,
-                references: { model: 'CollectionInfo', key: 'collection_info_id' },
-                allowNull: false,
-                unique: false, // It's a mapping so you can't have uniques
-            },
+            // collection_info_id: {
+            //     type: Sequelize.DataTypes.INTEGER,
+            //     references: { model: 'CollectionInfo', key: 'collection_info_id' },
+            //     allowNull: false,
+            //     unique: false, // It's a mapping, so you can't have uniques
+            // },
 
             player_id: { // This may or may not exist (If type is HAND then this will not be null)
                 type: Sequelize.DataTypes.INTEGER,

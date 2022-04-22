@@ -35,16 +35,6 @@ module.exports = {
             },
 
         });
-
-        // // Odd return
-        // return queryInterface.addColumn('Player', 'game_id', {
-        //     type: Sequelize.DataTypes.INTEGER,
-        //     references: {
-        //         model: 'Game',
-        //         key: 'game_id',
-        //     },
-        //     allowNull: false,
-        // });
     },
 
     async down(queryInterface, Sequelize) {
@@ -54,11 +44,6 @@ module.exports = {
          * Example:
          * await queryInterface.dropTable('users');
          */
-        // await queryInterface.removeColumn(
-        //     'Player',
-        //     'game_id',
-        // );
-
         return queryInterface.dropTable('Game');
     },
 };

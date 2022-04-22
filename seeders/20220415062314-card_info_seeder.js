@@ -52,7 +52,7 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-        return await queryInterface.bulkInsert('CardInfo', seedAllCards());
+        return queryInterface.bulkInsert('CardInfo', seedAllCards());
     },
 
     async down(queryInterface, Sequelize) {
@@ -62,6 +62,6 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-        return await queryInterface.bulkDelete('CardInfo', null, {});
+        return queryInterface.bulkDelete('CardInfo', null, {});
     },
 };

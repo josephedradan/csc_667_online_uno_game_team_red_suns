@@ -7,7 +7,7 @@ module.exports = {
          * await queryInterface.createTable('users', { id: Sequelize.DataTypes.INTEGER });
          */
 
-        return queryInterface.createTable('CollectionInfo', {
+        await queryInterface.createTable('CollectionInfo', {
 
             collection_info_id: {
                 type: Sequelize.DataTypes.INTEGER,
@@ -24,6 +24,13 @@ module.exports = {
             },
 
         });
+
+        return queryInterface.addColumn('Collection', 'collection_info_id', {
+            type: Sequelize.DataTypes.INTEGER,
+            references: { model: 'CollectionInfo', key: 'collection_info_id' },
+            allowNull: false,
+            unique: false, // It's a mapping so you can't have uniques
+        });
     },
 
     async down(queryInterface, Sequelize) {
@@ -33,6 +40,12 @@ module.exports = {
          * Example:
          * await queryInterface.dropTable('users');
          */
+
+        await queryInterface.removeColumn(
+            'Collection',
+            'collection_info_id',
+        );
+
         return queryInterface.dropTable('CollectionInfo');
     },
 };

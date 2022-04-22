@@ -60,7 +60,6 @@ dbEngine.sequelizeGetUsers = sequelizeGetUsers;
  * @returns {Promise<any[]>}
  */
 async function getGetCardInfoTableOnColor(color) {
-    // Acceptable values: blue, green, yellow, red
     debugPrinter.printFunction(getGetCardInfoTableOnColor.name);
     const result = await db.any(
         `
@@ -76,8 +75,13 @@ async function getGetCardInfoTableOnColor(color) {
 
 dbEngine.getGetCardTableOnColor = getGetCardInfoTableOnColor;
 
+/**
+ * Notes:
+ *      Acceptable values: NUMBER, SPECIAL
+ * @param type
+ * @returns {Promise<any[]>}
+ */
 async function getCardInfoTableOnType(type) {
-    // Acceptable values: NUMBER, SPECIAL
     debugPrinter.printFunction(getCardInfoTableOnType.name);
     const result = await db.any(
         `
@@ -138,7 +142,7 @@ async function getUserByUsername(username) {
 
     const result = await db.any(
         `
-        SELECT "user".username, "user".password, "user".user_id 
+        SELECT *
         FROM "User" AS "user" 
         WHERE "user".username = $1;
         `,
@@ -156,6 +160,7 @@ dbEngine.getUserByUsername = getUserByUsername;
  *
  * @param username
  * @param password
+ * @param display_name
  * @returns {Promise<any[]>}
  */
 async function createUser(username, password, display_name) {
@@ -164,7 +169,7 @@ async function createUser(username, password, display_name) {
         `
         INSERT INTO "User" (username, password, display_name)
         VALUES ($1, $2, $3)
-        RETURNING user_id, username, password, display_name;
+        RETURNING *;
         `,
         [
             username,
@@ -188,9 +193,9 @@ async function createUserStatistic(user_id) {
     debugPrinter.printFunction(createUserStatistic.name);
     const result = await db.any(
         `
-        INSERT INTO "UserStatistic" (statistic_id, num_wins, num_loss)
+        INSERT INTO "UserStatistic" (user_id, num_wins, num_loss)
         VALUES ($1, 0, 0)
-        RETURNING statistic_id, num_wins, num_loss, date_joined;
+        RETURNING *;
         `,
         [
             user_id,
@@ -201,17 +206,5 @@ async function createUserStatistic(user_id) {
 }
 
 dbEngine.createUserStatistic = createUserStatistic;
-
-/* ################################################## Game related stuff ################################################## */
-
-async function createPlayer(user_id) {
-
-}
-dbEngine.createPlayer = createPlayer;
-
-async function createGame(user_id) {
-
-}
-dbEngine.createPlayer = createPlayer;
 
 module.exports = dbEngine;

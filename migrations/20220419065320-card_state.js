@@ -6,7 +6,7 @@ module.exports = {
          * Example:
          * await queryInterface.createTable('users', { id: Sequelize.DataTypes.INTEGER });
          */
-        return queryInterface.createTable('CardState', {
+        await queryInterface.createTable('CardState', {
 
             card_state_id: {
                 type: Sequelize.DataTypes.INTEGER,
@@ -39,6 +39,17 @@ module.exports = {
             //     references: { model: 'Collection', key: 'collection_id' },
             //     allowNull: false,
             // },
+
+        });
+
+        return queryInterface.addColumn('Collection', 'card_state_id', {
+            type: Sequelize.DataTypes.INTEGER,
+            references: {
+                model: 'CardState',
+                key: 'card_state_id',
+            },
+            allowNull: false,
+            unique: true,
         });
     },
 
@@ -49,6 +60,12 @@ module.exports = {
          * Example:
          * await queryInterface.dropTable('users');
          */
+
+        await queryInterface.removeColumn(
+            'Collection',
+            'card_state_id',
+        );
+
         return queryInterface.dropTable('CardState');
     },
 };
