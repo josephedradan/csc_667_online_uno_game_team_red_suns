@@ -1,4 +1,4 @@
-controllerUsers = {};
+const controllerUsers = {};
 
 const dbEngine = require('./db_engine');
 

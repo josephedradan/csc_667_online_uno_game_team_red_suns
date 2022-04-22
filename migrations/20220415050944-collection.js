@@ -36,7 +36,7 @@ module.exports = {
             },
 
             // Index of the card_state_id in the collection. The collection based on collection_info_id
-            index: {
+            collection_index: {
                 type: Sequelize.DataTypes.INTEGER,
                 allowNull: false,
                 unique: false, // All collections are stored in this table

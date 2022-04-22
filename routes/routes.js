@@ -1,15 +1,15 @@
 const express = require('express');
 
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
-const testRouter = require('./routes/test');
-const gameRouter = require('./routes/games');
+const routerIndex = require('./routes/index');
+const routerUser = require('./routes/users');
+const routerTest = require('./routes/test');
+const routerGame = require('./routes/game');
 
 const router = express.Router();
 
-router.use('/', indexRouter);
-router.use('/users', usersRouter);
-router.use('/games', gameRouter);
-router.use('/test', testRouter);
+router.use('/', routerIndex);
+router.use('/users', routerUser);
+router.use('/game', routerGame);
+router.use('/test', routerTest);
 
 module.exports = router;

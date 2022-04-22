@@ -13,8 +13,8 @@ const dbEngineGameUno = {};
  * @param username
  * @returns {Promise<any[]>}
  */
-async function getGetCardInfoTableOnColor(color) {
-    debugPrinter.printFunction(getGetCardInfoTableOnColor.name);
+async function getCardInfoRowByColor(color) {
+    debugPrinter.printFunction(getCardInfoRowByColor.name);
     const result = await db.any(
         `
         SELECT card_info_id, type, content, color
@@ -27,7 +27,7 @@ async function getGetCardInfoTableOnColor(color) {
     return result[0];
 }
 
-dbEngineGameUno.getGetCardTableOnColor = getGetCardInfoTableOnColor;
+dbEngineGameUno.getCardInfoRowByColor = getCardInfoRowByColor;
 
 /**
  * Notes:
@@ -36,8 +36,8 @@ dbEngineGameUno.getGetCardTableOnColor = getGetCardInfoTableOnColor;
  * @param type
  * @returns {Promise<any[]>}
  */
-async function getCardInfoTableOnType(type) {
-    debugPrinter.printFunction(getCardInfoTableOnType.name);
+async function getCardInfoRowByType(type) {
+    debugPrinter.printFunction(getCardInfoRowByType.name);
     const result = await db.any(
         `
         SELECT card_info_id, type, content, color
@@ -51,10 +51,10 @@ async function getCardInfoTableOnType(type) {
     return result[0];
 }
 
-dbEngineGameUno.getCardTableOnType = getCardInfoTableOnType;
+dbEngineGameUno.getCardInfoRowByType = getCardInfoRowByType;
 
-async function getAllPlayableCardInfo() {
-    debugPrinter.printFunction(getAllPlayableCardInfo.name);
+async function getCardInfoRows() {
+    debugPrinter.printFunction(getCardInfoRows.name);
     const result = await db.any(
         `
         SELECT * 
@@ -64,7 +64,7 @@ async function getAllPlayableCardInfo() {
     return result;
 }
 
-dbEngineGameUno.getAllPlayableCardInfo = getAllPlayableCardInfo;
+dbEngineGameUno.getCardInfoRows = getCardInfoRows;
 
 /**
  * Create Player row based on user_id
@@ -112,7 +112,7 @@ async function createGameRow() {
         `,
     );
 
-    return result[0]; // Should be the new object
+    return result[0];
 }
 
 dbEngineGameUno.createGameRow = createGameRow;
@@ -138,10 +138,9 @@ async function createPlayersRow(game_id, player_id, is_host) {
             player_id,
             is_host,
         ],
-
     );
 
-    return result[0]; // Should be the new object
+    return result[0];
 }
 
 dbEngineGameUno.createPlayersRow = createPlayersRow;
@@ -178,7 +177,6 @@ async function createCardStateRows(deckMultiplier) {
         [
             deckMultiplier,
         ],
-
     );
 
     return result;
@@ -234,24 +232,78 @@ async function createCardStateRowsAndCardsRows(game_id, deckMultiplier) {
                 CROSS JOIN generate_series(1, $1)
             ) AS temp
             RETURNING *
-        ) 
-        INSERT INTO "Cards" (game_id, card_state_id)
-        SELECT $2, cardStateRows.card_state_id
-        FROM cardStateRows
-        RETURNING "Cards".game_id, "Cards".card_state_id;
+        ), cardsRows AS(
+            INSERT INTO "Cards" (game_id, card_state_id)
+            SELECT $2, cardStateRows.card_state_id
+            FROM cardStateRows
+            RETURNING *
+        )
+        SELECT 
+            cardsRows.game_id, 
+            cardStateRows.card_state_id, 
+            cardStateRows.card_info_id
+        FROM cardsRows
+        LEFT JOIN cardStateRows ON cardsRows.card_state_id = cardStateRows.card_state_id;
         `,
         [
             deckMultiplier,
             game_id,
         ],
-
     );
 
     return result;
 }
 
-// dbEngineGameUno.createCardStateRowsAndCardsRows = createCardStateRowsAndCardsRows;
+dbEngineGameUno.createCardStateRowsAndCardsRows = createCardStateRowsAndCardsRows;
 
+/**
+ * Create Collection Row based on card_state_id, collection_info_id, collection_index
+ *
+ * Notes:
+ *      This function is made primarily because shuffling the indies of the CardState Rows is difficult, so the job
+ *      is off loaded to JS
+ *
+ * @param card_state_id
+ * @param collection_info_id
+ * @param collection_index
+ * @returns {Promise<void>}
+ */
+async function createCollectionRow(card_state_id, collection_info_id, collection_index) {
+    const result = await db.any(
+        `
+        INSERT INTO "Collection" (card_state_id, collection_info_id, collection_index)
+        SELECT $1, $2, $3
+        FROM cardStateRows
+        RETURNING *
+        `,
+        [
+            card_state_id,
+            collection_info_id,
+            collection_index,
+        ],
+    );
+
+    return result[0];
+}
+
+dbEngineGameUno.createCollectionRow = createCollectionRow;
+
+/**
+ * Create CardState Rows, Collection Rows, and Cards Rows for a game_id
+ *
+ * IMPORTANT NOTES:
+ *      This will set the collection_index of all Collection Rows as 0
+ *
+ * Notes:
+ *      Create CardState Rows
+ *          Create CardState Rows based on CardState.card_state_id and CardInfo.card_info_id
+ *          Create Collection Rows based on CardState.card_state_id and CollectionInfo.collection_info_id
+ *          Create Cards Rows based on CardState.card_state_id and Game.game_id
+ *
+ * @param game_id
+ * @param deckMultiplier
+ * @returns {Promise<any[]>}
+ */
 async function createCardStateRowsAndCardsRowsAndCollectionRows(game_id, deckMultiplier) {
     debugPrinter.printFunction(createCardStateRowsAndCardsRows.name);
     const result = await db.any(
@@ -266,8 +318,8 @@ async function createCardStateRowsAndCardsRowsAndCollectionRows(game_id, deckMul
                 ) AS temp
             RETURNING *
         ), collectionRows AS (
-            INSERT INTO "Collection" (card_state_id, collection_info_id)
-            SELECT card_state_id, 1
+            INSERT INTO "Collection" (card_state_id, collection_info_id, collection_index)
+            SELECT card_state_id, 1, 0
             FROM cardStateRows
             RETURNING *
         ), cardsRows AS(
@@ -276,7 +328,13 @@ async function createCardStateRowsAndCardsRowsAndCollectionRows(game_id, deckMul
             FROM cardStateRows
             RETURNING *
         )
-        SELECT cardsRows.game_id, cardStateRows.card_state_id, cardStateRows.card_info_id, collectionRows.collection_info_id, collectionRows.player_id
+        SELECT 
+            cardsRows.game_id, 
+            cardStateRows.card_state_id, 
+            cardStateRows.card_info_id, 
+            collectionRows.collection_info_id, 
+            collectionRows.player_id,
+            collectionRows.collection_index
         FROM cardsRows
         LEFT JOIN cardStateRows ON cardsRows.card_state_id = cardStateRows.card_state_id
         LEFT JOIN collectionRows ON cardsRows.card_state_id = collectionRows.card_state_id;
@@ -285,11 +343,29 @@ async function createCardStateRowsAndCardsRowsAndCollectionRows(game_id, deckMul
             deckMultiplier,
             game_id,
         ],
-
     );
 
     return result;
 }
-dbEngineGameUno.createCardStateRowsAndCardsRowsAndCollectionRows = createCardStateRowsAndCardsRowsAndCollectionRows;
+
+// dbEngineGameUno.createCardStateRowsAndCardsRowsAndCollectionRows = createCardStateRowsAndCardsRowsAndCollectionRows; // Don't use this
+
+async function getGameRowByGameID(game_id) {
+    debugPrinter.printFunction(getGameRowByGameID.name);
+    const result = await db.any(
+        `
+        SELECT *
+        FROM "Game"
+        WHERE "Game".game_id=$1
+        `,
+        [
+            game_id,
+        ],
+    );
+
+    return result;
+}
+
+dbEngineGameUno.getGameRowByGameID = getGameRowByGameID;
 
 module.exports = dbEngineGameUno;

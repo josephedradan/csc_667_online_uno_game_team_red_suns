@@ -9,7 +9,7 @@ IMPORTANT NOTES:
                 The login should have been called to get something in the database such as their username, we'll call username X in this case
             2. serializeUser is called second
                 X (which should be username) will be then added to the session (this will be used as an identifier)
-            3. deserializeUser is called third (This call should have been called via req.logIn which should be in middleware_authentication_passport)
+            3. deserializeUser is called third (This call should have been called via req.getLogIn which should be in middleware_authentication_passport)
                 X is used again to identify who the user is, but the identification should be used to get more information about the user
                 which would then be added to req.user
             4. Standard login behavior should happen, req.user should have stuff in it, and the cookie is sent back
@@ -23,7 +23,7 @@ IMPORTANT NOTES:
 
         If the user logs out:
             1. Same behavior as (request that is not static and is logged in),
-                but req.logOut should be called after which should be in middleware_authentication_passport
+                but req.getLogOut should be called after which should be in middleware_authentication_passport
                 and the session is deleted along with the cookie on the client side
 
         If the user makes a requests that are not static and is NOT logged in:
@@ -71,7 +71,7 @@ Reference:
         Notes:
             Basic the passport package understanding
 
-            Has standard way of logging in using req.logIn
+            Has standard way of logging in using req.getLogIn
 
         Reference:
             https://www.youtube.com/watch?v=IUw_TgRhTBE&t=1538s
@@ -114,7 +114,7 @@ async function verifyCallback(username, password, doneCallback) {
     debugPrinter.printFunction(verifyCallback.name);
 
     try {
-        const account = await dbEngine.getUserByUsername(username);
+        const account = await dbEngine.getUserRowByUsername(username);
 
         // Invalid username
         if (account === null || account === undefined) {
@@ -157,7 +157,7 @@ async function verifyCallback(username, password, doneCallback) {
             return doneCallback(error);
         }
     } catch (err) {
-        console.log('failure to query getUserAndUserStatisticsByUsername');
+        console.log('failure to query getUserJoinUserStatisticsRowByUsername');
         console.log(err);
     }
 }
@@ -261,7 +261,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
         // }
 
         // Get the userAndUserStatistics via username
-        const [error, userAndUserStatistics] = await to(dbEngine.getUserAndUserStatisticsByUsername(username));
+        const [error, userAndUserStatistics] = await to(dbEngine.getUserJoinUserStatisticsRowByUsername(username));
 
         // debugPrinter.printSuccess(userAndUserStatistics);
 
@@ -272,8 +272,8 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
                 error, // error
                 /*
                 userAndUserStatistics is the stuff that will be stored in req.user.
-                The adding of userAndUserStatistics to req.user should happen through a successful req.logIn call (req.logIn is added by passport.js automatically).
-                The function req.logIn should technically be called within the body of this callback.
+                The adding of userAndUserStatistics to req.user should happen through a successful req.getLogIn call (req.getLogIn is added by passport.js automatically).
+                The function req.getLogIn should technically be called within the body of this callback.
                 userAndUserStatistics may also lead to problematic/inconsistent attribute/property/value attaining if it does not use a good naming convention.
                 For example, attributes/properties with naming conventions such as USER_NAME, USERNAME, userName, etc... may not conform to this project's coding style.
                  */

@@ -53,16 +53,16 @@ dbEngine.sequelizeGetUsers = sequelizeGetUsers;
 
 /* #################################################################################################### */
 
-async function getUserAndUserStatisticsByUsername(username) {
-    debugPrinter.printFunction(getUserAndUserStatisticsByUsername.name);
+async function getUserJoinUserStatisticsRowByUsername(username) {
+    debugPrinter.printFunction(getUserJoinUserStatisticsRowByUsername.name);
 
     const result = await db.any(
         `
         SELECT * 
-        FROM public."User" AS "user"
-        LEFT JOIN "UserStatistic" AS "statistics" 
-        ON "user".user_id="statistics".statistic_id
-        WHERE "user".username = $1; 
+        FROM "User"
+        LEFT JOIN "UserStatistic"
+        ON "User".user_id="UserStatistic".user_id
+        WHERE "User".username = $1; 
         `,
         [
             username,
@@ -72,7 +72,7 @@ async function getUserAndUserStatisticsByUsername(username) {
     return result[0];
 }
 
-dbEngine.getUserAndUserStatisticsByUsername = getUserAndUserStatisticsByUsername;
+dbEngine.getUserJoinUserStatisticsRowByUsername = getUserJoinUserStatisticsRowByUsername;
 
 /**
  * Example output:
@@ -81,14 +81,14 @@ dbEngine.getUserAndUserStatisticsByUsername = getUserAndUserStatisticsByUsername
  * @param username
  * @returns {Promise<any>}
  */
-async function getUserByUsername(username) {
-    debugPrinter.printFunction(getUserByUsername.name);
+async function getUserRowByUsername(username) {
+    debugPrinter.printFunction(getUserRowByUsername.name);
 
     const result = await db.any(
         `
         SELECT *
-        FROM "User" AS "user" 
-        WHERE "user".username = $1;
+        FROM "User" 
+        WHERE "User".username = $1;
         `,
         [
             username,
@@ -98,7 +98,7 @@ async function getUserByUsername(username) {
     return result[0]; // Should be an object returned
 }
 
-dbEngine.getUserByUsername = getUserByUsername;
+dbEngine.getUserRowByUsername = getUserRowByUsername;
 
 /**
  *
@@ -107,8 +107,8 @@ dbEngine.getUserByUsername = getUserByUsername;
  * @param display_name
  * @returns {Promise<any[]>}
  */
-async function createUser(username, password, display_name) {
-    debugPrinter.printFunction(createUser.name);
+async function createUserRow(username, password, display_name) {
+    debugPrinter.printFunction(createUserRow.name);
     const result = await db.any(
         `
         INSERT INTO "User" (username, password, display_name)
@@ -125,7 +125,7 @@ async function createUser(username, password, display_name) {
     return result[0]; // Should be the new object
 }
 
-dbEngine.createUser = createUser;
+dbEngine.createUserRow = createUserRow;
 
 /**
  * Create account statistic given user_id, will return statistic_id
@@ -133,8 +133,8 @@ dbEngine.createUser = createUser;
  * @param user_id
  * @returns {Promise<any[]>}
  */
-async function createUserStatistic(user_id) {
-    debugPrinter.printFunction(createUserStatistic.name);
+async function createUserStatisticRow(user_id) {
+    debugPrinter.printFunction(createUserStatisticRow.name);
     const result = await db.any(
         `
         INSERT INTO "UserStatistic" (user_id, num_wins, num_loss)
@@ -149,6 +149,6 @@ async function createUserStatistic(user_id) {
     return result[0]; // Should be the new object
 }
 
-dbEngine.createUserStatistic = createUserStatistic;
+dbEngine.createUserStatisticRow = createUserStatisticRow;
 
 module.exports = dbEngine;

@@ -240,15 +240,15 @@ handlerPassport.configurePassportLocalStrategy(passport);
 app.use(passport.initialize()); // Initialize password middleware
 
 /*
-If your application uses persistent logIn sessions, passport.session() middleware must also be used.
-(Serialize and deserialize. Persist the logIn)
+If your application uses persistent getLogIn sessions, passport.session() middleware must also be used.
+(Serialize and deserialize. Persist the getLogIn)
 */
 app.use(passport.session());
 
 /* ############################## Middleware Message (Custom middlewares) ############################## */
 
-app.use(middlewareCommunicateToFrontend.middlewareMessage);
-app.use(middlewareCommunicateToFrontend.middlewarePersistUser);
+app.use(middlewareCommunicateToFrontend.attachMessageToResLocals);
+app.use(middlewareCommunicateToFrontend.attachUserToResLocals);
 
 /* ############################## DEBUGGING ############################## */
 

@@ -4,6 +4,7 @@ const dbEngine = require('./db_engine');
 const passwordHandler = require('./handler_password');
 
 const debugPrinter = require('../util/debug_printer');
+const logicGameUno = require('./logic_game_uno');
 
 /* ############################################################################################################## */
 
@@ -20,13 +21,13 @@ const controllerIndex = {};
  * @param next
  * @returns {Promise<void>}
  */
-async function logIn(req, res, next) {
-    debugPrinter.printMiddleware(logIn.name);
+async function getLogIn(req, res, next) {
+    debugPrinter.printMiddleware(getLogIn.name);
 
     res.redirect('/');
 }
 
-controllerIndex.logIn = logIn;
+controllerIndex.getLogIn = getLogIn;
 
 /**
  * Log out user. Actual log out is handled by passport middleware
@@ -39,22 +40,22 @@ controllerIndex.logIn = logIn;
  * @param next
  * @returns {Promise<void>}
  */
-async function logOut(req, res, next) {
-    debugPrinter.printMiddleware(logOut.name);
+async function getLogOut(req, res, next) {
+    debugPrinter.printMiddleware(getLogOut.name);
 
     res.redirect('/');
 }
 
-controllerIndex.logOut = logOut;
+controllerIndex.getLogOut = getLogOut;
 
-async function renderIndex(req, res, next) {
-    debugPrinter.printMiddleware(renderIndex.name);
+async function getIndex(req, res, next) {
+    debugPrinter.printMiddleware(getIndex.name);
     debugPrinter.printBackendBlue(req.user);
 
     res.render('index');
 }
 
-controllerIndex.renderIndex = renderIndex;
+controllerIndex.getIndex = getIndex;
 
 /**
  *
@@ -64,17 +65,17 @@ async function x() {
     return [{}, {}];
 }
 
-async function renderRegistration(req, res, next) {
+async function getRegistration(req, res, next) {
     res.render('registration', {
         title: 'registration',
         registration: true,
     });
 }
 
-controllerIndex.renderRegistration = renderRegistration;
+controllerIndex.getRegistration = getRegistration;
 
-async function registration(req, res, next) {
-    debugPrinter.printMiddleware(registration.name);
+async function postRegistration(req, res, next) {
+    debugPrinter.printMiddleware(postRegistration.name);
 
     debugPrinter.printDebug(req.body);
 
@@ -87,7 +88,7 @@ async function registration(req, res, next) {
 
     try {
         // Check if username already exists
-        const existingAccount = await dbEngine.getUserByUsername(username);
+        const existingAccount = await dbEngine.getUserRowByUsername(username);
 
         if (existingAccount) {
             req.session.message = {
@@ -101,7 +102,7 @@ async function registration(req, res, next) {
 
             const hashedPassword = await passwordHandler.hash(password);
 
-            const user = await dbEngine.createUser(
+            const user = await dbEngine.createUserRow(
                 username,
                 hashedPassword,
                 display_name,
@@ -109,7 +110,7 @@ async function registration(req, res, next) {
 
             debugPrinter.printBackendBlue(user);
 
-            const userStatistic = await dbEngine.createUserStatistic(
+            const userStatistic = await dbEngine.createUserStatisticRow(
                 user.user_id,
             );
             debugPrinter.printBackendMagenta(userStatistic);
@@ -124,14 +125,16 @@ async function registration(req, res, next) {
 
         debugPrinter.printBackendGreen('REDIRECTING');
     } catch (err) {
-        debugPrinter.printError(`ERROR FROM ${registration.name}`);
+        debugPrinter.printError(`ERROR FROM ${postRegistration.name}`);
         next(err);
     }
 }
 
-controllerIndex.registration = registration;
+controllerIndex.postRegistration = postRegistration;
 
-async function createGame(req, res, next) {
+async function postCreateGame(req, res, next) {
+    debugPrinter.printMiddleware(postCreateGame.name);
+
     // Create Player // ORDER NO MATTER
     // Crate Game // ORDER NO MATTER
 
@@ -144,13 +147,17 @@ async function createGame(req, res, next) {
     // Create Collection
     // // LINK TO CollectionInfo
 
-    const game_id = 0;
+    const result = await logicGameUno.createGame(req.user.user_id);
 
-    const url_game = path.join('/games', game_id);
+    debugPrinter.printBackendBlue(result);
+
+    const url_game = `/game/${result.game.game_id}`;
+
+    debugPrinter.printBackendGreen(url_game);
 
     res.redirect(url_game);
 }
 
-controllerIndex.createGame = createGame;
+controllerIndex.postCreateGame = postCreateGame;
 
 module.exports = controllerIndex;

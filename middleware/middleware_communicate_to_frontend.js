@@ -31,13 +31,13 @@ const middlewareCommunicateToFrontend = {};
  * @param res
  * @param next
  */
-async function middlewareMessage(req, res, next) {
+async function attachMessageToResLocals(req, res, next) {
     res.locals.message = req.session.message;
     delete req.session.message;
     next();
 }
 
-middlewareCommunicateToFrontend.middlewareMessage = middlewareMessage;
+middlewareCommunicateToFrontend.attachMessageToResLocals = attachMessageToResLocals;
 
 /**
  * Persist req.user from passport to res.locals.user
@@ -47,11 +47,11 @@ middlewareCommunicateToFrontend.middlewareMessage = middlewareMessage;
  * @param next
  * @returns {Promise<void>}
  */
-async function middlewarePersistUser(req, res, next) {
+async function attachUserToResLocals(req, res, next) {
     res.locals.user = req.user;
     next();
 }
 
-middlewareCommunicateToFrontend.middlewarePersistUser = middlewarePersistUser;
+middlewareCommunicateToFrontend.attachUserToResLocals = attachUserToResLocals;
 
 module.exports = middlewareCommunicateToFrontend;

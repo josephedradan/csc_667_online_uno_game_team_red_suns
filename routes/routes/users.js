@@ -1,11 +1,11 @@
 const express = require('express');
-const controllerUsers = require('../../controller/controller_users');
+const controllerUsers = require('../../controller/controller_user');
 
 const routerUsers = express.Router();
 
 /* GET users listing. */
 // routerUsers.get("/", controllerUsers.getUsers); // FIXME: website.com/users/ ?????
-// routerUsers.post("/registration", controllerUsers.registerUser); // FIXME: Why website.com/users/registration ?????
+// routerUsers.post("/postRegistration", controllerUsers.registerUser); // FIXME: Why website.com/users/postRegistration ?????
 
 // FIXME: website.com/users/users/bob
 // FIXME: website.com/users/users/joe

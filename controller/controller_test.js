@@ -29,7 +29,7 @@ controllerTest.testDB = async (req, res, next) => {
 controllerTest.testDBSequelizeRaw = async (req, res, next) => {
     try {
         const { username } = req.params;
-        res.json(dbEngine.getUserByUsername(username));
+        res.json(dbEngine.getUserRowByUsername(username));
     } catch (error) {
         next(error);
     }

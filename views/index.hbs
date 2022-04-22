@@ -3,34 +3,34 @@
         <ul class="">
             <li class="px-3 py-3 list-none border rounded-sm">Game List</li>
             <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/games">Game 1</a>
+                <a href="/game">Game 1</a>
             </li>
             <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/games">Game 2</a>
+                <a href="/game">Game 2</a>
             </li>
             <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/games">Game 3</a>
+                <a href="/game">Game 3</a>
             </li>
             <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/games">Game 4</a>
+                <a href="/game">Game 4</a>
             </li>
             <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/games">Game 5</a>
+                <a href="/game">Game 5</a>
             </li>
             <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/games">Game 6</a>
+                <a href="/game">Game 6</a>
             </li>
             <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/games">Game 7</a>
+                <a href="/game">Game 7</a>
             </li>
             <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/games">Game 8</a>
+                <a href="/game">Game 8</a>
             </li>
             <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/games">Game 9</a>
+                <a href="/game">Game 9</a>
             </li>
             <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/games">Game 10</a>
+                <a href="/game">Game 10</a>
             </li>
         </ul>
     </div>
@@ -94,12 +94,12 @@
             <div class="w-full mt-8">
                 <button
                     {{! We can add this to the game or user or index.  }}
-                    formaction="/createGameRow"
+                    formaction="/postCreateGame"
                     class="w-full px-2 py-2 font-semibold text-white bg-blue-500 rounded-lg shadow-lg hover:bg-blue-600"
-                    onclick="fetch('/logout', {method: 'POST'}).then( response =>{
+                    onclick="fetch('/createGame', {method: 'POST'}).then( response =>{
                             console.log(response)
                             // localStorage.clear();
-                            window.location.pathname = '/'
+                            window.location = response.url
                         }
                         )"
                 >Create Game
@@ -112,7 +112,7 @@
                     onclick="fetch('/logout', {method: 'POST'}).then( response =>{
                             console.log(response)
                             // localStorage.clear();
-                            window.location.pathname = '/'
+                            window.location = response.url
                         }
                         )"
                 >Logout
