@@ -82,12 +82,14 @@
                     </div>
                 </li>
 
-                <li class="mr-6">
-                    <a
-                        class="hover:text-blue-800"
-                        href="/registration"
-                    >Register</a>
-                </li>
+                {{#unless user.user_id}}
+                    <li class="mr-6">
+                        <a
+                            class="hover:text-blue-800"
+                            href="/registration"
+                        >Register</a>
+                    </li>
+                {{/unless}}
 
                 <li class="relative inline-block mr-6 dropdown">
                     <button
