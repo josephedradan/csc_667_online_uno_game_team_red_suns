@@ -37,6 +37,19 @@ Reference:
             Migrations
         Reference:
             https://stackoverflow.com/questions/27835801/how-to-auto-generate-migrations-with-sequelize-cli-from-sequelize-models
+
+    why app.listen should be at the end after all the requests? also why is it necessary?
+        Notes:
+            On the subject of app.listen at the end:
+                "...mostly as a convention to use a logical and safe order of initialization where you configure the server first
+                before starting it and exposing it to incoming connections.
+
+                So ... it seems that for most normal synchronous server initialization code, it doesn't really matter whether you
+                do app.listen() before or after configuring your routes. It is likely done last just as a logical convention that
+                seems the appropriate order to do things (configure the server, then start the server)."
+
+        Reference:
+            https://stackoverflow.com/questions/59835089/why-app-listen-should-be-at-the-end-after-all-the-requests-also-why-is-it-neces
  */
 
 const dotenv = require('dotenv');

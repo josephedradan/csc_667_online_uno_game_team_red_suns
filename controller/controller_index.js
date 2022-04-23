@@ -1,10 +1,10 @@
-const path = require("path");
-const db = require("../db/index");
-const dbEngine = require("./db_engine");
-const passwordHandler = require("./handler_password");
+const path = require('path');
+const db = require('../db/index');
+const dbEngine = require('./db_engine');
+const passwordHandler = require('./handler_password');
 
-const debugPrinter = require("../util/debug_printer");
-const logicGameUno = require("./logic_game_uno");
+const debugPrinter = require('../util/debug_printer');
+const logicGameUno = require('./logic_game_uno');
 
 /* ############################################################################################################## */
 
@@ -24,7 +24,7 @@ const controllerIndex = {};
 async function getLogIn(req, res, next) {
     debugPrinter.printMiddleware(getLogIn.name);
 
-    res.redirect("/");
+    res.redirect('/');
 }
 
 controllerIndex.getLogIn = getLogIn;
@@ -43,7 +43,7 @@ controllerIndex.getLogIn = getLogIn;
 async function getLogOut(req, res, next) {
     debugPrinter.printMiddleware(getLogOut.name);
 
-    res.redirect("/");
+    res.redirect('/');
 }
 
 controllerIndex.getLogOut = getLogOut;
@@ -52,7 +52,7 @@ async function getIndex(req, res, next) {
     debugPrinter.printMiddleware(getIndex.name);
     debugPrinter.printBackendBlue(req.user);
 
-    res.render("index");
+    res.render('index');
 }
 
 controllerIndex.getIndex = getIndex;
@@ -66,8 +66,8 @@ async function x() {
 }
 
 async function getRegistration(req, res, next) {
-    res.render("registration", {
-        title: "registration",
+    res.render('registration', {
+        title: 'registration',
         postRegistration: true,
     });
 }
@@ -79,7 +79,9 @@ async function postRegistration(req, res, next) {
 
     debugPrinter.printDebug(req.body);
 
-    const { username, display_name, password, confirm_password } = req.body;
+    const {
+        username, display_name, password, confirm_password,
+    } = req.body;
 
     try {
         // Check if username already exists
@@ -87,11 +89,11 @@ async function postRegistration(req, res, next) {
 
         if (existingAccount) {
             req.session.message = {
-                status: "failure",
-                message: "Username already exists",
+                status: 'failure',
+                message: 'Username already exists',
             };
 
-            res.redirect("back");
+            res.redirect('back');
         } else {
             // Create new account
 
@@ -100,25 +102,25 @@ async function postRegistration(req, res, next) {
             const user = await dbEngine.createUserRow(
                 username,
                 hashedPassword,
-                display_name
+                display_name,
             );
 
             debugPrinter.printBackendBlue(user);
 
             const userStatistic = await dbEngine.createUserStatisticRow(
-                user.user_id
+                user.user_id,
             );
             debugPrinter.printBackendMagenta(userStatistic);
             debugPrinter.printBackendGreen(existingAccount);
 
             req.session.message = {
-                status: "success",
+                status: 'success',
                 message: `Account "${user.username}" was created`,
             };
-            res.redirect("/");
+            res.redirect('/');
         }
 
-        debugPrinter.printBackendGreen("REDIRECTING");
+        debugPrinter.printBackendGreen('REDIRECTING');
     } catch (err) {
         debugPrinter.printError(`ERROR FROM ${postRegistration.name}`);
         next(err);
