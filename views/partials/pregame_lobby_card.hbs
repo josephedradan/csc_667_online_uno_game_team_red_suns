@@ -1,9 +1,8 @@
 <div
-    class="col-span-3 card bg-white flex flex-col items-center justify-center p-4 shadow-lg rounded-2xl"
+    class="flex flex-col items-center justify-center p-4 bg-white shadow-lg card rounded-2xl"
 >
-    <img class="w-50 h-50" src="/images/face.webp" alt="sum ting wong" />
-    <div>Username: {{username}}</div>
-    <div>Info1: </div>
-    <div>Info2: </div>
-    <div>Info3: </div>
+    <img src="/images/face.webp" alt="sum ting wong" />
+    <div>Username: {{user.display_name}}</div>
+    <div>Number of Wins: {{user.num_wins}}</div>
+    <div>Number of Loss: {{user.num_loss}}</div>
 </div>

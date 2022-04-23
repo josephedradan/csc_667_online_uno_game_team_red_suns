@@ -6,10 +6,9 @@
                 class="flex flex-col items-center justify-center p-4 bg-white shadow-lg card rounded-2xl"
             >
                 <img src="/images/face.webp" alt="sum ting wong" />
-                <div>Username: {{display_name}}</div>
-                <div>Info1: </div>
-                <div>Info2: </div>
-                <div>Info3: </div>
+                <div>Username: {{user.display_name}}</div>
+                <div>Number of Wins: {{user.num_wins}}</div>
+                <div>Number of Loss: {{user.num_loss}}</div>
             </div>
             <div></div>
             <div
@@ -44,8 +43,10 @@
             <div class="flex items-center justify-center">
                 <a
                     class="w-1/2 px-4 py-2 font-bold text-center text-white bg-sky-500 hover:bg-sky-700"
-                    href="/game/renderTestGame" <!-- FIXME: Don't redirect, make get request to game/api/startGame-->
-                >Start Game</a>
+                    href="/game/renderTestGame"
+                >
+                    <!-- FIXME: Don't redirect, make get request to game/api/startGame-->
+                    Start Game</a>
             </div>
             <div></div>
 
