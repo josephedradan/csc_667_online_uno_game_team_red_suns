@@ -34,7 +34,6 @@ Reference:
 
 const http = require('http');
 const express = require('express');
-const socket_io = require('socket.io');
 
 const debug = require('debug')('application:serverHttp');
 
@@ -156,10 +155,5 @@ function onListening() {
 
 serverHttp.on('listening', onListening);
 
-/* ############################## socket.io ############################## */
-
-const io = new socket_io.Server(serverHttp);
-
-connectionContainer.io = io;
 
 module.exports = connectionContainer;

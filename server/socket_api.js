@@ -14,15 +14,21 @@ Reference:
             https://socket.io/get-started/chat#integrating-socketio
 
  */
-// const io = require( "socket.io" )();
-// const socketAPI = {
-//     io: io
-// };
-//
-// // Add your socket.io logic here!
-// io.on("connection", function (socket) {
-//     console.log("A user connected");
-// });
-// // end of socket.io logic
-//
-// module.exports = socketAPI;
+
+/* ############################## socket.io ############################## */
+
+const socket_io = require('socket.io');
+const connectionContainer = require('./server');
+
+const io = new socket_io.Server(connectionContainer.serverHttp);
+
+const socketAPI = {
+    io,
+};
+
+// Add your socket.io logic here!
+io.on('connection', (socket) => {
+
+});
+
+module.exports = socketAPI;
