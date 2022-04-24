@@ -17,8 +17,8 @@ Reference:
 
 /* ############################## socket.io ############################## */
 
-const socket_io = require('socket.io');
-const connectionContainer = require('./server');
+const socket_io = require("socket.io");
+const connectionContainer = require("./server");
 
 const io = new socket_io.Server(connectionContainer.serverHttp);
 
@@ -27,8 +27,6 @@ const socketAPI = {
 };
 
 // Add your socket.io logic here!
-io.on('connection', (socket) => {
-
-});
+io.on("connection", (socket) => {});
 
 module.exports = socketAPI;

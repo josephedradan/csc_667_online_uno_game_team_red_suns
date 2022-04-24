@@ -37,9 +37,9 @@ Reference:
 const dbEngine = {};
 
 // const { mergeDefaults } = require("sequelize/types/utils");
-const { sequelize } = require('../models');
-const db = require('../db/index');
-const debugPrinter = require('../util/debug_printer');
+const { sequelize } = require("../models");
+const db = require("../db/index");
+const debugPrinter = require("../util/debug_printer");
 
 // const { QueryTypes } = require('sequelize');
 
@@ -64,15 +64,14 @@ async function getUserJoinUserStatisticsRowByUsername(username) {
         ON "User".user_id="UserStatistic".user_id
         WHERE "User".username = $1; 
         `,
-        [
-            username,
-        ],
+        [username]
     );
 
     return result[0];
 }
 
-dbEngine.getUserJoinUserStatisticsRowByUsername = getUserJoinUserStatisticsRowByUsername;
+dbEngine.getUserJoinUserStatisticsRowByUsername =
+    getUserJoinUserStatisticsRowByUsername;
 
 /**
  * Example output:
@@ -90,9 +89,7 @@ async function getUserRowByUsername(username) {
         FROM "User" 
         WHERE "User".username = $1;
         `,
-        [
-            username,
-        ],
+        [username]
     );
 
     return result[0]; // Should be an object returned
@@ -115,11 +112,7 @@ async function createUserRow(username, password, display_name) {
         VALUES ($1, $2, $3)
         RETURNING *;
         `,
-        [
-            username,
-            password,
-            display_name,
-        ],
+        [username, password, display_name]
     );
 
     return result[0]; // Should be the new object
@@ -141,14 +134,29 @@ async function createUserStatisticRow(user_id) {
         VALUES ($1, 0, 0)
         RETURNING *;
         `,
-        [
-            user_id,
-        ],
+        [user_id]
     );
 
     return result[0]; // Should be the new object
 }
 
 dbEngine.createUserStatisticRow = createUserStatisticRow;
+
+/**
+ * Grab all games
+ *
+ * @param
+ * @returns {Promise<any[]>}
+ */
+async function getCurrentGames() {
+    debugPrinter.printFunction();
+    const result = await db.any(
+        `SELECT * FROM "Game" ORDER BY game_id DESC;`,
+        []
+    );
+    return result;
+}
+
+dbEngine.getCurrentGames = getCurrentGames;
 
 module.exports = dbEngine;
