@@ -116,7 +116,6 @@ io.on('connection', (socket) => {
         });
 
         socket.on('message', (message) => {
-
             // TODO ADD DB STUFF
 
             // socket.to(room)
@@ -124,7 +123,6 @@ io.on('connection', (socket) => {
 
             io.in(room)
                 .emit(message); // YOU WANT THIS ONE BECAUSE OF DB CALLS
-
         });
     }
 });
