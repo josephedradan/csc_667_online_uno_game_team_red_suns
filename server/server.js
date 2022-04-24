@@ -26,6 +26,13 @@ Reference:
 
         Reference:
             https://expressjs.com/en/api.html
+
+    Using socket.io in Express 4 and express-generator's /bin/www
+        Notes:
+            If you are using Express-Generator and want to use socket.io
+        Reference:
+            https://stackoverflow.com/questions/24609991/using-socket-io-in-express-4-and-express-generators-bin-www
+
  */
 
 /**
@@ -34,6 +41,7 @@ Reference:
 
 const http = require('http');
 const express = require('express');
+const socket_io = require('socket.io');
 
 const debug = require('debug')('application:serverHttp');
 
@@ -92,7 +100,6 @@ connectionContainer.serverHttp = serverHttp;
 /**
  * Listen on provided PORT, on all network interfaces.
  */
-const initDeck = require('../controller/controller_test').initializeDrawStack;
 
 serverHttp.listen(PORT, async (err) => {
     if (err) {
@@ -155,5 +162,9 @@ function onListening() {
 
 serverHttp.on('listening', onListening);
 
+/* ############################## socket.io ############################## */
+
+const io = new socket_io.Server(serverHttp);
+connectionContainer.io = io;
 
 module.exports = connectionContainer;

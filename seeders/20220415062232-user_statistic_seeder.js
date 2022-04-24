@@ -17,14 +17,10 @@ module.exports = {
          * }], {});
          */
 
-        // count the num of entries in Account
+        // count the num of entries in User
         const result = await queryInterface.sequelize.query('SELECT user_id FROM public."User";');
 
         const ids = result[0];
-
-        // console.log(ids);
-
-        // const numSeededAccounts = data[0][0].count;
 
         // generate their initial stats.
         ids.forEach((element) => {

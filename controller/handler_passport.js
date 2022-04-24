@@ -9,7 +9,7 @@ IMPORTANT NOTES:
                 The login should have been called to get something in the database such as their username, we'll call username X in this case
             2. serializeUser is called second
                 X (which should be username) will be then added to the session (this will be used as an identifier)
-            3. deserializeUser is called third (This call should have been called via req.getLogIn which should be in middleware_authentication_passport)
+            3. deserializeUser is called third (This call should have been called via req.login which should be in middleware_authentication_passport)
                 X is used again to identify who the user is, but the identification should be used to get more information about the user
                 which would then be added to req.user
             4. Standard login behavior should happen, req.user should have stuff in it, and the cookie is sent back
@@ -71,7 +71,7 @@ Reference:
         Notes:
             Basic the passport package understanding
 
-            Has standard way of logging in using req.getLogIn
+            Has standard way of logging in using req.login
 
         Reference:
             https://www.youtube.com/watch?v=IUw_TgRhTBE&t=1538s
@@ -272,8 +272,8 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
                 error, // error
                 /*
                 userAndUserStatistics is the stuff that will be stored in req.user.
-                The adding of userAndUserStatistics to req.user should happen through a successful req.getLogIn call (req.getLogIn is added by passport.js automatically).
-                The function req.getLogIn should technically be called within the body of this callback.
+                The adding of userAndUserStatistics to req.user should happen through a successful req.login call (req.login is added by passport.js automatically).
+                The function req.login should technically be called within the body of this callback.
                 userAndUserStatistics may also lead to problematic/inconsistent attribute/property/value attaining if it does not use a good naming convention.
                 For example, attributes/properties with naming conventions such as USER_NAME, USERNAME, userName, etc... may not conform to this project's coding style.
                  */

@@ -13,15 +13,15 @@ routerGame.use(middlewareAuthenticationPassport.checkAuthenticated);
 
 routerGame.use('/api', routerGamesAPI);
 
-routerGame.get(
-    '/',
-    controllerGame.getGame,
-);
-
-routerGame.get(
-    '/getTestGame',
-    controllerGame.getTestGame,
-);
+// routerGame.get(
+//     '/',
+//     controllerGame.getGame,
+// );
+//
+// routerGame.get(
+//     '/getTestGame',
+//     controllerGame.getTestGame,
+// );
 
 routerGame.get(
     '/:game_id',

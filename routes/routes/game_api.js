@@ -9,6 +9,11 @@ routerGameAPI.use(middlewareGameUno.checkIfPlayerIsPlayerInGame);
 routerGameAPI.use(middlewareGameUno.validateRequestBody);
 routerGameAPI.use(middlewareGameUno.checkIfPlayerCanDoAction);
 
+routerGameAPI.get(
+    '/getCurrentGame',
+    controllerGameAPI.getCurrentGame,
+);
+
 routerGameAPI.post(
     '/playCard',
     controllerGameAPI.postPlayCard,

@@ -1,6 +1,6 @@
 /*
 This file contains middleware that can check if a user is authenticated or can authenticate the user.
-Basically, this middleware is responsible for allowing and denying access to other middleware and getLogIn the user.
+Basically, this middleware is responsible for allowing and denying access to other middleware and login the user.
 
 Notes:
     Middleware:
@@ -20,6 +20,7 @@ Reference:
 
 const passport = require('passport');
 const debugPrinter = require('../util/debug_printer');
+const utilCommon = require('../util/utilCommon');
 
 const middlewarePassport = {};
 
@@ -37,10 +38,7 @@ middlewarePassport.checkAuthenticated = async (req, res, next) => {
     if (req.isAuthenticated()) {
         next();
     } else {
-        req.session.message = {
-            status: 'failure',
-            message: 'User must be logged in to use this feature',
-        };
+        utilCommon.reqSessionMessageHandler(req, 'failure', 'User must be logged in to use this feature');
 
         res.redirect('back');
     }
@@ -60,10 +58,7 @@ middlewarePassport.checkUnauthenticated = async (req, res, next) => {
     if (req.isUnauthenticated()) {
         next();
     } else {
-        req.session.message = {
-            status: 'failure',
-            message: `${req.user.username} you are logged in, you must not be logged in to use this feature`,
-        };
+        utilCommon.reqSessionMessageHandler(req, 'failure', `${req.user.username} you are logged in, you must not be logged in to use this feature`);
 
         res.redirect('back');
     }
@@ -91,7 +86,7 @@ function callbackCustomWrapper(req, res, next) {
     Notes:
         The below is the doneCallback given to verifyCallback inside of handler_passport
 
-        * The actual logging in is done by the req.getLogIn call
+        * The actual logging in is done by the req.login call
 
     Reference:
             Passport authentication with JWT: How can I change passport's default unauthorized response to my custom response?
@@ -133,12 +128,10 @@ function callbackCustomWrapper(req, res, next) {
             It's a very bad idea to tell the user what they failed on when they log in, it is a security risk
          */
         if (!attributesAddedToReqUser) {
-            // Unsuccessful getLogIn response
+            // Unsuccessful login response
 
-            req.session.message = {
-                status: 'failure',
-                message: 'Password/Username is invalid', // If you care about security
-            };
+            utilCommon.reqSessionMessageHandler(req, 'failure', 'Password/Username is invalid'); // If you care about security
+
             res.redirect('back');
         } else {
             /*
@@ -146,38 +139,41 @@ function callbackCustomWrapper(req, res, next) {
 
             Login
                 Notes:
-                    This is the actual getLogIn, this will put the attributesAddedToReqUser in req.user and put req.user in
+                    This is the actual login, this will put the attributesAddedToReqUser in req.user and put req.user in
                     the session (express-session).
-                    The req.getLogIn function comes from the passport package.
+                    The req.login function comes from the passport package.
 
                 Reference:
                     Log In
                         Notes:
-                            "Passport exposes a getLogIn() function on req (also aliased as getLogIn()) that can be used to
-                            establish a getLogIn session."
+                            "Passport exposes a login() function on req (also aliased as login()) that can be used to
+                            establish a login session."
 
-                            "When the getLogIn operation completes, user (attributesAddedToReqUser) will be assigned to req.user."
+                            "When the login operation completes, user (attributesAddedToReqUser) will be assigned to req.user."
 
-                            "Note: passport.authenticate() middleware invokes req.getLogIn() automatically.
-                            This function is primarily used when users sign up, during which req.getLogIn()
+                            "Note: passport.authenticate() middleware invokes req.login() automatically.
+                            This function is primarily used when users sign up, during which req.login()
                             can be invoked to automatically log in the newly registered user."
 
                         Reference:
                             https://www.passportjs.org/concepts/authentication/login/
             */
             req.logIn(attributesAddedToReqUser, async (errorPassportLogin) => {
-                debugPrinter.printFunction('req.getLogIn');
+                debugPrinter.printFunction('req.login');
 
                 if (errorPassportLogin) {
                     next(errorPassportLogin);
                 } else {
-                    // Successful getLogIn response
-                    req.session.message = {
-                        status: 'success',
-                        message: `${req.user.username} has logged in`,
-                        // user_id: req.user.user_id,
-                        // username: req.user.username,
-                    };
+                    // Successful login response
+                    // req.session.message = {
+                    //     status: 'success',
+                    //     message: `${req.user.username} has logged in`,
+                    //     // user_id: req.user.user_id,
+                    //     // username: req.user.username,
+                    // };
+
+                    // Successful login response
+                    utilCommon.reqSessionMessageHandler(req, 'success', `${req.user.username} has logged in`);
 
                     next();
                 }

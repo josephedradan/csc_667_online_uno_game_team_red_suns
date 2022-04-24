@@ -84,6 +84,9 @@ const db = require('../db');
 const expressSession = require('express-session');
 
 const connectPGSimple = require('connect-pg-simple');
+
+const socketIOWrapped = require('../controller/socket_io_wrapped');
+
 // const connectSessionSequelize = require('connect-session-sequelize');
 
 const handlerPassport = require('../controller/handler_passport'); // WARNING: MAKE SURE THAT THIS IMPORT IS BEFORE ANY USAGE OF ANY PASSPORT FUNCTIONALITY
@@ -226,21 +229,22 @@ Reference:
         Reference:
             https://stackoverflow.com/questions/40381401/when-to-use-saveuninitialized-and-resave-in-express-session
  */
-app.use(
-    expressSession(
-        {
-            secret: 'SOME SECRET', // TODO: MOVE THIS TO A FILE OR SOMETHING
-            resave: false, // Rewrite/Resave the res.session.cookie on every request (THIS OPTION MUST BE SET TO TRUE DUE TO THE BACKEND NOT BEING RESTFUL)
-            saveUninitialized: false, // Allow saving empty/non modified session objects in session store (THIS OPTION MUST BE SET TO TRUE DUE TO THE BACKEND NOT BEING RESTFUL)
-            // store: sequelizeExpressSessionStore, // Use the Store made from connect-session-sequelize
-            store: pgSessionStore,
-            cookie: {
-                httpOnly: false, //     secure: true, // THIS REQUIRES THAT THE CONNECTION IS SECURE BY USING HTTPS (https://github.com/expressjs/session#cookiesecure)
-                //     maxAge: 86400, // 1 Week long cookie
-            },
+
+const middlewareExpressSession = expressSession(
+    {
+        secret: 'SOME SECRET', // TODO: MOVE THIS TO A FILE OR SOMETHING
+        resave: false, // Rewrite/Resave the res.session.cookie on every request (THIS OPTION MUST BE SET TO TRUE DUE TO THE BACKEND NOT BEING RESTFUL)
+        saveUninitialized: false, // Allow saving empty/non modified session objects in session store (THIS OPTION MUST BE SET TO TRUE DUE TO THE BACKEND NOT BEING RESTFUL)
+        // store: sequelizeExpressSessionStore, // Use the Store made from connect-session-sequelize
+        store: pgSessionStore,
+        cookie: {
+            httpOnly: false, //     secure: true, // THIS REQUIRES THAT THE CONNECTION IS SECURE BY USING HTTPS (https://github.com/expressjs/session#cookiesecure)
+            //     maxAge: 86400, // 1 Week long cookie
         },
-    ),
+    },
 );
+
+app.use(middlewareExpressSession);
 
 // Sync the express sessions table (If the table does not exist in the database, then this will create it)
 // sequelizeExpressSessionStore.sync();
@@ -249,14 +253,51 @@ app.use(
 // Config passport
 handlerPassport.configurePassportLocalStrategy(passport);
 
-// In a Connect or Express-based application, passport.initialize() middleware is required to initialize Passport.
+/*
+In a Connect or Express-based application, passport.initialize() middleware is required to initialize Passport.
+
+Reference:
+    what is passport.initialize()? (nodejs express)
+        Notes:
+            "passport.session() is another middleware that alters the request object and change the 'user' value that is currently
+            the session id (from the client cookie) into the true deserialized user object. It is explained in detail here."
+
+            " With sessions, initialize() setups the functions to serialize/deserialize the user data from the request.
+            You are not required to use passport.initialize() if you are not using sessions."
+
+        Reference:
+            https://stackoverflow.com/questions/46644366/what-is-passport-initialize-nodejs-express
+ */
+/**
+
+ */
 app.use(passport.initialize()); // Initialize password middleware
 
 /*
-If your application uses persistent getLogIn sessions, passport.session() middleware must also be used.
-(Serialize and deserialize. Persist the getLogIn)
+If your application uses persistent login sessions, passport.session() middleware must also be used.
+(Serialize and deserialize. Persist the login)
+
+Reference:
+
+    What does passport.session() middleware do?
+        Notes:
+            "passport.session() acts as a middleware to alter the req object and change the 'user' value that is currently
+            the session id (from the client cookie) into the true deserialized user object.
+
+            ... Where it essentially acts as a middleware and alters the value of the 'user' property in the req object to contain the deserialized
+            identity of the user. To allow this to work correctly you must include serializeUser and deserializeUser functions in your custom code.
+            "
+
+        Reference:
+            https://stackoverflow.com/questions/22052258/what-does-passport-session-middleware-do/28994045#28994045
+
 */
 app.use(passport.session());
+
+// Apply express-session, and passport to socket.io
+socketIOWrapped.use(middlewareExpressSession); // This will allow reading and writing to the db, basically this may or may not add socket.request.session.passport.user depending on the cookie
+socketIOWrapped.use(passport.initialize()); // This will add req.login and req.logout via socket.request.login and socket.request.logout
+socketIOWrapped.use(passport.session()); // This will basically add req.user which is accessible via socket.request.user
 
 /* ############################## Middleware Message (Custom middlewares) ############################## */
 
