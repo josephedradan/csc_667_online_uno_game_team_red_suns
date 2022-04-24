@@ -32,12 +32,12 @@ Reference:
  * Module dependencies.
  */
 
-const http = require('http');
-const express = require('express');
+const http = require("http");
+const express = require("express");
+const socketio = require("socket.io");
+const debug = require("debug")("application:serverHttp");
 
-const debug = require('debug')('application:serverHttp');
-
-const debugPrinter = require('../util/debug_printer');
+const debugPrinter = require("../util/debug_printer");
 // const socketAPI = require("./socket_api");
 
 /*
@@ -68,17 +68,16 @@ function normalizePort(val) {
     return false;
 }
 
-const PORT = normalizePort(process.env.PORT || '3000');
+const PORT = normalizePort(process.env.PORT || "3000");
 
 /* ############################## Express ############################## */
 const app = express();
 connectionContainer.app = app;
-
 /**
  * Get PORT from environment and store in Express.
  */
 
-app.set('port', PORT); // app is a callback
+app.set("port", PORT); // app is a callback
 
 /**
  * Create HTTP server.
@@ -89,10 +88,11 @@ app.set('port', PORT); // app is a callback
 const serverHttp = http.createServer(app);
 connectionContainer.serverHttp = serverHttp;
 
+const io = socketio(serverHttp);
 /**
  * Listen on provided PORT, on all network interfaces.
  */
-const initDeck = require('../controller/controller_test').initializeDrawStack;
+const initDeck = require("../controller/controller_test").initializeDrawStack;
 
 serverHttp.listen(PORT, async (err) => {
     if (err) {
@@ -100,14 +100,16 @@ serverHttp.listen(PORT, async (err) => {
         return;
     }
 
-    if (process.env.NODE_ENV === 'development') {
-        debugPrinter.printBackendWhite('--- SERVER START UP START ---');
+    if (process.env.NODE_ENV === "development") {
+        debugPrinter.printBackendWhite("--- SERVER START UP START ---");
 
-        debugPrinter.printBackendBlue('On Development mode...');
+        debugPrinter.printBackendBlue("On Development mode...");
         debugPrinter.printBackendBlue(`Server listening on port: ${PORT}`);
-        debugPrinter.printBackendBlue(`process.env.DATABASE_URL: ${process.env.DATABASE_URL}`);
+        debugPrinter.printBackendBlue(
+            `process.env.DATABASE_URL: ${process.env.DATABASE_URL}`
+        );
 
-        debugPrinter.printBackendWhite('--- SERVER START UP END ---');
+        debugPrinter.printBackendWhite("--- SERVER START UP END ---");
     }
 });
 
@@ -116,30 +118,28 @@ serverHttp.listen(PORT, async (err) => {
  */
 
 function onError(error) {
-    if (error.syscall !== 'listen') {
+    if (error.syscall !== "listen") {
         throw error;
     }
 
-    const bind = typeof PORT === 'string'
-        ? `Pipe ${PORT}`
-        : `Port ${PORT}`;
+    const bind = typeof PORT === "string" ? `Pipe ${PORT}` : `Port ${PORT}`;
 
     // handle specific listen errors with friendly messages
     switch (error.code) {
-    case 'EACCES':
-        console.error(`${bind} requires elevated privileges`);
-        process.exit(1);
-        break;
-    case 'EADDRINUSE':
-        console.error(`${bind} is already in use`);
-        process.exit(1);
-        break;
-    default:
-        throw error;
+        case "EACCES":
+            console.error(`${bind} requires elevated privileges`);
+            process.exit(1);
+            break;
+        case "EADDRINUSE":
+            console.error(`${bind} is already in use`);
+            process.exit(1);
+            break;
+        default:
+            throw error;
     }
 }
 
-serverHttp.on('error', onError);
+serverHttp.on("error", onError);
 
 /**
  * Event listener for HTTP serverHttp "listening" event.
@@ -147,13 +147,13 @@ serverHttp.on('error', onError);
 
 function onListening() {
     const address = serverHttp.address();
-    const bind = typeof address === 'string'
-        ? `pipe ${address}`
-        : `PORT ${address.port}`;
+    const bind =
+        typeof address === "string"
+            ? `pipe ${address}`
+            : `PORT ${address.port}`;
     debug(`Listening on ${bind}`);
 }
 
-serverHttp.on('listening', onListening);
-
+serverHttp.on("listening", onListening);
 
 module.exports = connectionContainer;
