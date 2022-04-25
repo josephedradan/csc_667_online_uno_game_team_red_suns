@@ -4,15 +4,19 @@ var socket = io();
 socket.on('connect', () => {
     console.log(`Connected, your id is: ${socket.id}`);
 
-    // socket.emit('join-room');
+    // THIS MUST BE CALLED ONCE AND BEFORE ANY OTHER EVENTS
+    socket.emit('client-join-room');
 
-    socket.emit('message', 'Hello 1');
-    socket.emit('message', 'Hello 2');
-    socket.emit('message', 'Hello 3');
+    // Test messages
+    socket.emit('client-message', 'Hello 1');
+    socket.emit('client-message', 'Hello 2');
+    socket.emit('client-message', 'Hello 3');
 });
 
-socket.on('message', (msg) => {
-    console.log(`message: ${msg}`);
+/*
+On Server messsage
+ */
+socket.on('server-message', (msg) => {
+    console.log('MESSAGE FROM THE SERVER:');
+    console.log(msg);
 });
-
-socket.emit('temp', 'yolo from frontend');

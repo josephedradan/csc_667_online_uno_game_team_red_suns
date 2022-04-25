@@ -11,13 +11,14 @@ const middlewareGameUno = require('../../middleware/middleware_game_uno');
 // Need to be logged in to access any route past this point
 routerGame.use(middlewarePassport.checkAuthenticated);
 
-routerGame.use('/api', routerGamesAPI);
+// TODO REDESIGN BASED ON ID SO /:game_id/COMMAND
+// routerGame.use('/api', routerGamesAPI);
 
-// routerGame.get(
-//     '/',
-//     controllerGame.getGame,
-// );
-//
+routerGame.get(
+    '/',
+    controllerGame.getGame,
+);
+
 // routerGame.get(
 //     '/getTestGame',
 //     controllerGame.getTestGame,

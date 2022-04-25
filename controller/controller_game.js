@@ -1,5 +1,7 @@
 const debugPrinter = require('../util/debug_printer');
 const utilCommon = require('../util/utilCommon');
+const logicGameUno = require('./logic_game_uno');
+const dbEngineGameUno = require('./db_engine_game_uno');
 
 const controllerGame = {};
 
@@ -10,7 +12,7 @@ const controllerGame = {};
  * @param res
  * @param next
  */
-function getGame(req, res, next) {
+async function getGame(req, res, next) {
     debugPrinter.printMiddleware(getGame.name);
 
     utilCommon.reqSessionMessageHandler(
@@ -31,13 +33,50 @@ controllerGame.getGame = getGame;
  * @param res
  * @param next
  */
-function getGameByGameId(req, res, next) {
+async function getGameByGameId(req, res, next) {
     debugPrinter.printMiddleware(getGameByGameId.name);
+    debugPrinter.printError(req.game.game_id);
+    debugPrinter.printError(req.user.user_id);
+
+    // JOIN GAME IF NOT ALREADY // TODO FIX THIS BY LIMITING AMOUNT OF PLAYERS
+    const result = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(req.game.game_id, req.user.user_id);
+
+    if (!result) {
+        let x = await logicGameUno.joinGame(req.game.game_id, req.user.user_id);
+        debugPrinter.printDebug(`PLAYER HAS JOINED GAME: ${req.game.game_id}`);
+        debugPrinter.printDebug(x);
+    }
+
+    /*
+    This is the current/most recent game_id that the user is on. DO NOT RELY ON THIS, IT WILL CHANGE OVER TIME.
+
+    Notes:
+        This is used for socket.io socket instance to identify what game the user is CURRENTLY on.
+        This value is used immediately when the user connects to their game to make them join that socket.io channel room.
+        If the user on the website emits the 'join-room' event after they have connected to a different game, then
+        they would also receive the emits from the server from that new game because game_id_temp would have changed.
+
+     */
+    req.session.game_id_temp = req.game.game_id;
 
     res.render('lobby');
 }
 
 controllerGame.getGameByGameId = getGameByGameId;
+
+// /**
+//  * Super cheap wait of getting the id of the game via post request
+//  *
+//  * @param req
+//  * @param res
+//  * @param next
+//  */
+// function postGameByGameId(req, res, next) {
+//     debugPrinter.printMiddleware(getGameByGameId.name);
+//     res.json(req.params);
+// }
+//
+// controllerGame.postGameByGameId = postGameByGameId;
 
 // function getTestGame(req, res, next) {
 //     debugPrinter.printMiddleware(getTestGame.name);

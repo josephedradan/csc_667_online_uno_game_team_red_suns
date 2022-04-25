@@ -3,19 +3,28 @@ const debugPrinter = require('../util/debug_printer');
 
 const logicGameUno = {};
 
-async function createPlayer(user_id) {
-    debugPrinter.printFunction(createPlayer.name);
-    return dbEngineGameUno.createPlayerRow(user_id);
+// async function createPlayer(user_id) {
+//     debugPrinter.printFunction(createPlayer.name);
+//     return dbEngineGameUno.createPlayerRow(user_id);
+// }
+//
+// logicGameUno.createPlayer = createPlayer;
+//
+// async function addPlayerToGame(game_id, player_id, is_host) {
+//     debugPrinter.printFunction(addPlayerToGame.name);
+//
+//     return dbEngineGameUno.createPlayersRow(game_id, player_id, is_host);
+// }
+//
+// logicGameUno.addPlayerToGame = addPlayerToGame;
+
+async function joinGame(game_id, user_id) {
+    const player = await dbEngineGameUno.createPlayerRow(user_id);
+    const players = await dbEngineGameUno.createPlayersRow(game_id, player.player_id, false);
+    return dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
 }
 
-logicGameUno.createPlayer = createPlayer;
-
-async function addPlayerToGame(game_id, player_id, is_host) {
-    debugPrinter.printFunction(addPlayerToGame.name);
-    return dbEngineGameUno.createPlayersRow(game_id, player_id, is_host);
-}
-
-logicGameUno.addPlayerToGame = addPlayerToGame;
+logicGameUno.joinGame = joinGame;
 
 /**
  * Generate the initial cards for a game
@@ -47,7 +56,7 @@ async function createGame(user_id) {
 
     const cards = await dbEngineGameUno.createCardStateRowsAndCardsRows(game.game_id, 2);
 
-    // TODO: ADDING TO THE Collection IS NOT WRITTEN
+    // TODO: ADDING TO THE Collection IS NOT WRITTEN, WRITE THE ALGO TO SHUFFLE THE CARDS IN THE DECT
     // dbEngineGameUno.createCollectionRow(card_state_id, collection_info_id, collection_index);
 
     return {

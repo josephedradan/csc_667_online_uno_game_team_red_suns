@@ -521,6 +521,7 @@
             ></textarea>
             <button
                 class="w-32 h-24 px-4 py-2 font-bold text-white bg-sky-500 hover:bg-sky-700"
+                onclick="socket.emit('client-message', 'Hello FROM BUTTON'); console.log(`BUTTON CLICKED`)"
             >
                 Send
             </button>

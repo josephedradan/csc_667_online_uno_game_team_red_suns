@@ -158,6 +158,7 @@ async function postRegistration(req, res, next) {
 
 controllerIndex.postRegistration = postRegistration;
 
+// TODO MOVE THIS TO controller_game_api MAYBE
 async function postCreateGame(req, res, next) {
     debugPrinter.printMiddleware(postCreateGame.name);
 

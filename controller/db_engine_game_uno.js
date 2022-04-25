@@ -367,7 +367,7 @@ async function getGameRowByGameID(game_id) {
         ],
     );
 
-    return result;
+    return result[0];
 }
 
 dbEngineGameUno.getGameRowByGameID = getGameRowByGameID;

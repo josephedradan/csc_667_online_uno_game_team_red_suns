@@ -83,6 +83,14 @@ async function getAllGames(req, res, next) {
 
 controllerGameAPI.getAllGames = getAllGames;
 
+/**
+ * Get Info about the current game the user is in
+ *
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<void>}
+ */
 async function getCurrentGame(req, res, next) {
     debugPrinter.printMiddleware(getCurrentGame.name);
 
@@ -93,13 +101,10 @@ async function getCurrentGame(req, res, next) {
 
 controllerGameAPI.getCurrentGame = getCurrentGame;
 
-async function sendMessage(req, res, next) {
-
-
-    io.sockets
-
-}
-
-controllerGameAPI.sendMessage = sendMessage;
+// async function sendMessage(req, res, next) {
+//     io.sockets;
+// }
+//
+// controllerGameAPI.sendMessage = sendMessage;
 
 module.exports = controllerGameAPI;
