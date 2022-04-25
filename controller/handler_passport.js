@@ -17,13 +17,13 @@ IMPORTANT NOTES:
         If the user makes a requests that are not static and is logged in:
             1. User sends the cookie they have been given by us
             2. deserializeUser is called
-                This behavior should be similar to the deserializeUser stated prior, but we use the cookie to get X which
+                This behavior should be similar to the deserializeUser stated prior, but we useExpressMiddleware the cookie to get X which
                 would then be used to add stuff to req.user
             3. The behavior of the request should happen and req.user should have info about the user
 
         If the user logs out:
             1. Same behavior as (request that is not static and is logged in),
-                but req.getLogOut should be called after which should be in middleware_authentication_passport
+                but req.postLogOut should be called after which should be in middleware_authentication_passport
                 and the session is deleted along with the cookie on the client side
 
         If the user makes a requests that are not static and is NOT logged in:
@@ -62,7 +62,7 @@ Reference:
                 (argument 2) is what should be put in the req unless it's false
 
                 (argument 3) AKA info, is used for express-flash or some version of flash, you can catch it if you
-                use a Custom Callback (http://www.passportjs.org/docs/authenticate/#custom-callback)
+                useExpressMiddleware a Custom Callback (http://www.passportjs.org/docs/authenticate/#custom-callback)
 
         Reference:
             https://www.youtube.com/watch?v=fGrSmBk9v-4&list=PLYQSCk-qyTW2ewJ05f_GKHtTIzjynDgjK&index=7
@@ -101,7 +101,7 @@ const handlerPassport = {};
  *
  * Notes:
  *      username and password are taken from the request body (req.body.username, req.body.password).
- *      It knows to use "username" and "password" based on the naming given from REQ_BODY_FIELD_NAMES_TO_LOOK_FOR that you set up.
+ *      It knows to useExpressMiddleware "username" and "password" based on the naming given from REQ_BODY_FIELD_NAMES_TO_LOOK_FOR that you set up.
  *
  *      This function is custom-made and specifically made for the local strategy.
  *
@@ -163,8 +163,8 @@ async function verifyCallback(username, password, doneCallback) {
 }
 
 /**
- * 1. Configure passport to use a custom local strategy via
- *      passport.use(localStrategy);
+ * 1. Configure passport to useExpressMiddleware a custom local strategy via
+ *      passport.useExpressMiddleware(localStrategy);
  *
  * 2. Configure passport when using express sessions via
  *      passport.serializeUser
@@ -187,7 +187,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
         verifyCallback,
     );
 
-    // Apply what local strategy to use
+    // Apply what local strategy to useExpressMiddleware
     passport.use(localStrategy);
 
     /*
@@ -274,7 +274,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
                 userAndUserStatistics is the stuff that will be stored in req.user.
                 The adding of userAndUserStatistics to req.user should happen through a successful req.login call (req.login is added by passport.js automatically).
                 The function req.login should technically be called within the body of this callback.
-                userAndUserStatistics may also lead to problematic/inconsistent attribute/property/value attaining if it does not use a good naming convention.
+                userAndUserStatistics may also lead to problematic/inconsistent attribute/property/value attaining if it does not useExpressMiddleware a good naming convention.
                 For example, attributes/properties with naming conventions such as USER_NAME, USERNAME, userName, etc... may not conform to this project's coding style.
                  */
                 userAndUserStatistics,

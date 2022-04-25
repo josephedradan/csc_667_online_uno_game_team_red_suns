@@ -1,5 +1,5 @@
 const express = require('express');
-const middlewareAuthenticationPassport = require('../../middleware/middleware_authentication_passport');
+const middlewarePassport = require('../../middleware/middleware_passport');
 const middlewareGameUno = require('../../middleware/middleware_game_uno');
 const controllerGameAPI = require('../../controller/controller_game_api');
 

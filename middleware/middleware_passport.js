@@ -38,7 +38,7 @@ middlewarePassport.checkAuthenticated = async (req, res, next) => {
     if (req.isAuthenticated()) {
         next();
     } else {
-        utilCommon.reqSessionMessageHandler(req, 'failure', 'User must be logged in to use this feature');
+        utilCommon.reqSessionMessageHandler(req, 'failure', 'User must be logged in to useExpressMiddleware this feature');
 
         res.redirect('back');
     }
@@ -91,7 +91,7 @@ function callbackCustomWrapper(req, res, next) {
     Reference:
             Passport authentication with JWT: How can I change passport's default unauthorized response to my custom response?
                 Notes:
-                    "As per the official documentation of Passport you may use custom callback function to handle the case of failed
+                    "As per the official documentation of Passport you may useExpressMiddleware custom callback function to handle the case of failed
                     authorization and override the default message."
 
                 Reference:

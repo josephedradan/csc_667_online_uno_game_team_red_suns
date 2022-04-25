@@ -23,13 +23,13 @@ const controllerIndex = {};
  * @param next
  * @returns {Promise<void>}
  */
-async function getLogIn(req, res, next) {
-    debugPrinter.printMiddleware(getLogIn.name);
+async function postLogIn(req, res, next) {
+    debugPrinter.printMiddleware(postLogIn.name);
 
     res.redirect('/');
 }
 
-controllerIndex.getLogIn = getLogIn;
+controllerIndex.postLogIn = postLogIn;
 
 /**
  * Log out user. Actual log out is handled by passport middleware
@@ -42,13 +42,13 @@ controllerIndex.getLogIn = getLogIn;
  * @param next
  * @returns {Promise<void>}
  */
-async function getLogOut(req, res, next) {
-    debugPrinter.printMiddleware(getLogOut.name);
+async function postLogOut(req, res, next) {
+    debugPrinter.printMiddleware(postLogOut.name);
 
     res.redirect('/');
 }
 
-controllerIndex.getLogOut = getLogOut;
+controllerIndex.postLogOut = postLogOut;
 
 /**
  * get Index page
@@ -59,10 +59,11 @@ controllerIndex.getLogOut = getLogOut;
  */
 async function getIndex(req, res, next) {
     debugPrinter.printMiddleware(getIndex.name);
-    debugPrinter.printBackendBlue(req.user);
+    debugPrinter.printBlue(req.user);
 
     const gameList = await dbEngine.getGameRows();
     console.log(gameList);
+
     res.render('index', { gameList });
 }
 

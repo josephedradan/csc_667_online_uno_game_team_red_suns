@@ -1,6 +1,10 @@
 /*
 This file contains functions that do db calls to the engine that are
 related to the game uno
+
+Notes:
+    Do not use db.one because returning nothing is not an error
+
  */
 const debugPrinter = require('../util/debug_printer');
 const db = require('../db/index');
@@ -182,7 +186,7 @@ async function createCardStateRows(deckMultiplier) {
     return result;
 }
 
-// dbEngineGameUno.createCardStateRows = createCardStateRows; // Don't use this
+// dbEngineGameUno.createCardStateRows = createCardStateRows; // Don't useExpressMiddleware this
 
 /**
  * Create CardState rows and Cards rows at the same time
@@ -207,7 +211,7 @@ async function createCardStateRows(deckMultiplier) {
  *          Reference:
  *              https://stackoverflow.com/questions/28413856/postgres-insert-into-table-multiple-return-values-from-with-rows-as
  *
- *      Can I use return value of INSERT...RETURNING in another INSERT?
+ *      Can I useExpressMiddleware return value of INSERT...RETURNING in another INSERT?
  *         Notes:
  *              Example using:
  *                  WITH rows AS
@@ -348,7 +352,7 @@ async function createCardStateRowsAndCardsRowsAndCollectionRows(game_id, deckMul
     return result;
 }
 
-// dbEngineGameUno.createCardStateRowsAndCardsRowsAndCollectionRows = createCardStateRowsAndCardsRowsAndCollectionRows; // Don't use this
+// dbEngineGameUno.createCardStateRowsAndCardsRowsAndCollectionRows = createCardStateRowsAndCardsRowsAndCollectionRows; // Don't useExpressMiddleware this
 
 async function getGameRowByGameID(game_id) {
     debugPrinter.printFunction(getGameRowByGameID.name);
@@ -368,42 +372,25 @@ async function getGameRowByGameID(game_id) {
 
 dbEngineGameUno.getGameRowByGameID = getGameRowByGameID;
 
-async function createMessageRow(game_id, player_id, message) {
-    debugPrinter.printFunction(createMessageRow.name);
+async function getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id) {
+    debugPrinter.printFunction(getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID.name);
     const result = await db.any(
         `
-        INSERT INTO "Message" (game_id, player_id, message)
-        VALUES ($1, $2, $3)
-        RETURNING *;
+        SELECT *
+        FROM "Player"
+        JOIN "Players" ON "Player".player_id = "Players".player_id
+        JOIN "Game" ON "Players".game_id = "Game".game_id
+        WHERE "Player".user_id= $1
+        AND "Game".game_id = $2;
         `,
         [
+            user_id,
             game_id,
-            player_id,
-            message,
         ],
     );
 
     return result[0];
 }
-
-dbEngineGameUno.createMessageRow = createMessageRow;
-
-async function getMessageRowsByGameID(game_id) {
-    debugPrinter.printFunction(getMessageRowsByGameID.name);
-    const result = await db.any(
-        `
-        SELECT * 
-        From "Message"
-        WHERE "Message".game_id = $1
-        `,
-        [
-            game_id,
-        ],
-    );
-
-    return result;
-}
-
-dbEngineGameUno.getMessageRowsByGameID = getMessageRowsByGameID;
+dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID = getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID;
 
 module.exports = dbEngineGameUno;

@@ -3,13 +3,13 @@ const express = require('express');
 const routerGame = express.Router();
 const routerGamesAPI = require('./game_api');
 
-const middlewareAuthenticationPassport = require('../../middleware/middleware_authentication_passport');
+const middlewarePassport = require('../../middleware/middleware_passport');
 
 const controllerGame = require('../../controller/controller_game');
 const middlewareGameUno = require('../../middleware/middleware_game_uno');
 
 // Need to be logged in to access any route past this point
-routerGame.use(middlewareAuthenticationPassport.checkAuthenticated);
+routerGame.use(middlewarePassport.checkAuthenticated);
 
 routerGame.use('/api', routerGamesAPI);
 
@@ -23,9 +23,10 @@ routerGame.use('/api', routerGamesAPI);
 //     controllerGame.getTestGame,
 // );
 
-routerGame.get(
+routerGame.use(
     '/:game_id',
-    middlewareGameUno.attachGameToResLocals,
+    middlewareGameUno.attachGameToRequestAndResponseLocals,
+    middlewareGameUno.attachPlayerToRequestAndResponseLocals,
 );
 
 routerGame.get(

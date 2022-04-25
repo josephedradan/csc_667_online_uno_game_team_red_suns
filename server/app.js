@@ -38,14 +38,14 @@ Reference:
         Reference:
             https://stackoverflow.com/questions/27835801/how-to-auto-generate-migrations-with-sequelize-cli-from-sequelize-models
 
-    why app.listen should be at the end after all the requests? also why is it necessary?
+    why application.listen should be at the end after all the requests? also why is it necessary?
         Notes:
-            On the subject of app.listen at the end:
-                "...mostly as a convention to use a logical and safe order of initialization where you configure the server first
+            On the subject of application.listen at the end:
+                "...mostly as a convention to useExpressMiddleware a logical and safe order of initialization where you configure the server first
                 before starting it and exposing it to incoming connections.
 
                 So ... it seems that for most normal synchronous server initialization code, it doesn't really matter whether you
-                do app.listen() before or after configuring your routes. It is likely done last just as a logical convention that
+                do application.listen() before or after configuring your routes. It is likely done last just as a logical convention that
                 seems the appropriate order to do things (configure the server, then start the server)."
 
         Reference:
@@ -63,7 +63,7 @@ const constants = require('./constants');
 const connectionContainer = require('./server');
 
 const {
-    app,
+    application,
     io,
 } = connectionContainer;
 
@@ -85,17 +85,18 @@ const expressSession = require('express-session');
 
 const connectPGSimple = require('connect-pg-simple');
 
-const socketIOWrapped = require('../controller/socket_io_wrapped');
-
 // const connectSessionSequelize = require('connect-session-sequelize');
+
+const handlerSocketIOUseExpress = require('../controller/handler_socket_io_use_express');
 
 const handlerPassport = require('../controller/handler_passport'); // WARNING: MAKE SURE THAT THIS IMPORT IS BEFORE ANY USAGE OF ANY PASSPORT FUNCTIONALITY
 
-const middlewareCommunicateToFrontend = require('../middleware/middleware_communicate_to_frontend');
+const middlewareModifyRequestAndResponse = require('../middleware/middleware_modify_request_and_response');
 
 const routes = require('../routes/routes');
 
 const debugPrinter = require('../util/debug_printer');
+const middlewareExpressToSocketIO = require('../ignore/middleware_express_to_socket_io');
 
 /*
 ##############################################################################################################
@@ -103,11 +104,11 @@ Setup and Settings
 ##############################################################################################################
  */
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(express.static(constants.dirPublic));
+application.use(logger('dev'));
+application.use(express.json());
+application.use(express.urlencoded({ extended: true }));
+application.use(cookieParser());
+application.use(express.static(constants.dirPublic));
 
 /* ############################## connect-session-sequelize ############################## */
 
@@ -196,18 +197,18 @@ const hbs = create({
     // },
 });
 
-app.engine('hbs', hbs.engine);
+application.engine('hbs', hbs.engine);
 
 // view engine setup
-app.set('view engine', 'hbs');
-app.set('views', constants.dirViews);
+application.set('view engine', 'hbs');
+application.set('views', constants.dirViews);
 
 /* ############################## express-session (Must be placed after hsb to prevent unnecessary db calls) ############################## */
 
 /*
 
 Reference:
-    When to use saveUninitialized and resave in express-session
+    When to useExpressMiddleware saveUninitialized and resave in express-session
         Notes:
             "If during the lifetime of the request the session object isn't modified then, at the end of the request
             and when saveUninitialized is false, the (still empty, because unmodified) session object will
@@ -244,7 +245,7 @@ const middlewareExpressSession = expressSession(
     },
 );
 
-app.use(middlewareExpressSession);
+application.use(middlewareExpressSession);
 
 // Sync the express sessions table (If the table does not exist in the database, then this will create it)
 // sequelizeExpressSessionStore.sync();
@@ -263,7 +264,7 @@ Reference:
             the session id (from the client cookie) into the true deserialized user object. It is explained in detail here."
 
             " With sessions, initialize() setups the functions to serialize/deserialize the user data from the request.
-            You are not required to use passport.initialize() if you are not using sessions."
+            You are not required to useExpressMiddleware passport.initialize() if you are not using sessions."
 
         Reference:
             https://stackoverflow.com/questions/46644366/what-is-passport-initialize-nodejs-express
@@ -271,7 +272,7 @@ Reference:
 /**
 
  */
-app.use(passport.initialize()); // Initialize password middleware
+application.use(passport.initialize()); // Initialize password middleware
 
 /*
 If your application uses persistent login sessions, passport.session() middleware must also be used.
@@ -292,21 +293,32 @@ Reference:
             https://stackoverflow.com/questions/22052258/what-does-passport-session-middleware-do/28994045#28994045
 
 */
-app.use(passport.session());
+application.use(passport.session());
 
-// Apply express-session, and passport to socket.io
-socketIOWrapped.use(middlewareExpressSession); // This will allow reading and writing to the db, basically this may or may not add socket.request.session.passport.user depending on the cookie
-socketIOWrapped.use(passport.initialize()); // This will add req.login and req.logout via socket.request.login and socket.request.logout
-socketIOWrapped.use(passport.session()); // This will basically add req.user which is accessible via socket.request.user
+/* ############################## socket.io ############################## */
+
+/*
+Apply express-session, and passport to socket.io
+
+ */
+// This will allow reading and writing to the db, basically this may or may not add socket.request.session.passport.user depending on if the session cookie exists
+handlerSocketIOUseExpress.useExpressMiddleware(middlewareExpressSession);
+// This will add req.login and req.logout via socket.request.login and socket.request.logout
+handlerSocketIOUseExpress.useExpressMiddleware(passport.initialize());
+// This will basically add req.user which is accessible via socket.request.user
+handlerSocketIOUseExpress.useExpressMiddleware(passport.session());
+
+// Setup more socket io middleware
+require('./socket_io');
 
 /* ############################## Middleware Message (Custom middlewares) ############################## */
 
-app.use(middlewareCommunicateToFrontend.attachMessageToResLocals);
-app.use(middlewareCommunicateToFrontend.attachUserToResLocals);
+application.use(middlewareModifyRequestAndResponse.attachMessageToResponseLocals);
+application.use(middlewareModifyRequestAndResponse.attachUserToResponseLocals);
 
 /* ############################## DEBUGGING ############################## */
 
-app.use((req, res, next) => {
+application.use((req, res, next) => {
     if (process.env.NODE_ENV === 'development') {
         debugPrinter.printBackendYellow('--- DEBUGGING MIDDLEWARE START ---');
 
@@ -325,17 +337,17 @@ app.use((req, res, next) => {
 
 /* ############################## routes ############################## */
 
-app.use('/', routes);
+application.use('/', routes);
 
 /* ############################## Error handling ############################## */
 
 // catch 404 and forward to error handler
-app.use((req, res, next) => {
+application.use((req, res, next) => {
     next(createError(404));
 });
 
 // error handler
-app.use((err, req, res, next) => {
+application.use((err, req, res, next) => {
     debugPrinter.printError(err);
 
     // set locals, only providing error in development
@@ -347,4 +359,4 @@ app.use((err, req, res, next) => {
     res.render('error');
 });
 
-module.exports = app;
+module.exports = application;

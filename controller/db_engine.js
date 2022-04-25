@@ -1,4 +1,6 @@
 /*
+Notes:
+    Do not use db.one because returning nothing is not an error
 
 Reference:
     Replacements
@@ -189,7 +191,7 @@ async function createUserAndUserStatisticRow(username, password, display_name) {
 dbEngine.createUserAndUserStatisticRow = createUserAndUserStatisticRow;
 
 /**
- * Grab all games
+ * Get all games
  *
  * @param
  * @returns {Promise<any[]>}

@@ -8,7 +8,7 @@ Description:
 
 Notes:
     Dumb note:
-        Must use
+        Must useExpressMiddleware
 
         Rather than
             input instanceof String
@@ -44,14 +44,14 @@ const colors = require('colors');
 // Color objects
 colors.setTheme(
     {
-        error: ['white', 'bgRed'],
-        success: ['white', 'bgGreen'],
-        request: ['black', 'bgCyan'],
-        warning: ['black', 'bgYellow'],
-        debug: ['white', 'bgBlue'],
-        middleware: ['white', 'bgMagenta'],
-        router: ['white', 'bgBrightBlue'],
-        function: ['black', 'bgGrey'],
+        _red: ['white', 'bgRed'],
+        _green: ['white', 'bgGreen'],
+        _cyan: ['black', 'bgCyan'],
+        _yellow: ['black', 'bgYellow'],
+        _blue: ['white', 'bgBlue'],
+        _magenta: ['white', 'bgMagenta'],
+        _bright_blue: ['white', 'bgBrightBlue'],
+        _grey: ['black', 'bgGrey'],
         backend_red: ['white', 'bgRed', 'italic'],
         backend_blue: ['white', 'bgBlue', 'italic'],
         backend_green: ['white', 'bgGreen', 'italic'],
@@ -83,56 +83,111 @@ function wrapperPrinter(functionGiven) {
     };
 }
 
-function printer(input, colorsTheme) {
+function printer(input, colorsTheme, messageHeader) {
+    // Printing non Objects
     if (typeof input !== 'object') {
-        // Color the input
-        console.log(`${moment()
-            .format()} ${input}`[colorsTheme]);
+        if (messageHeader) {
+            console.log(`${moment()
+                .format()} ${messageHeader} ${input}`[colorsTheme]);
+        } else {
+            console.log(`${moment()
+                .format()} ${input}`[colorsTheme]);
+        }
 
         // console.log(colors[colorsTheme](`${moment().format()} ${input}`)); // Does not work for some reason
-    } else if (input === null) {
+        return;
+    }
+
+    // Printing null
+    if (input === null) {
+        if (messageHeader) {
+            console.log(`${moment()
+                .format()} ${messageHeader} ${input}`[colorsTheme]);
+        } else {
+            console.log(`${moment()
+                .format()} ${input}`[colorsTheme]);
+        }
+        return;
+    }
+
+    // Printing Default
+    if (messageHeader) {
         console.log(`${moment()
-            .format()} ${null}`[colorsTheme]);
+            .format()} ${messageHeader}`[colorsTheme]);
     } else {
-        // Color the format
+        // Set the color for the next
         console.log(`${moment()
             .format()}`[colorsTheme]);
-
-        // Color the input
-        console.log(colors[colorsTheme](input));
-
-        // Color the input (Alternative)
-        // console.log(`${JSON.stringify(input)}`[colorsTheme]);
     }
+
+    // Color the input
+    console.log(colors[colorsTheme](input));
+
+    // Color the input (Alternative)
+    // console.log(`${JSON.stringify(input)}`[colorsTheme]);
 }
 
 // Custom printer for errors
 const debugPrinter = {
 
+    // Print with print type
     printError: wrapperPrinter((input) => {
-        printer(input, 'error');
+        printer(input, '_red', 'ERROR:');
     }),
     printSuccess: wrapperPrinter((input) => {
-        printer(input, 'success');
+        printer(input, '_green', 'SUCCESS:');
     }),
     printRequest: wrapperPrinter((input) => {
-        printer(input, 'request');
+        printer(input, '_cyan', 'REQUEST:');
     }),
     printWarning: wrapperPrinter((input) => {
-        printer(input, 'warning');
+        printer(input, '_yellow', 'WARNING:');
     }),
     printDebug: wrapperPrinter((input) => {
-        printer(input, 'debug');
+        printer(input, '_blue', 'DEBUG:');
     }),
     printMiddleware: wrapperPrinter((input) => {
-        printer(input, 'middleware');
+        printer(input, '_magenta', 'MIDDLEWARE:');
     }),
     printRoute: wrapperPrinter((input) => {
-        printer(input, 'route');
+        printer(input, '_bright_blue', 'ROUTE:');
     }),
     printFunction: wrapperPrinter((input) => {
-        printer(input, 'function');
+        printer(input, '_grey', 'FUNCTION:');
     }),
+
+    // Print with print type (custom)
+    printMiddlewareSocketIO: wrapperPrinter((input) => {
+        printer(input, '_magenta', 'MIDDLEWARE SOCKET IO:');
+    }),
+
+    // Print based on color
+    printRed: wrapperPrinter((input) => {
+        printer(input, '_red');
+    }),
+    printGreen: wrapperPrinter((input) => {
+        printer(input, '_green');
+    }),
+    printCyan: wrapperPrinter((input) => {
+        printer(input, '_cyan');
+    }),
+    printYellow: wrapperPrinter((input) => {
+        printer(input, '_yellow');
+    }),
+    printBlue: wrapperPrinter((input) => {
+        printer(input, '_blue');
+    }),
+    printMagenta: wrapperPrinter((input) => {
+        printer(input, '_magenta');
+    }),
+    printBrightBlue: wrapperPrinter((input) => {
+        printer(input, '_bright_blue');
+    }),
+    printGrey: wrapperPrinter((input) => {
+        printer(input, '_grey');
+    }),
+
+    // Print based on color (alternative that uses italics)
     printBackendRed: wrapperPrinter((input) => {
         printer(input, 'backend_red');
     }),

@@ -13,7 +13,7 @@ const middlewareGameUnoLogic = {};
  */
 async function validateRequestBody(req, res, next) {
     debugPrinter.printMiddleware(validateRequestBody.name);
-
+    // TODO
     next();
 }
 
@@ -31,6 +31,7 @@ middlewareGameUnoLogic.validateRequestBody = validateRequestBody;
  */
 async function checkIfPlayerCanDoAction(req, res, next) {
     debugPrinter.printMiddleware(checkIfPlayerCanDoAction.name);
+    // TODO
 
     next();
 }
@@ -46,21 +47,39 @@ middlewareGameUnoLogic.checkIfPlayerCanDoAction = checkIfPlayerCanDoAction;
  * @returns {Promise<void>}
  */
 async function checkIfPlayerIsPlayerInGame(req, res, next) {
+    // TODO
+
     next();
 }
 
 middlewareGameUnoLogic.checkIfPlayerIsPlayerInGame = checkIfPlayerIsPlayerInGame;
 
-async function attachGameToResLocals(req, res, next) {
-    debugPrinter.printMiddleware(attachGameToResLocals.name);
+async function attachGameToRequestAndResponseLocals(req, res, next) {
+    debugPrinter.printMiddleware(attachGameToRequestAndResponseLocals.name);
 
-    res.locals.game = await dbEngineGameUno.getGameRowByGameID(req.params.game_id);
+    req.game = await dbEngineGameUno.getGameRowByGameID(req.params.game_id);
+
+    res.locals.game = req.game;
 
     debugPrinter.printDebug(res.locals.game);
 
     next();
 }
 
-middlewareGameUnoLogic.attachGameToResLocals = attachGameToResLocals;
+middlewareGameUnoLogic.attachGameToRequestAndResponseLocals = attachGameToRequestAndResponseLocals;
+
+async function attachPlayerToRequestAndResponseLocals(req, res, next) {
+    debugPrinter.printMiddleware(attachGameToRequestAndResponseLocals.name);
+
+    req.player = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(req.params.game_id, req.user.user_id);
+
+    res.locals.player = req.player;
+
+    debugPrinter.printDebug(req.player);
+
+    next();
+}
+
+middlewareGameUnoLogic.attachPlayerToRequestAndResponseLocals = attachPlayerToRequestAndResponseLocals;
 
 module.exports = middlewareGameUnoLogic;
