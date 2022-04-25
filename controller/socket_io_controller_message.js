@@ -93,7 +93,7 @@ async function test(socket) {
                 debugPrinter.printDebug({
                     user,
                     game_id,
-                    player_id
+                    player_id,
                 });
 
                 debugPrinter.printDebug(message);

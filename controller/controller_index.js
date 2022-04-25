@@ -6,7 +6,7 @@ const passwordHandler = require('./handler_password');
 const debugPrinter = require('../util/debug_printer');
 const logicGameUno = require('./logic_game_uno');
 const handlerGameUno = require('./handler_game_uno');
-const utilCommon = require('../util/utilCommon');
+const utilCommon = require('../util/util_common');
 
 /* ############################################################################################################## */
 

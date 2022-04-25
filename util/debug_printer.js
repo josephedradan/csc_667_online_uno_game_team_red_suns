@@ -1,6 +1,6 @@
 /*
 Purpose:
-    Custom printer for console logging
+    Custom print for console logging
 
 Details:
 
@@ -83,7 +83,7 @@ function wrapperPrinter(functionGiven) {
     };
 }
 
-function printer(input, colorsTheme, messageHeader) {
+function print(input, colorsTheme, messageHeader) {
     // Printing non Objects
     if (typeof input !== 'object') {
         if (messageHeader) {
@@ -127,87 +127,87 @@ function printer(input, colorsTheme, messageHeader) {
     // console.log(`${JSON.stringify(input)}`[colorsTheme]);
 }
 
-// Custom printer for errors
+// Custom print for errors
 const debugPrinter = {
 
     // Print with print type
     printError: wrapperPrinter((input) => {
-        printer(input, '_red', 'ERROR:');
+        print(input, '_red', 'ERROR:');
     }),
     printSuccess: wrapperPrinter((input) => {
-        printer(input, '_green', 'SUCCESS:');
+        print(input, '_green', 'SUCCESS:');
     }),
     printRequest: wrapperPrinter((input) => {
-        printer(input, '_cyan', 'REQUEST:');
+        print(input, '_cyan', 'REQUEST:');
     }),
     printWarning: wrapperPrinter((input) => {
-        printer(input, '_yellow', 'WARNING:');
+        print(input, '_yellow', 'WARNING:');
     }),
     printDebug: wrapperPrinter((input) => {
-        printer(input, '_blue', 'DEBUG:');
+        print(input, '_blue', 'DEBUG:');
     }),
     printMiddleware: wrapperPrinter((input) => {
-        printer(input, '_magenta', 'MIDDLEWARE:');
+        print(input, '_magenta', 'MIDDLEWARE:');
     }),
     printRoute: wrapperPrinter((input) => {
-        printer(input, '_bright_blue', 'ROUTE:');
+        print(input, '_bright_blue', 'ROUTE:');
     }),
     printFunction: wrapperPrinter((input) => {
-        printer(input, '_grey', 'FUNCTION:');
+        print(input, '_grey', 'FUNCTION:');
     }),
 
     // Print with print type (custom)
     printMiddlewareSocketIO: wrapperPrinter((input) => {
-        printer(input, '_magenta', 'MIDDLEWARE SOCKET IO:');
+        print(input, '_magenta', 'MIDDLEWARE SOCKET IO:');
     }),
 
     // Print based on color
     printRed: wrapperPrinter((input) => {
-        printer(input, '_red');
+        print(input, '_red');
     }),
     printGreen: wrapperPrinter((input) => {
-        printer(input, '_green');
+        print(input, '_green');
     }),
     printCyan: wrapperPrinter((input) => {
-        printer(input, '_cyan');
+        print(input, '_cyan');
     }),
     printYellow: wrapperPrinter((input) => {
-        printer(input, '_yellow');
+        print(input, '_yellow');
     }),
     printBlue: wrapperPrinter((input) => {
-        printer(input, '_blue');
+        print(input, '_blue');
     }),
     printMagenta: wrapperPrinter((input) => {
-        printer(input, '_magenta');
+        print(input, '_magenta');
     }),
     printBrightBlue: wrapperPrinter((input) => {
-        printer(input, '_bright_blue');
+        print(input, '_bright_blue');
     }),
     printGrey: wrapperPrinter((input) => {
-        printer(input, '_grey');
+        print(input, '_grey');
     }),
 
     // Print based on color (alternative that uses italics)
     printBackendRed: wrapperPrinter((input) => {
-        printer(input, 'backend_red');
+        print(input, 'backend_red');
     }),
     printBackendBlue: wrapperPrinter((input) => {
-        printer(input, 'backend_blue');
+        print(input, 'backend_blue');
     }),
     printBackendGreen: wrapperPrinter((input) => {
-        printer(input, 'backend_green');
+        print(input, 'backend_green');
     }),
     printBackendMagenta: wrapperPrinter((input) => {
-        printer(input, 'backend_magenta');
+        print(input, 'backend_magenta');
     }),
     printBackendWhite: wrapperPrinter((input) => {
-        printer(input, 'backend_white');
+        print(input, 'backend_white');
     }),
     printBackendCyan: wrapperPrinter((input) => {
-        printer(input, 'backend_cyan');
+        print(input, 'backend_cyan');
     }),
     printBackendYellow: wrapperPrinter((input) => {
-        printer(input, 'backend_yellow');
+        print(input, 'backend_yellow');
     }),
 };
 

@@ -9,7 +9,7 @@ const handlerGameUno = require('./handler_game_uno');
 const dbEngine = require('./db_engine');
 const dbEngineGameUno = require('./db_engine_game_uno');
 
-const utilCommon = require('../util/utilCommon');
+const utilCommon = require('../util/util_common');
 
 const debugPrinter = require('../util/debug_printer');
 

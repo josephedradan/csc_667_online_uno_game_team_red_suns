@@ -1,5 +1,5 @@
 const debugPrinter = require('../util/debug_printer');
-const utilCommon = require('../util/utilCommon');
+const utilCommon = require('../util/util_common');
 const logicGameUno = require('./logic_game_uno');
 const dbEngineGameUno = require('./db_engine_game_uno');
 
@@ -42,7 +42,7 @@ async function getGameByGameId(req, res, next) {
     const result = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(req.game.game_id, req.user.user_id);
 
     if (!result) {
-        let x = await logicGameUno.joinGame(req.game.game_id, req.user.user_id);
+        const x = await logicGameUno.joinGame(req.game.game_id, req.user.user_id);
         debugPrinter.printDebug(`PLAYER HAS JOINED GAME: ${req.game.game_id}`);
         debugPrinter.printDebug(x);
     }

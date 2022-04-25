@@ -245,6 +245,11 @@ const middlewareExpressSession = expressSession(
     },
 );
 
+/*
+
+Notes:
+    Basically, it will add req.session.passport.user
+ */
 application.use(middlewareExpressSession);
 
 // Sync the express sessions table (If the table does not exist in the database, then this will create it)
@@ -256,6 +261,9 @@ handlerPassport.configurePassportLocalStrategy(passport);
 
 /*
 In a Connect or Express-based application, passport.initialize() middleware is required to initialize Passport.
+
+Notes:
+    Basically, it will add req.login and req.logout
 
 Reference:
     what is passport.initialize()? (nodejs express)
@@ -277,6 +285,9 @@ application.use(passport.initialize()); // Initialize password middleware
 /*
 If your application uses persistent login sessions, passport.session() middleware must also be used.
 (Serialize and deserialize. Persist the login)
+
+Notes:
+    Basically, it will add req.userr
 
 Reference:
 
