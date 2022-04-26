@@ -105,7 +105,6 @@ async function GETCurrentGame(req, res, next) {
 controllerGameAPI.GETCurrentGame = GETCurrentGame;
 
 async function POSTSendMessage(req, res, next) {
-
     const {
         message,
     } = req.body;

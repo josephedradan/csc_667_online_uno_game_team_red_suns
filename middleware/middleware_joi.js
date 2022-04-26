@@ -64,6 +64,7 @@ function callbackValidationErrorCommon(req, res, next, error) {
     utilCommon.reqSessionMessageHandler(req, 'failure', error);
 
     res.redirect('back');
+    // next();
 }
 
 /**

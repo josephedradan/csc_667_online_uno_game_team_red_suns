@@ -8,7 +8,6 @@ const debugPrinter = require('../util/debug_printer');
 
 const { io } = connectionContainer;
 
-
 /**
  *
  * Notes:
@@ -56,4 +55,3 @@ async function attachPlayerIDToSocketIORequest(socket, next) {
 }
 
 // io.use(attachPlayerIDToSocketIORequest);
-

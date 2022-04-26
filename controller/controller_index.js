@@ -62,7 +62,6 @@ async function GETIndex(req, res, next) {
     debugPrinter.printBlue(req.user);
 
     const gameList = await dbEngine.getGameRows();
-    console.log(gameList);
 
     res.render('index', { gameList });
 }
@@ -115,24 +114,23 @@ async function POSTRegistration(req, res, next) {
                 'Username already exists',
             );
 
-            res.redirect('back');
+            res.redirect('/');
             return;
         }
 
         // Check if display_name already exists
         const userByDisplayName = await dbEngine.getUserRowByDisplayName(display_name);
 
-        if (userByDisplayName) {
+        if (!userByDisplayName) {
             utilCommon.reqSessionMessageHandler(
                 req,
                 'failure',
                 'Display name already exists',
             );
 
-            res.redirect('back');
+            res.redirect('/');
             return;
         }
-
         // Create new User
 
         const hashedPassword = await passwordHandler.hash(password);
@@ -147,9 +145,8 @@ async function POSTRegistration(req, res, next) {
 
         utilCommon.reqSessionMessageHandler(req, 'success', `User "${user.username}" was created`);
 
-        res.redirect('/');
-
         debugPrinter.printBackendGreen('REDIRECTING');
+        res.redirect('/');
     } catch (err) {
         debugPrinter.printError(`ERROR FROM ${POSTRegistration.name}`);
         next(err);

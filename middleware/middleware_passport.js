@@ -41,6 +41,7 @@ middlewarePassport.checkAuthenticated = async (req, res, next) => {
         utilCommon.reqSessionMessageHandler(req, 'failure', 'User must be logged in to useExpressMiddleware this feature');
 
         res.redirect('back');
+        // next();
     }
 };
 
@@ -61,6 +62,7 @@ middlewarePassport.checkUnauthenticated = async (req, res, next) => {
         utilCommon.reqSessionMessageHandler(req, 'failure', `${req.user.username} you are logged in, you must not be logged in to use this feature`);
 
         res.redirect('back');
+        // next();
     }
 };
 
@@ -133,6 +135,7 @@ function callbackCustomWrapper(req, res, next) {
             utilCommon.reqSessionMessageHandler(req, 'failure', 'Password/Username is invalid'); // If you care about security
 
             res.redirect('back');
+            // next();
         } else {
             /*
             If null was given by the passport strategy.
