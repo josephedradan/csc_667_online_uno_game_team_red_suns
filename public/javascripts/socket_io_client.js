@@ -5,17 +5,21 @@ socket.on('connect', () => {
     console.log(`Connected, your id is: ${socket.id}`);
 
     // THIS MUST BE CALLED ONCE AND BEFORE ANY OTHER EVENTS
+
+    // grab the current path, only care for the route.
     const currPath = window.location.href.slice(LOCALHOST_SIZE);
     console.log(currPath);
 
+    // check to see if thwe word 'game' exists anywhere on this path.
     const gameRE = '(?:game)';
     const containsGame = currPath.search(gameRE);
     console.log(`contains game: ${containsGame > -1}`);
+    // emit the game_id if it does.
     if (containsGame > -1) {
-        const gameId = currPath.split('/')[1];
-        console.log(`game_id: ${gameId}`);
-        socket.emit('client-join-room', gameId); // parse for game_id from URL.
-    // TODO: PARSE URL Using Window object, review regex to grab game_id, verify if youre in the game lobby
+        // game_id will I assume be always the second element when the path is tokenized.
+        const game_id = currPath.split('/')[1];
+        console.log(`game_id: ${game_id}`);
+        socket.emit('client-join-room', game_id); // parsed game_id from URL.
     }
 
     // Test messages
