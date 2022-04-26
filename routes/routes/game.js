@@ -1,7 +1,7 @@
 const express = require('express');
 
 const routerGame = express.Router();
-const routerGamesAPI = require('./game_api');
+const routerGamesID = require('./game_id');
 
 const middlewarePassport = require('../../middleware/middleware_passport');
 
@@ -10,9 +10,6 @@ const middlewareGameUno = require('../../middleware/middleware_game_uno');
 
 // Need to be logged in to access any route past this point
 routerGame.use(middlewarePassport.checkAuthenticated);
-
-// TODO REDESIGN BASED ON ID SO /:game_id/COMMAND
-// routerGame.use('/api', routerGamesAPI);
 
 routerGame.get(
     '/',
@@ -30,9 +27,6 @@ routerGame.use(
     middlewareGameUno.attachPlayerToRequestAndResponseLocals,
 );
 
-routerGame.get(
-    '/:game_id',
-    controllerGame.getGameByGameId,
-);
+routerGame.use('/:game_id', routerGamesID);
 
 module.exports = routerGame;

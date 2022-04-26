@@ -57,23 +57,23 @@ async function createGame(user_id) {
     const cards = await dbEngineGameUno.createCardStateRowsAndCardsRows(game.game_id, 2);
 
     // TODO: ADDING TO THE Collection IS NOT WRITTEN, WRITE THE ALGO TO SHUFFLE THE CARDS IN THE DECk
-    //dbEngineGameUno.createCollectionRow(card_state_id, collection_info_id, collection_index);
+    // dbEngineGameUno.createCollectionRow(card_state_id, collection_info_id, collection_index);
 
     const shuffle = (unShuffledDeck) => {
         let tempCard;
         for (let i = unShuffledDeck.length - 1; i > 0; i--) {
-          let rand = Math.floor(Math.random() * (i + 1));
-          tempCard = unShuffledDeck[i];
-          unShuffledDeck[i] = unShuffledDeck[rand];
-          unShuffledDeck[rand] = tempCard;
+            const rand = Math.floor(Math.random() * (i + 1));
+            tempCard = unShuffledDeck[i];
+            unShuffledDeck[i] = unShuffledDeck[rand];
+            unShuffledDeck[rand] = tempCard;
         }
         return unShuffledDeck;
-    } 
+    };
 
-    const shuffledDeck = shuffle(cards); 
+    const shuffledDeck = shuffle(cards);
 
-    for(let i = 0; i < shuffledDeck.length; i++) {
-        await dbEngineGameUno.createCollectionRow(shuffledDeck[i].card_state_id, 1, i + 1); 
+    for (let i = 0; i < shuffledDeck.length; i++) {
+        await dbEngineGameUno.createCollectionRow(shuffledDeck[i].card_state_id, 1, i + 1);
     }
 
     return {

@@ -94,7 +94,7 @@ controllerGameAPI.getAllGames = getAllGames;
 async function getCurrentGame(req, res, next) {
     debugPrinter.printMiddleware(getCurrentGame.name);
 
-    const result = await dbEngineGameUno.getGameRowByGameID(req.params.game_id);
+    const result = await dbEngineGameUno.getGameRowByGameID(req.game.game_id);
     debugPrinter.printDebug(result);
     res.json(result);
 }
