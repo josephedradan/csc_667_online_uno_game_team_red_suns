@@ -29,7 +29,15 @@ socket.on('connect', () => {
 });
 
 /*
-On Server messsage
+On Server game message
+ */
+socket.on('server-game-message', (msg) => {
+    console.log('MESSAGE FROM THE SERVER RELATIVE TO THE GAME:');
+    console.log(msg);
+});
+
+/*
+On Server message
  */
 socket.on('server-message', (msg) => {
     console.log('MESSAGE FROM THE SERVER:');

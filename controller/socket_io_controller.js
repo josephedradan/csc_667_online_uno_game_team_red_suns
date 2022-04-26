@@ -90,7 +90,7 @@ async function initialSocketJoin(socket) {
                 // Assign player_id to socket.request.player_id
                 socket.request.player_id = resultPlayerRow.player_id;
 
-                socket.emit('server-message', `You have joined ${game_id_client} room`);
+                socket.emit('server-game-message', `You have joined ${game_id_client} room`);
 
                 debugPrinter.printDebug({
                     user,
@@ -102,22 +102,22 @@ async function initialSocketJoin(socket) {
 
         // If user's player is in a game
         if (socket.request.game_id) {
-            socket.on('client-message', async (message) => {
-                debugPrinter.printBackendMagenta('client-message');
-
-                debugPrinter.printDebug({
-                    user,
-                    game_id: socket.request.game_id,
-                    player_id: socket.request.player_id,
-                });
-
-                debugPrinter.printDebug(message);
-
-                const result = await dbEngineMessage.createMessageRow(game_id, player_id, message);
-
-                io.in(game_id)
-                    .emit('server-message', result);
-            });
+            // socket.on('client-message', async (message) => {
+            //     debugPrinter.printBackendMagenta('client-message');
+            //
+            //     debugPrinter.printDebug({
+            //         user,
+            //         game_id: socket.request.game_id,
+            //         player_id: socket.request.player_id,
+            //     });
+            //
+            //     debugPrinter.printDebug(message);
+            //
+            //     const result = await dbEngineMessage.createMessageRow(socket.request.game_id, socket.request.player_id, message);
+            //
+            //     io.in(socket.request.game_id)
+            //         .emit('server-game-message', result);
+            // });
         }
     }
 }

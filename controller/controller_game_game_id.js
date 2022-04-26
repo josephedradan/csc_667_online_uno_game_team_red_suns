@@ -112,7 +112,9 @@ async function POSTSendMessage(req, res, next) {
     const result = await dbEngineMessage.createMessageRow(req.game_id, req.player_id, message);
 
     io.in(req.game_id)
-        .emit('server-message', result);
+        .emit('server-game-message', result);
+
+    res.json(result);
 }
 
 controllerGameAPI.POSTSendMessage = POSTSendMessage;
