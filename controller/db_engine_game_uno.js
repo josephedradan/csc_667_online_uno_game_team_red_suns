@@ -276,8 +276,7 @@ async function createCollectionRow(card_state_id, collection_info_id, collection
     const result = await db.any(
         `
         INSERT INTO "Collection" (card_state_id, collection_info_id, collection_index)
-        SELECT $1, $2, $3
-        FROM cardStateRows
+        VALUES ($1, $2, $3)
         RETURNING *
         `,
         [
