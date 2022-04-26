@@ -6,6 +6,7 @@ socket.on('connect', () => {
 
     // THIS MUST BE CALLED ONCE AND BEFORE ANY OTHER EVENTS
     socket.emit('client-join-room'); // parse for game_id from URL.
+    // TODO: PARSE URL Using Window object, review regex to grab game_id, verify if youre in the game lobby
 
     // Test messages
     socket.emit('client-message', 'Hello 1');
