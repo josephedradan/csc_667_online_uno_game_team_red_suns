@@ -13,7 +13,7 @@ routerGame.use(middlewarePassport.checkAuthenticated);
 
 routerGame.get(
     '/',
-    controllerGame.getGame,
+    controllerGame.GETGame,
 );
 
 // routerGame.get(

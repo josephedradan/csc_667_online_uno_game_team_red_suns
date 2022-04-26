@@ -6,34 +6,33 @@ const controllerGame = require('../../controller/controller_game');
 
 const routerGameID = express.Router();
 
-
 routerGameID.use(middlewareGameUno.checkIfPlayerIsPlayerInGame);
 routerGameID.use(middlewareGameUno.validateRequestBody);
 routerGameID.use(middlewareGameUno.checkIfPlayerCanDoAction);
 
 routerGameID.get(
-    '/getCurrentGame',
-    controllerGameAPI.getCurrentGame,
+    '/GETCurrentGame',
+    controllerGameAPI.GETCurrentGame,
 );
 
 routerGameID.post(
     '/playCard',
-    controllerGameAPI.postPlayCard,
+    controllerGameAPI.POSTPlayCard,
 );
 
 routerGameID.post(
     '/drawCard',
-    controllerGameAPI.getDrawCard,
+    controllerGameAPI.GETDrawCard,
 );
 
 routerGameID.post(
     '/startGame',
-    controllerGameAPI.getStartGame,
+    controllerGameAPI.POSTStartGame,
 );
 
 routerGameID.get(
     '/',
-    controllerGame.getGameByGameId,
+    controllerGame.GETGameByGameId,
 );
 
 module.exports = routerGameID;

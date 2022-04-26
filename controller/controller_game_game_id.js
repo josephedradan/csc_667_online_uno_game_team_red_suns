@@ -21,7 +21,7 @@ const controllerGameAPI = {};
 //     const blackWildCards = await dbEngine.getCardTableOnType('SPECIAL');
 // };
 
-async function postPlayCard(req, res, next) {
+async function POSTPlayCard(req, res, next) {
     // TODO VALIDATE IF USER IS IN THAT GAME
     // TODO VALIDATE REQUEST
     // TODO: SOCKET HERE
@@ -37,9 +37,9 @@ async function postPlayCard(req, res, next) {
     });
 }
 
-controllerGameAPI.postPlayCard = postPlayCard;
+controllerGameAPI.POSTPlayCard = POSTPlayCard;
 
-async function getDrawCard(req, res, next) {
+async function GETDrawCard(req, res, next) {
     // TODO: SOCKET HERE
 
     res.json({
@@ -48,9 +48,9 @@ async function getDrawCard(req, res, next) {
     });
 }
 
-controllerGameAPI.getDrawCard = getDrawCard;
+controllerGameAPI.GETDrawCard = GETDrawCard;
 
-async function getStartGame(req, res, next) {
+async function POSTStartGame(req, res, next) {
     // TODO: SOCKET HERE
 
     res.json({
@@ -59,10 +59,10 @@ async function getStartGame(req, res, next) {
     });
 }
 
-controllerGameAPI.getStartGame = getStartGame;
+controllerGameAPI.POSTStartGame = POSTStartGame;
 
-async function postCreateGame(req, res, next) {
-    debugPrinter.printMiddleware(postCreateGame.name);
+async function POSTCreateGame(req, res, next) {
+    debugPrinter.printMiddleware(POSTCreateGame.name);
 
     const result = await handlerGameUno.createGameWrapped(req.user.user_id);
 
@@ -71,17 +71,17 @@ async function postCreateGame(req, res, next) {
         .json(result);
 }
 
-controllerGameAPI.postCreateGame = postCreateGame;
+controllerGameAPI.POSTCreateGame = POSTCreateGame;
 
-async function getAllGames(req, res, next) {
-    debugPrinter.printMiddleware(getAllGames.name);
+async function GETAllGames(req, res, next) {
+    debugPrinter.printMiddleware(GETAllGames.name);
 
     const result = await dbEngine.getGameRows();
 
     res.json(result);
 }
 
-controllerGameAPI.getAllGames = getAllGames;
+controllerGameAPI.GETAllGames = GETAllGames;
 
 /**
  * Get Info about the current game the user is in
@@ -91,15 +91,15 @@ controllerGameAPI.getAllGames = getAllGames;
  * @param next
  * @returns {Promise<void>}
  */
-async function getCurrentGame(req, res, next) {
-    debugPrinter.printMiddleware(getCurrentGame.name);
+async function GETCurrentGame(req, res, next) {
+    debugPrinter.printMiddleware(GETCurrentGame.name);
 
     const result = await dbEngineGameUno.getGameRowByGameID(req.game.game_id);
     debugPrinter.printDebug(result);
     res.json(result);
 }
 
-controllerGameAPI.getCurrentGame = getCurrentGame;
+controllerGameAPI.GETCurrentGame = GETCurrentGame;
 
 // async function sendMessage(req, res, next) {
 //     io.sockets;

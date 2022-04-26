@@ -5,6 +5,8 @@ queryInterface.sequelize.query(
     type: queryInterface.sequelize.QueryTypes.SELECT
   }).then(users => {
 */
+const debugPrinter = require('../util/debug_printer');
+
 module.exports = {
     async up(queryInterface, Sequelize) {
         /**
@@ -21,19 +23,22 @@ module.exports = {
         const result = await queryInterface.sequelize.query('SELECT user_id FROM public."User";');
 
         const ids = result[0];
+        console.log(ids);
 
         // generate their initial stats.
         ids.forEach((element) => {
-            queryInterface.sequelize.query(
-                `
+
+        });
+
+        const resultInsert = Promise.all(ids.map((element) => queryInterface.sequelize.query(
+            `
                 INSERT INTO public."UserStatistic" ("user_id", "num_wins", "num_loss") 
                 VALUES ($user_id, 0, 0);
                 `,
-                { bind: { user_id: element.user_id } },
-            );
-        });
+            { bind: { user_id: element.user_id } },
+        )));
 
-        return true;
+        return resultInsert;
     },
 
     async down(queryInterface, Sequelize) {

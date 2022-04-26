@@ -12,8 +12,8 @@ const controllerGame = {};
  * @param res
  * @param next
  */
-async function getGame(req, res, next) {
-    debugPrinter.printMiddleware(getGame.name);
+async function GETGame(req, res, next) {
+    debugPrinter.printMiddleware(GETGame.name);
 
     utilCommon.reqSessionMessageHandler(
         req,
@@ -24,7 +24,7 @@ async function getGame(req, res, next) {
     res.redirect('/');
 }
 
-controllerGame.getGame = getGame;
+controllerGame.GETGame = GETGame;
 
 /**
  * Get Request to get a game given the game's game_id
@@ -33,8 +33,8 @@ controllerGame.getGame = getGame;
  * @param res
  * @param next
  */
-async function getGameByGameId(req, res, next) {
-    debugPrinter.printMiddleware(getGameByGameId.name);
+async function GETGameByGameId(req, res, next) {
+    debugPrinter.printMiddleware(GETGameByGameId.name);
     debugPrinter.printError(req.game.game_id);
     debugPrinter.printError(req.user.user_id);
 
@@ -57,12 +57,12 @@ async function getGameByGameId(req, res, next) {
         they would also receive the emits from the server from that new game because game_id_temp would have changed.
 
      */
-    req.session.game_id_temp = req.game.game_id;
+    // req.session.game_id_temp = req.game.game_id;
 
     res.render('lobby');
 }
 
-controllerGame.getGameByGameId = getGameByGameId;
+controllerGame.GETGameByGameId = GETGameByGameId;
 
 // /**
 //  * Super cheap wait of getting the id of the game via post request
@@ -72,7 +72,7 @@ controllerGame.getGameByGameId = getGameByGameId;
 //  * @param next
 //  */
 // function postGameByGameId(req, res, next) {
-//     debugPrinter.printMiddleware(getGameByGameId.name);
+//     debugPrinter.printMiddleware(GETGameByGameId.name);
 //     res.json(req.params);
 // }
 //

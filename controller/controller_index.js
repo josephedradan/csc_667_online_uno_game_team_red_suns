@@ -23,13 +23,13 @@ const controllerIndex = {};
  * @param next
  * @returns {Promise<void>}
  */
-async function postLogIn(req, res, next) {
-    debugPrinter.printMiddleware(postLogIn.name);
+async function POSTLogIn(req, res, next) {
+    debugPrinter.printMiddleware(POSTLogIn.name);
 
     res.redirect('/');
 }
 
-controllerIndex.postLogIn = postLogIn;
+controllerIndex.POSTLogIn = POSTLogIn;
 
 /**
  * Log out user. Actual log out is handled by passport middleware
@@ -42,13 +42,13 @@ controllerIndex.postLogIn = postLogIn;
  * @param next
  * @returns {Promise<void>}
  */
-async function postLogOut(req, res, next) {
-    debugPrinter.printMiddleware(postLogOut.name);
+async function POSTLogOut(req, res, next) {
+    debugPrinter.printMiddleware(POSTLogOut.name);
 
     res.redirect('/');
 }
 
-controllerIndex.postLogOut = postLogOut;
+controllerIndex.POSTLogOut = POSTLogOut;
 
 /**
  * get Index page
@@ -57,8 +57,8 @@ controllerIndex.postLogOut = postLogOut;
  * @param next
  * @returns {Promise<void>}
  */
-async function getIndex(req, res, next) {
-    debugPrinter.printMiddleware(getIndex.name);
+async function GETIndex(req, res, next) {
+    debugPrinter.printMiddleware(GETIndex.name);
     debugPrinter.printBlue(req.user);
 
     const gameList = await dbEngine.getGameRows();
@@ -67,7 +67,7 @@ async function getIndex(req, res, next) {
     res.render('index', { gameList });
 }
 
-controllerIndex.getIndex = getIndex;
+controllerIndex.GETIndex = GETIndex;
 
 /**
  * Get registration page
@@ -76,14 +76,14 @@ controllerIndex.getIndex = getIndex;
  * @param next
  * @returns {Promise<void>}
  */
-async function getRegistration(req, res, next) {
+async function GETRegistration(req, res, next) {
     res.render('registration', {
         title: 'registration',
         postRegistration: true,
     });
 }
 
-controllerIndex.getRegistration = getRegistration;
+controllerIndex.GETRegistration = GETRegistration;
 
 /**
  * Handle post requset to registration
@@ -92,8 +92,8 @@ controllerIndex.getRegistration = getRegistration;
  * @param next
  * @returns {Promise<void>}
  */
-async function postRegistration(req, res, next) {
-    debugPrinter.printMiddleware(postRegistration.name);
+async function POSTRegistration(req, res, next) {
+    debugPrinter.printMiddleware(POSTRegistration.name);
 
     debugPrinter.printDebug(req.body);
 
@@ -151,16 +151,16 @@ async function postRegistration(req, res, next) {
 
         debugPrinter.printBackendGreen('REDIRECTING');
     } catch (err) {
-        debugPrinter.printError(`ERROR FROM ${postRegistration.name}`);
+        debugPrinter.printError(`ERROR FROM ${POSTRegistration.name}`);
         next(err);
     }
 }
 
-controllerIndex.postRegistration = postRegistration;
+controllerIndex.POSTRegistration = POSTRegistration;
 
 // TODO MOVE THIS TO controller_game_api MAYBE
-async function postCreateGame(req, res, next) {
-    debugPrinter.printMiddleware(postCreateGame.name);
+async function POSTCreateGame(req, res, next) {
+    debugPrinter.printMiddleware(POSTCreateGame.name);
 
     const result = await handlerGameUno.createGameWrapped(req.user.user_id);
 
@@ -169,6 +169,6 @@ async function postCreateGame(req, res, next) {
     res.redirect(result.game_url);
 }
 
-controllerIndex.postCreateGame = postCreateGame;
+controllerIndex.POSTCreateGame = POSTCreateGame;
 
 module.exports = controllerIndex;

@@ -23,7 +23,7 @@ IMPORTANT NOTES:
 
         If the user logs out:
             1. Same behavior as (request that is not static and is logged in),
-                but req.postLogOut should be called after which should be in middleware_authentication_passport
+                but req.POSTLogOut should be called after which should be in middleware_authentication_passport
                 and the session is deleted along with the cookie on the client side
 
         If the user makes a requests that are not static and is NOT logged in:
@@ -266,7 +266,7 @@ handlerPassport.configurePassportLocalStrategy = (passport) => {
         // debugPrinter.printSuccess(userAndUserStatistics);
 
         // If userAndUserStatistics exists
-        if (userAndUserStatistics !== null) {
+        if (userAndUserStatistics) {
             // What ever data is sent to the second parameter of this function will be stored in req.user
             doneCallback(
                 error, // error

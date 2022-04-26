@@ -8,6 +8,7 @@ const debugPrinter = require('../util/debug_printer');
 
 const { io } = connectionContainer;
 
+
 /**
  *
  * Notes:
@@ -16,7 +17,7 @@ const { io } = connectionContainer;
  * @param next
  * @returns {Promise<void>}
  */
-async function attachGameIDToSocketIORequest(socket, next) {
+async function attachGameIDToSocketIORequest(socket, next) { // TODO REMOVE ME WHEN CLIETN SENDS game_id
     debugPrinter.printMiddlewareSocketIO(attachGameIDToSocketIORequest.name);
 
     if (socket.request.session.game_id_temp) {
@@ -26,7 +27,7 @@ async function attachGameIDToSocketIORequest(socket, next) {
     next();
 }
 
-io.use(attachGameIDToSocketIORequest);
+// io.use(attachGameIDToSocketIORequest);
 
 /**
  *
@@ -39,6 +40,8 @@ io.use(attachGameIDToSocketIORequest);
  */
 async function attachPlayerIDToSocketIORequest(socket, next) {
     debugPrinter.printMiddlewareSocketIO(attachPlayerIDToSocketIORequest.name);
+    debugPrinter.printDebug(socket.request.user);
+    debugPrinter.printDebug(socket.request.game_id);
 
     if (socket.request.user && socket.request.game_id) {
         const result = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(
@@ -52,4 +55,5 @@ async function attachPlayerIDToSocketIORequest(socket, next) {
     next();
 }
 
-io.use(attachPlayerIDToSocketIORequest);
+// io.use(attachPlayerIDToSocketIORequest);
+

@@ -9,35 +9,35 @@ const middlewareJoi = require('../../middleware/middleware_joi');
 
 /* GET home page. */
 
-routerIndex.get('/', controllerIndex.getIndex);
+routerIndex.get('/', controllerIndex.GETIndex);
 
-routerIndex.get('/registration', controllerIndex.getRegistration);
+routerIndex.get('/registration', controllerIndex.GETRegistration);
 
 routerIndex.post(
     '/login',
     middlewarePassport.checkUnauthenticated, // Check if not logged in
     middlewareJoi.validateUserLogin, // Validate req.body
     middlewarePassport.authenticate('local'), // Log in user via passport
-    controllerIndex.postLogIn, // Do additional log in behavior
+    controllerIndex.POSTLogIn, // Do additional log in behavior
 );
 
 routerIndex.post(
     '/logout',
     middlewarePassport.checkAuthenticated, // Check if logged in
     middlewarePassport.logOut, // Log out user via passport
-    controllerIndex.postLogOut, // Do additional log out behavior
+    controllerIndex.POSTLogOut, // Do additional log out behavior
 );
 
 routerIndex.post(
     '/registration',
     middlewareJoi.validateUserRegistration,
-    controllerIndex.postRegistration,
+    controllerIndex.POSTRegistration,
 );
 
 routerIndex.post(
     '/createGame',
     middlewarePassport.checkAuthenticated, // Check if logged in
-    controllerIndex.postCreateGame,
+    controllerIndex.POSTCreateGame,
 );
 
 module.exports = routerIndex;

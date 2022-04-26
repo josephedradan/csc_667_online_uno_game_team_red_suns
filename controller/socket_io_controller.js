@@ -54,7 +54,7 @@ const dbEngineGameUno = require('./db_engine_game_uno');
 //     // })
 // });
 
-async function test(socket) {
+async function initialSocketJoin(socket) {
     /*
     THE BELOW VARIABLES MOST LIKELY CAME FROM EXPRESS MIDDLEWARE APPLIED TO THE
     SOCKET IO SERVER INSTANCE VIA io.use
@@ -77,11 +77,24 @@ async function test(socket) {
         debugPrinter.printDebug(player_id);
 
         // Join socket to a room (THIS SHOULD BE CALLED ONCE EVERY TIME A USER IS DIRECTED TO A GAME)
-        socket.on('client-join-room', () => {
+        socket.on('client-join-room', async (game_id_client) => {
             debugPrinter.printBackendMagenta('client-join-room');
 
-            if (game_id) {
-                socket.join(game_id);
+            if (game_id_client) {
+                socket.join(game_id_client);
+
+                // Assign game_id to socket.request.game_id
+                socket.request.game_id = game_id_client;
+
+                const resultPlayerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(
+                    socket.request.game_id,
+                    socket.request.user.user_id,
+                );
+
+                // Assign player_id to socket.request.player_id
+                socket.request.player_id = resultPlayerRow.player_id;
+
+                socket.emit('server-message', `You have joined ${game_id_client} room`);
             }
         });
 
@@ -107,83 +120,4 @@ async function test(socket) {
     }
 }
 
-io.on('connection', test);
-
-// async function socketHandlerMessage(socket) {
-//     debugPrinter.printMiddlewareSocketIO(socketHandlerMessage.name);
-//
-//     /*
-//     THE BELOW VARIABLES MOST LIKELY CAME FROM EXPRESS MIDDLEWARE APPLIED TO THE
-//     SOCKET IO SERVER INSTANCE VIA io.use
-//
-//     IF THE VARIABLES CAME FROM EXPRESS MIDDLEWARE THEN YOU CAN TREAT THEM SIMLAR TO
-//     HOW THEY ARE USED IN EXPRESS
-//
-//      */
-//     const {
-//         user,
-//         game,
-//         player,
-//     } = socket.request;
-//
-//     debugPrinter.printBackendYellow('#################################################################');
-//     debugPrinter.printBlue(user);
-//     debugPrinter.printBlue(game);
-//     debugPrinter.printBlue(player);
-//     debugPrinter.printBackendYellow('#################################################################');
-//
-//     // If logged in
-//     if (user) {
-//         debugPrinter.printBackendCyan('USER');
-//         // If user is in a game, put them in a room based on game.game_id
-//         if (game) {
-//             debugPrinter.printBackendCyan('GAME');
-//
-//             const room = game.game_id;
-//
-//             socket.join(room);
-//
-//             debugPrinter.printError(await io.in(room)
-//                 .allSockets());
-//
-//             socket.on('message', (message) => {
-//                 // dbEngineMessage.createMessageRow(game.game_id, );
-//
-//                 // TODO ADD DB STUFF
-//
-//                 // socket.to(room)
-//                 //     .emit(message);
-//
-//                 io.in(room)
-//                     .emit(message); // YOU WANT THIS ONE BECAUSE OF DB CALLS
-//             });
-//         } else {
-//             debugPrinter.printBackendCyan('NOT GAME');
-//
-//             socket.on('message', (message) => {
-//                 // dbEngineMessage.createMessageRow(game.game_id, );
-//                 debugPrinter.printError(message);
-//                 // TODO ADD DB STUFF
-//
-//                 // socket.to(room)
-//                 //     .emit(message);
-//
-//                 io.emit(message);
-//             });
-//         }
-//
-//         // // make socket join room
-//         // socket.on('join-room', () => {
-//         //     // Join room based on their referer url
-//         //     socket.join(room);
-//         //
-//         //     debugPrinter.printSuccess(`${socket.id} joined room: ${room}`);
-//         //
-//         //     // callback(`${socket.id} join room: ${room}`);
-//         // });
-//     } else {
-//
-//     }
-// }
-//
-// io.on('connection', socketHandlerMessage);
+io.on('connection', initialSocketJoin);

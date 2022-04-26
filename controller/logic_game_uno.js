@@ -27,6 +27,28 @@ async function joinGame(game_id, user_id) {
 logicGameUno.joinGame = joinGame;
 
 /**
+ * Given an array, shuffle it
+ *
+ * @param array
+ * @returns {Promise<*>}
+ */
+async function shuffleArray(array) {
+    let itemTemp;
+
+    // eslint-disable-next-line no-plusplus
+    for (let i = array.length - 1; i > 0; i--) {
+        const indexRandom = Math.floor(Math.random() * (i + 1));
+
+        itemTemp = array[i];
+
+        // Swap items at index location
+        array[i] = array[indexRandom];
+        array[indexRandom] = itemTemp;
+    }
+    return array;
+}
+
+/**
  * Generate the initial cards for a game
  *
  * Notes:
@@ -45,42 +67,35 @@ logicGameUno.joinGame = joinGame;
  */
 async function createGame(user_id) {
     debugPrinter.printFunction(createGame.name);
+    debugPrinter.printDebug(user_id);
 
     // WARNING: DANGEROUS AND NOT ACID PROOF
 
     const player = await dbEngineGameUno.createPlayerRow(user_id);
 
+    debugPrinter.printDebug(player);
+
     const game = await dbEngineGameUno.createGameRow();
+    debugPrinter.printDebug(game);
 
     const players = await dbEngineGameUno.createPlayersRow(game.game_id, player.player_id, true);
+    debugPrinter.printDebug(players);
 
-    const cards = await dbEngineGameUno.createCardStateRowsAndCardsRows(game.game_id, 2);
+    const cardStateRows = await dbEngineGameUno.createCardStateRowsAndCardsRows(game.game_id, 2);
+    debugPrinter.printDebug(cardStateRows);
 
     // TODO: ADDING TO THE Collection IS NOT WRITTEN, WRITE THE ALGO TO SHUFFLE THE CARDS IN THE DECk
     // dbEngineGameUno.createCollectionRow(card_state_id, collection_info_id, collection_index);
 
-    const shuffle = (unShuffledDeck) => {
-        let tempCard;
-        for (let i = unShuffledDeck.length - 1; i > 0; i--) {
-            const rand = Math.floor(Math.random() * (i + 1));
-            tempCard = unShuffledDeck[i];
-            unShuffledDeck[i] = unShuffledDeck[rand];
-            unShuffledDeck[rand] = tempCard;
-        }
-        return unShuffledDeck;
-    };
-
-    const shuffledDeck = shuffle(cards);
-
-    for (let i = 0; i < shuffledDeck.length; i++) {
-        await dbEngineGameUno.createCollectionRow(shuffledDeck[i].card_state_id, 1, i + 1);
-    }
+    const cardStateRowsShuffled = await shuffleArray(cardStateRows);
+    const collection = await Promise.all(cardStateRowsShuffled.map((element, index) => dbEngineGameUno.createCollectionRow(cardStateRowsShuffled[index].card_state_id, 1, index)));
 
     return {
         player,
         game,
         players,
-        cards,
+        cardStateRows,
+        collection,
     };
 }
 
