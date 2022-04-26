@@ -65,16 +65,12 @@ async function initialSocketJoin(socket) {
      */
     const {
         user, // THIS MAY EXIST AND SHOULD NOT CHANGE WHEN THE SOCKET IS CONNECTED
-        game_id, // THIS MAY EXIST AND SHOULD NOT CHANGE WHEN THE SOCKET IS CONNECTED (THIS IS game_id AND NOT game, game SHOULD CHANGE OVER TIME)
-        player_id, // THIS MAY EXIST AND SHOULD NOT CHANGE WHEN THE SOCKET IS CONNECTED (THIS IS game_id AND NOT player_id, player SHOULD CHANGE OVER TIME)
     } = socket.request;
 
     // If the user is logged in
     if (user) {
         debugPrinter.printMiddlewareSocketIO('SOCKET LOGGED IN');
         debugPrinter.printDebug(user);
-        debugPrinter.printDebug(game_id);
-        debugPrinter.printDebug(player_id);
 
         // Join socket to a room (THIS SHOULD BE CALLED ONCE EVERY TIME A USER IS DIRECTED TO A GAME)
         socket.on('client-join-room', async (game_id_client) => {
@@ -99,14 +95,14 @@ async function initialSocketJoin(socket) {
         });
 
         // If user's player is in a game
-        if (game_id) {
+        if (socket.request.game_id) {
             socket.on('client-message', async (message) => {
                 debugPrinter.printBackendMagenta('client-message');
 
                 debugPrinter.printDebug({
                     user,
-                    game_id,
-                    player_id,
+                    socket.request.game_id,
+                    socket.request.player_id,
                 });
 
                 debugPrinter.printDebug(message);
