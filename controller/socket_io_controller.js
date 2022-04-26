@@ -91,6 +91,12 @@ async function initialSocketJoin(socket) {
                 socket.request.player_id = resultPlayerRow.player_id;
 
                 socket.emit('server-message', `You have joined ${game_id_client} room`);
+
+                debugPrinter.printDebug({
+                    user,
+                    game_id: socket.request.game_id,
+                    player_id: socket.request.player_id,
+                });
             }
         });
 
@@ -101,8 +107,8 @@ async function initialSocketJoin(socket) {
 
                 debugPrinter.printDebug({
                     user,
-                    socket.request.game_id,
-                    socket.request.player_id,
+                    game_id: socket.request.game_id,
+                    player_id: socket.request.player_id,
                 });
 
                 debugPrinter.printDebug(message);
