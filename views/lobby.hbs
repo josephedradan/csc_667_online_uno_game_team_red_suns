@@ -43,7 +43,7 @@
             <div class="flex items-center justify-center">
                 <a
                     class="w-1/2 px-4 py-2 font-bold text-center text-white bg-sky-500 hover:bg-sky-700"
-                    href="/game/renderTestGame"
+                    href="/game/{{game.game_id}}/startGame"
                 >
                     <!-- FIXME: Don't redirect, make get request to game/api/startGame-->
                     Start Game</a>
@@ -516,12 +516,13 @@
                 class="w-full p-2 resize-none"
                 name=""
                 height="100%"
-                id=""
-                placeholder="Talk Smack"
+                id="socket_message"
+                placeholder="Message here"
             ></textarea>
             <button
+                id="in_game_socket_message_button"
                 class="w-32 h-24 px-4 py-2 font-bold text-white bg-sky-500 hover:bg-sky-700"
-                onclick="socket.emit('client-message', 'Hello FROM BUTTON'); console.log(`BUTTON CLICKED`)"
+                {{! onclick="socket.emit('client-message', 'Hello FROM BUTTON'); console.log(`BUTTON CLICKED`)" }}
             >
                 Send
             </button>
