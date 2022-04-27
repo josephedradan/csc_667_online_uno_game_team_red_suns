@@ -41,12 +41,12 @@ module.exports = {
             },
             {
                 username: 'JosephEdredan321',
-                display_name: 'JosephE',
+                display_name: 'Joseph 1',
                 password: await passwordHandler.hash('EddyYeti321!'),
             },
             {
                 username: 'joseph1',
-                display_name: 'JosephE2',
+                display_name: 'Joseph 2',
                 password: await passwordHandler.hash('Test123!'),
             },
             {

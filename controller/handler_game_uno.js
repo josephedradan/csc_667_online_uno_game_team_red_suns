@@ -14,7 +14,7 @@ const handlerGameUno = {};
 async function createGameWrapped(user_id) {
     debugPrinter.printFunction(createGameWrapped.name);
 
-    const result = await logicGameUno.createGame(user_id);
+    const result = await logicGameUno.createGameV2(user_id);
 
     debugPrinter.printBackendBlue(result);
 

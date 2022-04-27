@@ -76,7 +76,7 @@ async function initialSocketJoin(socket) {
         socket.on('client-join-room', async (game_id_client) => {
             debugPrinter.printBackendMagenta('client-join-room');
             debugPrinter.printSuccess(game_id_client);
-            debugPrinter.printSuccess(typeof(game_id_client));
+            debugPrinter.printSuccess(typeof (game_id_client));
 
             if (game_id_client) {
                 socket.join(game_id_client);
@@ -89,16 +89,26 @@ async function initialSocketJoin(socket) {
                     socket.request.user.user_id,
                 );
 
+                // debugPrinter.printBackendRed(resultPlayerRow);
+
                 // Assign player_id to socket.request.player_id
                 socket.request.player_id = resultPlayerRow.player_id;
 
-                socket.emit('server-game-message', `You have joined ${game_id_client} room`);
+                const user_temp = await dbEngineGameUno.getUserDisplayNameByPlayerID(resultPlayerRow.player_id);
 
-                debugPrinter.printDebug({
-                    user,
-                    game_id: socket.request.game_id,
-                    player_id: socket.request.player_id,
-                });
+                // TODO: WARNING, THIS IS NOT RECORDED BY THE SERVER
+                io.in(socket.request.game_id)
+                    .emit('server-message', {
+                        display_name: 'Server',
+                        message: `${user_temp.display_name} has joined`,
+                    });
+
+                // debugPrinter.printDebug({
+                //     user_temp,
+                //     game_id: socket.request.game_id,
+                //     player_id: socket.request.player_id,
+                // });
+                // debugPrinter.printBackendRed('END');
             }
         });
 

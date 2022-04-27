@@ -6,10 +6,14 @@ const controllerGame = require('../../controller/controller_game');
 
 const routerGameID = express.Router();
 
+
+
 routerGameID.get(
     '/',
     controllerGame.GETGameByGameId,
 );
+
+
 
 routerGameID.use(middlewareGameUno.checkIfPlayerIsPlayerInGame);
 routerGameID.use(middlewareGameUno.validateRequestBody); // FIXME: IS THIS A GENERAL REQ.BODY JOI VALIDATION, IS THIS NECESSARY?
@@ -19,6 +23,10 @@ routerGameID.post(
     controllerGameID.POSTSendMessage, // TODO JOI VALIDATION
 );
 
+routerGameID.get(
+    '/getAllMessages',
+    controllerGameID.GETAllMessages,
+);
 routerGameID.get(
     '/currentGame',
     controllerGameID.GETCurrentGame,

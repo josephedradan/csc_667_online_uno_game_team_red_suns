@@ -114,21 +114,21 @@ async function POSTRegistration(req, res, next) {
                 'Username already exists',
             );
 
-            res.redirect('/');
+            res.redirect('back');
             return;
         }
 
         // Check if display_name already exists
         const userByDisplayName = await dbEngine.getUserRowByDisplayName(display_name);
 
-        if (!userByDisplayName) {
+        if (userByDisplayName) {
             utilCommon.reqSessionMessageHandler(
                 req,
                 'failure',
                 'Display name already exists',
             );
 
-            res.redirect('/');
+            res.redirect('back');
             return;
         }
         // Create new User

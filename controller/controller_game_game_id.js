@@ -61,16 +61,6 @@ async function POSTStartGame(req, res, next) {
 
 controllerGameAPI.POSTStartGame = POSTStartGame;
 
-async function POSTCreateGame(req, res, next) {
-    debugPrinter.printMiddleware(POSTCreateGame.name);
-
-    const result = await handlerGameUno.createGameWrapped(req.user.user_id);
-
-    res.status(200).json(result);
-}
-
-controllerGameAPI.POSTCreateGame = POSTCreateGame;
-
 async function GETAllGames(req, res, next) {
     debugPrinter.printMiddleware(GETAllGames.name);
 
@@ -80,6 +70,17 @@ async function GETAllGames(req, res, next) {
 }
 
 controllerGameAPI.GETAllGames = GETAllGames;
+
+
+async function GETAllMessages(req, res, next) {
+    debugPrinter.printMiddleware(GETAllMessages.name);
+
+    const result = await dbEngineMessage.getMessageRowsByGameID(req.game.game_id);
+
+    res.json(result);
+}
+
+controllerGameAPI.GETAllMessages = GETAllMessages;
 
 /**
  * Get Info about the current game the user is in
@@ -107,7 +108,6 @@ async function POSTSendMessage(req, res, next) {
         req.player.player_id,
         message,
     );
-
 
     io.in(req.game.game_id).emit('server-game-message', result);
 

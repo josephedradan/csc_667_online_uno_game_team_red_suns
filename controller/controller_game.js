@@ -35,8 +35,8 @@ controllerGame.GETGame = GETGame;
  */
 async function GETGameByGameId(req, res, next) {
     debugPrinter.printMiddleware(GETGameByGameId.name);
-    debugPrinter.printError(req.game.game_id);
-    debugPrinter.printError(req.user.user_id);
+    debugPrinter.printDebug(req.game.game_id);
+    debugPrinter.printDebug(req.user.user_id);
 
     // JOIN GAME IF NOT ALREADY // TODO FIX THIS BY LIMITING AMOUNT OF PLAYERS
     const result = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(req.game.game_id, req.user.user_id);

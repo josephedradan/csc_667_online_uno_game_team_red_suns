@@ -38,7 +38,7 @@ async function createMessageRow(game_id, player_id, message) {
 dbEngineMessage.createMessageRow = createMessageRow;
 
 async function getMessageRowsByGameID(game_id) {
-    debugPrinter.printFunction(getMessageRowsByGameID.name); // TODO FIX THIS ONE TOO LIKE THE ABOVE
+    debugPrinter.printFunction(getMessageRowsByGameID.name); // TODO FIX THIS ONE TOO LIKE THE ABOVE FOR THE SPECIFIC STUFF TO RETURN
     const result = await db.any(
         `
         SELECT * 
