@@ -3,8 +3,8 @@ Notes:
     Do not use db.one because returning nothing is not an error
 
  */
-const debugPrinter = require("../util/debug_printer");
-const db = require("../db/index");
+const debugPrinter = require('../util/debug_printer');
+const db = require('../db/index');
 
 const dbEngineMessage = {};
 
@@ -12,11 +12,23 @@ async function createMessageRow(game_id, player_id, message) {
     debugPrinter.printFunction(createMessageRow.name);
     const result = await db.any(
         `
-        INSERT INTO "Message" (game_id, player_id, message)
-        VALUES ($1, $2, $3)
-        RETURNING *;
+        WITH messageRow AS (
+            INSERT INTO "Message" (game_id, player_id, message)
+            VALUES ($1, $2, $3)
+            RETURNING *
+        )
+        SELECT 
+            "Player".player_id, 
+            messageRow.message_id, 
+            messageRow.game_id, 
+            messageRow.message, 
+            messageRow.time_stamp, 
+            "User".display_name 
+        FROM "Player"
+        JOIN messageRow ON "Player".player_id=messageRow.player_id
+        JOIN "User" ON "Player".user_id="User".user_id;
         `,
-        [game_id, player_id, message]
+        [game_id, player_id, message],
     );
     // debugPrinter.printBackendCyan(result);
 
@@ -26,14 +38,14 @@ async function createMessageRow(game_id, player_id, message) {
 dbEngineMessage.createMessageRow = createMessageRow;
 
 async function getMessageRowsByGameID(game_id) {
-    debugPrinter.printFunction(getMessageRowsByGameID.name);
+    debugPrinter.printFunction(getMessageRowsByGameID.name); // TODO FIX THIS ONE TOO LIKE THE ABOVE
     const result = await db.any(
         `
         SELECT * 
         From "Message"
         WHERE "Message".game_id = $1
         `,
-        [game_id]
+        [game_id],
     );
 
     return result;
