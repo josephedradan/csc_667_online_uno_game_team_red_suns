@@ -61,7 +61,7 @@ async function attachGameToRequestAndResponseLocals(req, res, next) {
 
     res.locals.game = req.game;
 
-    debugPrinter.printDebug(res.locals.game);
+    debugPrinter.printDebug(req.game);
 
     next();
 }

@@ -75,6 +75,8 @@ async function initialSocketJoin(socket) {
         // Join socket to a room (THIS SHOULD BE CALLED ONCE EVERY TIME A USER IS DIRECTED TO A GAME)
         socket.on('client-join-room', async (game_id_client) => {
             debugPrinter.printBackendMagenta('client-join-room');
+            debugPrinter.printSuccess(game_id_client);
+            debugPrinter.printSuccess(typeof(game_id_client));
 
             if (game_id_client) {
                 socket.join(game_id_client);

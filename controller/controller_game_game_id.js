@@ -2,21 +2,21 @@
 Handle all the game api calls
 
  */
-const logicGameUno = require("./logic_game_uno");
+const logicGameUno = require('./logic_game_uno');
 
-const handlerGameUno = require("./handler_game_uno");
+const handlerGameUno = require('./handler_game_uno');
 
-const connectionContainer = require("../server/server");
+const connectionContainer = require('../server/server');
 
 const { io } = connectionContainer;
 
-const dbEngine = require("./db_engine");
-const dbEngineGameUno = require("./db_engine_game_uno");
+const dbEngine = require('./db_engine');
+const dbEngineGameUno = require('./db_engine_game_uno');
 
-const utilCommon = require("../util/util_common");
+const utilCommon = require('../util/util_common');
 
-const debugPrinter = require("../util/debug_printer");
-const dbEngineMessage = require("./db_engine_message");
+const debugPrinter = require('../util/debug_printer');
+const dbEngineMessage = require('./db_engine_message');
 
 const controllerGameAPI = {};
 
@@ -32,8 +32,8 @@ async function POSTPlayCard(req, res, next) {
     const { card_id, lobby_id } = req.body;
 
     res.json({
-        status: "success",
-        message: "you played a card",
+        status: 'success',
+        message: 'you played a card',
     });
 }
 
@@ -43,8 +43,8 @@ async function GETDrawCard(req, res, next) {
     // TODO: SOCKET HERE
 
     res.json({
-        status: "success",
-        message: "you drew a card",
+        status: 'success',
+        message: 'you drew a card',
     });
 }
 
@@ -54,8 +54,8 @@ async function POSTStartGame(req, res, next) {
     // TODO: SOCKET HERE
 
     res.json({
-        status: "success",
-        message: "game started",
+        status: 'success',
+        message: 'game started',
     });
 }
 
@@ -105,10 +105,11 @@ async function POSTSendMessage(req, res, next) {
     const result = await dbEngineMessage.createMessageRow(
         req.game.game_id,
         req.player.player_id,
-        message
+        message,
     );
 
-    io.in(req.game.game_id).emit("server-game-message", result);
+
+    io.in(req.game.game_id).emit('server-game-message', result);
 
     res.json(result);
 }
