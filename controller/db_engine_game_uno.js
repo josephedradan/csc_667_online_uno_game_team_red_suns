@@ -70,11 +70,11 @@ async function getCardInfoRows() {
 
 dbEngineGameUno.getCardInfoRows = getCardInfoRows;
 
-async function getUserDisplayNameByPlayerID(player_id) {
-    debugPrinter.printFunction(getUserDisplayNameByPlayerID.name);
+async function getUserByPlayerID(player_id) {
+    debugPrinter.printFunction(getUserByPlayerID.name);
     const result = await db.any(
         `
-        SELECT display_name
+        SELECT *
         FROM "User"
         JOIN "Player" ON "User".user_id = "Player".user_id
         WHERE "Player".player_id = $1
@@ -87,7 +87,7 @@ async function getUserDisplayNameByPlayerID(player_id) {
     return result[0]; // Should be the new object
 }
 
-dbEngineGameUno.getUserDisplayNameByPlayerID = getUserDisplayNameByPlayerID;
+dbEngineGameUno.getUserByPlayerID = getUserByPlayerID;
 
 /**
  * Create Player row based on user_id

@@ -71,7 +71,6 @@ async function GETAllGames(req, res, next) {
 
 controllerGameAPI.GETAllGames = GETAllGames;
 
-
 async function GETAllMessages(req, res, next) {
     debugPrinter.printMiddleware(GETAllMessages.name);
 
@@ -101,6 +100,8 @@ async function GETCurrentGame(req, res, next) {
 controllerGameAPI.GETCurrentGame = GETCurrentGame;
 
 async function POSTSendMessage(req, res, next) {
+    debugPrinter.printMiddleware(POSTSendMessage.name);
+
     const { message } = req.body;
 
     const result = await dbEngineMessage.createMessageRow(
@@ -115,5 +116,14 @@ async function POSTSendMessage(req, res, next) {
 }
 
 controllerGameAPI.POSTSendMessage = POSTSendMessage;
+
+async function GETGetHand(req, res, next) {
+    debugPrinter.printMiddleware(GETGetHand.name);
+
+    const result = await dbEngineGameUno.getCollectionByPlayerID(req.player.player_id);
+    debugPrinter.printDebug(result);
+    res.json(result);
+}
+controllerGameAPI.GETGetHand = GETGetHand;
 
 module.exports = controllerGameAPI;

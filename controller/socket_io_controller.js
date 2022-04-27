@@ -94,7 +94,7 @@ async function initialSocketJoin(socket) {
                 // Assign player_id to socket.request.player_id
                 socket.request.player_id = resultPlayerRow.player_id;
 
-                const user_temp = await dbEngineGameUno.getUserDisplayNameByPlayerID(resultPlayerRow.player_id);
+                const user_temp = await dbEngineGameUno.getUserByPlayerID(resultPlayerRow.player_id);
 
                 // TODO: WARNING, THIS IS NOT RECORDED BY THE SERVER
                 io.in(socket.request.game_id)
