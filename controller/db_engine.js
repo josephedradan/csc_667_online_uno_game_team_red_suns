@@ -190,6 +190,4 @@ async function createUserAndUserStatisticRow(username, password, display_name) {
 
 dbEngine.createUserAndUserStatisticRow = createUserAndUserStatisticRow;
 
-
-
 module.exports = dbEngine;

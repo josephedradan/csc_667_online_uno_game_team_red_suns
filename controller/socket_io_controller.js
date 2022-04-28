@@ -106,7 +106,7 @@ async function initialSocketJoin(socket) {
                                 message: `${user_temp.display_name} has joined`,
                             },
                         ),
-                        intermediateSocketIOGameUno.emitInRoomSeverGamePlayers(socket.request.game_id)
+                        intermediateSocketIOGameUno.emitInRoomSeverGamePlayers(socket.request.game_id),
                     ],
                 );
 

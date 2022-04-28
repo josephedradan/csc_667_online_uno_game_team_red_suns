@@ -139,7 +139,7 @@ async function joinGameIfPossible(req, res, next) {
     // Get player of the user if they are already in the game
     const player = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(req.game.game_id, req.user.user_id);
 
-    debugPrinter.printError(player)
+    debugPrinter.printError(player);
 
     // If the user is a player in the game
     if (player) {
