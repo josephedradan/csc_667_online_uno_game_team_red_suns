@@ -55,6 +55,13 @@ const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno')
 //     // })
 // });
 
+/*
+IMPORTANT NOTES:
+    WHEN USING socket.request FOR STUFF RELATED TO THE USER, GAME, OR PLAYER
+    USE .user_id, .game_id, and .player_id AND MAKE DB CALLS BECAUSE INFORMATION
+    STORED ON THE SOCKET MIGHT BE OUT OF DATE.
+
+ */
 async function initialSocketJoin(socket) {
     /*
     THE BELOW VARIABLES MOST LIKELY CAME FROM EXPRESS MIDDLEWARE APPLIED TO THE
@@ -73,6 +80,7 @@ async function initialSocketJoin(socket) {
         debugPrinter.printMiddlewareSocketIO('SOCKET LOGGED IN');
         debugPrinter.printDebug(user);
 
+        // TODO MOVE THIS
         // Join socket to a room (THIS SHOULD BE CALLED ONCE EVERY TIME A USER IS DIRECTED TO A GAME)
         socket.on('client-join-room', async (game_id_client) => {
             debugPrinter.printBackendMagenta('client-join-room');
@@ -109,35 +117,46 @@ async function initialSocketJoin(socket) {
                         intermediateSocketIOGameUno.emitInRoomSeverGamePlayers(socket.request.game_id),
                     ],
                 );
-
-                // debugPrinter.printDebug({
-                //     user_temp,
-                //     game_id: socket.request.game_id,
-                //     player_id: socket.request.player_id,
-                // });
-                // debugPrinter.printBackendRed('END');
             }
         });
 
-        // If user's player is in a game
-        if (socket.request.game_id) {
-            // socket.on('client-message', async (message) => {
-            //     debugPrinter.printBackendMagenta('client-message');
-            //
-            //     debugPrinter.printDebug({
-            //         user,
-            //         game_id: socket.request.game_id,
-            //         player_id: socket.request.player_id,
-            //     });
-            //
-            //     debugPrinter.printDebug(message);
-            //
-            //     const result = await dbEngineMessage.createMessageRow(socket.request.game_id, socket.request.player_id, message);
-            //
-            //     io.in(socket.request.game_id)
-            //         .emit('server-game-message', result);
-            // });
-        }
+        // TODO MOVE THIS
+        socket.on('disconnect', async (reason) => {
+            const user_temp = await dbEngineGameUno.getUserByPlayerID(socket.request.player_id);
+
+            await Promise.all(
+                [
+                    intermediateSocketIOGameUno.emitInRoomSeverMessage(
+                        socket.request.game_id,
+                        {
+                            display_name: 'Server',
+                            message: `${user_temp.display_name} has left`,
+                        },
+                    ),
+                    intermediateSocketIOGameUno.emitInRoomSeverGamePlayers(socket.request.game_id),
+                ],
+            );
+        });
+
+        // // If user's player is in a game
+        // if (socket.request.game_id) {
+        //     // socket.on('client-message', async (message) => {
+        //     //     debugPrinter.printBackendMagenta('client-message');
+        //     //
+        //     //     debugPrinter.printDebug({
+        //     //         user,
+        //     //         game_id: socket.request.game_id,
+        //     //         player_id: socket.request.player_id,
+        //     //     });
+        //     //
+        //     //     debugPrinter.printDebug(message);
+        //     //
+        //     //     const result = await dbEngineMessage.createMessageRow(socket.request.game_id, socket.request.player_id, message);
+        //     //
+        //     //     io.in(socket.request.game_id)
+        //     //         .emit('server-game-message', result);
+        //     // });
+        // }
     }
 }
 

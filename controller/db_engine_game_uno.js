@@ -867,11 +867,14 @@ async function getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, u
             "Player".user_id,
             "Players".game_id,
             "Players".is_host,
-            "User".display_name
+            "User".display_name,
+            "UserStatistic".num_wins,
+            "UserStatistic".num_loss
         FROM "Player"
         JOIN "Players" ON "Player".player_id = "Players".player_id
         JOIN "Game" ON "Players".game_id = "Game".game_id
         JOIN "User" ON "Player".user_id = "User".user_id
+        JOIN "UserStatistic" ON "Player".user_id = "UserStatistic".user_id
         WHERE "Player".user_id = $1
         AND "Game".game_id = $2;
         `,
@@ -902,11 +905,14 @@ async function getPlayerRowsJoinPlayersRowJoinGameRowByGameID(game_id) {
             "Player".user_id,
             "Players".game_id,
             "Players".is_host,
-            "User".display_name
+            "User".display_name,
+            "UserStatistic".num_wins,
+            "UserStatistic".num_loss
         FROM "Player"
         JOIN "Players" ON "Player".player_id = "Players".player_id
         JOIN "Game" ON "Players".game_id = "Game".game_id
         JOIN "User" ON "Player".user_id = "User".user_id
+        JOIN "UserStatistic" ON "Player".user_id = "UserStatistic".user_id
         WHERE "Players".game_id = $1
         `,
         [
