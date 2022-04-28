@@ -1,3 +1,9 @@
+/*
+
+IMPORTANT NOTES:
+    THERE SHOULD BE NO SOCKET IO STUFF HERE
+
+ */
 const dbEngine = require('./db_engine');
 const dbEngineGameUno = require('./db_engine_game_uno');
 
@@ -20,13 +26,17 @@ const intermediateGameUno = {};
 //
 // intermediateGameUno.addPlayerToGame = addPlayerToGame;
 
+/**
+ * Get All games and the players in those games
+ *
+ * @returns {Promise<{game: *, players: *}[]>}
+ */
 async function getGamesAndTheirPlayers() {
     debugPrinter.printFunction(getGamesAndTheirPlayers.name);
 
-    const gameRows = await dbEngine.getGameRows();
+    const gameRows = await dbEngineGameUno.getGameRows();
 
     const playersRows = await Promise.all(gameRows.map((gameRow) => dbEngineGameUno.getPlayerRowsJoinPlayersRowJoinGameRowByGameID(gameRow.game_id)));
-    debugPrinter.printCyan(playersRows);
 
     const gamesWithPlayersRows = gameRows.map((row, index) => ({
         game: row,
@@ -36,11 +46,44 @@ async function getGamesAndTheirPlayers() {
     return gamesWithPlayersRows;
 }
 
-intermediateGameUno.getAllGamesAndTheirPlayers = getGamesAndTheirPlayers;
+intermediateGameUno.getGamesAndTheirPlayers = getGamesAndTheirPlayers;
 
+async function getGameAndTheirPlayersByGameID(game_id) {
+    debugPrinter.printFunction(getGameAndTheirPlayersByGameID.name);
+
+    const gameRow = await dbEngineGameUno.getGameRowByGameID(game_id);
+
+    const playersRows = await dbEngineGameUno.getPlayerRowsJoinPlayersRowJoinGameRowByGameID(gameRow.game_id);
+
+    const gameWithPlayersRows = {
+        game: gameRow,
+        players: playersRows,
+    };
+
+    return gameWithPlayersRows;
+}
+
+intermediateGameUno.getGameAndTheirPlayersByGameID = getGameAndTheirPlayersByGameID;
+
+async function checkIfGameIsActive(game_id) {
+    debugPrinter.printFunction(checkIfGameIsActive.name);
+
+    const result = await dbEngineGameUno.getGameRowByGameID(game_id);
+
+    return result.is_active;
+}
+
+intermediateGameUno.checkIfGameIsActive = checkIfGameIsActive;
+
+/**
+ * Join a game
+ *
+ * @param game_id
+ * @param user_id
+ * @returns {Promise<*>}
+ */
 async function joinGame(game_id, user_id) {
     debugPrinter.printFunction(joinGame.name);
-
     const players = await dbEngineGameUno.createPlayerRowAndCreatePlayersRow(user_id, game_id, false);
     return dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
 }
@@ -169,3 +212,10 @@ async function createGameV2(user_id) {
 intermediateGameUno.createGameV2 = createGameV2;
 
 module.exports = intermediateGameUno;
+
+// TODO REASSIGN player_index WHEN A PLAYER IS OUT. BASCIALLY WHEN THEY CALLED UNO AND THEY ARE NOT A PLAYER IN THE ACTUAL PLAYING OF THE GAME
+// TODO SOCKET EMIT PLAYERS IN GAME LOBBY
+// TODO HANDLE PLAYER TURNS
+// TODO GET TOP CARD OF DRAW COLLECTION
+// TODO SET CURRENT TURN PLAYER ID
+// TODO SET CLOCKWISE

@@ -1,5 +1,5 @@
 const debugPrinter = require('../util/debug_printer');
-const utilCommon = require('../util/util_common');
+const utilCommon = require('./util_common');
 const intermediateGameUno = require('./intermediate_game_uno');
 const dbEngineGameUno = require('./db_engine_game_uno');
 
@@ -37,15 +37,6 @@ async function GETGameByGameId(req, res, next) {
     debugPrinter.printMiddleware(GETGameByGameId.name);
     debugPrinter.printDebug(req.game.game_id);
     debugPrinter.printDebug(req.user.user_id);
-
-    // JOIN GAME IF NOT ALREADY // TODO FIX THIS BY LIMITING AMOUNT OF PLAYERS
-    const result = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(req.game.game_id, req.user.user_id);
-
-    if (!result) {
-        const x = await intermediateGameUno.joinGame(req.game.game_id, req.user.user_id);
-        debugPrinter.printDebug(`PLAYER HAS JOINED GAME: ${req.game.game_id}`);
-        debugPrinter.printDebug(x);
-    }
 
     /*
     This is the current/most recent game_id that the user is on. DO NOT RELY ON THIS, IT WILL CHANGE OVER TIME.

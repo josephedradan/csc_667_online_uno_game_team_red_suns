@@ -33,8 +33,8 @@ socket.on('connect', () => {
 On Server game message
 */
 socket.on('server-game-message', (msg) => {
-    console.log('MESSAGE FROM THE SERVER RELATIVE TO THE GAME:');
-    // console.log(msg);
+    console.log('%cserver-game-message', 'color: black;background-color:lawngreen;font-size: 20px;');
+    console.log(msg);
     outputMessage(msg);
     document.querySelector('#sandbox_message_box').scrollTop = document.querySelector('#sandbox_message_box').scrollHeight;
 });
@@ -52,7 +52,8 @@ const outputMessage = (msg) => {
     messageContent.textContent = msg.message;
     div.append(pSpanName);
     div.append(messageContent);
-    document.querySelector('#sandbox_message_box').appendChild(div);
+    document.querySelector('#sandbox_message_box')
+        .appendChild(div);
 };
 
 const outputMessageServer = (msg) => {
@@ -68,7 +69,8 @@ const outputMessageServer = (msg) => {
     messageContent.textContent = msg.message;
     div.append(pSpanName);
     div.append(messageContent);
-    document.querySelector('#sandbox_message_box').appendChild(div);
+    document.querySelector('#sandbox_message_box')
+        .appendChild(div);
 };
 
 const randomColor = () => {
@@ -80,6 +82,16 @@ const randomColor = () => {
 On Server message
  */
 socket.on('server-message', (msg) => {
-    console.log('MESSAGE FROM THE SERVER:');
+    console.log('%cserver-message', 'color: black;background-color:lawngreen;font-size: 20px;');
     outputMessageServer(msg);
+});
+
+/*
+On Server game players
+Notes:
+    To show players in lobby
+*/
+socket.on('server-game-players', (gameWithPlayersRows) => {
+    console.log('%cserver-game-players', 'color: black;background-color:lawngreen;font-size: 20px;');
+    console.log(gameWithPlayersRows);
 });

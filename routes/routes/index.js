@@ -22,21 +22,21 @@ routerIndex.post(
 );
 
 routerIndex.post(
-    '/logout',
-    middlewarePassport.checkAuthenticated, // Check if logged in
-    middlewarePassport.logOut, // Log out user via passport
-    controllerIndex.POSTLogOut, // Do additional log out behavior
-);
-
-routerIndex.post(
     '/registration',
     middlewareJoi.validateUserRegistration,
     controllerIndex.POSTRegistration,
 );
 
+routerIndex.use(middlewarePassport.checkAuthenticated); // Check if logged in
+
+routerIndex.post(
+    '/logout',
+    middlewarePassport.logOut, // Log out user via passport
+    controllerIndex.POSTLogOut, // Do additional log out behavior
+);
+
 routerIndex.post(
     '/createGame',
-    middlewarePassport.checkAuthenticated, // Check if logged in
     controllerIndex.POSTCreateGame,
 );
 

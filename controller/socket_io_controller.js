@@ -9,6 +9,7 @@ const { io } = connectionContainer;
 const debugPrinter = require('../util/debug_printer');
 const dbEngineMessage = require('./db_engine_message');
 const dbEngineGameUno = require('./db_engine_game_uno');
+const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');
 
 // io.on('connection', (socket) => {
 //     debugPrinter.printSuccess(`Client Socket 1: ${socket.id}`);
@@ -96,12 +97,18 @@ async function initialSocketJoin(socket) {
 
                 const user_temp = await dbEngineGameUno.getUserByPlayerID(resultPlayerRow.player_id);
 
-                // TODO: WARNING, THIS IS NOT RECORDED BY THE SERVER
-                io.in(socket.request.game_id)
-                    .emit('server-message', {
-                        display_name: 'Server',
-                        message: `${user_temp.display_name} has joined`,
-                    });
+                await Promise.all(
+                    [
+                        intermediateSocketIOGameUno.emitInRoomSeverMessage(
+                            socket.request.game_id,
+                            {
+                                display_name: 'Server',
+                                message: `${user_temp.display_name} has joined`,
+                            },
+                        ),
+                        intermediateSocketIOGameUno.emitInRoomSeverGamePlayers(socket.request.game_id)
+                    ],
+                );
 
                 // debugPrinter.printDebug({
                 //     user_temp,

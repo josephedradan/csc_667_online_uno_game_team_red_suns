@@ -6,7 +6,7 @@ const passwordHandler = require('./handler_password');
 const debugPrinter = require('../util/debug_printer');
 const intermediateGameUno = require('./intermediate_game_uno');
 const handlerGameUno = require('./handler_game_uno');
-const utilCommon = require('../util/util_common');
+const utilCommon = require('./util_common');
 
 /* ############################################################################################################## */
 
@@ -61,9 +61,9 @@ async function GETIndex(req, res, next) {
     debugPrinter.printMiddleware(GETIndex.name);
     debugPrinter.printBlue(req.user);
 
-    const gamesWithPlayersRows = await intermediateGameUno.getAllGamesAndTheirPlayers();
+    const gamesWithPlayersRows = await intermediateGameUno.getGamesAndTheirPlayers();
 
-    debugPrinter.printBackendRed(gamesWithPlayersRows);
+    debugPrinter.printBackendRed(JSON.stringify(gamesWithPlayersRows, null, 2));
 
     res.render('index', { game_list: gamesWithPlayersRows });
 }

@@ -18,7 +18,7 @@ module.exports = {
             },
 
             // Is the game being played or is it in lobby
-            active: {
+            is_active: {
                 type: Sequelize.DataTypes.BOOLEAN,
                 defaultValue: false,
                 allowNull: false,
@@ -26,7 +26,7 @@ module.exports = {
             },
 
             // Current player's turn determined by the player_id
-            current_player_id: { // TODO current_turn_player_id
+            current_turn_player_id: { // TODO current_turn_player_id
                 type: Sequelize.DataTypes.INTEGER,
                 references: {
                     model: 'Player',
@@ -36,8 +36,18 @@ module.exports = {
                 unique: true, // Enforce rule to prevent the same player from playing in multiple games
             },
 
-            // TODO direction, clockwise or counter
-            //
+            is_clockwise: {
+                type: Sequelize.DataTypes.BOOLEAN,
+                defaultValue: true,
+                allowNull: false,
+                unique: false,
+            },
+
+            password: {
+                type: Sequelize.DataTypes.STRING,
+                allowNull: true,
+                unique: false,
+            },
 
         });
     },

@@ -3,6 +3,12 @@ const debugPrinter = require('../util/debug_printer');
 
 const handlerGameUno = {};
 
+async function getRelativeGameURL(game_id) {
+    return `/game/${game_id}`;
+}
+
+handlerGameUno.getRelativeGameURL = getRelativeGameURL;
+
 /**
  * Intermediate function creates the uno game while also append the game url to the result
  * Notes:
@@ -18,7 +24,7 @@ async function createGameWrapped(user_id) {
 
     debugPrinter.printBackendBlue(result);
 
-    const game_url = `/game/${result.game.game_id}`;
+    const game_url = await handlerGameUno.getRelativeGameURL(result.game.game_id);
 
     debugPrinter.printBackendGreen(game_url);
 

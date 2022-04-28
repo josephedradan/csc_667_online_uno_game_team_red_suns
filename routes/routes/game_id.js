@@ -1,18 +1,16 @@
+/*
+
+Notes:
+    All routes here should return json
+ */
 const express = require('express');
-const middlewarePassport = require('../../middleware/middleware_passport');
-const middlewareGameUno = require('../../middleware/middleware_game_uno');
+const middlewareGameUnoGameGameID = require('../../middleware/middleware_game_uno_game_game_id');
 const controllerGameID = require('../../controller/controller_game_game_id');
-const controllerGame = require('../../controller/controller_game');
 
 const routerGameID = express.Router();
 
-routerGameID.get(
-    '/',
-    controllerGame.GETGameByGameId,
-);
-
-routerGameID.use(middlewareGameUno.checkIfPlayerIsPlayerInGame); // TODO CHANGE HANGE AND CHANGE JOB
-routerGameID.use(middlewareGameUno.validateRequestBody); // FIXME: IS THIS A GENERAL REQ.BODY JOI VALIDATION, IS THIS NECESSARY?
+routerGameID.use(middlewareGameUnoGameGameID.checkIfAllowedToUseAPI);
+routerGameID.use(middlewareGameUnoGameGameID.validateRequestBody); // FIXME: IS THIS A GENERAL REQ.BODY JOI VALIDATION, IS THIS NECESSARY?
 
 routerGameID.post(
     '/sendMessage',
@@ -28,7 +26,7 @@ routerGameID.get(
     controllerGameID.GETCurrentGame,
 );
 
-routerGameID.use(middlewareGameUno.checkIfPlayerCanDoAction); // TODO WRITE
+routerGameID.use(middlewareGameUnoGameGameID.checkIfPlayerCanDoAction); // TODO WRITE
 
 routerGameID.post(
     '/playCard',

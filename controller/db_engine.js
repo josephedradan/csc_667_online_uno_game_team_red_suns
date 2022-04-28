@@ -190,25 +190,6 @@ async function createUserAndUserStatisticRow(username, password, display_name) {
 
 dbEngine.createUserAndUserStatisticRow = createUserAndUserStatisticRow;
 
-/**
- * Get all games
- *
- * @param
- * @returns {Promise<any[]>}
- */
-async function getGameRows() {
-    debugPrinter.printFunction(getGameRows.name);
 
-    const result = await db.any(
-        `
-        SELECT * 
-        FROM "Game"
-        ORDER BY game_id DESC;`,
-    );
-
-    return result;
-}
-
-dbEngine.getGameRows = getGameRows;
 
 module.exports = dbEngine;

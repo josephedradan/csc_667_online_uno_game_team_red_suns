@@ -1,3 +1,4 @@
 {
-    "max_players": 4
+    "players_max": 4
+    "players_min": 2
 }

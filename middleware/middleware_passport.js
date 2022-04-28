@@ -20,7 +20,7 @@ Reference:
 
 const passport = require('passport');
 const debugPrinter = require('../util/debug_printer');
-const utilCommon = require('../util/util_common');
+const utilCommon = require('../controller/util_common');
 
 const middlewarePassport = {};
 

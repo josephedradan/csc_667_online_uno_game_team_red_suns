@@ -6,7 +6,7 @@ const middlewareUnoGameSettings = {};
 async function checkIfPlayerLimitIsReached(req, res, next) {
     const result = dbEngineGameUno.getNumberOfPlayersRowsByGameID(req.game.game_id);
 
-    if (result <= configGameUno.max_players) {
+    if (result <= configGameUno.players_max) {
         next();
     }
 }

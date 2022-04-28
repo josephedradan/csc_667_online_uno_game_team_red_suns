@@ -44,11 +44,12 @@ module.exports = {
                 unique: false,
             },
 
-            // SEAT ORDER IS IMPLIED
-            // seat_index: {
-            //     type: Sequelize.DataTypes.INTEGER,
-            //     allowNull: false,
-            // },
+            // The index of the player (seat of the player)
+            player_index: {
+                type: Sequelize.DataTypes.INTEGER,
+                allowNull: true,
+                unique: false, // False because this table holds all the player indices
+            },
         });
     },
 
