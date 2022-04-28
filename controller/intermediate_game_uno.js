@@ -1,14 +1,16 @@
+const dbEngine = require('./db_engine');
 const dbEngineGameUno = require('./db_engine_game_uno');
+
 const debugPrinter = require('../util/debug_printer');
 
-const logicGameUno = {};
+const intermediateGameUno = {};
 
 // async function createPlayer(user_id) {
 //     debugPrinter.printFunction(createPlayer.name);
 //     return dbEngineGameUno.createPlayerRow(user_id);
 // }
 //
-// logicGameUno.createPlayer = createPlayer;
+// intermediateGameUno.createPlayer = createPlayer;
 //
 // async function addPlayerToGame(game_id, player_id, is_host) {
 //     debugPrinter.printFunction(addPlayerToGame.name);
@@ -16,14 +18,34 @@ const logicGameUno = {};
 //     return dbEngineGameUno.createPlayersRow(game_id, player_id, is_host);
 // }
 //
-// logicGameUno.addPlayerToGame = addPlayerToGame;
+// intermediateGameUno.addPlayerToGame = addPlayerToGame;
+
+async function getGamesAndTheirPlayers() {
+    debugPrinter.printFunction(getGamesAndTheirPlayers.name);
+
+    const gameRows = await dbEngine.getGameRows();
+
+    const playersRows = await Promise.all(gameRows.map((gameRow) => dbEngineGameUno.getPlayerRowsJoinPlayersRowJoinGameRowByGameID(gameRow.game_id)));
+    debugPrinter.printCyan(playersRows);
+
+    const gamesWithPlayersRows = gameRows.map((row, index) => ({
+        game: row,
+        players: playersRows[index],
+    }));
+
+    return gamesWithPlayersRows;
+}
+
+intermediateGameUno.getAllGamesAndTheirPlayers = getGamesAndTheirPlayers;
 
 async function joinGame(game_id, user_id) {
+    debugPrinter.printFunction(joinGame.name);
+
     const players = await dbEngineGameUno.createPlayerRowAndCreatePlayersRow(user_id, game_id, false);
     return dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
 }
 
-logicGameUno.joinGame = joinGame;
+intermediateGameUno.joinGame = joinGame;
 
 /**
  * Given an array, shuffle it
@@ -99,7 +121,7 @@ async function createGame(user_id) {
     };
 }
 
-// logicGameUno.createGame = createGame;
+// intermediateGameUno.createGame = createGame;
 
 /**
  * Generate the initial cards for a game
@@ -144,6 +166,6 @@ async function createGameV2(user_id) {
     };
 }
 
-logicGameUno.createGameV2 = createGameV2;
+intermediateGameUno.createGameV2 = createGameV2;
 
-module.exports = logicGameUno;
+module.exports = intermediateGameUno;

@@ -2,7 +2,7 @@
 Handle all the game api calls
 
  */
-const logicGameUno = require('./logic_game_uno');
+const intermediateGameUno = require('./intermediate_game_uno');
 
 const handlerGameUno = require('./handler_game_uno');
 

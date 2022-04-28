@@ -830,10 +830,16 @@ async function getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, u
     debugPrinter.printFunction(getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID.name);
     const result = await db.any(
         `
-        SELECT *
+        SELECT
+            "Player".player_id,
+            "Player".user_id,
+            "Players".game_id,
+            "Players".is_host,
+            "User".display_name
         FROM "Player"
         JOIN "Players" ON "Player".player_id = "Players".player_id
         JOIN "Game" ON "Players".game_id = "Game".game_id
+        JOIN "User" ON "Player".user_id = "User".user_id
         WHERE "Player".user_id = $1
         AND "Game".game_id = $2;
         `,
@@ -847,5 +853,71 @@ async function getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, u
 }
 
 dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID = getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID;
+
+/**
+ * Get all Player Rows based the game_id
+ *
+ * @param game_id
+ * @param user_id
+ * @returns {Promise<any>}
+ */
+async function getPlayerRowsJoinPlayersRowJoinGameRowByGameID(game_id) {
+    debugPrinter.printFunction(getPlayerRowsJoinPlayersRowJoinGameRowByGameID.name);
+    const result = await db.any(
+        `
+        SELECT
+            "Player".player_id,
+            "Player".user_id,
+            "Players".game_id,
+            "Players".is_host,
+            "User".display_name
+        FROM "Player"
+        JOIN "Players" ON "Player".player_id = "Players".player_id
+        JOIN "Game" ON "Players".game_id = "Game".game_id
+        JOIN "User" ON "Player".user_id = "User".user_id
+        WHERE "Players".game_id = $1
+        `,
+        [
+            game_id,
+        ],
+    );
+
+    return result;
+}
+
+dbEngineGameUno.getPlayerRowsJoinPlayersRowJoinGameRowByGameID = getPlayerRowsJoinPlayersRowJoinGameRowByGameID;
+
+
+async function getNumberOfPlayersRowsByGameID(game_id) {
+    debugPrinter.printFunction(getNumberOfPlayersRowsByGameID.name);
+
+    const result = await db.any(
+        `
+        SELECT COUNT(*)
+        FROM "Players"
+        WHERE "Players".game_id = $1
+        `,
+        [game_id],
+    );
+
+    return result[0];
+}
+dbEngineGameUno.getNumberOfPlayersRowsByGameID = getNumberOfPlayersRowsByGameID;
+
+// async function getPlayersRowsByGameID(game_id) {
+//     debugPrinter.printFunction(getPlayersRowsByGameID.name);
+//
+//     const result = await db.any(
+//         `
+//         SELECT *
+//         FROM "Players"
+//         WHERE "Players".game_id = $1
+//         `,
+//         [game_id],
+//     );
+//
+//     return result;
+// }
+// dbEngineGameUno.getPlayersRowsByGameID = getPlayersRowsByGameID;
 
 module.exports = dbEngineGameUno;

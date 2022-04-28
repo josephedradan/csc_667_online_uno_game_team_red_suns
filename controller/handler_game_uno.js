@@ -1,4 +1,4 @@
-const logicGameUno = require('./logic_game_uno');
+const intermediateGameUno = require('./intermediate_game_uno');
 const debugPrinter = require('../util/debug_printer');
 
 const handlerGameUno = {};
@@ -14,7 +14,7 @@ const handlerGameUno = {};
 async function createGameWrapped(user_id) {
     debugPrinter.printFunction(createGameWrapped.name);
 
-    const result = await logicGameUno.createGameV2(user_id);
+    const result = await intermediateGameUno.createGameV2(user_id);
 
     debugPrinter.printBackendBlue(result);
 
