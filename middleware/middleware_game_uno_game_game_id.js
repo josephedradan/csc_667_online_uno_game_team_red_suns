@@ -130,7 +130,7 @@ async function joinGameIfPossible(req, res, next) {
 
     // Is the game active (Is the game being played)
     if (await intermediateGameUno.checkIfGameIsActive(req.game.game_id)) {
-        debugPrinter.printError('GAME IS ACTIVE');
+        debugPrinter.printDebug('GAME IS ACTIVE');
         utilCommon.reqSessionMessageHandler(req, 'failure', 'Game is active');
         res.redirect('back');
         return;
@@ -139,11 +139,11 @@ async function joinGameIfPossible(req, res, next) {
     // Get player of the user if they are already in the game
     const player = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(req.game.game_id, req.user.user_id);
 
-    debugPrinter.printError(player);
+    debugPrinter.printDebug(player);
 
     // If the user is a player in the game
     if (player) {
-        debugPrinter.printError('PLAYER IS ALREADY IN GAME');
+        debugPrinter.printDebug('PLAYER IS ALREADY IN THE GAME');
         // utilCommon.reqSessionMessageHandler(req, 'success', 'Welcome back');
         next();
         return;

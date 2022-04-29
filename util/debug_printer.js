@@ -83,7 +83,8 @@ function wrapperPrinter(functionGiven) {
     };
 }
 
-function print(input, colorsTheme, messageHeader) {
+// eslint-disable-next-line no-underscore-dangle
+function _print(input, colorsTheme, messageHeader) {
     // Printing non Objects
     if (typeof input !== 'object') {
         if (messageHeader) {
@@ -130,84 +131,88 @@ function print(input, colorsTheme, messageHeader) {
 // Custom print for errors
 const debugPrinter = {
 
+    print: wrapperPrinter((input) => {
+        console.log(input);
+    }),
+
     // Print with print type
     printError: wrapperPrinter((input) => {
-        print(input, '_red', 'ERROR:');
+        _print(input, '_red', 'ERROR:');
     }),
     printSuccess: wrapperPrinter((input) => {
-        print(input, '_green', 'SUCCESS:');
+        _print(input, '_green', 'SUCCESS:');
     }),
     printRequest: wrapperPrinter((input) => {
-        print(input, '_cyan', 'REQUEST:');
+        _print(input, '_cyan', 'REQUEST:');
     }),
     printWarning: wrapperPrinter((input) => {
-        print(input, '_yellow', 'WARNING:');
+        _print(input, '_yellow', 'WARNING:');
     }),
     printDebug: wrapperPrinter((input) => {
-        print(input, '_blue', 'DEBUG:');
+        _print(input, '_blue', 'DEBUG:');
     }),
     printMiddleware: wrapperPrinter((input) => {
-        print(input, '_magenta', 'MIDDLEWARE:');
+        _print(input, '_magenta', 'MIDDLEWARE:');
     }),
     printRoute: wrapperPrinter((input) => {
-        print(input, '_bright_blue', 'ROUTE:');
+        _print(input, '_bright_blue', 'ROUTE:');
     }),
     printFunction: wrapperPrinter((input) => {
-        print(input, '_grey', 'FUNCTION:');
+        _print(input, '_grey', 'FUNCTION:');
     }),
 
     // Print with print type (custom)
     printMiddlewareSocketIO: wrapperPrinter((input) => {
-        print(input, '_magenta', 'MIDDLEWARE SOCKET IO:');
+        _print(input, '_magenta', 'MIDDLEWARE SOCKET IO:');
     }),
 
     // Print based on color
     printRed: wrapperPrinter((input) => {
-        print(input, '_red');
+        _print(input, '_red');
     }),
     printGreen: wrapperPrinter((input) => {
-        print(input, '_green');
+        _print(input, '_green');
     }),
     printCyan: wrapperPrinter((input) => {
-        print(input, '_cyan');
+        _print(input, '_cyan');
     }),
     printYellow: wrapperPrinter((input) => {
-        print(input, '_yellow');
+        _print(input, '_yellow');
     }),
     printBlue: wrapperPrinter((input) => {
-        print(input, '_blue');
+        _print(input, '_blue');
     }),
     printMagenta: wrapperPrinter((input) => {
-        print(input, '_magenta');
+        _print(input, '_magenta');
     }),
     printBrightBlue: wrapperPrinter((input) => {
-        print(input, '_bright_blue');
+        _print(input, '_bright_blue');
     }),
     printGrey: wrapperPrinter((input) => {
-        print(input, '_grey');
+        _print(input, '_grey');
     }),
 
     // Print based on color (alternative that uses italics)
     printBackendRed: wrapperPrinter((input) => {
-        print(input, 'backend_red');
+        _print(input, 'backend_red');
     }),
     printBackendBlue: wrapperPrinter((input) => {
-        print(input, 'backend_blue');
+        _print(input, 'backend_blue');
     }),
     printBackendGreen: wrapperPrinter((input) => {
-        print(input, 'backend_green');
+        _print(input, 'backend_green');
     }),
     printBackendMagenta: wrapperPrinter((input) => {
-        print(input, 'backend_magenta');
+        _print(input, 'backend_magenta');
     }),
     printBackendWhite: wrapperPrinter((input) => {
-        print(input, 'backend_white');
+        _print(input, 'backend_white');
     }),
     printBackendCyan: wrapperPrinter((input) => {
-        print(input, 'backend_cyan');
+        _print(input, 'backend_cyan');
     }),
     printBackendYellow: wrapperPrinter((input) => {
-        print(input, 'backend_yellow');
+        _print(input, 'backend_yellow');
     }),
 };
 

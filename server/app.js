@@ -92,6 +92,7 @@ const handlerSocketIOUseExpress = require('../controller/handler_socket_io_use_e
 const handlerPassport = require('../controller/handler_passport'); // WARNING: MAKE SURE THAT THIS IMPORT IS BEFORE ANY USAGE OF ANY PASSPORT FUNCTIONALITY
 
 const middlewareModifyRequestAndResponse = require('../middleware/middleware_modify_request_and_response');
+const middlewareDebug = require('../middleware/middleware_debug');
 
 const routes = require('../routes/routes');
 
@@ -329,22 +330,11 @@ application.use(middlewareModifyRequestAndResponse.attachUserToResponseLocals);
 
 /* ############################## DEBUGGING ############################## */
 
-application.use((req, res, next) => {
-    if (process.env.NODE_ENV === 'development') {
-        debugPrinter.printBackendYellow('--- DEBUGGING MIDDLEWARE START ---');
+// Express debugging
+application.use(middlewareDebug.printDebugger('Express'));
 
-        debugPrinter.printBackendGreen('req.url');
-        debugPrinter.printDebug(req.url);
-        debugPrinter.printBackendGreen('req.body');
-        debugPrinter.printDebug(req.body);
-        debugPrinter.printBackendGreen('req.user');
-        debugPrinter.printDebug(req.user);
-
-        debugPrinter.printBackendYellow('--- DEBUGGING MIDDLEWARE END ---');
-    }
-
-    next();
-});
+// Socket.io debugging
+handlerSocketIOUseExpress.useExpressMiddleware(middlewareDebug.printDebugger('Socket.io'));
 
 /* ############################## routes ############################## */
 
