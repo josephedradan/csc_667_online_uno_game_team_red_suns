@@ -120,11 +120,11 @@ async function initialSocketJoin(socket) {
             }
         });
 
-        // If the user is a player in the game and disconnects
-        if (socket.request.player_id) {
-            // TODO MOVE THIS
-            socket.on('disconnect', async (reason) => {
+        // If the user is a player in the game and disconnects         // TODO MOVE THIS
+        socket.on('disconnect', async (reason) => {
+            if (socket.request.player_id) {
                 const user_temp = await dbEngineGameUno.getUserByPlayerID(socket.request.player_id);
+
                 await Promise.all(
                     [
                         intermediateSocketIOGameUno.emitInRoomSeverMessage(
@@ -137,8 +137,9 @@ async function initialSocketJoin(socket) {
                         intermediateSocketIOGameUno.emitInRoomSeverGamePlayers(socket.request.game_id),
                     ],
                 );
-            });
-        }
+            }
+        });
+
         // // If user's player is in a game
         // if (socket.request.game_id) {
         //     // socket.on('client-message', async (message) => {
