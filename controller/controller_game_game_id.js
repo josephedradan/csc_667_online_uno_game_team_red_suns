@@ -115,7 +115,7 @@ async function POSTSendMessage(req, res, next) {
         message,
     );
 
-    await intermediateSocketIOGameUno.emitInRoomSeverGameMessageClient(req.game.game_id, result);
+    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageClient(req.game.game_id, result);
 
     res.json(result);
 }
@@ -138,6 +138,8 @@ async function POSTLeaveGame(req, res, next) {
 
     const result = await intermediateGameUno.leaveGame(req.game.game_id, req.user.user_id);
     debugPrinter.printDebug(result);
+
+    await intermediateSocketIOGameUno.emitInRoomSeverIndexGames(),
 
     res.json(result);
 }

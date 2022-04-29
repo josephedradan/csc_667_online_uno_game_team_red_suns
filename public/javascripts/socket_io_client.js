@@ -8,10 +8,10 @@ socket.on('connect', () => {
     // THIS MUST BE CALLED ONCE AND BEFORE ANY OTHER EVENTS
 
     // grab the current path, only care for the route.
-    const currPath = window.location.href.slice(LOCALHOST_SIZE);
+    const currPath = window.location.href.slice(LOCALHOST_SIZE); // FIXME: DONT DO THSI
     console.log(currPath);
 
-    // check to see if thwe word 'game' exists anywhere on this path.
+    // check to see if the word 'game' exists anywhere on this path.
     const gameRE = '(?:game)';
     const containsGame = currPath.search(gameRE);
     console.log(`contains game: ${containsGame > -1}`);
@@ -20,7 +20,9 @@ socket.on('connect', () => {
         // game_id will I assume be always the second element when the path is tokenized.
         const game_id = currPath.split('/')[1];
         console.log(`game_id: ${game_id}`);
-        socket.emit('client-join-room', parseInt(game_id)); // parsed game_id from URL.
+        socket.emit('client-game-game-id-join-room', parseInt(game_id)); // parsed game_id from URL.
+    } else {
+        socket.emit('client-index-join-room');
     }
 
     // Test messages
@@ -32,9 +34,9 @@ socket.on('connect', () => {
 /*
 On Server game message
 */
-socket.on('server-game-message-client', (msg) => {
+socket.on('server-game-game-id-message-client', (msg) => {
     console.log(
-        '%cserver-game-message-client',
+        '%cserver-game-game-id-message-client',
         'color: black;background-color:lawngreen;font-size: 20px;',
     );
     console.log(msg);
@@ -55,7 +57,8 @@ const outputMessage = (msg) => {
     messageContent.textContent = msg.message;
     div.append(pSpanName);
     div.append(messageContent);
-    document.querySelector('#sandbox_message_box').appendChild(div);
+    document.querySelector('#sandbox_message_box')
+        .appendChild(div);
 };
 
 const outputMessageServer = (msg) => {
@@ -71,7 +74,8 @@ const outputMessageServer = (msg) => {
     messageContent.textContent = msg.message;
     div.append(pSpanName);
     div.append(messageContent);
-    document.querySelector('#sandbox_message_box').appendChild(div);
+    document.querySelector('#sandbox_message_box')
+        .appendChild(div);
 };
 
 const randomColor = () => {
@@ -82,9 +86,9 @@ const randomColor = () => {
 /*
 On Server message
  */
-socket.on('server-game-message-server', (msg) => {
+socket.on('server-game-game-id-message-server', (msg) => {
     console.log(
-        '%cserver-game-message-server',
+        '%cserver-game-game-id-message-server',
         'color: black;background-color:lawngreen;font-size: 20px;',
     );
     outputMessageServer(msg);
@@ -95,9 +99,9 @@ On Server game players
 Notes:
     To show players in lobby
 */
-socket.on('server-game-players', (gameWithPlayersRows) => {
+socket.on('server-game-game-id-players', (gameWithPlayersRows) => {
     console.log(
-        '%cserver-game-players',
+        '%cserver-game-game-id-players',
         'color: black;background-color:lawngreen;font-size: 20px;',
     );
     console.log(gameWithPlayersRows);
@@ -192,3 +196,25 @@ const create_player_card = (player_info_array, player_idx) => {
     divWrapper.append(num_of_losses_div);
     return divWrapper;
 };
+
+/**
+ * Server message
+ */
+socket.on('server-message', (msg) => {
+    console.log(
+        '%cserver-message',
+        'color: black;background-color:lawngreen;font-size: 20px;',
+    );
+    console.log(msg);
+});
+
+/**
+ * Index page game list
+ */
+socket.on('server-index-games', (msg) => {
+    console.log(
+        '%cserver-index-games',
+        'color: black;background-color:lawngreen;font-size: 20px;',
+    );
+    console.log(msg);
+});

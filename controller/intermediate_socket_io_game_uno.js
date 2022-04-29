@@ -1,38 +1,50 @@
 const connectionContainer = require('../server/server');
 const intermediateGameUno = require('./intermediate_game_uno');
+const constants = require('../server/constants');
 
 const intermediateSocketIOGameUno = {};
 const { io } = connectionContainer;
 
-async function emitInRoomSeverGamePlayers(game_id) {
+async function emitInRoomSeverIndexGames() {
+    const gamesWithPlayersRows = await intermediateGameUno.getGamesAndTheirPlayers();
+
+    io.in(constants.socketIDRoomIndex)
+        .emit('server-index-games', gamesWithPlayersRows);
+
+    return gamesWithPlayersRows;
+}
+
+intermediateSocketIOGameUno.emitInRoomSeverIndexGames = emitInRoomSeverIndexGames;
+
+async function emitInRoomSeverGameGameIDPlayers(game_id) {
     const gameWithPlayersRows = await intermediateGameUno.getGameAndTheirPlayersByGameIDDetailed(game_id);
 
     io.in(game_id)
-        .emit('server-game-players', gameWithPlayersRows);
+        .emit('server-game-game-id-players', gameWithPlayersRows);
 
     return gameWithPlayersRows;
 }
 
-intermediateSocketIOGameUno.emitInRoomSeverGamePlayers = emitInRoomSeverGamePlayers;
+intermediateSocketIOGameUno.emitInRoomSeverGameGameIDPlayers = emitInRoomSeverGameGameIDPlayers;
 
-async function emitInRoomSeverGameMessageClient(game_id, messageObject) {
+async function emitInRoomSeverGameGameIDMessageClient(game_id, messageObject) {
     io.in(game_id)
-        .emit('server-game-message-client', messageObject);
+        .emit('server-game-game-id-message-client', messageObject);
 
     return messageObject;
 }
 
-intermediateSocketIOGameUno.emitInRoomSeverGameMessageClient = emitInRoomSeverGameMessageClient;
+intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageClient = emitInRoomSeverGameGameIDMessageClient;
 
 // TODO: WARNING, THIS IS NOT RECORDED BY THE SERVER
-async function emitInRoomSeverGameMessageServer(game_id, messageObject) {
+async function emitInRoomSeverGameGameIDMessageServer(game_id, messageObject) {
     io.in(game_id)
-        .emit('server-game-message-server', messageObject);
+        .emit('server-game-game-id-message-server', messageObject);
 
     return messageObject;
 }
 
-intermediateSocketIOGameUno.emitInRoomSeverGameMessageServer = emitInRoomSeverGameMessageServer;
+intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServer = emitInRoomSeverGameGameIDMessageServer;
 
 async function emitInRoomSeverMessage(game_id, messageObject) {
     io.in(game_id)

@@ -22,10 +22,12 @@ routerGame.get(
 //     controllerGame.getTestGame,
 // );
 
-routerGame.use('/:game_id',
+routerGame.use(
+    '/:game_id',
     middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocals,
     middlewareGameUnoGameGameID.joinGameIfPossible,
-    middlewareModifyReqResGameUnoGameID.attachPlayerToRequestAndResponseLocals);
+    middlewareModifyReqResGameUnoGameID.attachPlayerToRequestAndResponseLocals,
+);
 
 routerGame.get('/:game_id', controllerGame.GETGameByGameId);
 

@@ -11,4 +11,6 @@ constants.dirPartials = path.join(__dirname, '../views/partials');
 constants.dirViews = path.join(__dirname, '../views');
 constants.dirPublic = path.join(__dirname, '../public');
 
+constants.socketIDRoomIndex = 'index';
+
 module.exports = constants;
