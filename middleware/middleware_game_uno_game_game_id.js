@@ -52,7 +52,7 @@ middlewareGameUnoGamdID.checkIfPlayerCanDoAction = checkIfPlayerCanDoAction;
  */
 async function checkIfAllowedToUseAPI(req, res, next) {
     // Get player of the user if they are already in the game
-    const player = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(req.game.game_id, req.user.user_id);
+    const { player } = req;
 
     // If the user is not a player in the game
     if (!player) {
@@ -68,52 +68,6 @@ async function checkIfAllowedToUseAPI(req, res, next) {
 }
 
 middlewareGameUnoGamdID.checkIfAllowedToUseAPI = checkIfAllowedToUseAPI;
-
-/**
- * NOTES:
- *      THIS FUNCTION REQUIRES req.params
- *
- * @param req
- * @param res
- * @param next
- * @returns {Promise<void>}
- */
-async function attachGameToRequestAndResponseLocals(req, res, next) {
-    debugPrinter.printMiddleware(attachGameToRequestAndResponseLocals.name);
-
-    req.game = await dbEngineGameUno.getGameRowByGameID(req.params.game_id);
-
-    res.locals.game = req.game;
-
-    debugPrinter.printDebug(req.game);
-
-    next();
-}
-
-middlewareGameUnoGamdID.attachGameToRequestAndResponseLocals = attachGameToRequestAndResponseLocals;
-
-/**
- * NOTES:
- *      THIS FUNCTION REQUIRES req.params
- *
- * @param req
- * @param res
- * @param next
- * @returns {Promise<void>}
- */
-async function attachPlayerToRequestAndResponseLocals(req, res, next) {
-    debugPrinter.printMiddleware(attachGameToRequestAndResponseLocals.name);
-
-    req.player = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(req.params.game_id, req.user.user_id);
-
-    res.locals.player = req.player;
-
-    debugPrinter.printDebug(req.player);
-
-    next();
-}
-
-middlewareGameUnoGamdID.attachPlayerToRequestAndResponseLocals = attachPlayerToRequestAndResponseLocals;
 
 /**
  * IMPORTANT NOTES:
@@ -132,6 +86,7 @@ async function joinGameIfPossible(req, res, next) {
     if (await intermediateGameUno.checkIfGameIsActive(req.game.game_id)) {
         debugPrinter.printDebug('GAME IS ACTIVE');
         utilCommon.reqSessionMessageHandler(req, 'failure', 'Game is active');
+
         res.redirect('back');
         return;
     }
@@ -145,6 +100,7 @@ async function joinGameIfPossible(req, res, next) {
     if (player) {
         debugPrinter.printDebug('PLAYER IS ALREADY IN THE GAME');
         // utilCommon.reqSessionMessageHandler(req, 'success', 'Welcome back');
+
         next();
         return;
     }

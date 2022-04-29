@@ -20,7 +20,7 @@ handlerGameUno.getRelativeGameURL = getRelativeGameURL;
 async function createGameWrapped(user_id) {
     debugPrinter.printFunction(createGameWrapped.name);
 
-    const result = await intermediateGameUno.createGameV2(user_id);
+    const result = await intermediateGameUno.createGameV2(user_id, 2);
 
     debugPrinter.printBackendBlue(result);
 

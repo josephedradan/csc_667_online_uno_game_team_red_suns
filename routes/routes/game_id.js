@@ -21,9 +21,20 @@ routerGameID.get(
     '/getAllMessages',
     controllerGameID.GETAllMessages,
 );
+
 routerGameID.get(
     '/currentGame',
     controllerGameID.GETCurrentGame,
+);
+
+/*
+Notes:
+    Leaving the game automatically happens if the game.is_active === false
+    If game.is_active === true then you must explicitly call the below function to leave entirely
+ */
+routerGameID.post(
+    '/leaveGame',
+    controllerGameID.POSTLeaveGame,
 );
 
 routerGameID.use(middlewareGameUnoGameGameID.checkIfPlayerCanDoAction); // TODO WRITE

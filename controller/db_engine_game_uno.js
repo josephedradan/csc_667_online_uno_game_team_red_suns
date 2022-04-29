@@ -495,6 +495,9 @@ dbEngineGameUno.createCardStateRowsAndCardsRowsAndCollectionRowsWithCollectionRa
  *                  ) s
  *                  order by rn;
  *
+ *          Reference:
+ *              https://stackoverflow.com/questions/25571094/joining-a-series-in-postgres-with-a-select-query
+ *
  *      SQL update records with ROW_NUMBER()
  *          Notes:
  *              Example:
@@ -682,11 +685,62 @@ async function randomizeCollectionByGameID(game_id) {
 
 dbEngineGameUno.randomizeCollectionByGameID = randomizeCollectionByGameID;
 
-async function getGameRowByGameID(game_id) {
-    debugPrinter.printFunction(getGameRowByGameID.name);
+async function deletePlayerRowsByUserID(user_id) {
+    debugPrinter.printFunction(deletePlayerRowsByUserID.name);
     const result = await db.any(
         `
-        SELECT *
+        DELETE FROM "Player"
+        WHERE "Player".user_id = $1
+        RETURNING *;
+        `,
+        [
+            user_id,
+        ],
+    );
+
+    return result[0];
+}
+dbEngineGameUno.deletePlayerRowsByUserID = deletePlayerRowsByUserID;
+
+async function deletePlayerRowByPlayerID(player_id) {
+    debugPrinter.printFunction(deletePlayerRowsByUserID.name);
+    const result = await db.any(
+        `
+        DELETE FROM "Player"
+        WHERE "Player".player_id = $1
+        RETURNING *;
+        `,
+        [
+            player_id,
+        ],
+    );
+
+    return result[0];
+}
+dbEngineGameUno.deletePlayerRowByPlayerID = deletePlayerRowByPlayerID;
+
+async function deleteGame(game_id) {
+    debugPrinter.printFunction(deleteGame.name);
+    const result = await db.any(
+        `
+        DELETE FROM "Game"
+        WHERE "Game".game_id = $1
+        RETURNING *;
+        `,
+        [
+            game_id,
+        ],
+    );
+
+    return result[0];
+}
+dbEngineGameUno.deleteGameRow = deleteGame;
+
+async function getGameRowByGameIDDetailed(game_id) {
+    debugPrinter.printFunction(getGameRowByGameIDDetailed.name);
+    const result = await db.any(
+        `
+        SELECT game_id, is_active, player_id_current_turn, is_clockwise
         FROM "Game"
         WHERE "Game".game_id = $1
         `,
@@ -697,6 +751,24 @@ async function getGameRowByGameID(game_id) {
 
     return result[0];
 }
+dbEngineGameUno.getGameRowByGameIDDetailed = getGameRowByGameIDDetailed;
+
+async function getGameRowByGameIDSimple(game_id) {
+    debugPrinter.printFunction(getGameRowByGameIDSimple.name);
+    const result = await db.any(
+        `
+        SELECT game_id, is_active
+        FROM "Game"
+        WHERE "Game".game_id = $1
+        `,
+        [
+            game_id,
+        ],
+    );
+
+    return result[0];
+}
+dbEngineGameUno.getGameRowByGameIDSimple = getGameRowByGameIDSimple;
 
 /**
  * Get all games
@@ -704,12 +776,12 @@ async function getGameRowByGameID(game_id) {
  * @param
  * @returns {Promise<any[]>}
  */
-async function getGameRows() {
-    debugPrinter.printFunction(getGameRows.name);
+async function getGameRowSimple() {
+    debugPrinter.printFunction(getGameRowSimple.name);
 
     const result = await db.any(
         `
-        SELECT *
+        SELECT game_id, is_active
         FROM "Game"
         ORDER BY game_id DESC;
         `,
@@ -718,9 +790,7 @@ async function getGameRows() {
     return result;
 }
 
-dbEngineGameUno.getGameRows = getGameRows;
-
-dbEngineGameUno.getGameRowByGameID = getGameRowByGameID;
+dbEngineGameUno.getGameRowSimple = getGameRowSimple;
 
 /**
  * Get Collection by game_id

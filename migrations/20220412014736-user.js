@@ -16,7 +16,6 @@ module.exports = {
                 autoIncrement: true,
                 allowNull: false,
                 unique: true,
-                onDelete: 'CASCADE',
             },
 
             display_name: {

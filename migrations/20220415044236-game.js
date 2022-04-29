@@ -14,7 +14,6 @@ module.exports = {
                 autoIncrement: true,
                 allowNull: false,
                 unique: false,
-                onDelete: 'CASCADE',
             },
 
             // Is the game being played or is it in lobby
@@ -26,7 +25,7 @@ module.exports = {
             },
 
             // Current player's turn determined by the player_id
-            current_turn_player_id: { // TODO current_turn_player_id
+            player_id_current_turn: {
                 type: Sequelize.DataTypes.INTEGER,
                 references: {
                     model: 'Player',

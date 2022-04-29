@@ -15,6 +15,7 @@ module.exports = {
                     model: 'Game',
                     key: 'game_id',
                 },
+                onDelete: 'CASCADE',
                 allowNull: false,
                 unique: false, // False because multiple different players in 1 game
             },
@@ -26,6 +27,7 @@ module.exports = {
                     model: 'Player',
                     key: 'player_id',
                 },
+                onDelete: 'CASCADE',
                 allowNull: false,
                 unique: true, // Can't have a player in different as well as in the same game multiple times
             },

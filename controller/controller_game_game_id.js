@@ -27,46 +27,6 @@ const controllerGameID = {};
 //     const blackWildCards = await dbEngine.getCardTableOnType('SPECIAL');
 // };
 
-// async function POSTJoinGameIfPossible(req, res, next) {
-//     debugPrinter.printMiddleware(POSTJoinGameIfPossible.name);
-//     // TODO FIX THIS BY LIMITING AMOUNT OF PLAYERS
-//     // TODO CAN PASSWORD PROTECT JOING GAME IF USING POST
-//
-//     // Is the game active (game is being played)
-//     if (await intermediateGameUno.checkIfGameIsActive(req.game.game_id)) {
-//         res.json({
-//             status: 'failure',
-//             message: 'Game is active',
-//             url: handlerGameUno.getRelativeGameURL(req.game.game_id),
-//         });
-//
-//         return;
-//     }
-//
-//     // Get player of the user if the user is a player in the game already
-//     const player = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(req.game.game_id, req.user.user_id);
-//
-//     // User is not a player in the game
-//     if (!player) {
-//         const x = await intermediateGameUno.joinGame(req.game.game_id, req.user.user_id);
-//         debugPrinter.printDebug(`PLAYER HAS JOINED GAME: ${req.game.game_id}`);
-//         debugPrinter.printDebug(x);
-//
-//         res.json({
-//             status: 'success',
-//             message: 'you have joined the game',
-//             url: handlerGameUno.getRelativeGameURL(req.game.game_id),
-//         });
-//     }
-//
-//     res.json({
-//         status: 'failure',
-//         message: 'You are already a player in the game',
-//         url: handlerGameUno.getRelativeGameURL(req.game.game_id),
-//
-//     });
-// }
-
 async function POSTPlayCard(req, res, next) {
     // TODO: SOCKET HERE
 
@@ -108,7 +68,7 @@ controllerGameID.POSTStartGame = POSTStartGame;
 async function GETAllGames(req, res, next) {
     debugPrinter.printMiddleware(GETAllGames.name);
 
-    const result = await dbEngineGameUno.getGameRows();
+    const result = await dbEngineGameUno.getGameRowSimple();
 
     res.json(result);
 }
@@ -136,8 +96,9 @@ controllerGameID.GETAllMessages = GETAllMessages;
 async function GETCurrentGame(req, res, next) {
     debugPrinter.printMiddleware(GETCurrentGame.name);
 
-    const result = await dbEngineGameUno.getGameRowByGameID(req.game.game_id);
+    const result = await dbEngineGameUno.getGameRowByGameIDSimple(req.game.game_id);
     debugPrinter.printDebug(result);
+
     res.json(result);
 }
 
@@ -153,8 +114,8 @@ async function POSTSendMessage(req, res, next) {
         req.player.player_id,
         message,
     );
-    // debugPrinter.printBackendRed(result)
-    await intermediateSocketIOGameUno.emitInRoomSeverGameMessage(req.game.game_id, result);
+
+    await intermediateSocketIOGameUno.emitInRoomSeverGameMessageClient(req.game.game_id, result);
 
     res.json(result);
 }
@@ -172,4 +133,14 @@ async function GETGetHand(req, res, next) {
 
 controllerGameID.GETGetHand = GETGetHand;
 
+async function POSTLeaveGame(req, res, next) {
+    debugPrinter.printMiddleware(POSTLeaveGame.name);
+
+    const result = await intermediateGameUno.leaveGame(req.game.game_id, req.user.user_id);
+    debugPrinter.printDebug(result);
+
+    res.json(result);
+}
+
+controllerGameID.POSTLeaveGame = POSTLeaveGame;
 module.exports = controllerGameID;

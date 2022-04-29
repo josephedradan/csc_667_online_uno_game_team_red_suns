@@ -91,7 +91,7 @@ const handlerSocketIOUseExpress = require('../controller/handler_socket_io_use_e
 
 const handlerPassport = require('../controller/handler_passport'); // WARNING: MAKE SURE THAT THIS IMPORT IS BEFORE ANY USAGE OF ANY PASSPORT FUNCTIONALITY
 
-const middlewareModifyRequestAndResponse = require('../middleware/middleware_modify_request_and_response');
+const middlewareModifyReqRes = require('../middleware/middleware_modify_req_res');
 const middlewareDebug = require('../middleware/middleware_debug');
 
 const routes = require('../routes/routes');
@@ -325,8 +325,8 @@ require('./socket_io');
 
 /* ############################## Middleware Message (Custom middlewares) ############################## */
 
-application.use(middlewareModifyRequestAndResponse.attachMessageToResponseLocals);
-application.use(middlewareModifyRequestAndResponse.attachUserToResponseLocals);
+application.use(middlewareModifyReqRes.attachMessageToResponseLocals);
+application.use(middlewareModifyReqRes.attachUserToResponseLocals);
 
 /* ############################## DEBUGGING ############################## */
 

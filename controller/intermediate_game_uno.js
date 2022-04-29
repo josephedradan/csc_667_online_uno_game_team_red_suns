@@ -31,10 +31,10 @@ const intermediateGameUno = {};
  *
  * @returns {Promise<{game: *, players: *}[]>}
  */
-async function getGamesAndTheirPlayers() {
-    debugPrinter.printFunction(getGamesAndTheirPlayers.name);
+async function getGamesAndTheirPlayersSimple() {
+    debugPrinter.printFunction(getGamesAndTheirPlayersSimple.name);
 
-    const gameRows = await dbEngineGameUno.getGameRows();
+    const gameRows = await dbEngineGameUno.getGameRowSimple();
 
     const playersRows = await Promise.all(gameRows.map((gameRow) => dbEngineGameUno.getPlayerRowsJoinPlayersRowJoinGameRowByGameID(gameRow.game_id)));
 
@@ -46,14 +46,31 @@ async function getGamesAndTheirPlayers() {
     return gamesWithPlayersRows;
 }
 
-intermediateGameUno.getGamesAndTheirPlayers = getGamesAndTheirPlayers;
+intermediateGameUno.getGamesAndTheirPlayers = getGamesAndTheirPlayersSimple;
 
-async function getGameAndTheirPlayersByGameID(game_id) {
-    debugPrinter.printFunction(getGameAndTheirPlayersByGameID.name);
+/**
+ * Notes:
+ *      Do not use this in getGamesAndTheirPlayersSimple() because you will be making more db calls
+ *
+ * @param game_id
+ * @returns {Promise<{game: *, players: *}>}
+ */
+async function getGameAndTheirPlayersByGameIDDetailed(game_id) {
+    debugPrinter.printFunction(getGameAndTheirPlayersByGameIDDetailed.name);
 
-    const gameRow = await dbEngineGameUno.getGameRowByGameID(game_id);
+    const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
+
+    // If Game Row does not exist
+    if (!gameRow) {
+        return null;
+    }
 
     const playersRows = await dbEngineGameUno.getPlayerRowsJoinPlayersRowJoinGameRowByGameID(gameRow.game_id);
+
+    // If Players Row does not exist
+    if (!playersRows) {
+        return null;
+    }
 
     const gameWithPlayersRows = {
         game: gameRow,
@@ -63,12 +80,12 @@ async function getGameAndTheirPlayersByGameID(game_id) {
     return gameWithPlayersRows;
 }
 
-intermediateGameUno.getGameAndTheirPlayersByGameID = getGameAndTheirPlayersByGameID;
+intermediateGameUno.getGameAndTheirPlayersByGameIDDetailed = getGameAndTheirPlayersByGameIDDetailed;
 
 async function checkIfGameIsActive(game_id) {
     debugPrinter.printFunction(checkIfGameIsActive.name);
 
-    const result = await dbEngineGameUno.getGameRowByGameID(game_id);
+    const result = await dbEngineGameUno.getGameRowByGameIDSimple(game_id);
 
     return result.is_active;
 }
@@ -84,11 +101,37 @@ intermediateGameUno.checkIfGameIsActive = checkIfGameIsActive;
  */
 async function joinGame(game_id, user_id) {
     debugPrinter.printFunction(joinGame.name);
-    const players = await dbEngineGameUno.createPlayerRowAndCreatePlayersRow(user_id, game_id, false);
+
+    await dbEngineGameUno.createPlayerRowAndCreatePlayersRow(user_id, game_id, false);
+
+    // This should return more info about the player
     return dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
 }
 
 intermediateGameUno.joinGame = joinGame;
+
+async function leaveGame(game_id, user_id) {
+    const playersRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
+
+    // If playersRow does not exist
+    if (!playersRow) {
+        return null;
+    }
+
+    let result;
+
+    debugPrinter.printDebug(playersRow);
+    if (playersRow.is_host) {
+        debugPrinter.printRed('DELETE ROW');
+        result = await dbEngineGameUno.deleteGameRow(game_id);
+    } else {
+        debugPrinter.printRed('DELETE GAME');
+        result = await dbEngineGameUno.deletePlayerRowByPlayerID(playersRow.player_id);
+    }
+    return result;
+}
+
+intermediateGameUno.leaveGame = leaveGame;
 
 /**
  * Given an array, shuffle it
@@ -183,7 +226,7 @@ async function createGame(user_id) {
  * @param game_id
  * @returns {Promise<void>}
  */
-async function createGameV2(user_id) {
+async function createGameV2(user_id, deckMultiplier) {
     debugPrinter.printFunction(createGameV2.name);
     debugPrinter.printDebug(user_id);
 
@@ -198,7 +241,7 @@ async function createGameV2(user_id) {
     const players = await dbEngineGameUno.createPlayersRow(game.game_id, player.player_id, true);
     debugPrinter.printDebug(players);
 
-    const cardStateRows = await dbEngineGameUno.createCardStateRowsAndCardsRowsAndCollectionRowsWithCollectionRandomized(game.game_id, 2);
+    const cardStateRows = await dbEngineGameUno.createCardStateRowsAndCardsRowsAndCollectionRowsWithCollectionRandomized(game.game_id, deckMultiplier);
     debugPrinter.printDebug(cardStateRows);
 
     return {
@@ -210,6 +253,54 @@ async function createGameV2(user_id) {
 }
 
 intermediateGameUno.createGameV2 = createGameV2;
+
+/*
+game_state
+
+Notes:
+    This should not show any information about the actual card itself
+
+{
+    game: {
+        game_id,
+        is_active,
+        player_id_current_turn,
+        is_clockwise,
+    },
+    players:
+        [
+            {
+                display_name,
+                game_id,
+                is_host,
+                num_loss,
+                num_wins,
+                player_id,
+                user_id,
+                collection:
+                    [
+                        {collection_index: 0},
+                        {collection_index: 1},
+                        {collection_index: 2},
+                        {collection_index: 3},
+                        {collection_index: 4},
+                        ...
+                    ]
+            },
+            ...
+        ],
+    ],
+}
+ */
+
+/**
+ *
+ * @param game_id
+ * @returns {Promise<void>}
+ */
+async function getGameState(game_id) {
+
+}
 
 module.exports = intermediateGameUno;
 

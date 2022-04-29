@@ -65,6 +65,13 @@ Reference:
         Reference:
             https://stackoverflow.com/questions/42379952/combine-sockets-and-express-when-using-express-middleware
 
+    Usage of Passport JWT Strategy for Authentication in Socket.IO
+        Notes:
+            If you care about passport then use the below
+                const wrapMiddlewareForSocketIo = middleware => (socket, next) => middleware(socket.request, {}, next);
+        Rerference:
+            https://philenius.github.io/web%20development/2021/03/31/use-passportjs-for-authentication-in-socket-io.html
+
  */
 
 const connectionContainer = require('../server/server');

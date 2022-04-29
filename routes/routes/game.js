@@ -7,6 +7,7 @@ const middlewarePassport = require('../../middleware/middleware_passport');
 
 const controllerGame = require('../../controller/controller_game');
 const middlewareGameUnoGameGameID = require('../../middleware/middleware_game_uno_game_game_id');
+const middlewareModifyReqResGameUnoGameID = require('../../middleware/middleware_modify_req_res_uno_game_game_id');
 
 // Need to be logged in to access any route past this point
 routerGame.use(middlewarePassport.checkAuthenticated);
@@ -21,17 +22,12 @@ routerGame.get(
 //     controllerGame.getTestGame,
 // );
 
-routerGame.use(
-    '/:game_id',
-    middlewareGameUnoGameGameID.attachGameToRequestAndResponseLocals,
-    middlewareGameUnoGameGameID.attachPlayerToRequestAndResponseLocals,
-);
-
-routerGame.get(
-    '/:game_id',
+routerGame.use('/:game_id',
+    middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocals,
     middlewareGameUnoGameGameID.joinGameIfPossible,
-    controllerGame.GETGameByGameId,
-);
+    middlewareModifyReqResGameUnoGameID.attachPlayerToRequestAndResponseLocals);
+
+routerGame.get('/:game_id', controllerGame.GETGameByGameId);
 
 routerGame.use('/:game_id', routerGamesID);
 

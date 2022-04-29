@@ -31,6 +31,7 @@ module.exports = {
                     model: 'Player',
                     key: 'player_id',
                 },
+                onDelete: 'CASCADE',
                 allowNull: true, // card state may not be in user hand, it can be the deck stack or draw stack
                 unique: false, // Player can have multiple card states
             },

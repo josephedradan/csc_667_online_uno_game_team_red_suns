@@ -23,6 +23,7 @@ module.exports = {
                     model: 'CardInfo',
                     key: 'card_info_id',
                 },
+                onDelete: 'CASCADE',
                 allowNull: false, // Required
                 unique: false, // False because you can have duplicates of a card in a game as well as this table tracks all the card states throughout all games
             },
@@ -35,6 +36,7 @@ module.exports = {
                 model: 'CardState',
                 key: 'card_state_id',
             },
+            onDelete: 'CASCADE',
             allowNull: false,
             unique: true,
         });

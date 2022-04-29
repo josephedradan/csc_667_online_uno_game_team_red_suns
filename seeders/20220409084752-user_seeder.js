@@ -46,7 +46,17 @@ module.exports = {
             },
             {
                 username: 'joseph1',
-                display_name: 'Joseph 2',
+                display_name: 'joseph1',
+                password: await passwordHandler.hash('Test123!'),
+            },
+            {
+                username: 'bob',
+                display_name: 'bob_display_name',
+                password: await passwordHandler.hash('Test123!'),
+            },
+            {
+                username: 'joe',
+                display_name: 'joe_display_name',
                 password: await passwordHandler.hash('Test123!'),
             },
             {

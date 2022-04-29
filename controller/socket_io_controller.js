@@ -10,6 +10,7 @@ const debugPrinter = require('../util/debug_printer');
 const dbEngineMessage = require('./db_engine_message');
 const dbEngineGameUno = require('./db_engine_game_uno');
 const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');
+const intermediateGameUno = require('./intermediate_game_uno');
 
 // io.on('connection', (socket) => {
 //     debugPrinter.printSuccess(`Client Socket 1: ${socket.id}`);
@@ -91,6 +92,7 @@ async function initialSocketJoin(socket) {
                 socket.join(game_id_client);
 
                 // Assign game_id to socket.request.game_id
+                // eslint-disable-next-line no-param-reassign
                 socket.request.game_id = game_id_client;
 
                 const resultPlayerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(
@@ -98,45 +100,75 @@ async function initialSocketJoin(socket) {
                     socket.request.user.user_id,
                 );
 
-                // debugPrinter.printBackendRed(resultPlayerRow);
+                // If Player Row exists
+                if (resultPlayerRow) {
+                    // debugPrinter.printBackendRed(resultPlayerRow);
 
-                // Assign player_id to socket.request.player_id
-                socket.request.player_id = resultPlayerRow.player_id;
+                    // Assign player_id to socket.request.player_id
+                    // eslint-disable-next-line no-param-reassign
+                    socket.request.player_id = resultPlayerRow.player_id;
 
-                const user_temp = await dbEngineGameUno.getUserByPlayerID(resultPlayerRow.player_id);
+                    const user_recent = await dbEngineGameUno.getUserByPlayerID(resultPlayerRow.player_id);
 
-                await Promise.all(
-                    [
-                        intermediateSocketIOGameUno.emitInRoomSeverMessage(
-                            socket.request.game_id,
-                            {
-                                display_name: 'Server',
-                                message: `${user_temp.display_name} has joined`,
-                            },
-                        ),
-                        intermediateSocketIOGameUno.emitInRoomSeverGamePlayers(socket.request.game_id),
-                    ],
-                );
+                    await Promise.all(
+                        [
+                            intermediateSocketIOGameUno.emitInRoomSeverGameMessageServer(
+                                socket.request.game_id,
+                                {
+                                    display_name: 'Server',
+                                    message: `${user_recent.display_name} has joined.`,
+                                },
+                            ),
+                            intermediateSocketIOGameUno.emitInRoomSeverGamePlayers(socket.request.game_id),
+                        ],
+                    );
+                }
+            } else {
+                debugPrinter.printDebug(`${user.display_name} gave a and invalid game_id: ${game_id_client}`);
             }
         });
 
         // If the user is a player in the game and disconnects         // TODO MOVE THIS
         socket.on('disconnect', async (reason) => {
-            if (socket.request.player_id) {
-                const user_temp = await dbEngineGameUno.getUserByPlayerID(socket.request.player_id);
+            debugPrinter.printRed('DISCONNECT');
+            if (socket.request.game_id && socket.request.player_id) {
+                const user_recent = await dbEngineGameUno.getUserByPlayerID(socket.request.player_id);
 
-                await Promise.all(
-                    [
-                        intermediateSocketIOGameUno.emitInRoomSeverMessage(
+                const game_current = await dbEngineGameUno.getGameRowByGameIDDetailed(socket.request.game_id);
+
+                // If user exists and game exists
+                if (user_recent && game_current) {
+                    let emitInRoomSeverMessage;
+
+                    // If the game is active, then the player can rejoin
+                    if (game_current.is_active) {
+                        emitInRoomSeverMessage = intermediateSocketIOGameUno.emitInRoomSeverGameMessageServer(
                             socket.request.game_id,
                             {
                                 display_name: 'Server',
-                                message: `${user_temp.display_name} has left`,
+                                message: `${user_recent.display_name} has left (They can rejoin).`,
                             },
-                        ),
-                        intermediateSocketIOGameUno.emitInRoomSeverGamePlayers(socket.request.game_id),
-                    ],
-                );
+                        );
+                    } else {
+                        // Make the player leave the game
+                        await intermediateGameUno.leaveGame(socket.request.game_id, socket.request.user.user_id);
+
+                        emitInRoomSeverMessage = intermediateSocketIOGameUno.emitInRoomSeverGameMessageServer(
+                            socket.request.game_id,
+                            {
+                                display_name: 'Server',
+                                message: `${user_recent.display_name} has left.`,
+                            },
+                        );
+                    }
+
+                    await Promise.all(
+                        [
+                            emitInRoomSeverMessage,
+                            intermediateSocketIOGameUno.emitInRoomSeverGamePlayers(socket.request.game_id),
+                        ],
+                    );
+                }
             }
         });
 
@@ -156,7 +188,7 @@ async function initialSocketJoin(socket) {
         //     //     const result = await dbEngineMessage.createMessageRow(socket.request.game_id, socket.request.player_id, message);
         //     //
         //     //     io.in(socket.request.game_id)
-        //     //         .emit('server-game-message', result);
+        //     //         .emit('server-game-message-client', result);
         //     // });
         // }
     }
