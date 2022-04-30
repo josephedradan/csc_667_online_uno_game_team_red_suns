@@ -736,6 +736,13 @@ async function deleteGame(game_id) {
 }
 dbEngineGameUno.deleteGameRow = deleteGame;
 
+/**
+ * Notes:
+ *      This function can return undefined
+ *
+ * @param game_id
+ * @returns {Promise<any>}
+ */
 async function getGameRowByGameIDDetailed(game_id) {
     debugPrinter.printFunction(getGameRowByGameIDDetailed.name);
     const result = await db.any(
@@ -753,6 +760,13 @@ async function getGameRowByGameIDDetailed(game_id) {
 }
 dbEngineGameUno.getGameRowByGameIDDetailed = getGameRowByGameIDDetailed;
 
+/**
+ * Notes:
+ *      This function can return undefined
+ *
+ * @param game_id
+ * @returns {Promise<any>}
+ */
 async function getGameRowByGameIDSimple(game_id) {
     debugPrinter.printFunction(getGameRowByGameIDSimple.name);
     const result = await db.any(
@@ -776,8 +790,8 @@ dbEngineGameUno.getGameRowByGameIDSimple = getGameRowByGameIDSimple;
  * @param
  * @returns {Promise<any[]>}
  */
-async function getGameRowSimple() {
-    debugPrinter.printFunction(getGameRowSimple.name);
+async function getGameRowsSimple() {
+    debugPrinter.printFunction(getGameRowsSimple.name);
 
     const result = await db.any(
         `
@@ -790,7 +804,7 @@ async function getGameRowSimple() {
     return result;
 }
 
-dbEngineGameUno.getGameRowSimple = getGameRowSimple;
+dbEngineGameUno.getGameRowsSimple = getGameRowsSimple;
 
 /**
  * Get Collection by game_id

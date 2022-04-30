@@ -163,9 +163,14 @@ async function POSTCreateGame(req, res, next) {
 
     const result = await handlerGameUno.createGameWrapped(req.user.user_id);
 
-    utilCommon.reqSessionMessageHandler(req, 'success', `Game id ${result.game_id} created`);
+    if (!result) {
+        utilCommon.reqSessionMessageHandler(req, 'failure', 'Game failed to be created');
+        res.redirect('back');
+    } else {
+        utilCommon.reqSessionMessageHandler(req, 'success', `Game id ${result.game_id} created`);
 
-    res.redirect(result.game_url);
+        res.redirect(result.game_url);
+    }
 }
 
 controllerIndex.POSTCreateGame = POSTCreateGame;

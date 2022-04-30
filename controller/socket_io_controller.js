@@ -179,7 +179,6 @@ async function initialSocketJoin(socket) {
     // Join the index room if emitted by the client
     socket.on('client-index-join-room', async () => {
         debugPrinter.printBackendMagenta('client-index-join-room');
-
         socket.join(constants.socketIDRoomIndex);
     });
 }

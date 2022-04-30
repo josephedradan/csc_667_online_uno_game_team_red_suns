@@ -349,6 +349,7 @@ application.use((req, res, next) => {
 
 // error handler
 application.use((err, req, res, next) => {
+    debugPrinter.printError('IN ERROR YO');
     debugPrinter.printError(err);
 
     // set locals, only providing error in development

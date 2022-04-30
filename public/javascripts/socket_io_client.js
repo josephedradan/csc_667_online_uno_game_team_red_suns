@@ -22,6 +22,7 @@ socket.on('connect', () => {
         console.log(`game_id: ${game_id}`);
         socket.emit('client-game-game-id-join-room', parseInt(game_id)); // parsed game_id from URL.
     } else {
+        console.log('ELSE');
         socket.emit('client-index-join-room');
     }
 

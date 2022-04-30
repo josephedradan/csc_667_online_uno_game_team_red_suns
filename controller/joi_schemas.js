@@ -22,8 +22,8 @@ Reference:
 
     Confirm password cannot be set as required with JOI
         Notes:
-            This the most up todate version on how to correctly validate a password which would allow you to
-            setup a custom failure message
+            This the most up to date version on how to correctly validate a password which would allow you to
+            set up a custom failure message
         Reference:
                 https://stackoverflow.com/a/60909048/9133458
 */

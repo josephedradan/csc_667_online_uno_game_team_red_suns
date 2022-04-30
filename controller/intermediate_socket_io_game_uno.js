@@ -17,6 +17,7 @@ async function emitInRoomSeverIndexGames() {
 intermediateSocketIOGameUno.emitInRoomSeverIndexGames = emitInRoomSeverIndexGames;
 
 async function emitInRoomSeverGameGameIDPlayers(game_id) {
+    // This may be nuill
     const gameWithPlayersRows = await intermediateGameUno.getGameAndTheirPlayersByGameIDDetailed(game_id);
 
     io.in(game_id)

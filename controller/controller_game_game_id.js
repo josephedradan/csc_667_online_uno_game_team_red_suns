@@ -68,7 +68,7 @@ controllerGameID.POSTStartGame = POSTStartGame;
 async function GETAllGames(req, res, next) {
     debugPrinter.printMiddleware(GETAllGames.name);
 
-    const result = await dbEngineGameUno.getGameRowSimple();
+    const result = await dbEngineGameUno.getGameRowsSimple();
 
     res.json(result);
 }

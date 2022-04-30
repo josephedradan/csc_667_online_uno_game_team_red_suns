@@ -11,6 +11,7 @@ handlerGameUno.getRelativeGameURL = getRelativeGameURL;
 
 /**
  * Intermediate function creates the uno game while also append the game url to the result
+ *
  * Notes:
  *      This function was created so that req.json and res.redirect/res.render could share code
  *
@@ -20,34 +21,23 @@ handlerGameUno.getRelativeGameURL = getRelativeGameURL;
 async function createGameWrapped(user_id) {
     debugPrinter.printFunction(createGameWrapped.name);
 
-    const result = await intermediateGameUno.createGameV2(user_id, 2);
+    const gameObject = await intermediateGameUno.createGameV2(user_id, 2);
+    debugPrinter.printBackendBlue(gameObject);
 
-    debugPrinter.printBackendBlue(result);
+    // If nothing returned
+    if (!gameObject) {
+        return null;
+    }
 
-    const game_url = await handlerGameUno.getRelativeGameURL(result.game.game_id);
+    const game_url = await handlerGameUno.getRelativeGameURL(gameObject.game.game_id);
 
     debugPrinter.printBackendGreen(game_url);
 
-    result.game_url = game_url;
+    gameObject.game_url = game_url;
 
-    return result;
+    return gameObject;
 }
 
 handlerGameUno.createGameWrapped = createGameWrapped;
-
-async function joinGameWrapped(user_id) {
-    debugPrinter.printFunction(joinGameWrapped.name);
-
-    // TODO JOin game warpped
-}
-
-handlerGameUno.joinGameWrapped = joinGameWrapped;
-
-// IGNORE
-// module.exports = Object.keys(handlerGameUno)
-//     .map((key, index) => {
-//         debugPrinter.printFunction(key.name);
-//         return key;
-//     });
 
 module.exports = handlerGameUno;

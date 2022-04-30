@@ -22,15 +22,15 @@ async function attachGameToRequestAndResponseLocalsIfPossible(req, res, next) {
         utilCommon.reqSessionMessageHandler(req, 'failure', 'Game does not exist');
 
         res.redirect('/');
-        return;
+    } else {
+        req.game = gameRow;
+
+        res.locals.game = req.game;
+
+        debugPrinter.printDebug(req.game);
+
+        next();
     }
-    req.game = gameRow;
-
-    res.locals.game = req.game;
-
-    debugPrinter.printDebug(req.game);
-
-    next();
 }
 
 middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocals = attachGameToRequestAndResponseLocalsIfPossible;
@@ -53,16 +53,15 @@ async function attachPlayerToRequestAndResponseLocalsIfPossible(req, res, next) 
         utilCommon.reqSessionMessageHandler(req, 'failure', 'Player does not exist');
 
         res.redirect('/');
-        return;
+    } else {
+        req.player = rowPlayer;
+
+        res.locals.player = req.player;
+
+        debugPrinter.printDebug(req.player);
+
+        next();
     }
-
-    req.player = rowPlayer;
-
-    res.locals.player = req.player;
-
-    debugPrinter.printDebug(req.player);
-
-    next();
 }
 
 middlewareModifyReqResGameUnoGameID.attachPlayerToRequestAndResponseLocals = attachPlayerToRequestAndResponseLocalsIfPossible;
