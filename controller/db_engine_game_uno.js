@@ -166,6 +166,7 @@ async function createPlayerRowAndCreatePlayersRow(user_id, game_id, is_host) {
 
     return result[0]; // Should be the new object
 }
+
 dbEngineGameUno.createPlayerRowAndCreatePlayersRow = createPlayerRowAndCreatePlayersRow;
 
 /**
@@ -700,6 +701,7 @@ async function deletePlayerRowsByUserID(user_id) {
 
     return result[0];
 }
+
 dbEngineGameUno.deletePlayerRowsByUserID = deletePlayerRowsByUserID;
 
 async function deletePlayerRowByPlayerID(player_id) {
@@ -717,6 +719,7 @@ async function deletePlayerRowByPlayerID(player_id) {
 
     return result[0];
 }
+
 dbEngineGameUno.deletePlayerRowByPlayerID = deletePlayerRowByPlayerID;
 
 async function deleteGame(game_id) {
@@ -734,6 +737,7 @@ async function deleteGame(game_id) {
 
     return result[0];
 }
+
 dbEngineGameUno.deleteGameRow = deleteGame;
 
 /**
@@ -758,6 +762,7 @@ async function getGameRowByGameIDDetailed(game_id) {
 
     return result[0];
 }
+
 dbEngineGameUno.getGameRowByGameIDDetailed = getGameRowByGameIDDetailed;
 
 /**
@@ -782,6 +787,7 @@ async function getGameRowByGameIDSimple(game_id) {
 
     return result[0];
 }
+
 dbEngineGameUno.getGameRowByGameIDSimple = getGameRowByGameIDSimple;
 
 /**
@@ -1023,7 +1029,25 @@ async function getNumberOfPlayersRowsByGameID(game_id) {
 
     return result[0];
 }
+
 dbEngineGameUno.getNumberOfPlayersRowsByGameID = getNumberOfPlayersRowsByGameID;
+
+async function getCollectionCollectionIndexRowsByPlayerID(player_id) {
+    debugPrinter.printFunction(getCollectionCollectionIndexRowsByPlayerID.name);
+
+    const result = await db.any(
+        `
+        SELECT collection_index
+        FROM "Collection"
+        WHERE "Collection".player_id = $1
+        `,
+        [player_id],
+    );
+
+    return result;
+}
+
+dbEngineGameUno.getCollectionCollectionIndexRowsByPlayerID = getCollectionCollectionIndexRowsByPlayerID;
 
 // async function getPlayersRowsByGameID(game_id) {
 //     debugPrinter.printFunction(getPlayersRowsByGameID.name);

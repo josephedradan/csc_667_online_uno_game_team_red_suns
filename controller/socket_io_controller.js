@@ -10,8 +10,9 @@ const debugPrinter = require('../util/debug_printer');
 const dbEngineMessage = require('./db_engine_message');
 const dbEngineGameUno = require('./db_engine_game_uno');
 const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');
-const intermediateGameUno = require('./intermediate_game_uno');
+const gameUno = require('./game_uno');
 const constants = require('../server/constants');
+const intermediateGameUno = require('./intermediate_game_uno');
 
 // io.on('connection', (socket) => {
 //     debugPrinter.printSuccess(`Client Socket 1: ${socket.id}`);
@@ -121,7 +122,6 @@ async function initialSocketJoin(socket) {
                                 },
                             ),
                             intermediateSocketIOGameUno.emitInRoomSeverGameGameIDPlayers(socket.request.game_id),
-                            intermediateSocketIOGameUno.emitInRoomSeverIndexGames,
                         ],
                     );
                 }
@@ -153,7 +153,7 @@ async function initialSocketJoin(socket) {
                         );
                     } else {
                         // Make the player leave the game
-                        await intermediateGameUno.leaveGame(socket.request.game_id, socket.request.user.user_id);
+                        await intermediateGameUno.leaveGameWrapped(socket.request.game_id, socket.request.user.user_id);
 
                         emitInRoomSeverMessage = intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServer(
                             socket.request.game_id,
@@ -168,7 +168,6 @@ async function initialSocketJoin(socket) {
                         [
                             emitInRoomSeverMessage,
                             intermediateSocketIOGameUno.emitInRoomSeverGameGameIDPlayers(socket.request.game_id),
-                            intermediateSocketIOGameUno.emitInRoomSeverIndexGames,
                         ],
                     );
                 }

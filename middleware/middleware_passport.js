@@ -38,7 +38,7 @@ middlewarePassport.checkAuthenticated = async (req, res, next) => {
     if (req.isAuthenticated()) {
         next();
     } else {
-        utilCommon.reqSessionMessageHandler(req, 'failure', 'User must be logged in to useExpressMiddleware this feature');
+        utilCommon.reqSessionMessageHandler(req, 'failure', 'User must be logged in to use this feature');
 
         res.redirect('back');
         // next();

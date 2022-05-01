@@ -1,7 +1,9 @@
 const debugPrinter = require('../util/debug_printer');
 const dbEngineGameUno = require('../controller/db_engine_game_uno');
-const intermediateGameUno = require('../controller/intermediate_game_uno');
+const gameUno = require('../controller/game_uno');
 const utilCommon = require('../controller/util_common');
+const intermediateSocketIOGameUno = require('../controller/intermediate_socket_io_game_uno');
+const intermediateGameUno = require('../controller/intermediate_game_uno');
 
 const middlewareGameUnoGamdID = {};
 
@@ -83,35 +85,33 @@ async function joinGameIfPossible(req, res, next) {
     debugPrinter.printMiddleware(joinGameIfPossible.name);
 
     // Is the game active (Is the game being played)
-    if (await intermediateGameUno.checkIfGameIsActive(req.game.game_id)) {
+    if (await gameUno.checkIfGameIsActive(req.game.game_id)) {
         debugPrinter.printDebug('GAME IS ACTIVE');
         utilCommon.reqSessionMessageHandler(req, 'failure', 'Game is active');
 
         res.redirect('back');
-        return;
+    } else {
+        // Get player of the user if they are already in the game
+        const player = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(req.game.game_id, req.user.user_id);
+
+        debugPrinter.printDebug(player);
+
+        // If the user is a player in the game
+        if (player) {
+            debugPrinter.printDebug('PLAYER IS ALREADY IN THE GAME');
+            // utilCommon.reqSessionMessageHandler(req, 'success', 'Welcome back');
+
+            next();
+        } else {
+            const result = await intermediateGameUno.joinGameWrapped(req.game.game_id, req.user.user_id);
+            utilCommon.reqSessionMessageHandler(req, 'success', `You have successfully joined game ${req.game.game_id}`);
+
+            debugPrinter.printDebug(`PLAYER HAS JOINED GAME: ${req.game.game_id}`);
+            debugPrinter.printDebug(result);
+
+            next();
+        }
     }
-
-    // Get player of the user if they are already in the game
-    const player = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(req.game.game_id, req.user.user_id);
-
-    debugPrinter.printDebug(player);
-
-    // If the user is a player in the game
-    if (player) {
-        debugPrinter.printDebug('PLAYER IS ALREADY IN THE GAME');
-        // utilCommon.reqSessionMessageHandler(req, 'success', 'Welcome back');
-
-        next();
-        return;
-    }
-
-    const result = await intermediateGameUno.joinGame(req.game.game_id, req.user.user_id);
-    utilCommon.reqSessionMessageHandler(req, 'success', `You have successfully join game ${req.game.game_id}`);
-
-    debugPrinter.printDebug(`PLAYER HAS JOINED GAME: ${req.game.game_id}`);
-    debugPrinter.printDebug(result);
-
-    next();
 }
 
 middlewareGameUnoGamdID.joinGameIfPossible = joinGameIfPossible;

@@ -2,9 +2,9 @@
 Handle all the game api calls
 
  */
-const intermediateGameUno = require('./intermediate_game_uno');
+const gameUno = require('./game_uno');
 
-const handlerGameUno = require('./handler_game_uno');
+const intermediateGameUno = require('./intermediate_game_uno');
 
 const connectionContainer = require('../server/server');
 
@@ -136,10 +136,9 @@ controllerGameID.GETGetHand = GETGetHand;
 async function POSTLeaveGame(req, res, next) {
     debugPrinter.printMiddleware(POSTLeaveGame.name);
 
-    const result = await intermediateGameUno.leaveGame(req.game.game_id, req.user.user_id);
-    debugPrinter.printDebug(result);
+    const result = await intermediateGameUno.joinGameWrapped(req.game.game_id, req.user.user_id);
 
-    await intermediateSocketIOGameUno.emitInRoomSeverIndexGames(),
+    debugPrinter.printDebug(result);
 
     res.json(result);
 }

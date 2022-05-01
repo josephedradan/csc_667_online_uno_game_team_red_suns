@@ -4,9 +4,10 @@ const dbEngine = require('./db_engine');
 const passwordHandler = require('./handler_password');
 
 const debugPrinter = require('../util/debug_printer');
+const gameUno = require('./game_uno');
 const intermediateGameUno = require('./intermediate_game_uno');
-const handlerGameUno = require('./handler_game_uno');
 const utilCommon = require('./util_common');
+const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');
 
 /* ############################################################################################################## */
 
@@ -61,7 +62,7 @@ async function GETIndex(req, res, next) {
     debugPrinter.printMiddleware(GETIndex.name);
     debugPrinter.printBlue(req.user);
 
-    const gamesWithPlayersRows = await intermediateGameUno.getGamesAndTheirPlayers();
+    const gamesWithPlayersRows = await gameUno.getGamesAndTheirPlayers();
 
     debugPrinter.printBackendRed(JSON.stringify(gamesWithPlayersRows, null, 2));
 
@@ -161,14 +162,13 @@ controllerIndex.POSTRegistration = POSTRegistration;
 async function POSTCreateGame(req, res, next) {
     debugPrinter.printMiddleware(POSTCreateGame.name);
 
-    const result = await handlerGameUno.createGameWrapped(req.user.user_id);
+    const result = await intermediateGameUno.createGameWrapped(req.user.user_id);
 
     if (!result) {
         utilCommon.reqSessionMessageHandler(req, 'failure', 'Game failed to be created');
         res.redirect('back');
     } else {
         utilCommon.reqSessionMessageHandler(req, 'success', `Game id ${result.game_id} created`);
-
         res.redirect(result.game_url);
     }
 }
