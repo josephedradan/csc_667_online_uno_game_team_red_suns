@@ -109,15 +109,16 @@ async function POSTSendMessage(req, res, next) {
 
     const { message } = req.body;
 
-    const result = await dbEngineMessage.createMessageRow(
+    const messageRow = await dbEngineMessage.createMessageRow(
         req.game.game_id,
         req.player.player_id,
         message,
     );
 
-    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageClient(req.game.game_id, result);
+    // Emit client message to everyone in the room
+    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageClient(req.game.game_id, messageRow);
 
-    res.json(result);
+    res.json(messageRow);
 }
 
 controllerGameID.POSTSendMessage = POSTSendMessage;
@@ -136,7 +137,7 @@ controllerGameID.GETGetHand = GETGetHand;
 async function POSTLeaveGame(req, res, next) {
     debugPrinter.printMiddleware(POSTLeaveGame.name);
 
-    const result = await intermediateGameUno.joinGameWrapped(req.game.game_id, req.user.user_id);
+    const result = await intermediateGameUno.leaveGameWrapped(req.game.game_id, req.user.user_id);
 
     debugPrinter.printDebug(result);
 

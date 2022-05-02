@@ -11,21 +11,6 @@ const debugPrinter = require('../util/debug_printer');
 
 const gameUno = {};
 
-// async function createPlayer(user_id) {
-//     debugPrinter.printFunction(createPlayer.name);
-//     return dbEngineGameUno.createPlayerRow(user_id);
-// }
-//
-// gameUno.createPlayer = createPlayer;
-//
-// async function addPlayerToGame(game_id, player_id, is_host) {
-//     debugPrinter.printFunction(addPlayerToGame.name);
-//
-//     return dbEngineGameUno.createPlayersRow(game_id, player_id, is_host);
-// }
-//
-// gameUno.addPlayerToGame = addPlayerToGame;
-
 /**
  * Get All games and the players in those games
  *
@@ -65,7 +50,7 @@ gameUno.getGamesAndTheirPlayers = getGamesAndTheirPlayersSimple;
 async function getGameAndTheirPlayersByGameIDDetailed(game_id) {
     debugPrinter.printFunction(getGameAndTheirPlayersByGameIDDetailed.name);
 
-    // May be undefined
+    // Might be undefined
     const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
 
     // If Game Row does not exist
@@ -96,7 +81,7 @@ gameUno.getGameAndTheirPlayersByGameIDDetailed = getGameAndTheirPlayersByGameIDD
 async function checkIfGameIsActive(game_id) {
     debugPrinter.printFunction(checkIfGameIsActive.name);
 
-    // May be undefined
+    // Might be undefined
     const result = await dbEngineGameUno.getGameRowByGameIDSimple(game_id);
 
     if (!result) {
@@ -108,11 +93,26 @@ async function checkIfGameIsActive(game_id) {
 
 gameUno.checkIfGameIsActive = checkIfGameIsActive;
 
+/*
+Return format
+{
+    status
+    message
+    player
+{
+ */
 /**
  * Join a game
  *
  * Notes:
  *      This function is dependent on if the db is successful
+ *
+ *      Return format:
+ *      {
+ *          status
+ *          message
+ *          player
+ *      {
  *
  * @param game_id
  * @param user_id
@@ -121,24 +121,51 @@ gameUno.checkIfGameIsActive = checkIfGameIsActive;
 async function joinGame(game_id, user_id) {
     debugPrinter.printFunction(joinGame.name);
 
-    debugPrinter.printRed(`${game_id} ${user_id}`);
+    debugPrinter.printDebug(`game_id: ${game_id} user_id: ${user_id}`);
 
-    // May be undefined
-    const playerRow = await dbEngineGameUno.createPlayerRowAndCreatePlayersRow(user_id, game_id, false);
+    const result = {
+        status: null,
+        message: null,
+        player: null,
+    };
+
+    // Get player given game_id and user_id (Might be undefined)
+    const playerRowTemp = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
+
+    // If player is exists for the user for the game
+    if (playerRowTemp) {
+        result.status = 'failure';
+        result.message = `Player already exists in game ${game_id}`;
+        result.player = playerRowTemp;
+        return result;
+    }
+
+    // Create Player (Might be undefined)
+    const playerRowNew = await dbEngineGameUno.createPlayerRowAndCreatePlayersRow(user_id, game_id);
 
     // If player row was not made
-    if (!playerRow) {
-        return null;
+    if (!playerRowNew) {
+        debugPrinter.printError('COULD NOT MAKE NEW PLAYER ROW');
+        result.status = 'failure';
+        result.message = `Something went wrong on the server for game ${game_id}`;
+        return result;
     }
 
-    // This should return more info about the player, May be undefined
-    const playerRowDetailed = dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
+    // This should return more info about the player, Might be undefined
+    const playerRowDetailed = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
 
     if (!playerRowDetailed) {
-        return null;
+        debugPrinter.printError('COULD NOT GET PLAYER ROW DETAILED');
+        result.status = 'failure';
+        result.message = `Something went wrong on the server for game ${game_id}`;
+        return result;
     }
 
-    return playerRowDetailed;
+    result.status = 'success';
+    result.message = `Player ${playerRowDetailed.player_id} was made for game ${game_id}`;
+    result.player = playerRowDetailed;
+
+    return result;
 }
 
 gameUno.joinGame = joinGame;
@@ -149,6 +176,13 @@ gameUno.joinGame = joinGame;
  * Notes:
  *      This function is dependent on if the db is successful
  *
+ *      Return format:
+ *      {
+ *          status
+ *          message
+ *          player
+ *      {
+ *
  * @param game_id
  * @param user_id
  * @returns {Promise<*>}
@@ -156,25 +190,46 @@ gameUno.joinGame = joinGame;
 async function leaveGame(game_id, user_id) {
     debugPrinter.printFunction(leaveGame.name);
 
-    // May be undefined
+    const result = {
+        status: null,
+        message: null,
+        player: null,
+    };
+
+    const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
+
+    if (!gameRow) {
+        result.status = 'failure';
+        result.message = `${game_id} does not exist`;
+        return result;
+    }
+
+    // Might be undefined
     const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
 
     // If playerRow does not exist
     if (!playerRow) {
-        return null;
+        result.status = 'failure';
+        result.message = `Player ${playerRow.player_id} does not exist for game ${game_id}`;
+        return result;
     }
 
-    let result;
+    let resultDB;
 
-    if (playerRow.is_host) {
+    if (playerRow.player_id === gameRow.player_id_host) {
         // May be empty
-        result = await dbEngineGameUno.deleteGameRow(game_id);
+        resultDB = await dbEngineGameUno.deleteGameRow(game_id); // Will also delete players in game
+        result.message = `Player ${playerRow.player_id} was removed from game ${game_id} and game ${game_id} was removed`;
     } else {
         // May be empty
-        result = await dbEngineGameUno.deletePlayerRowByPlayerID(playerRow.player_id);
+        resultDB = await dbEngineGameUno.deletePlayerRowByPlayerID(playerRow.player_id);
+        result.message = `Player ${playerRow.player_id} was removed from game ${game_id}`;
     }
 
-    return result;
+    result.status = 'success';
+    result.player = playerRow;
+
+    return resultDB;
 }
 
 gameUno.leaveGame = leaveGame;
@@ -226,16 +281,16 @@ async function createGame(user_id) {
 
     // WARNING: DANGEROUS AND NOT ACID PROOF
 
-    const player = await dbEngineGameUno.createPlayerRow(user_id);
-    debugPrinter.printDebug(player);
+    const playerRow = await dbEngineGameUno.createPlayerRow(user_id);
+    debugPrinter.printDebug(playerRow);
 
-    const game = await dbEngineGameUno.createGameRow();
-    debugPrinter.printDebug(game);
+    const gameRow = await dbEngineGameUno.createGameRow(playerRow.player_id);
+    debugPrinter.printDebug(gameRow);
 
-    const players = await dbEngineGameUno.createPlayersRow(game.game_id, player.player_id, true);
-    debugPrinter.printDebug(players);
+    const playersRow = await dbEngineGameUno.createPlayersRow(gameRow.game_id, playerRow.player_id);
+    debugPrinter.printDebug(playersRow);
 
-    const cardStateRows = await dbEngineGameUno.createCardStateRowsAndCardsRows(game.game_id, 2);
+    const cardStateRows = await dbEngineGameUno.createCardStateRowsAndCardsRows(gameRow.game_id, 2);
     debugPrinter.printDebug(cardStateRows);
 
     // TODO: ADDING TO THE Collection IS NOT WRITTEN, WRITE THE ALGO TO SHUFFLE THE CARDS IN THE DECk
@@ -245,9 +300,9 @@ async function createGame(user_id) {
     const collection = await Promise.all(cardStateRowsShuffled.map((element, index) => dbEngineGameUno.createCollectionRow(cardStateRowsShuffled[index].card_state_id, 1, index)));
 
     return {
-        player,
-        game,
-        players,
+        player: playerRow,
+        game: gameRow,
+        players: playersRow,
         cardStateRows,
         collection,
     };
@@ -255,6 +310,9 @@ async function createGame(user_id) {
 
 // gameUno.createGame = createGame;
 
+/*
+
+ */
 /**
  * Generate the initial cards for a game
  *
@@ -269,8 +327,17 @@ async function createGame(user_id) {
  *          Create Cards Rows based on CardState.card_state_id and Game.game_id
  *          Create Collection Rows based on CardState.card_state_id and CollectionInfo.collection_info_id
  *
- * @param game_id
- * @returns {Promise<void>}
+ *
+ *      Return format:
+ *      {
+ *          player,
+ *          game,
+ *          players,
+ *          cardStateRows,
+ *      }
+ *
+ * @param user_id
+ * @param deckMultiplier
  */
 async function createGameV2(user_id, deckMultiplier) {
     debugPrinter.printFunction(createGameV2.name);
@@ -278,7 +345,7 @@ async function createGameV2(user_id, deckMultiplier) {
 
     // FIXME: WARNING: DANGEROUS, NOT ACID PROOF
 
-    // May be undefined
+    // Might be undefined
     const playerRow = await dbEngineGameUno.createPlayerRow(user_id);
     debugPrinter.printDebug(playerRow);
 
@@ -286,16 +353,16 @@ async function createGameV2(user_id, deckMultiplier) {
         return null;
     }
 
-    // May be undefined
-    const gameRow = await dbEngineGameUno.createGameRow();
+    // Might be undefined
+    const gameRow = await dbEngineGameUno.createGameRow(playerRow.player_id);
     debugPrinter.printDebug(gameRow);
 
     if (!gameRow) {
         return null;
     }
 
-    // May be undefined
-    const playersRow = await dbEngineGameUno.createPlayersRow(gameRow.game_id, playerRow.player_id, true);
+    // Might be undefined
+    const playersRow = await dbEngineGameUno.createPlayersRow(gameRow.game_id, playerRow.player_id);
     debugPrinter.printDebug(playersRow);
 
     if (!playersRow) {
@@ -333,13 +400,13 @@ Notes:
         is_active,
         player_id_current_turn,
         is_clockwise,
+        player_id_host,
     },
     players:
         [
             {
                 display_name,
                 game_id,
-                is_host,
                 num_loss,
                 num_wins,
                 player_id,
@@ -367,7 +434,7 @@ Notes:
  * @returns {Promise<{game: *, players: *}>}
  */
 async function getGameState(game_id) {
-    // May be undefined
+    // Might be undefined
     const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
 
     // If Game Row does not exist
@@ -399,3 +466,5 @@ module.exports = gameUno;
 // TODO SET CURRENT TURN PLAYER ID
 // TODO SET CLOCKWISE
 // TODO CHANGE HOST
+
+// TODO SWITCH GAME STATE TO ACTIVE WHEN GAME STARTED

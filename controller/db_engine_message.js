@@ -41,9 +41,16 @@ async function getMessageRowsByGameID(game_id) {
     debugPrinter.printFunction(getMessageRowsByGameID.name); // TODO FIX THIS ONE TOO LIKE THE ABOVE FOR THE SPECIFIC STUFF TO RETURN
     const result = await db.any(
         `
-        SELECT * 
-        From "Message"
-        WHERE "Message".game_id = $1
+        SELECT 
+            "Player".player_id, 
+            messageRow.message_id, 
+            messageRow.game_id, 
+            messageRow.message, 
+            messageRow.time_stamp, 
+            "User".display_name 
+        FROM "Player"
+        JOIN "Message" ON "Player".player_id="Message".player_id
+        JOIN "User" ON "Player".user_id="User".user_id;
         `,
         [game_id],
     );

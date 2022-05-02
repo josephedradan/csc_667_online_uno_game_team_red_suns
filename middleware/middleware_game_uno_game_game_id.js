@@ -87,30 +87,14 @@ async function joinGameIfPossible(req, res, next) {
     // Is the game active (Is the game being played)
     if (await gameUno.checkIfGameIsActive(req.game.game_id)) {
         debugPrinter.printDebug('GAME IS ACTIVE');
+
         utilCommon.reqSessionMessageHandler(req, 'failure', 'Game is active');
 
         res.redirect('back');
     } else {
-        // Get player of the user if they are already in the game
-        const player = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(req.game.game_id, req.user.user_id);
+        const playerObject = await intermediateGameUno.joinGameWrapped(req.game.game_id, req.user.user_id);
 
-        debugPrinter.printDebug(player);
-
-        // If the user is a player in the game
-        if (player) {
-            debugPrinter.printDebug('PLAYER IS ALREADY IN THE GAME');
-            // utilCommon.reqSessionMessageHandler(req, 'success', 'Welcome back');
-
-            next();
-        } else {
-            const result = await intermediateGameUno.joinGameWrapped(req.game.game_id, req.user.user_id);
-            utilCommon.reqSessionMessageHandler(req, 'success', `You have successfully joined game ${req.game.game_id}`);
-
-            debugPrinter.printDebug(`PLAYER HAS JOINED GAME: ${req.game.game_id}`);
-            debugPrinter.printDebug(result);
-
-            next();
-        }
+        next();
     }
 }
 

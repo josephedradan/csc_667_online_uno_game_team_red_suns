@@ -35,6 +35,22 @@ module.exports = {
                 unique: true, // Enforce rule to prevent the same player from playing in multiple games
             },
 
+            /*
+            Host of the game
+
+            Notes:
+                Host of the game
+             */
+            player_id_host: {
+                type: Sequelize.DataTypes.INTEGER,
+                references: {
+                    model: 'Player',
+                    key: 'player_id',
+                },
+                allowNull: true, // Allow games to have no host which would allow for more expandability later on
+                unique: true, // Enforce rule to prevent the same player from being a host for multiple games
+            },
+
             is_clockwise: {
                 type: Sequelize.DataTypes.BOOLEAN,
                 defaultValue: true,

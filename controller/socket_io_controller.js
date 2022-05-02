@@ -97,20 +97,20 @@ async function initialSocketJoin(socket) {
                 // eslint-disable-next-line no-param-reassign
                 socket.request.game_id = game_id_client;
 
-                const resultPlayerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(
+                const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(
                     socket.request.game_id,
                     socket.request.user.user_id,
                 );
 
                 // If Player Row exists
-                if (resultPlayerRow) {
-                    // debugPrinter.printBackendRed(resultPlayerRow);
+                if (playerRow) {
+                    // debugPrinter.printBackendRed(playerRow);
 
                     // Assign player_id to socket.request.player_id
                     // eslint-disable-next-line no-param-reassign
-                    socket.request.player_id = resultPlayerRow.player_id;
+                    socket.request.player_id = playerRow.player_id;
 
-                    const user_recent = await dbEngineGameUno.getUserByPlayerID(resultPlayerRow.player_id);
+                    const user_recent = await dbEngineGameUno.getUserByPlayerID(playerRow.player_id);
 
                     await Promise.all(
                         [
@@ -133,9 +133,13 @@ async function initialSocketJoin(socket) {
         // If the user is a player in the game and disconnects         // TODO MOVE THIS
         socket.on('disconnect', async (reason) => {
             debugPrinter.printRed('DISCONNECT');
+
+            // If socket has the game_id and socket has the player_id
             if (socket.request.game_id && socket.request.player_id) {
+                // get user
                 const user_recent = await dbEngineGameUno.getUserByPlayerID(socket.request.player_id);
 
+                // get game
                 const game_current = await dbEngineGameUno.getGameRowByGameIDDetailed(socket.request.game_id);
 
                 // If user exists and game exists

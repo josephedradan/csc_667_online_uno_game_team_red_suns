@@ -118,21 +118,19 @@ dbEngineGameUno.createPlayerRow = createPlayerRow;
  *
  * @param game_id
  * @param player_id
- * @param is_host
  * @returns {Promise<any>}
  */
-async function createPlayersRow(game_id, player_id, is_host) {
+async function createPlayersRow(game_id, player_id) {
     debugPrinter.printFunction(createPlayersRow.name);
     const result = await db.any(
         `
-        INSERT INTO "Players" (game_id, player_id, is_host) 
-        VALUES ($1, $2, $3)
+        INSERT INTO "Players" (game_id, player_id) 
+        VALUES ($1, $2)
         RETURNING *;
         `,
         [
             game_id,
             player_id,
-            is_host,
         ],
     );
 
@@ -141,7 +139,7 @@ async function createPlayersRow(game_id, player_id, is_host) {
 
 dbEngineGameUno.createPlayersRow = createPlayersRow;
 
-async function createPlayerRowAndCreatePlayersRow(user_id, game_id, is_host) {
+async function createPlayerRowAndCreatePlayersRow(user_id, game_id) {
     debugPrinter.printFunction(createPlayerRow.name);
     const result = await db.any(
         `
@@ -150,8 +148,8 @@ async function createPlayerRowAndCreatePlayersRow(user_id, game_id, is_host) {
             VALUES ($1)
             RETURNING *
         ), playersRow AS(
-            INSERT INTO "Players" (game_id, player_id, is_host) 
-            SELECT $2, playerRow.player_id, $3
+            INSERT INTO "Players" (game_id, player_id) 
+            SELECT $2, playerRow.player_id
             FROM playerRow
             RETURNING *
         )
@@ -160,7 +158,7 @@ async function createPlayerRowAndCreatePlayersRow(user_id, game_id, is_host) {
         JOIN playersRow ON playerRow.player_id = playersRow.player_id
         `,
         [
-            user_id, game_id, is_host,
+            user_id, game_id,
         ],
     );
 
@@ -182,13 +180,17 @@ dbEngineGameUno.createPlayerRowAndCreatePlayersRow = createPlayerRowAndCreatePla
  * @param user_id
  * @returns {Promise<any>}
  */
-async function createGameRow() {
+async function createGameRow(player_id_host) {
     debugPrinter.printFunction(createGameRow.name);
     const result = await db.any(
         `
-        INSERT INTO "Game" DEFAULT VALUES
+        INSERT INTO "Game" (player_id_host)
+        VALUES ($1)
         RETURNING *;
         `,
+        [
+            player_id_host,
+        ],
     );
 
     return result[0];
@@ -751,7 +753,7 @@ async function getGameRowByGameIDDetailed(game_id) {
     debugPrinter.printFunction(getGameRowByGameIDDetailed.name);
     const result = await db.any(
         `
-        SELECT game_id, is_active, player_id_current_turn, is_clockwise
+        SELECT game_id, is_active, player_id_current_turn, is_clockwise, player_id_host
         FROM "Game"
         WHERE "Game".game_id = $1
         `,
@@ -776,7 +778,7 @@ async function getGameRowByGameIDSimple(game_id) {
     debugPrinter.printFunction(getGameRowByGameIDSimple.name);
     const result = await db.any(
         `
-        SELECT game_id, is_active
+        SELECT game_id, is_active, player_id_host
         FROM "Game"
         WHERE "Game".game_id = $1
         `,
@@ -956,7 +958,6 @@ async function getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, u
             "Player".player_id,
             "Player".user_id,
             "Players".game_id,
-            "Players".is_host,
             "User".display_name,
             "UserStatistic".num_wins,
             "UserStatistic".num_loss
@@ -994,7 +995,6 @@ async function getPlayerRowsJoinPlayersRowJoinGameRowByGameID(game_id) {
             "Player".player_id,
             "Player".user_id,
             "Players".game_id,
-            "Players".is_host,
             "User".display_name,
             "UserStatistic".num_wins,
             "UserStatistic".num_loss

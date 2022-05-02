@@ -24,9 +24,9 @@ routerGame.get(
 
 routerGame.use(
     '/:game_id',
-    middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocals,
+    middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocalsIfPossible,
     middlewareGameUnoGameGameID.joinGameIfPossible,
-    middlewareModifyReqResGameUnoGameID.attachPlayerToRequestAndResponseLocals,
+    middlewareModifyReqResGameUnoGameID.attachPlayerToRequestAndResponseLocalsIfPossible,
 );
 
 routerGame.get('/:game_id', controllerGame.GETGameByGameId);

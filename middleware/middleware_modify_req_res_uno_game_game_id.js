@@ -33,7 +33,7 @@ async function attachGameToRequestAndResponseLocalsIfPossible(req, res, next) {
     }
 }
 
-middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocals = attachGameToRequestAndResponseLocalsIfPossible;
+middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocalsIfPossible = attachGameToRequestAndResponseLocalsIfPossible;
 
 /**
  * NOTES:
@@ -64,6 +64,6 @@ async function attachPlayerToRequestAndResponseLocalsIfPossible(req, res, next) 
     }
 }
 
-middlewareModifyReqResGameUnoGameID.attachPlayerToRequestAndResponseLocals = attachPlayerToRequestAndResponseLocalsIfPossible;
+middlewareModifyReqResGameUnoGameID.attachPlayerToRequestAndResponseLocalsIfPossible = attachPlayerToRequestAndResponseLocalsIfPossible;
 
 module.exports = middlewareModifyReqResGameUnoGameID;

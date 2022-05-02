@@ -32,12 +32,12 @@ module.exports = {
                 unique: true, // Can't have a player in different as well as in the same game multiple times
             },
 
-            // Is the player the host of the game
-            is_host: {
-                type: Sequelize.DataTypes.BOOLEAN,
-                defaultValue: false,
-                unique: false,
-            },
+            // // Is the player the host of the game (MOVED TO Game)
+            // is_host: {
+            //     type: Sequelize.DataTypes.BOOLEAN,
+            //     defaultValue: false,
+            //     unique: false,
+            // },
 
             // Is the player currently playing the game or is out of the game
             in_game: {
