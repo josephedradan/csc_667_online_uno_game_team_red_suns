@@ -139,6 +139,7 @@ async function createPlayersRow(game_id, player_id) {
 
 dbEngineGameUno.createPlayersRow = createPlayersRow;
 
+// 1 CALL ACID PROOF JOIN GAME
 async function createPlayerRowAndCreatePlayersRow(user_id, game_id) {
     debugPrinter.printFunction(createPlayerRow.name);
     const result = await db.any(
@@ -1049,20 +1050,106 @@ async function getCollectionCollectionIndexRowsByPlayerID(player_id) {
 
 dbEngineGameUno.getCollectionCollectionIndexRowsByPlayerID = getCollectionCollectionIndexRowsByPlayerID;
 
-// async function getPlayersRowsByGameID(game_id) {
-//     debugPrinter.printFunction(getPlayersRowsByGameID.name);
-//
-//     const result = await db.any(
-//         `
-//         SELECT *
-//         FROM "Players"
-//         WHERE "Players".game_id = $1
-//         `,
-//         [game_id],
-//     );
-//
-//     return result;
-// }
-// dbEngineGameUno.getPlayersRowsByGameID = getPlayersRowsByGameID;
+async function getCollectionCollectionIndexRowsByPlayerID(player_id) {
+    debugPrinter.printFunction(getCollectionCollectionIndexRowsByPlayerID.name);
+
+    const result = await db.any(
+        `
+        SELECT collection_index
+        FROM "Collection"
+        WHERE "Collection".player_id = $1
+        `,
+        [player_id],
+    );
+
+    return result;
+}
+
+dbEngineGameUno.getCollectionCollectionIndexRowsByPlayerID = getCollectionCollectionIndexRowsByPlayerID;
+
+
+async function updateGameIsActiveByGameID(game_id, boolean) {
+    debugPrinter.printFunction(updateGameIsActiveByGameID.name);
+
+    const result = await db.any(
+        `
+        UPDATE "Game"
+        SET is_active = $2
+        WHERE "Game".game_id = $1
+        RETURNING *;
+        `,
+        [
+            game_id,
+            boolean,
+        ],
+    );
+
+    return result;
+}
+
+dbEngineGameUno.updateGameIsActiveByGameID = updateGameIsActiveByGameID;
+
+async function updateGameIsClockwiseByGameID(game_id, boolean) {
+    debugPrinter.printFunction(updateGameIsClockwiseByGameID.name);
+
+    const result = await db.any(
+        `
+        UPDATE "Game"
+        SET is_clockwise = $2
+        WHERE "Game".game_id = $1
+        RETURNING *;
+        `,
+        [
+            game_id,
+            boolean,
+        ],
+    );
+
+    return result;
+}
+
+dbEngineGameUno.updateGameIsClockwiseByGameID = updateGameIsClockwiseByGameID;
+
+async function updateGamePlayerIDCurrentTurnByGameID(game_id, player_id) {
+    debugPrinter.printFunction(updateGameIsClockwiseByGameID.name);
+
+    const result = await db.any(
+        `
+        UPDATE "Game"
+        SET player_id_current_turn = $2
+        WHERE "Game".game_id = $1
+        RETURNING *;
+        `,
+        [
+            game_id,
+            player_id,
+        ],
+    );
+
+    return result;
+}
+
+dbEngineGameUno.updateGamePlayerIDCurrentTurnByGameID = updateGamePlayerIDCurrentTurnByGameID;
+
+async function updateGamePlayerIDHostByGameID(game_id, player_id) {
+    debugPrinter.printFunction(updateGameIsClockwiseByGameID.name);
+
+    const result = await db.any(
+        `
+        UPDATE "Game"
+        SET player_id_host = $2
+        WHERE "Game".game_id = $1
+        RETURNING *;
+        `,
+        [
+            game_id,
+            player_id,
+        ],
+    );
+
+    return result;
+}
+
+dbEngineGameUno.updateGamePlayerIDHostByGameID = updateGamePlayerIDHostByGameID;
 
 module.exports = dbEngineGameUno;

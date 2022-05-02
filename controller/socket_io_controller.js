@@ -114,12 +114,9 @@ async function initialSocketJoin(socket) {
 
                     await Promise.all(
                         [
-                            intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServer(
+                            intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServerWrapped(
                                 socket.request.game_id,
-                                {
-                                    display_name: 'Server',
-                                    message: `${user_recent.display_name} has joined.`,
-                                },
+                                `${user_recent.display_name} has joined.`,
                             ),
                             intermediateSocketIOGameUno.emitInRoomSeverGameGameIDPlayers(socket.request.game_id),
                         ],
@@ -148,23 +145,19 @@ async function initialSocketJoin(socket) {
 
                     // If the game is active, then the player can rejoin
                     if (game_current.is_active) {
-                        emitInRoomSeverMessage = intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServer(
+                        emitInRoomSeverMessage = intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServerWrapped(
                             socket.request.game_id,
-                            {
-                                display_name: 'Server',
-                                message: `${user_recent.display_name} has left (They can rejoin).`,
-                            },
+                            `${user_recent.display_name} has left (They can rejoin).`,
+
                         );
                     } else {
                         // Make the player leave the game
                         await intermediateGameUno.leaveGameWrapped(socket.request.game_id, socket.request.user.user_id);
 
-                        emitInRoomSeverMessage = intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServer(
+                        emitInRoomSeverMessage = intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServerWrapped(
                             socket.request.game_id,
-                            {
-                                display_name: 'Server',
-                                message: `${user_recent.display_name} has left.`,
-                            },
+                            `${user_recent.display_name} has left.`,
+
                         );
                     }
 

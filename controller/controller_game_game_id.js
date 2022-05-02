@@ -37,7 +37,7 @@ async function POSTPlayCard(req, res, next) {
 
     res.json({
         status: 'success',
-        message: 'you played a card',
+        message: 'you played a card (CHANGE ME)', // TODO CHANGE ME
     });
 }
 
@@ -48,39 +48,28 @@ async function GETDrawCard(req, res, next) {
 
     res.json({
         status: 'success',
-        message: 'you drew a card',
+        message: 'you drew a card (CHANGE ME)', // TODO CHANGE ME
     });
 }
 
 controllerGameID.GETDrawCard = GETDrawCard;
 
 async function POSTStartGame(req, res, next) {
-    // TODO: SOCKET HERE
+    // If game is not active, make it active
 
-    res.json({
-        status: 'success',
-        message: 'game started',
-    });
+    const gameState = await intermediateGameUno.startGameWrapped(req.game.game_id, req.player.player_id);
+
+    res.json(gameState);
 }
 
 controllerGameID.POSTStartGame = POSTStartGame;
 
-async function GETAllGames(req, res, next) {
-    debugPrinter.printMiddleware(GETAllGames.name);
-
-    const result = await dbEngineGameUno.getGameRowsSimple();
-
-    res.json(result);
-}
-
-controllerGameID.GETAllGames = GETAllGames;
-
 async function GETAllMessages(req, res, next) {
     debugPrinter.printMiddleware(GETAllMessages.name);
 
-    const result = await dbEngineMessage.getMessageRowsByGameID(req.game.game_id);
+    const messageRows = await dbEngineMessage.getMessageRowsByGameID(req.game.game_id);
 
-    res.json(result);
+    res.json(messageRows);
 }
 
 controllerGameID.GETAllMessages = GETAllMessages;
@@ -96,6 +85,8 @@ controllerGameID.GETAllMessages = GETAllMessages;
 async function GETCurrentGame(req, res, next) {
     debugPrinter.printMiddleware(GETCurrentGame.name);
 
+    // TODO: CHANGE ME TO GAME STATE OR SOMETHING IDK
+
     const result = await dbEngineGameUno.getGameRowByGameIDSimple(req.game.game_id);
     debugPrinter.printDebug(result);
 
@@ -107,16 +98,13 @@ controllerGameID.GETCurrentGame = GETCurrentGame;
 async function POSTSendMessage(req, res, next) {
     debugPrinter.printMiddleware(POSTSendMessage.name);
 
-    const { message } = req.body;
+    const { message } = req.body; // TODO NO VALIDATION BY THE WAY
 
-    const messageRow = await dbEngineMessage.createMessageRow(
+    const messageRow = await intermediateGameUno.sendMessageWrapped(
         req.game.game_id,
         req.player.player_id,
         message,
     );
-
-    // Emit client message to everyone in the room
-    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageClient(req.game.game_id, messageRow);
 
     res.json(messageRow);
 }
@@ -127,6 +115,7 @@ async function GETGetHand(req, res, next) {
     debugPrinter.printMiddleware(GETGetHand.name);
 
     const result = await dbEngineGameUno.getCollectionByPlayerID(req.player.player_id);
+
     debugPrinter.printDebug(result);
 
     res.json(result);

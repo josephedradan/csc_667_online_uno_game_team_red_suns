@@ -33,6 +33,17 @@ async function emitInRoomSeverGameGameIDPlayers(game_id) {
 
 intermediateSocketIOGameUno.emitInRoomSeverGameGameIDPlayers = emitInRoomSeverGameGameIDPlayers;
 
+/*
+
+{
+    message_id,
+    game_id,
+    player_id,
+    message,
+    time_stamp,
+
+}
+ */
 async function emitInRoomSeverGameGameIDMessageClient(game_id, messageObject) {
     debugPrinter.printFunction(emitInRoomSeverGameGameIDMessageClient.name);
 
@@ -44,6 +55,13 @@ async function emitInRoomSeverGameGameIDMessageClient(game_id, messageObject) {
 
 intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageClient = emitInRoomSeverGameGameIDMessageClient;
 
+/*
+
+{
+    display_name,
+    massage,
+}
+ */
 // TODO: WARNING, THIS IS NOT RECORDED BY THE SERVER
 async function emitInRoomSeverGameGameIDMessageServer(game_id, messageObject) {
     debugPrinter.printFunction(emitInRoomSeverGameGameIDMessageServer.name);
@@ -56,6 +74,20 @@ async function emitInRoomSeverGameGameIDMessageServer(game_id, messageObject) {
 
 intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServer = emitInRoomSeverGameGameIDMessageServer;
 
+async function emitInRoomSeverGameGameIDMessageServerWrapped(game_id, message) {
+    debugPrinter.printFunction(emitInRoomSeverGameGameIDMessageServer.name);
+
+    return emitInRoomSeverGameGameIDMessageServer(
+        game_id,
+        {
+            display_name: 'Server',
+            message,
+        },
+    );
+}
+
+intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServerWrapped = emitInRoomSeverGameGameIDMessageServerWrapped;
+
 async function emitInRoomSeverMessage(game_id, messageObject) {
     debugPrinter.printFunction(emitInRoomSeverMessage.name);
 
@@ -66,5 +98,18 @@ async function emitInRoomSeverMessage(game_id, messageObject) {
 }
 
 intermediateSocketIOGameUno.emitInRoomSeverMessage = emitInRoomSeverMessage;
+
+async function emitInRoomSeverGameGameIDGameState(game_id) {
+    debugPrinter.printFunction(emitInRoomSeverGameGameIDGameState.name);
+
+    const gameState = await gameUno.getGameState(game_id);
+
+    io.in(game_id)
+        .emit('server-game-game-id-game-state', gameState);
+
+    return gameState;
+}
+
+intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState = emitInRoomSeverGameGameIDGameState;
 
 module.exports = intermediateSocketIOGameUno;

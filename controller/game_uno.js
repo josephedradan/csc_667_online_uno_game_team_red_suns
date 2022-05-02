@@ -23,12 +23,12 @@ async function getGamesAndTheirPlayersSimple() {
     debugPrinter.printFunction(getGamesAndTheirPlayersSimple.name);
 
     // May be empty
-    const gameRows = await dbEngineGameUno.getGameRowsSimple();
+    const gameRowsSimple = await dbEngineGameUno.getGameRowsSimple();
 
     // May be empty
-    const playerRows = await Promise.all(gameRows.map((gameRow) => dbEngineGameUno.getPlayerRowsJoinPlayersRowJoinGameRowByGameID(gameRow.game_id)));
+    const playerRows = await Promise.all(gameRowsSimple.map((gameRow) => dbEngineGameUno.getPlayerRowsJoinPlayersRowJoinGameRowByGameID(gameRow.game_id)));
 
-    const gamesWithPlayersRows = gameRows.map((row, index) => ({
+    const gamesWithPlayersRows = gameRowsSimple.map((row, index) => ({
         game: row,
         players: playerRows[index],
     }));
@@ -423,7 +423,25 @@ Notes:
             },
             ...
         ],
-    ],
+    draw:
+        [
+            {collection_index: 0},
+            {collection_index: 1},
+            {collection_index: 2},
+            {collection_index: 3},
+            {collection_index: 4},
+            ...
+        ],
+    player:
+        [
+            {collection_index: 0},
+            {collection_index: 1},
+            {collection_index: 2},
+            {collection_index: 3},
+            {collection_index: 4},
+            ...
+        ]
+
 }
  */
 
@@ -451,12 +469,18 @@ async function getGameState(game_id) {
         playerRow.collection = await dbEngineGameUno.getCollectionCollectionIndexRowsByPlayerID(playerRow.player_id);
     }
 
+
+
+
+
     // Game state
     return {
         game: gameRow,
         players: playerRows,
     };
 }
+
+gameUno.getGameState = getGameState;
 
 module.exports = gameUno;
 

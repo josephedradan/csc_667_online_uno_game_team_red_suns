@@ -9,7 +9,7 @@ const controllerGameID = require('../../controller/controller_game_game_id');
 
 const routerGameID = express.Router();
 
-routerGameID.use(middlewareGameUnoGameGameID.checkIfAllowedToUseAPI);
+routerGameID.use(middlewareGameUnoGameGameID.checkIfAllowedToUseAPI); // TODO
 routerGameID.use(middlewareGameUnoGameGameID.validateRequestBody); // FIXME: IS THIS A GENERAL REQ.BODY JOI VALIDATION, IS THIS NECESSARY?
 
 routerGameID.post(
@@ -19,7 +19,7 @@ routerGameID.post(
 
 routerGameID.get(
     '/getAllMessages',
-    controllerGameID.GETAllMessages,
+    controllerGameID.GETAllMessages, // TODO CLEAN
 );
 
 routerGameID.get(
@@ -37,6 +37,12 @@ routerGameID.post(
     controllerGameID.POSTLeaveGame,
 );
 
+routerGameID.post(
+    '/startGame',
+    middlewareGameUnoGameGameID.checkIfPlayerIDIsHost,
+    controllerGameID.POSTStartGame,
+);
+
 routerGameID.use(middlewareGameUnoGameGameID.checkIfPlayerCanDoAction); // TODO WRITE
 
 routerGameID.post(
@@ -44,14 +50,9 @@ routerGameID.post(
     controllerGameID.POSTPlayCard, // TODO WRITE AND DO JOI VALIDATION
 );
 
-routerGameID.post(
+routerGameID.get(
     '/drawCard',
     controllerGameID.GETDrawCard, // TODO
-);
-
-routerGameID.post(
-    '/startGame',
-    controllerGameID.POSTStartGame, // TODO
 );
 
 routerGameID.get(

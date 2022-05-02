@@ -55,6 +55,7 @@ middlewareGameUnoGamdID.checkIfPlayerCanDoAction = checkIfPlayerCanDoAction;
 async function checkIfAllowedToUseAPI(req, res, next) {
     // Get player of the user if they are already in the game
     const { player } = req;
+    // TODO
 
     // If the user is not a player in the game
     if (!player) {
@@ -88,7 +89,7 @@ async function joinGameIfPossible(req, res, next) {
     if (await gameUno.checkIfGameIsActive(req.game.game_id)) {
         debugPrinter.printDebug('GAME IS ACTIVE');
 
-        utilCommon.reqSessionMessageHandler(req, 'failure', 'Game is active');
+        utilCommon.reqSessionMessageHandler(req, 'failure', 'Cannot join an active game');
 
         res.redirect('back');
     } else {
@@ -99,5 +100,22 @@ async function joinGameIfPossible(req, res, next) {
 }
 
 middlewareGameUnoGamdID.joinGameIfPossible = joinGameIfPossible;
+
+async function checkIfPlayerIDIsHost(req, res, next) {
+    debugPrinter.printMiddleware(checkIfPlayerIDIsHost.name);
+
+    const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(req.game.game_id);
+
+    if (gameRow.player_id_host === req.player_id) {
+        next();
+    } else {
+        res.json({
+            status: 'failure',
+            message: 'You are not the host',
+        });
+    }
+}
+
+middlewareGameUnoGamdID.checkIfPlayerIDIsHost = checkIfPlayerIDIsHost;
 
 module.exports = middlewareGameUnoGamdID;

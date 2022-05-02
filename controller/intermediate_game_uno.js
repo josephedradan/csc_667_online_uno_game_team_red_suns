@@ -1,6 +1,8 @@
 const gameUno = require('./game_uno');
 const debugPrinter = require('../util/debug_printer');
 const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');
+const dbEngineMessage = require('./db_engine_message');
+const dbEngineGameUno = require('./db_engine_game_uno');
 
 const intermediateGameUno = {};
 
@@ -100,5 +102,49 @@ async function leaveGameWrapped(game_id, user_id) {
 }
 
 intermediateGameUno.leaveGameWrapped = leaveGameWrapped;
+
+/*
+    player_id,
+    message_id,
+    time_stamp_,
+    message,
+    display_name,
+    game_id
+
+ */
+async function sendMessageWrapped(game_id, player_id, message) {
+    debugPrinter.printFunction(sendMessageWrapped.name);
+
+    const messageRow = await dbEngineMessage.createMessageRow(
+        game_id,
+        player_id,
+        message,
+    );
+
+    // Emit client message to everyone in the room
+    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageClient(
+        game_id,
+        messageRow,
+    );
+
+    return messageRow;
+}
+
+intermediateGameUno.sendMessageWrapped = sendMessageWrapped;
+
+async function startGameWrapped(game_id, player_id) {
+    const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
+
+    // If player_id is host and if game is not active, make it active
+    if (gameRow.plyer_id_host === player_id && gameRow.is_active === false) {
+        await dbEngineGameUno.updateGameIsActiveByGameID(game_id, true);
+    }
+    // Emit the gameState to room and get gameState
+    const gameState = await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(game_id);
+
+    return gameState;
+}
+
+intermediateGameUno.startGameWrapped = startGameWrapped;
 
 module.exports = intermediateGameUno;

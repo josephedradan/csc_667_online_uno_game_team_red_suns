@@ -25,8 +25,8 @@ async function createMessageRow(game_id, player_id, message) {
             messageRow.time_stamp, 
             "User".display_name 
         FROM "Player"
-        JOIN messageRow ON "Player".player_id=messageRow.player_id
-        JOIN "User" ON "Player".user_id="User".user_id;
+        JOIN messageRow ON "Player".player_id = messageRow.player_id
+        JOIN "User" ON "Player".user_id = "User".user_id;
         `,
         [game_id, player_id, message],
     );
@@ -38,19 +38,22 @@ async function createMessageRow(game_id, player_id, message) {
 dbEngineMessage.createMessageRow = createMessageRow;
 
 async function getMessageRowsByGameID(game_id) {
-    debugPrinter.printFunction(getMessageRowsByGameID.name); // TODO FIX THIS ONE TOO LIKE THE ABOVE FOR THE SPECIFIC STUFF TO RETURN
+    debugPrinter.printFunction(getMessageRowsByGameID.name);
     const result = await db.any(
         `
         SELECT 
-            "Player".player_id, 
-            messageRow.message_id, 
-            messageRow.game_id, 
-            messageRow.message, 
-            messageRow.time_stamp, 
-            "User".display_name 
-        FROM "Player"
-        JOIN "Message" ON "Player".player_id="Message".player_id
-        JOIN "User" ON "Player".user_id="User".user_id;
+            "Players".player_id, 
+            "Message".message_id, 
+            "Message".game_id, 
+            "Message".message, 
+            "Message".time_stamp, 
+            "User".display_name
+        FROM "Players"
+        JOIN "Message" ON "Players".player_id = "Message".player_id
+        JOIN "Player"  ON "Players".player_id = "Player".player_id
+        JOIN "User" ON "Player".user_id = "User".user_id
+        JOIN "Game" ON "Players".game_id = "Game".game_id
+        WHERE "Game".game_id = $1
         `,
         [game_id],
     );
