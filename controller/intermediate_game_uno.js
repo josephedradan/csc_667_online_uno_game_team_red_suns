@@ -71,8 +71,9 @@ Return format
 async function joinGameIfPossibleWrapped(game_id, user_id) {
     debugPrinter.printFunction(joinGameIfPossibleWrapped.name);
 
-    const result = await gameUno.joinGameIfPossibleWrapped(game_id, user_id);
-    debugPrinter.printRed(result);
+    const result = await gameUno.joinGameIfPossible(game_id, user_id);
+
+    debugPrinter.printDebug(result);
 
     await Promise.all([
         intermediateSocketIOGameUno.emitInRoomSeverIndexGames(),

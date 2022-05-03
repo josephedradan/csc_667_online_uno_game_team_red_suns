@@ -118,8 +118,8 @@ Return format
  * @param user_id
  * @returns {Promise<*>}
  */
-async function joinGameIfPossibleWrapped(game_id, user_id) {
-    debugPrinter.printFunction(joinGameIfPossibleWrapped.name);
+async function joinGameIfPossible(game_id, user_id) {
+    debugPrinter.printFunction(joinGameIfPossible.name);
 
     debugPrinter.printDebug(`game_id: ${game_id} user_id: ${user_id}`);
 
@@ -130,13 +130,22 @@ async function joinGameIfPossibleWrapped(game_id, user_id) {
     };
 
     // Get player given game_id and user_id (Might be undefined)
-    const playerRowTemp = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
+    const playerRowExists = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
 
     // If player is exists for the user for the game
-    if (playerRowTemp) {
+    if (playerRowExists) {
         result.status = 'failure';
         result.message = `Player already exists in game ${game_id}`;
-        result.player = playerRowTemp;
+        result.player = playerRowExists;
+        return result;
+    }
+
+    const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
+
+    // If game is active
+    if (gameRow.is_active) {
+        result.status = 'failure';
+        result.message = `Game ${game_id} is active`;
         return result;
     }
 
@@ -151,24 +160,24 @@ async function joinGameIfPossibleWrapped(game_id, user_id) {
         return result;
     }
 
-    // This should return more info about the player, Might be undefined
-    const playerRowDetailed = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
-
-    if (!playerRowDetailed) {
-        debugPrinter.printError('COULD NOT GET PLAYER ROW DETAILED');
-        result.status = 'failure';
-        result.message = `Something went wrong on the server for game ${game_id}`;
-        return result;
-    }
+    // // This should return more info about the player, Might be undefined
+    // const playerRowDetailed = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
+    //
+    // if (!playerRowDetailed) {
+    //     debugPrinter.printError('COULD NOT GET PLAYER ROW DETAILED');
+    //     result.status = 'failure';
+    //     result.message = `Something went wrong on the server for game ${game_id}`;
+    //     return result;
+    // }
 
     result.status = 'success';
-    result.message = `Player ${playerRowDetailed.player_id} was made for game ${game_id}`;
-    result.player = playerRowDetailed;
+    result.message = `Player ${playerRowNew.player_id} was made for game ${game_id}`;
+    result.player = playerRowNew;
 
     return result;
 }
 
-gameUno.joinGameIfPossibleWrapped = joinGameIfPossibleWrapped;
+gameUno.joinGameIfPossible = joinGameIfPossible;
 
 /**
  * Leave a game

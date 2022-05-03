@@ -85,31 +85,23 @@ middlewareGameUnoGamdID.checkIfAllowedToUseAPI = checkIfAllowedToUseAPI;
 async function joinGameIfPossible(req, res, next) {
     debugPrinter.printMiddleware(joinGameIfPossible.name);
 
-    // Is the game active (Is the game being played)
-    if (await gameUno.checkIfGameIsActive(req.game.game_id)) {
-        const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(req.player.player_id);
+    // Join game if possible
+    const responsePlayerObject = await intermediateGameUno.joinGameIfPossibleWrapped(
+        req.game.game_id,
+        req.user.user_id,
+    );
 
-        // If player already exists in game
-        if (playerRow) {
-            next();
-        } else {
-            debugPrinter.printDebug('GAME IS ACTIVE');
+    if (responsePlayerObject.player === null) {
+        debugPrinter.printRed(`${responsePlayerObject.message}`);
 
-            utilCommon.reqSessionMessageHandler(
-                req,
-                'failure',
-                'Cannot join an active game',
-            );
-
-            res.redirect('back');
-        }
-    } else {
-        // Join game if possible
-        const playerObject = await intermediateGameUno.joinGameIfPossibleWrapped(
-            req.game.game_id,
-            req.user.user_id,
+        utilCommon.reqSessionMessageHandler(
+            req,
+            responsePlayerObject.status,
+            responsePlayerObject.message,
         );
 
+        res.redirect('back');
+    } else {
         next();
     }
 }

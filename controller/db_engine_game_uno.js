@@ -154,9 +154,20 @@ async function createPlayerRowAndCreatePlayersRow(user_id, game_id) {
             FROM playerRow
             RETURNING *
         )
-        SELECT *
+        SELECT
+            playerRow.player_id,
+            playerRow.user_id,
+            playersRow.game_id,
+            "User".display_name,
+            "UserStatistic".num_wins,
+            "UserStatistic".num_loss
         FROM playerRow
         JOIN playersRow ON playerRow.player_id = playersRow.player_id
+        JOIN "Game" ON playersRow.game_id = "Game".game_id
+        JOIN "User" ON playerRow.user_id = "User".user_id
+        JOIN "UserStatistic" ON playerRow.user_id = "UserStatistic".user_id
+        WHERE playerRow.user_id = $1
+        AND "Game".game_id = $2;
         `,
         [
             user_id, game_id,
