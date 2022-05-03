@@ -118,8 +118,8 @@ Return format
  * @param user_id
  * @returns {Promise<*>}
  */
-async function joinGame(game_id, user_id) {
-    debugPrinter.printFunction(joinGame.name);
+async function joinGameIfPossibleWrapped(game_id, user_id) {
+    debugPrinter.printFunction(joinGameIfPossibleWrapped.name);
 
     debugPrinter.printDebug(`game_id: ${game_id} user_id: ${user_id}`);
 
@@ -168,7 +168,7 @@ async function joinGame(game_id, user_id) {
     return result;
 }
 
-gameUno.joinGame = joinGame;
+gameUno.joinGameIfPossibleWrapped = joinGameIfPossibleWrapped;
 
 /**
  * Leave a game
@@ -434,11 +434,18 @@ Notes:
         ],
     play:
         [
-            {collection_index: 0},
-            {collection_index: 1},
-            {collection_index: 2},
-            {collection_index: 3},
-            {collection_index: 4},
+            {
+                game_id,
+                card_info_type,
+                card_color,
+                card_content,
+                player_id: null,
+                collection_index,
+                card_state_id,
+                collection_info_id,
+                card_info_id,
+                collection_info_type,
+            },
             ...
         ]
 
@@ -479,8 +486,8 @@ async function getGameState(game_id) {
     return {
         game: gameRow,
         players: playerRows,
-        draw: drawRows,
-        play: playRows,
+        collection_draw: drawRows,
+        collection_play: playRows,
     };
 }
 

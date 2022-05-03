@@ -35,7 +35,7 @@ Return format
 async function createGameWrapped(user_id) {
     debugPrinter.printFunction(createGameWrapped.name);
 
-    const gameObject = await gameUno.createGameV2(user_id, 2);
+    const gameObject = await gameUno.createGameV2(user_id, 1); // TODO: Possibly redesign because card generation should happen when you start the game, not create a game
     debugPrinter.printBackendBlue(gameObject);
 
     // If nothing returned
@@ -68,10 +68,10 @@ Return format
     player
 {
  */
-async function joinGameWrapped(game_id, user_id) {
-    debugPrinter.printFunction(joinGameWrapped.name);
+async function joinGameIfPossibleWrapped(game_id, user_id) {
+    debugPrinter.printFunction(joinGameIfPossibleWrapped.name);
 
-    const result = await gameUno.joinGame(game_id, user_id);
+    const result = await gameUno.joinGameIfPossibleWrapped(game_id, user_id);
     debugPrinter.printRed(result);
 
     await Promise.all([
@@ -81,7 +81,7 @@ async function joinGameWrapped(game_id, user_id) {
     return result;
 }
 
-intermediateGameUno.joinGameWrapped = joinGameWrapped;
+intermediateGameUno.joinGameIfPossibleWrapped = joinGameIfPossibleWrapped;
 
 /*
 Return format
@@ -137,11 +137,7 @@ intermediateGameUno.sendMessageWrapped = sendMessageWrapped;
 
 async function startGameWrapped(game_id, player_id) {
     const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
-    console.log('GAMEROW');
-    console.log(gameRow);
-    console.log('GAMEROW');
-    console.log(`playerid  ${player_id}`);
-    console.log(`gameid ${game_id}`);
+
     // If player_id is host and if game is not active, make it active
     if (gameRow.player_id_host === player_id && gameRow.is_active === false) {
         await dbEngineGameUno.updateGameIsActiveByGameID(game_id, true);

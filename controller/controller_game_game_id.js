@@ -84,18 +84,17 @@ controllerGameID.GETAllMessages = GETAllMessages;
  * @param next
  * @returns {Promise<void>}
  */
-async function GETCurrentGame(req, res, next) {
-    debugPrinter.printMiddleware(GETCurrentGame.name);
+async function GETGameState(req, res, next) {
+    debugPrinter.printMiddleware(GETGameState.name);
 
-    // TODO: CHANGE ME TO GAME STATE OR SOMETHING IDK
+    const result = await dbEngineGameUno.getGameState(req.game.game_id);
 
-    const result = await dbEngineGameUno.getGameRowByGameIDSimple(req.game.game_id);
     debugPrinter.printDebug(result);
 
     res.json(result);
 }
 
-controllerGameID.GETCurrentGame = GETCurrentGame;
+controllerGameID.GETGameState = GETGameState;
 
 async function POSTSendMessage(req, res, next) {
     debugPrinter.printMiddleware(POSTSendMessage.name);
