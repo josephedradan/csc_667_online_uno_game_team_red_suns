@@ -162,16 +162,6 @@ async function joinGameIfPossible(game_id, user_id) {
         return result;
     }
 
-    // // This should return more info about the player, May be undefined
-    // const playerRowDetailed = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
-    //
-    // if (!playerRowDetailed) {
-    //     debugPrinter.printError('COULD NOT GET PLAYER ROW DETAILED');
-    //     result.status = 'failure';
-    //     result.message = `Something went wrong on the server for game ${game_id}`;
-    //     return result;
-    // }
-
     result.status = 'success';
     result.message = `Player ${playerRowNew.player_id} was made for game ${game_id}`;
     result.player = playerRowNew;
@@ -299,20 +289,20 @@ async function createGame(user_id) {
     const playersRow = await dbEngineGameUno.createPlayersRow(gameRow.game_id, playerRow.player_id);
     debugPrinter.printDebug(playersRow);
 
-    const cardStateRows = await dbEngineGameUno.createCardRowsAndCardsRows(gameRow.game_id, 2);
-    debugPrinter.printDebug(cardStateRows);
+    const cardRows = await dbEngineGameUno.createCardRowsAndCardsRows(gameRow.game_id, 2);
+    debugPrinter.printDebug(cardRows);
 
     // TODO: ADDING TO THE Collection IS NOT WRITTEN, WRITE THE ALGO TO SHUFFLE THE CARDS IN THE DECk
     // dbEngineGameUno.createCollectionRow(card_id, collection_info_id, collection_index);
 
-    const cardStateRowsShuffled = await shuffleArray(cardStateRows);
-    const collection = await Promise.all(cardStateRowsShuffled.map((element, index) => dbEngineGameUno.createCollectionRow(cardStateRowsShuffled[index].card_id, 1, index)));
+    const cardRowsShuffled = await shuffleArray(cardRows);
+    const collection = await Promise.all(cardRowsShuffled.map((element, index) => dbEngineGameUno.createCollectionRow(cardRowsShuffled[index].card_id, 1, index)));
 
     return {
         player: playerRow,
         game: gameRow,
         players: playersRow,
-        cardStateRows,
+        cardRows,
         collection,
     };
 }
@@ -326,29 +316,23 @@ async function createGame(user_id) {
  * Generate the initial cards for a game
  *
  * Notes:
- *      Create Player Row
- *      Create Game Row
+ *      Order:
+ *          Create Player Row
+ *          Create Game Row (Set the player_id_host of the game to the player_id of the Player row)
  *
- *      Create Players Row (Link Player Row to Game Row. The first player should be the host)
- *
- *      Create Card Rows
- *          Create Card Rows based on Card.card_id and CardInfo.card_info_id
- *          Create Cards Rows based on Card.card_id and Game.game_id
- *          Create Collection Rows based on Card.card_id and CollectionInfo.collection_info_id
- *
+ *          Create Players Row
  *
  *      Return format:
- *      {
- *          player,
- *          game,
- *          players,
- *          cardStateRows,
- *      }
+ *          {
+ *              player,
+ *              game,
+ *              players,
+ *          }
  *
  * @param user_id
  * @param deckMultiplier
  */
-async function createGameV2(user_id, deckMultiplier) {
+async function createGameV2(user_id) {
     debugPrinter.printFunction(createGameV2.name);
     debugPrinter.printDebug(user_id);
 
@@ -378,24 +362,91 @@ async function createGameV2(user_id, deckMultiplier) {
         return null;
     }
 
-    // May be empty
-    const cardStateRows = await dbEngineGameUno.createCardRowsAndCardsRowsAndCollectionRowsWithCollectionRandomized(gameRow.game_id, deckMultiplier);
-    debugPrinter.printDebug(cardStateRows);
-
-    // Basically if no rows created
-    if (!cardStateRows.length) {
-        return null;
-    }
-
     return {
         player: playerRow,
         game: gameRow,
         players: playersRow,
-        cardStateRows,
     };
 }
 
 gameUno.createGameV2 = createGameV2;
+
+/**
+ * Start the game
+ *
+ * Notes:
+ *      Order:
+ *          Get the game row
+ *          Set game to active
+ *
+ *          Create Card Rows
+ *              Create Card Rows based on Card.card_id and CardInfo.card_info_id
+ *              Create Cards Rows based on Card.card_id and Game.game_id
+ *              Create Collection Rows based on Card.card_id and CollectionInfo.collection_info_id
+ *                  (Cards are randomized)
+ *
+ * @param game_id
+ * @param player_id
+ * @returns {Promise<null|{game: null, message: null, status: null}>}
+ */
+async function startGame(game_id, player_id, deckMultiplier) {
+    debugPrinter.printFunction(startGame.name);
+
+    // TODO: Assign initial cards to players
+    // TODO: Assign player_index to players so you know the turn order
+
+    const result = {
+        status: null,
+        message: null,
+        game: null,
+        cards: null,
+    };
+
+    const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
+
+    if (!gameRow) {
+        result.status = 'failure';
+        result.message = 'Game does not exist';
+        return result;
+    }
+
+    result.game = gameRow;
+
+    if (gameRow.player_id_host !== player_id) {
+        result.status = 'failure';
+        result.message = 'player_id is not player_id_host';
+        return result;
+    }
+
+    // If player_id is host and if game is not active, make it active
+    if (gameRow.is_active === true) {
+        result.status = 'failure';
+        result.message = 'Game is already active';
+        return result;
+    }
+
+    await dbEngineGameUno.updateGameIsActiveByGameID(game_id, true);
+
+    // May be empty
+    const cardRows = await dbEngineGameUno.createCardRowsAndCardsRowsAndCollectionRowsWithCollectionRandomized(gameRow.game_id, deckMultiplier);
+    debugPrinter.printDebug(cardRows);
+
+    // Basically if cards not created
+    if (!cardRows.length) {
+        result.status = 'failure';
+        result.message = 'Game is probably broken';
+        return result;
+    }
+
+    result.cards = cardRows; // In this case, cardsRows is not cards, but cardRows is cards
+
+    result.status = 'success';
+    result.message = `Game ${game_id} is not active`;
+
+    return result;
+}
+
+gameUno.startGame = startGame;
 
 /*
 game_state
@@ -516,51 +567,15 @@ async function drawCard(game_id, player_id) { // TODO ADD MORE GUARDING AND ERRO
 
 gameUno.drawCard = drawCard;
 
-async function startGame(game_id, player_id) {
-    debugPrinter.printFunction(startGame.name);
-
-    const result = {
-        status: null,
-        message: null,
-        game: null,
-    };
-
-    const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
-
-    if (!gameRow) {
-        result.status = 'failure';
-        result.message = 'Game does not exist';
-        return result;
-    }
-
-    if (gameRow.player_id_host !== player_id) {
-        result.status = 'failure';
-        result.message = 'player_id is not player_id_host';
-        return result;
-    }
-
-    // If player_id is host and if game is not active, make it active
-    if (gameRow.is_active === true) {
-        result.status = 'failure';
-        result.message = 'Game is already active';
-        return result;
-    }
-
-    await dbEngineGameUno.updateGameIsActiveByGameID(game_id, true);
-
-    result.status = 'success';
-    result.message = `Game ${game_id} is not active`;
-    result.game = gameRow;
-
-    return result;
-}
-
-gameUno.startGame = startGame;
-
 module.exports = gameUno;
 
 // TODO REASSIGN player_index WHEN A PLAYER IS OUT. BASCIALLY WHEN THEY CALLED UNO AND THEY ARE NOT A PLAYER IN THE ACTUAL PLAYING OF THE GAME
-// TODO HANDLE PLAYER TURNS
 // TODO SET CURRENT TURN PLAYER ID
 // TODO SET CLOCKWISE
 // TODO CHANGE HOST
+// TODO some route about calling Uno
+
+/// //////////
+// TODO Automatic Change Host when main host leaves
+// TODO ON Start game ASSIGN PLAYER INDEX
+// TODO Automatically change player turn

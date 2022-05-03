@@ -288,7 +288,7 @@ async function createCardRowsAndCardsRows(game_id, deckMultiplier) {
     debugPrinter.printFunction(createCardRowsAndCardsRows.name);
     const result = await db.any(
         `
-        WITH cardStateRows AS (
+        WITH cardRows AS (
             INSERT INTO "Card" (card_info_id)
             SELECT temp.card_info_id
             FROM (
@@ -299,16 +299,16 @@ async function createCardRowsAndCardsRows(game_id, deckMultiplier) {
             RETURNING *
         ), cardsRows AS(
             INSERT INTO "Cards" (game_id, card_id)
-            SELECT $2, cardStateRows.card_id
-            FROM cardStateRows
+            SELECT $2, cardRows.card_id
+            FROM cardRows
             RETURNING *
         )
         SELECT 
             cardsRows.game_id, 
-            cardStateRows.card_id, 
-            cardStateRows.card_info_id
+            cardRows.card_id, 
+            cardRows.card_info_id
         FROM cardsRows
-        LEFT JOIN cardStateRows ON cardsRows.card_id = cardStateRows.card_id;
+        LEFT JOIN cardRows ON cardsRows.card_id = cardRows.card_id;
         `,
         [
             deckMultiplier,
@@ -373,7 +373,7 @@ async function createCardRowsAndCardsRowsAndCollectionRows(game_id, deckMultipli
     debugPrinter.printFunction(createCardRowsAndCardsRows.name);
     const result = await db.any(
         `
-        WITH cardStateRows AS (
+        WITH cardRows AS (
             INSERT INTO "Card" (card_info_id)
             SELECT temp.card_info_id
             FROM (
@@ -385,23 +385,23 @@ async function createCardRowsAndCardsRowsAndCollectionRows(game_id, deckMultipli
         ), collectionRows AS (
             INSERT INTO "Collection" (card_id, collection_info_id, collection_index)
             SELECT card_id, 1, 0
-            FROM cardStateRows
+            FROM cardRows
             RETURNING *
         ), cardsRows AS(
             INSERT INTO "Cards" (game_id, card_id)
-            SELECT $1, cardStateRows.card_id
-            FROM cardStateRows
+            SELECT $1, cardRows.card_id
+            FROM cardRows
             RETURNING *
         )
         SELECT 
             cardsRows.game_id, 
-            cardStateRows.card_id, 
-            cardStateRows.card_info_id, 
+            cardRows.card_id, 
+            cardRows.card_info_id, 
             collectionRows.collection_info_id, 
             collectionRows.player_id,
             collectionRows.collection_index
         FROM cardsRows
-        LEFT JOIN cardStateRows ON cardsRows.card_id = cardStateRows.card_id
+        LEFT JOIN cardRows ON cardsRows.card_id = cardRows.card_id
         LEFT JOIN collectionRows ON cardsRows.card_id = collectionRows.card_id;
         `,
         [
@@ -435,7 +435,7 @@ async function createCardRowsAndCardsRowsAndCollectionRowsWithCollectionRandomiz
     debugPrinter.printFunction(createCardRowsAndCardsRows.name);
     const result = await db.any(
         `
-        WITH cardStateRows AS (
+        WITH cardRows AS (
             INSERT INTO "Card" (card_info_id)
             SELECT temp.card_info_id
             FROM (
@@ -444,33 +444,33 @@ async function createCardRowsAndCardsRowsAndCollectionRowsWithCollectionRandomiz
                 CROSS JOIN generate_series(1, $2)
                 ) AS temp
             RETURNING *
-        ), cardStateRowsRandom AS(
+        ), cardRowsRandom AS(
             SELECT *
-            FROM cardStateRows
+            FROM cardRows
             ORDER BY RANDOM()
-        ), cardStateRowsRandomWithRow AS(
+        ), cardRowsRandomWithRow AS(
             SELECT *, ROW_NUMBER() OVER() AS row_number
-            FROM cardStateRowsRandom
+            FROM cardRowsRandom
         ), collectionRows AS (
             INSERT INTO "Collection" (card_id, collection_info_id, collection_index)
-            SELECT card_id, 1, cardStateRowsRandomWithRow.row_number - 1
-            FROM cardStateRowsRandomWithRow
+            SELECT card_id, 1, cardRowsRandomWithRow.row_number - 1
+            FROM cardRowsRandomWithRow
             RETURNING *
         ), cardsRows AS(
             INSERT INTO "Cards" (game_id, card_id)
-            SELECT $1, cardStateRows.card_id
-            FROM cardStateRows
+            SELECT $1, cardRows.card_id
+            FROM cardRows
             RETURNING *
         )
         SELECT 
             cardsRows.game_id, 
-            cardStateRows.card_id, 
-            cardStateRows.card_info_id, 
+            cardRows.card_id, 
+            cardRows.card_info_id, 
             collectionRows.collection_info_id, 
             collectionRows.player_id,
             collectionRows.collection_index
         FROM cardsRows
-        LEFT JOIN cardStateRows ON cardsRows.card_id = cardStateRows.card_id
+        LEFT JOIN cardRows ON cardsRows.card_id = cardRows.card_id
         LEFT JOIN collectionRows ON cardsRows.card_id = collectionRows.card_id
         ORDER BY collectionRows.collection_index;
         `,

@@ -19,7 +19,7 @@ Return format
     player,
     game,
     players,
-    cardStateRows,
+    cardRows,
     game_url,
 }
  */
@@ -35,7 +35,7 @@ Return format
 async function createGameWrapped(user_id) {
     debugPrinter.printFunction(createGameWrapped.name);
 
-    const gameObject = await gameUno.createGameV2(user_id, 1); // TODO: Possibly redesign because card generation should happen when you start the game, not create a game
+    const gameObject = await gameUno.createGameV2(user_id); // TODO: Possibly redesign because card generation should happen when you start the game, not create a game
     debugPrinter.printBackendBlue(gameObject);
 
     // If nothing returned
@@ -154,7 +154,7 @@ Return format
 }
  */
 async function startGameWrapped(game_id, player_id) {
-    const result = await gameUno.startGame(game_id, player_id);
+    const result = await gameUno.startGame(game_id, player_id, 1);
 
     // Emit the gameState to room and get gameState
     const gameState = await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(
