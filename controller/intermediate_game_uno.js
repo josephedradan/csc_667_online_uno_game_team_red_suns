@@ -139,6 +139,10 @@ async function startGameWrapped(game_id, player_id) {
     if (gameRow.plyer_id_host === player_id && gameRow.is_active === false) {
         await dbEngineGameUno.updateGameIsActiveByGameID(game_id, true);
     }
+
+    // TODO GET THE CARDS
+
+
     // Emit the gameState to room and get gameState
     const gameState = await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(game_id);
 
