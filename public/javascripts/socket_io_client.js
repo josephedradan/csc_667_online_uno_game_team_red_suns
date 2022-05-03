@@ -153,21 +153,33 @@ const removeAllChildren = (parent) => {
 
 const create_game_url = (gameId) => {
     const div = document.createElement("div");
-    const a = document.createElement("a");
+    // const a = document.createElement("a");
+    const button = document.createElement("button");
     div.classList.add("flex", "items-center", "justify-center");
-    a.classList.add(
-        "w-1/2",
-        "px-4",
-        "py-2",
-        "font-bold",
-        "text-center",
-        "text-white",
+    button.classList.add(
+        "flex",
+        "items-center",
+        "justify-center",
         "bg-sky-500",
-        "hover:bg-sky-700"
+        "hover:bg-sky-700",
+        "text-white",
+        "font-bold",
+        "py-2",
+        "px-4",
+        "rounded"
     );
-    a.textContent = "Start Game";
-    a.href = `/game/${gameId}/startGame`;
-    div.append(a);
+    button.textContent = "Start Game";
+    button.id = "in_game_socket_start_game_button";
+    // add the eventlistener here. // Figure out load ordering of the scripts as why it's not running.
+    button.addEventListener("click", async () => {
+        const gameId = window.location.href.split("/");
+        let results = await axios.post(
+            `/game/${gameId.at(gameId.length - 1)}/startGame`,
+            {}
+        );
+        console.log(results);
+    });
+    div.append(button);
     return div;
 };
 
@@ -262,4 +274,12 @@ socket.on("server-index-games", (msg) => {
         }
         individual_game.append(list_of_players);
     }
+});
+
+/**
+ * Start game logic
+ */
+
+socket.on("server-game-game-id-game-state", (msg) => {
+    console.log(msg);
 });
