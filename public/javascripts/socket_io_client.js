@@ -327,8 +327,18 @@ const generate_wild_black = (is_wild) => {
         .classList.add(is_wild ? "wildMark" : "wild4Mark");
 
     // 4 colors...
-    const wildRed = document.createElement("div");
-    const wildBlue = document.createElement("div");
-    const wildYellow = document.createElement("div");
-    const wildGreen = document.createElement("div");
+    const wildRed = document
+        .createElement("div")
+        .classList.add("wildRed", "wildCard");
+    const wildBlue = document
+        .createElement("div")
+        .classList.add("wildBlue", "wildCard");
+    const wildYellow = document
+        .createElement("div")
+        .classList.add("wildYellow", "wildCard");
+    const wildGreen = document
+        .createElement("div")
+        .classList.add("wildGreen", "wildCard");
+
+    // TODO: need to finish wild4 then generalize, talk to joseph about what i'm getting back from server.
 };
