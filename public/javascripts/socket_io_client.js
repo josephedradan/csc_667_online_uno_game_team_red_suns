@@ -283,3 +283,62 @@ socket.on("server-index-games", (msg) => {
 socket.on("server-game-game-id-game-state", (msg) => {
     console.log(msg);
 });
+
+const generate_flipped_card = () => {
+    const cardWrapper = document
+        .createElement("div")
+        .classList.add("cardWrapper");
+    const unoCard = document
+        .createElement("div")
+        .classList.add("unoCard", "flipped");
+    const inner = document.createElement("span").classList.add("inner");
+    const mark = document.createElement("span").classList.add("mark");
+    inner.append(mark);
+    unoCard.append(inner);
+    cardWrapper.append(unoCard);
+    return cardWrapper;
+};
+
+const generate_user_card = (number, color) => {
+    const cardWrapper = document
+        .createElement("div")
+        .classList.add("cardWrapper");
+    const unoCard = document
+        .createElement("div")
+        .classList.add("unoCard", `number-${number}`, color);
+    const inner = document.createElement("span").classList.add("inner");
+    const mark = document.createElement("span").classList.add("mark");
+    inner.append(mark);
+    unoCard.append(inner);
+    cardWrapper.append(unoCard);
+    return cardWrapper;
+};
+
+const generate_wild_black = (is_wild) => {
+    const cardWrapper = document
+        .createElement("div")
+        .classList.add("cardWrapper");
+    const unoCard = document
+        .createElement("div")
+        .classList.add("unoCard", is_wild ? "wild" : "wild4", black);
+    const inner = document.createElement("span").classList.add("inner");
+    const wildMark = document
+        .createElement("span")
+        .classList.add(is_wild ? "wildMark" : "wild4Mark");
+
+    // 4 colors...
+    const wildRed = document
+        .createElement("div")
+        .classList.add("wildRed", "wildCard");
+    const wildBlue = document
+        .createElement("div")
+        .classList.add("wildBlue", "wildCard");
+    const wildYellow = document
+        .createElement("div")
+        .classList.add("wildYellow", "wildCard");
+    const wildGreen = document
+        .createElement("div")
+        .classList.add("wildGreen", "wildCard");
+
+    // TODO: need to finish wild4 then generalize, talk to joseph about what i'm getting back from server.
+};
