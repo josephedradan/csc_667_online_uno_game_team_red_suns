@@ -432,7 +432,7 @@ Notes:
             {collection_index: 4},
             ...
         ],
-    player:
+    play:
         [
             {collection_index: 0},
             {collection_index: 1},
@@ -469,14 +469,18 @@ async function getGameState(game_id) {
         playerRow.collection = await dbEngineGameUno.getCollectionCollectionIndexRowsByPlayerID(playerRow.player_id);
     }
 
+    // May be empty
+    const drawRows = await dbEngineGameUno.getCollectionCollectionIndexRowsDrawByGameID(game_id);
 
-
-
+    // May be empty
+    const playRows = await dbEngineGameUno.getCollectionByGameIDAndCollectionInfoID(game_id, 2);
 
     // Game state
     return {
         game: gameRow,
         players: playerRows,
+        draw: drawRows,
+        play: playRows,
     };
 }
 

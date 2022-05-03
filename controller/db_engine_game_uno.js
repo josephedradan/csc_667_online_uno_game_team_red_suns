@@ -1050,23 +1050,23 @@ async function getCollectionCollectionIndexRowsByPlayerID(player_id) {
 
 dbEngineGameUno.getCollectionCollectionIndexRowsByPlayerID = getCollectionCollectionIndexRowsByPlayerID;
 
-async function getCollectionCollectionIndexRowsByPlayerID(player_id) {
+async function getCollectionCollectionIndexRowsDrawByGameID(game_id) {
     debugPrinter.printFunction(getCollectionCollectionIndexRowsByPlayerID.name);
 
     const result = await db.any(
         `
         SELECT collection_index
         FROM "Collection"
-        WHERE "Collection".player_id = $1
+        JOIN "Cards" ON "Collection".card_state_id = "Cards".card_state_id
+        WHERE "Cards".game_id = $1
         `,
-        [player_id],
+        [game_id],
     );
 
     return result;
 }
 
-dbEngineGameUno.getCollectionCollectionIndexRowsByPlayerID = getCollectionCollectionIndexRowsByPlayerID;
-
+dbEngineGameUno.getCollectionCollectionIndexRowsDrawByGameID = getCollectionCollectionIndexRowsDrawByGameID;
 
 async function updateGameIsActiveByGameID(game_id, boolean) {
     debugPrinter.printFunction(updateGameIsActiveByGameID.name);
