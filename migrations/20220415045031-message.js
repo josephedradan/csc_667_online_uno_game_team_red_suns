@@ -16,9 +16,24 @@ module.exports = {
                 unique: true,
             },
 
+            game_id: {
+                type: Sequelize.DataTypes.INTEGER,
+                references: {
+                    model: 'Game',
+                    key: 'game_id',
+                },
+                onDelete: 'CASCADE',
+                allowNull: false,
+                unique: false, // Allows for multiple messages for a game
+            },
+
             player_id: {
                 type: Sequelize.DataTypes.INTEGER,
-                references: { model: 'Player', key: 'player_id' },
+                references: {
+                    model: 'Player',
+                    key: 'player_id',
+                },
+                onDelete: 'CASCADE',
                 allowNull: false,
                 unique: false, // Allows a user to send multiple messages
             },
@@ -31,17 +46,11 @@ module.exports = {
 
             time_stamp: {
                 type: Sequelize.DATE,
-                defaultValue: Sequelize.literal('NOW()'),
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
                 allowNull: false,
                 unique: false,
             },
 
-            game_id: {
-                type: Sequelize.DataTypes.INTEGER,
-                references: { model: 'Game', key: 'game_id' },
-                allowNull: false,
-                unique: false, // Allows for multiple messages for a game
-            },
         });
     },
 

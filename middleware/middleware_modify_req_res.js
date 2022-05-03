@@ -18,7 +18,7 @@ Reference:
 
  */
 
-const middlewareCommunicateToFrontend = {};
+const middlewareModifyReqRes = {};
 
 /**
  * Add a message (which in this case should be an object) so the frontend can deal with it
@@ -31,13 +31,13 @@ const middlewareCommunicateToFrontend = {};
  * @param res
  * @param next
  */
-async function attachMessageToResLocals(req, res, next) {
+async function attachMessageToResponseLocals(req, res, next) {
     res.locals.message = req.session.message;
     delete req.session.message;
     next();
 }
 
-middlewareCommunicateToFrontend.attachMessageToResLocals = attachMessageToResLocals;
+middlewareModifyReqRes.attachMessageToResponseLocals = attachMessageToResponseLocals;
 
 /**
  * Persist req.user from passport to res.locals.user
@@ -47,11 +47,11 @@ middlewareCommunicateToFrontend.attachMessageToResLocals = attachMessageToResLoc
  * @param next
  * @returns {Promise<void>}
  */
-async function attachUserToResLocals(req, res, next) {
+async function attachUserToResponseLocals(req, res, next) {
     res.locals.user = req.user;
     next();
 }
 
-middlewareCommunicateToFrontend.attachUserToResLocals = attachUserToResLocals;
+middlewareModifyReqRes.attachUserToResponseLocals = attachUserToResponseLocals;
 
-module.exports = middlewareCommunicateToFrontend;
+module.exports = middlewareModifyReqRes;

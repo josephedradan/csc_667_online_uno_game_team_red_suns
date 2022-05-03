@@ -15,6 +15,7 @@ module.exports = {
                     model: 'Game',
                     key: 'game_id',
                 },
+                onDelete: 'CASCADE',
                 allowNull: false,
                 unique: false, // False because multiple different players in 1 game
             },
@@ -26,16 +27,17 @@ module.exports = {
                     model: 'Player',
                     key: 'player_id',
                 },
+                onDelete: 'CASCADE',
                 allowNull: false,
                 unique: true, // Can't have a player in different as well as in the same game multiple times
             },
 
-            // Is the player the host of the game
-            is_host: {
-                type: Sequelize.DataTypes.BOOLEAN,
-                defaultValue: false,
-                unique: false,
-            },
+            // // Is the player the host of the game (MOVED TO Game)
+            // is_host: {
+            //     type: Sequelize.DataTypes.BOOLEAN,
+            //     defaultValue: false,
+            //     unique: false,
+            // },
 
             // Is the player currently playing the game or is out of the game
             in_game: {
@@ -44,11 +46,12 @@ module.exports = {
                 unique: false,
             },
 
-            // SEAT ORDER IS IMPLIED
-            // seat_index: {
-            //     type: Sequelize.DataTypes.INTEGER,
-            //     allowNull: false,
-            // },
+            // The index of the player (seat of the player)
+            player_index: {
+                type: Sequelize.DataTypes.INTEGER,
+                allowNull: true,
+                unique: false, // False because this table holds all the player indices
+            },
         });
     },
 

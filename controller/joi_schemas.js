@@ -22,21 +22,19 @@ Reference:
 
     Confirm password cannot be set as required with JOI
         Notes:
-            This the most up todate version on how to correctly validate a password which would allow you to
-            setup a custom failure message
+            This the most up to date version on how to correctly validate a password which would allow you to
+            set up a custom failure message
         Reference:
                 https://stackoverflow.com/a/60909048/9133458
 */
 
-const Joi = require("joi");
+const Joi = require('joi');
 
 // TODO THIS SHOULD BE SHARED WITH THE FRONT END
 const nameRegex = /^[A-Za-z]+$/;
 const usernameRegex = /^(|.*[a-z])(|.*[A-Z])[0-9a-zA-Z]{3,}$/;
-const passwordRegex =
-    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
-const emailRegex =
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 const phoneNumberRegex = /^\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$/;
 
 const joiSchemas = {};
@@ -49,23 +47,23 @@ joiSchemas.SCHEMA_ACCOUNT_REGISTRATION = Joi.object()
     .keys({
         // Username based on regex pattern
         username: Joi.string().regex(usernameRegex).required().messages({
-            "string.pattern.base": "username does not follow format",
+            'string.pattern.base': 'username does not follow format',
             // 'string.empty': 'Username must not be empty',
             // 'any.required': 'username key is missing from the body',
         }),
 
         // Password based on regex pattern
         password: Joi.string().regex(passwordRegex).required().messages({
-            "string.pattern.base": "password does not follow format",
+            'string.pattern.base': 'password does not follow format',
             // 'string.empty': 'Password must not be empty',
         }),
 
         // Reference to the key 'password'
         confirm_password: Joi.string()
             .required()
-            .valid(Joi.ref("password"))
+            .valid(Joi.ref('password'))
             .messages({
-                "any.only": "passwords do not match",
+                'any.only': 'passwords do not match',
                 // 'string.empty': 'password confirmation must not be empty',
             }),
 
@@ -102,7 +100,7 @@ joiSchemas.SCHEMA_ACCOUNT_REGISTRATION = Joi.object()
         //         // 'string.empty': 'email must not be empty',
         //     }),
     })
-    .with("password", "confirm_password");
+    .with('password', 'confirm_password');
 
 joiSchemas.SCHEMA_ACCOUNT_LOGIN = Joi.object().keys({
     // Username based on regex pattern
@@ -182,10 +180,10 @@ joiSchemas.SCHEMA_ACCOUNT_UPDATE = Joi.object().keys({
     email: Joi.string()
         .regex(emailRegex)
         .messages({
-            "string.pattern.base": "Email does not follow format",
+            'string.pattern.base': 'Email does not follow format',
             // 'string.empty': 'Email must not be empty',
         })
-        .allow("")
+        .allow('')
         .allow(null),
 
     // // Profile URL
@@ -232,12 +230,12 @@ joiSchemas.SCHEMA_ACCOUNT_UPDATE = Joi.object().keys({
             // 'string.pattern.base': 'Gender does not follow format',
             // 'string.empty': 'Gender must not be empty',
         })
-        .allow("")
+        .allow('')
         .allow(null),
 
-    age: Joi.string().allow(null).allow(""),
+    age: Joi.string().allow(null).allow(''),
 
-    biography: Joi.string().max(2048).allow(null).allow(""),
+    biography: Joi.string().max(2048).allow(null).allow(''),
 });
 // .with('password', 'password_confirmation');
 

@@ -21,6 +21,7 @@ module.exports = {
                     model: 'Game',
                     key: 'game_id',
                 },
+                onDelete: 'CASCADE',
                 allowNull: false,
                 unique: false, // This table is to map the game to the card state so this should be false
             },
@@ -31,6 +32,7 @@ module.exports = {
                     model: 'CardState',
                     key: 'card_state_id',
                 },
+                onDelete: 'CASCADE',
                 allowNull: false,
                 unique: true, // Prevents a card state from being in more than 1 game
             },

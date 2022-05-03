@@ -8,12 +8,12 @@ const fadeOutFlashMessage = (msg) => {
             }
             currentOpacity -= 0.05;
             msg.style.opacity = currentOpacity;
-            console.log(msg.style.opacity);
+            // console.log(msg.style.opacity);
         }, 50);
     }, 2000);
 };
 
-const flash_message = document.getElementById('flash-message');
+const flash_message = document.getElementById("flash-message");
 if (flash_message) {
     fadeOutFlashMessage(flash_message);
 }

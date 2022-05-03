@@ -28,7 +28,11 @@ module.exports = {
 
         return queryInterface.addColumn('Collection', 'collection_info_id', {
             type: Sequelize.DataTypes.INTEGER,
-            references: { model: 'CollectionInfo', key: 'collection_info_id' },
+            references: {
+                model: 'CollectionInfo',
+                key: 'collection_info_id',
+            },
+            onDelete: 'CASCADE',
             allowNull: false,
             unique: false, // It's a mapping so you can't have uniques
         });

@@ -1,62 +1,12 @@
 <div class="grid grid-cols-8 gap-3">
-    {{#unless game.active}}
-        <div class="grid grid-cols-3 col-span-6 gap-4">
-            <div></div>
-            <div
-                class="flex flex-col items-center justify-center p-4 bg-white shadow-lg card rounded-2xl"
-            >
-                <img src="/images/face.webp" alt="sum ting wong" />
-                <div>Username: {{user.display_name}}</div>
-                <div>Number of Wins: {{user.num_wins}}</div>
-                <div>Number of Loss: {{user.num_loss}}</div>
-            </div>
-            <div></div>
-
-            {{! TODO: add for each to render the players here. look at pregame_lobby_card }}
-            <div
-                class="flex flex-col items-center justify-center p-4 bg-white shadow-lg card rounded-2xl"
-            >
-                <img src="/images/face.webp" alt="sum ting wong" />
-                <div>Username: {{display_name}}</div>
-                <div>Info1: </div>
-                <div>Info2: </div>
-                <div>Info3: </div>
-            </div>
-            <div
-                class="flex flex-col items-center justify-center p-4 bg-white shadow-lg card rounded-2xl"
-            >
-                <img src="/images/face.webp" alt="sum ting wong" />
-                <div>Username: {{display_name}}</div>
-                <div>Info1: </div>
-                <div>Info2: </div>
-                <div>Info3: </div>
-            </div>
-            <div
-                class="flex flex-col items-center justify-center p-4 bg-white shadow-lg card rounded-2xl"
-            >
-                <img src="/images/face.webp" alt="sum ting wong" />
-                <div>Username: {{username}}</div>
-                <div>Info1: </div>
-                <div>Info2: </div>
-                <div>Info3: </div>
-            </div>
-
-            <div></div>
-            <div class="flex items-center justify-center">
-                <a
-                    class="w-1/2 px-4 py-2 font-bold text-center text-white bg-sky-500 hover:bg-sky-700"
-                    href="/game/renderTestGame"
-                >
-                    <!-- FIXME: Don't redirect, make get request to game/api/startGame-->
-                    Start Game</a>
-            </div>
-            <div></div>
+    {{#if game.is_active}}
+        <div class="grid grid-cols-3 col-span-6 gap-4" id="list_of_players">
 
         </div>
     {{else}}
-        <div class="grid grid-cols-3 col-span-6">
+        <div class="grid grid-cols-3 col-span-6" id="gameTable">
             <div class="col-span-1"></div>
-            <div class="col-span-1 cards northPlayer">
+            <div class="col-span-1 cardStateRows northPlayer">
                 <div class="cardWrapper">
                     <div class="unoCard flipped">
                         <span class="inner">
@@ -122,7 +72,7 @@
                 </div>
             </div>
             <div class="col-span-1"></div>
-            <div class="col-span-1 cards westPlayer">
+            <div class="col-span-1 cardStateRows westPlayer">
                 <div class="cardWrapper">
                     <div class="unoCard flipped">
                         <span class="inner">
@@ -196,23 +146,27 @@
                         <span class="inner">
                             <span class="mark"></span>
                         </span>
-                        <div class="unoCard flipped drawCard">
+                    </div>
+                    <div class="cardWrapper" id="drawCard">
+                        <div class="unoCard flipped">
                             <span class="inner">
                                 <span class="mark"></span>
                             </span>
                         </div>
                     </div>
                 </div>
-                <div class="cardWrapper">
-                    <div class="unoCard num-3 green">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
+                <div id="discard">
+                    <div class="cardWrapper">
+                        <div class="unoCard num-3 green">
+                            <span class="inner">
+                                <span class="mark"></span>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-span-1 cards eastPlayer">
+            <div class="col-span-1 cardStateRows eastPlayer">
                 <div class="cardWrapper">
                     <div class="unoCard flipped">
                         <span class="inner">
@@ -278,7 +232,7 @@
                 </div>
             </div>
             <div class="col-span-1"></div>
-            <div class="col-span-1 cards playerDeck">
+            <div class="col-span-1 cardStateRows" id="playerHand">
                 <div class="cardWrapper">
                     <div class="unoCard num-0 blue">
                         <span class="inner">
@@ -398,14 +352,16 @@
                 </div>
 
             </div>
-            <div class="relative col-span-1">
+            <div></div>
+            <div class="relative col-span-1 grid content-center">
                 <button
                     {{! callUno will be used with tandem with an event listener to call the back }}
                     id="challenge"
                     class="absolute bottom-0 right-0 px-4 py-2 mb-4 font-bold text-white rounded bg-sky-500 hover:bg-sky-700"
                 >Challenge</button>
             </div>
-            <div class="relative col-span-1">
+            <div></div>
+            <div class="relative col-span-1 grid content-center">
                 <button
                     {{! callUno will be used with tandem with an event listener to call the back }}
                     id="callUno"
@@ -413,7 +369,7 @@
                 >Uno</button>
             </div>
         </div>
-    {{/unless}}
+    {{/if}}
     {{! Chat Box }}
     <div
         class="flex flex-col space-y-2 col-span-2 h-[calc(100vh_-_112px)] p-2 bg-slate-200"
@@ -421,111 +377,24 @@
         <div class="flex flex-row font-bold text-black">
             <p class="w-full text-center">Chat</p>
         </div>
-        <div class="p-2 overflow-y-auto bg-white grow">
-
-            <div class="p-2">
-                <span class="font-bold text-sky-700">Eric: </span>
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry.
-            </div>
-
-            <div class="p-2">
-                <span class="font-bold text-green-700">John: </span>
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry. Lorem Ipsum has been the industry's standard dummy
-                text ever since the 1500s, when an unknown printer took a galley
-                of type and scrambled it to make a type specimen book. It has
-                survived not only five centuries, but also the leap into
-                electronic typesetting, remaining essentially unchanged. It was
-                popularised in the 1960s with the release of Letraset sheets
-                containing Lorem Ipsum passages, and more recently with desktop
-                publishing software like Aldus PageMaker including versions of
-                Lorem Ipsum.
-            </div>
-
-            <div class="p-2">
-                <span class="font-bold text-red-700">Eddy: </span>
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry. Lorem Ipsum has been the industry's standard dummy
-                text ever since the 1500s, when an unknown printer took a galley
-                of type and scrambled it to make a type specimen book. It has
-                survived not only five centuries, but also the leap into
-                electronic typesetting, remaining essentially unchanged. It was
-                popularised in the 1960s with the release of Letraset sheets
-                containing Lorem Ipsum passages, and more recently with desktop
-                publishing software like Aldus PageMaker including versions of
-                Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing
-                and typesetting industry. Lorem Ipsum has been the industry's
-                standard dummy text ever since the 1500s, when an unknown
-                printer took a galley of type and scrambled it to make a type
-                specimen book. It has survived not only five centuries, but also
-                the leap into electronic typesetting, remaining essentially
-                unchanged. It was popularised in the 1960s with the release of
-                Letraset sheets containing Lorem Ipsum passages, and more
-                recently with desktop publishing software like Aldus PageMaker
-                including versions of Lorem Ipsum.
-            </div>
-
-            <div class="p-2">
-                <span class="font-bold text-red-700">Eddy: </span>
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry. Lorem Ipsum has been the industry's standard dummy
-                text ever since the 1500s, when an unknown printer took a galley
-                of type and scrambled it to make a type specimen book. It has
-                survived not only five centuries, but also the leap into
-                electronic typesetting, remaining essentially unchanged. It was
-                popularised in the 1960s with the release of Letraset sheets
-                containing Lorem Ipsum passages, and more recently with desktop
-                publishing software like Aldus PageMaker including versions of
-                Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing
-                and typesetting industry. Lorem Ipsum has been the industry's
-                standard dummy text ever since the 1500s, when an unknown
-                printer took a galley of type and scrambled it to make a type
-                specimen book. It has survived not only five centuries, but also
-                the leap into electronic typesetting, remaining essentially
-                unchanged. It was popularised in the 1960s with the release of
-                Letraset sheets containing Lorem Ipsum passages, and more
-                recently with desktop publishing software like Aldus PageMaker
-                including versions of Lorem Ipsum.
-            </div>
-
-            <div class="p-2">
-                <span class="font-bold text-red-700">Eddy: </span>
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry. Lorem Ipsum has been the industry's standard dummy
-                text ever since the 1500s, when an unknown printer took a galley
-                of type and scrambled it to make a type specimen book. It has
-                survived not only five centuries, but also the leap into
-                electronic typesetting, remaining essentially unchanged. It was
-                popularised in the 1960s with the release of Letraset sheets
-                containing Lorem Ipsum passages, and more recently with desktop
-                publishing software like Aldus PageMaker including versions of
-                Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing
-                and typesetting industry. Lorem Ipsum has been the industry's
-                standard dummy text ever since the 1500s, when an unknown
-                printer took a galley of type and scrambled it to make a type
-                specimen book. It has survived not only five centuries, but also
-                the leap into electronic typesetting, remaining essentially
-                unchanged. It was popularised in the 1960s with the release of
-                Letraset sheets containing Lorem Ipsum passages, and more
-                recently with desktop publishing software like Aldus PageMaker
-                including versions of Lorem Ipsum.
-            </div>
-
+        <div class="p-2 overflow-y-auto bg-white grow" id="sandbox_message_box">
         </div>
         <div class="flex flex-row">
             <textarea
                 class="w-full p-2 resize-none"
                 name=""
                 height="100%"
-                id=""
-                placeholder="Talk Smack"
+                id="socket_message"
+                placeholder="Message here"
             ></textarea>
             <button
+                id="in_game_socket_message_button"
                 class="w-32 h-24 px-4 py-2 font-bold text-white bg-sky-500 hover:bg-sky-700"
+                {{! onclick="socket.emit('client-message', 'Hello FROM BUTTON'); console.log(`BUTTON CLICKED`)" }}
             >
                 Send
             </button>
         </div>
     </div>
 </div>
+<script src="/javascripts/test_game.js"></script>

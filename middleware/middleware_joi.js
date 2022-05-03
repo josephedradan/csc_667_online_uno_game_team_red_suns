@@ -17,6 +17,7 @@ const to = require('await-to-js').default;
 
 const joiSchemas = require('../controller/joi_schemas');
 const debugPrinter = require('../util/debug_printer');
+const utilCommon = require('../controller/util_common');
 
 async function validateCommon(
     req,
@@ -60,12 +61,10 @@ async function validateCommon(
 const middlewareValidation = {};
 
 function callbackValidationErrorCommon(req, res, next, error) {
-    req.session.message = {
-        status: 'failure',
-        message: error,
-    };
+    utilCommon.reqSessionMessageHandler(req, 'failure', error);
 
     res.redirect('back');
+    // next();
 }
 
 /**
@@ -76,8 +75,8 @@ function callbackValidationErrorCommon(req, res, next, error) {
  * @param next
  * @returns {Promise<void>}
  */
-async function validateAccountRegistration(req, res, next) {
-    debugPrinter.printFunction(validateAccountRegistration.name);
+async function validateUserRegistration(req, res, next) {
+    debugPrinter.printFunction(validateUserRegistration.name);
 
     await validateCommon(
         req,
@@ -85,10 +84,11 @@ async function validateAccountRegistration(req, res, next) {
         next,
         joiSchemas.SCHEMA_ACCOUNT_REGISTRATION,
         callbackValidationErrorCommon,
-        'ERROR IN validateAccountRegistration',
+        'ERROR IN validateUserRegistration',
     );
 }
-middlewareValidation.validateAccountRegistration = validateAccountRegistration;
+
+middlewareValidation.validateUserRegistration = validateUserRegistration;
 
 /**
  *  Middleware to validate req.body used when logging in using the joi package
@@ -97,8 +97,8 @@ middlewareValidation.validateAccountRegistration = validateAccountRegistration;
  * @param next
  * @returns {Promise<void>}
  */
-async function validateAccountLogin(req, res, next) {
-    debugPrinter.printFunction(validateAccountLogin.name);
+async function validateUserLogin(req, res, next) {
+    debugPrinter.printFunction(validateUserLogin.name);
 
     await validateCommon(
         req,
@@ -106,13 +106,14 @@ async function validateAccountLogin(req, res, next) {
         next,
         joiSchemas.SCHEMA_ACCOUNT_LOGIN,
         callbackValidationErrorCommon,
-        'ERROR IN validateAccountLogin',
+        'ERROR IN validateUserLogin',
     );
 }
-middlewareValidation.validateAccountLogin = validateAccountLogin;
 
-async function validateAccountUpdate(req, res, next) {
-    debugPrinter.printFunction(validateAccountUpdate.name);
+middlewareValidation.validateUserLogin = validateUserLogin;
+
+async function validateUserUpdate(req, res, next) {
+    debugPrinter.printFunction(validateUserUpdate.name);
 
     await validateCommon(
         req,
@@ -120,8 +121,9 @@ async function validateAccountUpdate(req, res, next) {
         next,
         joiSchemas.SCHEMA_ACCOUNT_UPDATE,
         callbackValidationErrorCommon,
-        'ERROR IN validateAccountUpdate',
+        'ERROR IN validateUserUpdate',
     );
 }
-middlewareValidation.validateAccountUpdate = validateAccountUpdate;
+
+middlewareValidation.validateUserUpdate = validateUserUpdate;
 module.exports = middlewareValidation;

@@ -37,6 +37,19 @@ Reference:
             Migrations
         Reference:
             https://stackoverflow.com/questions/27835801/how-to-auto-generate-migrations-with-sequelize-cli-from-sequelize-models
+
+    why application.listen should be at the end after all the requests? also why is it necessary?
+        Notes:
+            On the subject of application.listen at the end:
+                "...mostly as a convention to useExpressMiddleware a logical and safe order of initialization where you configure the server first
+                before starting it and exposing it to incoming connections.
+
+                So ... it seems that for most normal synchronous server initialization code, it doesn't really matter whether you
+                do application.listen() before or after configuring your routes. It is likely done last just as a logical convention that
+                seems the appropriate order to do things (configure the server, then start the server)."
+
+        Reference:
+            https://stackoverflow.com/questions/59835089/why-app-listen-should-be-at-the-end-after-all-the-requests-also-why-is-it-neces
  */
 
 const dotenv = require('dotenv');
@@ -50,7 +63,7 @@ const constants = require('./constants');
 const connectionContainer = require('./server');
 
 const {
-    app,
+    application,
     io,
 } = connectionContainer;
 
@@ -71,15 +84,20 @@ const db = require('../db');
 const expressSession = require('express-session');
 
 const connectPGSimple = require('connect-pg-simple');
+
 // const connectSessionSequelize = require('connect-session-sequelize');
+
+const handlerSocketIOUseExpress = require('../controller/handler_socket_io_use_express');
 
 const handlerPassport = require('../controller/handler_passport'); // WARNING: MAKE SURE THAT THIS IMPORT IS BEFORE ANY USAGE OF ANY PASSPORT FUNCTIONALITY
 
-const middlewareCommunicateToFrontend = require('../middleware/middleware_communicate_to_frontend');
+const middlewareModifyReqRes = require('../middleware/middleware_modify_req_res');
+const middlewareDebug = require('../middleware/middleware_debug');
 
 const routes = require('../routes/routes');
 
 const debugPrinter = require('../util/debug_printer');
+const middlewareExpressToSocketIO = require('../ignore/middleware_express_to_socket_io');
 
 /*
 ##############################################################################################################
@@ -87,11 +105,11 @@ Setup and Settings
 ##############################################################################################################
  */
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(express.static(constants.dirPublic));
+application.use(logger('dev'));
+application.use(express.json());
+application.use(express.urlencoded({ extended: true }));
+application.use(cookieParser());
+application.use(express.static(constants.dirPublic));
 
 /* ############################## connect-session-sequelize ############################## */
 
@@ -180,18 +198,18 @@ const hbs = create({
     // },
 });
 
-app.engine('hbs', hbs.engine);
+application.engine('hbs', hbs.engine);
 
 // view engine setup
-app.set('view engine', 'hbs');
-app.set('views', constants.dirViews);
+application.set('view engine', 'hbs');
+application.set('views', constants.dirViews);
 
 /* ############################## express-session (Must be placed after hsb to prevent unnecessary db calls) ############################## */
 
 /*
 
 Reference:
-    When to use saveUninitialized and resave in express-session
+    When to useExpressMiddleware saveUninitialized and resave in express-session
         Notes:
             "If during the lifetime of the request the session object isn't modified then, at the end of the request
             and when saveUninitialized is false, the (still empty, because unmodified) session object will
@@ -213,21 +231,27 @@ Reference:
         Reference:
             https://stackoverflow.com/questions/40381401/when-to-use-saveuninitialized-and-resave-in-express-session
  */
-app.use(
-    expressSession(
-        {
-            secret: 'SOME SECRET', // TODO: MOVE THIS TO A FILE OR SOMETHING
-            resave: false, // Rewrite/Resave the res.session.cookie on every request (THIS OPTION MUST BE SET TO TRUE DUE TO THE BACKEND NOT BEING RESTFUL)
-            saveUninitialized: false, // Allow saving empty/non modified session objects in session store (THIS OPTION MUST BE SET TO TRUE DUE TO THE BACKEND NOT BEING RESTFUL)
-            // store: sequelizeExpressSessionStore, // Use the Store made from connect-session-sequelize
-            store: pgSessionStore,
-            cookie: {
-                httpOnly: false, //     secure: true, // THIS REQUIRES THAT THE CONNECTION IS SECURE BY USING HTTPS (https://github.com/expressjs/session#cookiesecure)
-                //     maxAge: 86400, // 1 Week long cookie
-            },
+
+const middlewareExpressSession = expressSession(
+    {
+        secret: 'SOME SECRET', // TODO: MOVE THIS TO A FILE OR SOMETHING
+        resave: false, // Rewrite/Resave the res.session.cookie on every request (THIS OPTION MUST BE SET TO TRUE DUE TO THE BACKEND NOT BEING RESTFUL)
+        saveUninitialized: false, // Allow saving empty/non modified session objects in session store (THIS OPTION MUST BE SET TO TRUE DUE TO THE BACKEND NOT BEING RESTFUL)
+        // store: sequelizeExpressSessionStore, // Use the Store made from connect-session-sequelize
+        store: pgSessionStore,
+        cookie: {
+            httpOnly: false, //     secure: true, // THIS REQUIRES THAT THE CONNECTION IS SECURE BY USING HTTPS (https://github.com/expressjs/session#cookiesecure)
+            //     maxAge: 86400, // 1 Week long cookie
         },
-    ),
+    },
 );
+
+/*
+
+Notes:
+    Basically, it will add req.session.passport.user
+ */
+application.use(middlewareExpressSession);
 
 // Sync the express sessions table (If the table does not exist in the database, then this will create it)
 // sequelizeExpressSessionStore.sync();
@@ -236,52 +260,96 @@ app.use(
 // Config passport
 handlerPassport.configurePassportLocalStrategy(passport);
 
-// In a Connect or Express-based application, passport.initialize() middleware is required to initialize Passport.
-app.use(passport.initialize()); // Initialize password middleware
+/*
+In a Connect or Express-based application, passport.initialize() middleware is required to initialize Passport.
+
+Notes:
+    Basically, it will add req.login and req.logout
+
+Reference:
+    what is passport.initialize()? (nodejs express)
+        Notes:
+            "passport.session() is another middleware that alters the request object and change the 'user' value that is currently
+            the session id (from the client cookie) into the true deserialized user object. It is explained in detail here."
+
+            " With sessions, initialize() setups the functions to serialize/deserialize the user data from the request.
+            You are not required to useExpressMiddleware passport.initialize() if you are not using sessions."
+
+        Reference:
+            https://stackoverflow.com/questions/46644366/what-is-passport-initialize-nodejs-express
+ */
+/**
+
+ */
+application.use(passport.initialize()); // Initialize password middleware
 
 /*
-If your application uses persistent getLogIn sessions, passport.session() middleware must also be used.
-(Serialize and deserialize. Persist the getLogIn)
+If your application uses persistent login sessions, passport.session() middleware must also be used.
+(Serialize and deserialize. Persist the login)
+
+Notes:
+    Basically, it will add req.userr
+
+Reference:
+
+    What does passport.session() middleware do?
+        Notes:
+            "passport.session() acts as a middleware to alter the req object and change the 'user' value that is currently
+            the session id (from the client cookie) into the true deserialized user object.
+
+            ... Where it essentially acts as a middleware and alters the value of the 'user' property in the req object to contain the deserialized
+            identity of the user. To allow this to work correctly you must include serializeUser and deserializeUser functions in your custom code.
+            "
+
+        Reference:
+            https://stackoverflow.com/questions/22052258/what-does-passport-session-middleware-do/28994045#28994045
+
 */
-app.use(passport.session());
+application.use(passport.session());
+
+/* ############################## socket.io ############################## */
+
+/*
+Apply express-session, and passport to socket.io
+
+ */
+// This will allow reading and writing to the db, basically this may or may not add socket.request.session.passport.user depending on if the session cookie exists
+handlerSocketIOUseExpress.useExpressMiddleware(middlewareExpressSession);
+// This will add req.login and req.logout via socket.request.login and socket.request.logout
+handlerSocketIOUseExpress.useExpressMiddleware(passport.initialize());
+// This will basically add req.user which is accessible via socket.request.user
+handlerSocketIOUseExpress.useExpressMiddleware(passport.session());
+
+// Setup more socket io middleware
+require('./socket_io');
 
 /* ############################## Middleware Message (Custom middlewares) ############################## */
 
-app.use(middlewareCommunicateToFrontend.attachMessageToResLocals);
-app.use(middlewareCommunicateToFrontend.attachUserToResLocals);
+application.use(middlewareModifyReqRes.attachMessageToResponseLocals);
+application.use(middlewareModifyReqRes.attachUserToResponseLocals);
 
 /* ############################## DEBUGGING ############################## */
 
-app.use((req, res, next) => {
-    if (process.env.NODE_ENV === 'development') {
-        debugPrinter.printBackendYellow('--- DEBUGGING MIDDLEWARE START ---');
+// Express debugging
+application.use(middlewareDebug.printDebugger('Express'));
 
-        debugPrinter.printBackendGreen('req.url');
-        debugPrinter.printDebug(req.url);
-        debugPrinter.printBackendGreen('req.body');
-        debugPrinter.printDebug(req.body);
-        debugPrinter.printBackendGreen('req.user');
-        debugPrinter.printDebug(req.user);
-
-        debugPrinter.printBackendYellow('--- DEBUGGING MIDDLEWARE END ---');
-    }
-
-    next();
-});
+// Socket.io debugging
+handlerSocketIOUseExpress.useExpressMiddleware(middlewareDebug.printDebugger('Socket.io'));
 
 /* ############################## routes ############################## */
 
-app.use('/', routes);
+application.use('/', routes);
 
 /* ############################## Error handling ############################## */
 
 // catch 404 and forward to error handler
-app.use((req, res, next) => {
+application.use((req, res, next) => {
     next(createError(404));
 });
 
 // error handler
-app.use((err, req, res, next) => {
+application.use((err, req, res, next) => {
+    debugPrinter.printError('IN ERROR YO');
     debugPrinter.printError(err);
 
     // set locals, only providing error in development
@@ -293,4 +361,4 @@ app.use((err, req, res, next) => {
     res.render('error');
 });
 
-module.exports = app;
+module.exports = application;

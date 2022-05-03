@@ -1,10 +1,13 @@
-const path = require("path");
-const db = require("../db/index");
-const dbEngine = require("./db_engine");
-const passwordHandler = require("./handler_password");
+const path = require('path');
+const db = require('../db/index');
+const dbEngine = require('./db_engine');
+const passwordHandler = require('./handler_password');
 
-const debugPrinter = require("../util/debug_printer");
-const logicGameUno = require("./logic_game_uno");
+const debugPrinter = require('../util/debug_printer');
+const gameUno = require('./game_uno');
+const intermediateGameUno = require('./intermediate_game_uno');
+const utilCommon = require('./util_common');
+const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');
 
 /* ############################################################################################################## */
 
@@ -21,13 +24,13 @@ const controllerIndex = {};
  * @param next
  * @returns {Promise<void>}
  */
-async function getLogIn(req, res, next) {
-    debugPrinter.printMiddleware(getLogIn.name);
+async function POSTLogIn(req, res, next) {
+    debugPrinter.printMiddleware(POSTLogIn.name);
 
-    res.redirect("/");
+    res.redirect('/');
 }
 
-controllerIndex.getLogIn = getLogIn;
+controllerIndex.POSTLogIn = POSTLogIn;
 
 /**
  * Log out user. Actual log out is handled by passport middleware
@@ -40,119 +43,136 @@ controllerIndex.getLogIn = getLogIn;
  * @param next
  * @returns {Promise<void>}
  */
-async function getLogOut(req, res, next) {
-    debugPrinter.printMiddleware(getLogOut.name);
+async function POSTLogOut(req, res, next) {
+    debugPrinter.printMiddleware(POSTLogOut.name);
 
-    res.redirect("/");
+    res.redirect('/');
 }
 
-controllerIndex.getLogOut = getLogOut;
-
-async function getIndex(req, res, next) {
-    debugPrinter.printMiddleware(getIndex.name);
-    debugPrinter.printBackendBlue(req.user);
-
-    res.render("index");
-}
-
-controllerIndex.getIndex = getIndex;
+controllerIndex.POSTLogOut = POSTLogOut;
 
 /**
- *
- * @returns {Promise<[{},{}]>}
+ * get Index page
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<void>}
  */
-async function x() {
-    return [{}, {}];
+async function GETIndex(req, res, next) {
+    debugPrinter.printMiddleware(GETIndex.name);
+    debugPrinter.printBlue(req.user);
+
+    const gamesWithPlayersRows = await gameUno.getGamesAndTheirPlayers();
+
+    debugPrinter.printBackendRed(JSON.stringify(gamesWithPlayersRows, null, 2));
+
+    res.render('index', { game_list: gamesWithPlayersRows });
 }
 
-async function getRegistration(req, res, next) {
-    res.render("registration", {
-        title: "registration",
+controllerIndex.GETIndex = GETIndex;
+
+/**
+ * Get registration page
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<void>}
+ */
+async function GETRegistration(req, res, next) {
+    res.render('registration', {
+        title: 'registration',
         postRegistration: true,
     });
 }
 
-controllerIndex.getRegistration = getRegistration;
+controllerIndex.GETRegistration = GETRegistration;
 
-async function postRegistration(req, res, next) {
-    debugPrinter.printMiddleware(postRegistration.name);
+/**
+ * Handle post requset to registration
+ * @param req
+ * @param res
+ * @param next
+ * @returns {Promise<void>}
+ */
+async function POSTRegistration(req, res, next) {
+    debugPrinter.printMiddleware(POSTRegistration.name);
 
     debugPrinter.printDebug(req.body);
 
-    const { username, display_name, password, confirm_password } = req.body;
+    const {
+        username,
+        display_name,
+        password,
+        confirm_password,
+    } = req.body;
 
     try {
         // Check if username already exists
-        const existingAccount = await dbEngine.getUserRowByUsername(username);
+        const userByUsername = await dbEngine.getUserRowByUsername(username);
 
-        if (existingAccount) {
-            req.session.message = {
-                status: "failure",
-                message: "Username already exists",
-            };
-
-            res.redirect("back");
-        } else {
-            // Create new account
-
-            const hashedPassword = await passwordHandler.hash(password);
-
-            const user = await dbEngine.createUserRow(
-                username,
-                hashedPassword,
-                display_name
+        if (userByUsername) {
+            utilCommon.reqSessionMessageHandler(
+                req,
+                'failure',
+                'Username already exists',
             );
 
-            debugPrinter.printBackendBlue(user);
-
-            const userStatistic = await dbEngine.createUserStatisticRow(
-                user.user_id
-            );
-            debugPrinter.printBackendMagenta(userStatistic);
-            debugPrinter.printBackendGreen(existingAccount);
-
-            req.session.message = {
-                status: "success",
-                message: `Account "${user.username}" was created`,
-            };
-            res.redirect("/");
+            res.redirect('back');
+            return;
         }
 
-        debugPrinter.printBackendGreen("REDIRECTING");
+        // Check if display_name already exists
+        const userByDisplayName = await dbEngine.getUserRowByDisplayName(display_name);
+
+        if (userByDisplayName) {
+            utilCommon.reqSessionMessageHandler(
+                req,
+                'failure',
+                'Display name already exists',
+            );
+
+            res.redirect('back');
+            return;
+        }
+        // Create new User
+
+        const hashedPassword = await passwordHandler.hash(password);
+
+        const user = await dbEngine.createUserAndUserStatisticRow(
+            username,
+            hashedPassword,
+            display_name,
+        );
+
+        debugPrinter.printBackendGreen(user);
+
+        utilCommon.reqSessionMessageHandler(req, 'success', `User "${user.username}" was created`);
+
+        debugPrinter.printBackendGreen('REDIRECTING');
+        res.redirect('/');
     } catch (err) {
-        debugPrinter.printError(`ERROR FROM ${postRegistration.name}`);
+        debugPrinter.printError(`ERROR FROM ${POSTRegistration.name}`);
         next(err);
     }
 }
 
-controllerIndex.postRegistration = postRegistration;
+controllerIndex.POSTRegistration = POSTRegistration;
 
-async function postCreateGame(req, res, next) {
-    debugPrinter.printMiddleware(postCreateGame.name);
+// TODO MOVE THIS TO controller_game_api MAYBE
+async function POSTCreateGame(req, res, next) {
+    debugPrinter.printMiddleware(POSTCreateGame.name);
 
-    // Create Player // ORDER NO MATTER
-    // Crate Game // ORDER NO MATTER
+    const result = await intermediateGameUno.createGameWrapped(req.user.user_id);
 
-    // Create Players row (for the host)
-
-    // Generate literal cards for the game (CardState)
-    // // LINK CardState TO CardInfo
-    // // Link CardState TO Cards
-
-    // Create Collection
-    // // LINK TO CollectionInfo
-
-    const result = await logicGameUno.createGame(req.user.user_id);
-
-    debugPrinter.printBackendBlue(result);
-
-    const url_game = `/game/${result.game.game_id}`;
-
-    debugPrinter.printBackendGreen(url_game);
-
-    res.redirect(url_game);
+    if (!result) {
+        utilCommon.reqSessionMessageHandler(req, 'failure', 'Game failed to be created');
+        res.redirect('back');
+    } else {
+        utilCommon.reqSessionMessageHandler(req, 'success', `Game id ${result.game_id} created`);
+        res.redirect(result.game_url);
+    }
 }
 
-controllerIndex.postCreateGame = postCreateGame;
+controllerIndex.POSTCreateGame = POSTCreateGame;
 
 module.exports = controllerIndex;

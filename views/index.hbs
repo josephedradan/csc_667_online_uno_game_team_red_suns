@@ -1,37 +1,30 @@
 <div class="grid grid-cols-8 gap-3">
     <div class="col-span-5 overflow-y-scroll rounded-lg bg-slate-400 h-50">
-        <ul class="">
+        <ul id="game_list" class="">
             <li class="px-3 py-3 list-none border rounded-sm">Game List</li>
-            <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/game">Game 1</a>
-            </li>
-            <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/game">Game 2</a>
-            </li>
-            <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/game">Game 3</a>
-            </li>
-            <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/game">Game 4</a>
-            </li>
-            <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/game">Game 5</a>
-            </li>
-            <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/game">Game 6</a>
-            </li>
-            <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/game">Game 7</a>
-            </li>
-            <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/game">Game 8</a>
-            </li>
-            <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/game">Game 9</a>
-            </li>
-            <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
-                <a href="/game">Game 10</a>
-            </li>
+            {{#each game_list}}
+                <li class="px-3 py-3 list-none border rounded-sm bg-slate-100">
+                    <a href="/game/{{this.game.game_id}}">Game
+                        {{this.game.game_id}}</a>
+                    <ul
+                        class="list_of_players"
+                        style="list-style: none;
+                                      margin: 0;
+                                      padding: 0;
+                                      display: inline-flex"
+                    >
+                        {{#each this.players}}
+                            <li
+                                style="
+                                    padding-right: 10px;
+                                    padding-left: 10px;"
+                            >
+                                {{this.display_name}}
+                            </li>
+                        {{/each}}
+                    </ul>
+                </li>
+            {{/each}}
         </ul>
     </div>
     {{#unless user.username}}
@@ -57,7 +50,6 @@
                     class="flex px-3 py-3 rounded-lg"
                     for="password"
                 >Password</label>
-                <!-- FIXME: VERY UNSAFE -->
                 <input
                     class="flex px-3 py-3 rounded-lg w-96"
                     type="password"
@@ -67,7 +59,8 @@
                 />
                 <button
                     class="px-4 py-2 mt-3 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
-                >Login</button>
+                >Login
+                </button>
             </form>
         </div>
     {{else}}

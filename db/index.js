@@ -1,5 +1,5 @@
 /*
-Why use this file when you can use sequelize for raw queries...
+Why useExpressMiddleware this file when you can useExpressMiddleware sequelize for raw queries...
  */
 const pgp = require('pg-promise')();
 // const fs = require("fs");

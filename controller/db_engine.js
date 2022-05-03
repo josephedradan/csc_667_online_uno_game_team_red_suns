@@ -1,4 +1,6 @@
 /*
+Notes:
+    Do not use db.one because returning nothing is not an error
 
 Reference:
     Replacements
@@ -64,9 +66,7 @@ async function getUserJoinUserStatisticsRowByUsername(username) {
         ON "User".user_id="UserStatistic".user_id
         WHERE "User".username = $1; 
         `,
-        [
-            username,
-        ],
+        [username],
     );
 
     return result[0];
@@ -90,15 +90,30 @@ async function getUserRowByUsername(username) {
         FROM "User" 
         WHERE "User".username = $1;
         `,
-        [
-            username,
-        ],
+        [username],
     );
 
     return result[0]; // Should be an object returned
 }
 
 dbEngine.getUserRowByUsername = getUserRowByUsername;
+
+async function getUserRowByDisplayName(display_name) {
+    debugPrinter.printFunction(getUserRowByDisplayName.name);
+
+    const result = await db.any(
+        `
+        SELECT *
+        FROM "User" 
+        WHERE "User".display_name = $1;
+        `,
+        [display_name],
+    );
+
+    return result[0];
+}
+
+dbEngine.getUserRowByDisplayName = getUserRowByDisplayName;
 
 /**
  *
@@ -115,11 +130,7 @@ async function createUserRow(username, password, display_name) {
         VALUES ($1, $2, $3)
         RETURNING *;
         `,
-        [
-            username,
-            password,
-            display_name,
-        ],
+        [username, password, display_name],
     );
 
     return result[0]; // Should be the new object
@@ -141,14 +152,42 @@ async function createUserStatisticRow(user_id) {
         VALUES ($1, 0, 0)
         RETURNING *;
         `,
-        [
-            user_id,
-        ],
+        [user_id],
     );
 
     return result[0]; // Should be the new object
 }
 
 dbEngine.createUserStatisticRow = createUserStatisticRow;
+
+async function createUserAndUserStatisticRow(username, password, display_name) {
+    debugPrinter.printFunction(createUserStatisticRow.name);
+    const result = await db.any(
+        `
+        WITH userRow AS (
+            INSERT INTO "User" (username, password, display_name)
+            VALUES ($1, $2, $3)
+            RETURNING *
+        ), userStatisticRow AS(
+            INSERT INTO "UserStatistic" (user_id, num_wins, num_loss)
+            SELECT user_id, 0, 0
+            FROM userRow
+            RETURNING *
+        )
+        SELECT *
+        FROM userRow
+        JOIN userStatisticRow ON userRow.user_id = userStatisticRow.user_id;
+        `,
+        [
+            username,
+            password,
+            display_name,
+        ],
+    );
+
+    return result[0]; // Should be the new object
+}
+
+dbEngine.createUserAndUserStatisticRow = createUserAndUserStatisticRow;
 
 module.exports = dbEngine;

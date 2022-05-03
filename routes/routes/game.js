@@ -1,36 +1,36 @@
 const express = require('express');
 
 const routerGame = express.Router();
-const routerGamesAPI = require('./game_api');
+const routerGamesID = require('./game_id');
 
-const middlewareAuthenticationPassport = require('../../middleware/middleware_authentication_passport');
+const middlewarePassport = require('../../middleware/middleware_passport');
 
 const controllerGame = require('../../controller/controller_game');
-const middlewareGameUno = require('../../middleware/middleware_game_uno');
+const middlewareGameUnoGameGameID = require('../../middleware/middleware_game_uno_game_game_id');
+const middlewareModifyReqResGameUnoGameID = require('../../middleware/middleware_modify_req_res_uno_game_game_id');
 
 // Need to be logged in to access any route past this point
-routerGame.use(middlewareAuthenticationPassport.checkAuthenticated);
-
-routerGame.use('/api', routerGamesAPI);
+routerGame.use(middlewarePassport.checkAuthenticated);
 
 routerGame.get(
     '/',
-    controllerGame.getGame,
+    controllerGame.GETGame,
 );
 
-routerGame.get(
-    '/getTestGame',
-    controllerGame.getTestGame,
-);
+// routerGame.get(
+//     '/getTestGame',
+//     controllerGame.getTestGame,
+// );
 
-routerGame.get(
+routerGame.use(
     '/:game_id',
-    middlewareGameUno.attachGameToResLocals,
+    middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocalsIfPossible,
+    middlewareGameUnoGameGameID.joinGameIfPossible,
+    middlewareModifyReqResGameUnoGameID.attachPlayerToRequestAndResponseLocalsIfPossible,
 );
 
-routerGame.get(
-    '/:game_id',
-    controllerGame.getGameByGameId,
-);
+routerGame.get('/:game_id', controllerGame.GETGameByGameId);
+
+routerGame.use('/:game_id', routerGamesID);
 
 module.exports = routerGame;

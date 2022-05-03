@@ -6,11 +6,12 @@ module.exports = {
          * Example:
          * await queryInterface.createTable('users', { id: Sequelize.DataTypes.INTEGER });
          */
-        return queryInterface.createTable("UserStatistic", {
+        return queryInterface.createTable('UserStatistic', {
             // user_id is a foreign key not a primary key
             user_id: {
                 type: Sequelize.DataTypes.INTEGER,
-                references: { model: "User", key: "user_id" },
+                references: { model: 'User', key: 'user_id' },
+                onDelete: 'CASCADE',
                 allowNull: false,
                 unique: true,
             },
@@ -31,8 +32,7 @@ module.exports = {
 
             date_joined: {
                 type: Sequelize.DATE,
-                // change to NOW() to CURRENT_TIMESTAMP
-                defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+                defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
                 allowNull: false,
                 unique: false,
             },

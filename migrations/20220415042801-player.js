@@ -15,7 +15,6 @@ module.exports = {
                 autoIncrement: true,
                 allowNull: false,
                 unique: true,
-                onDelete: 'CASCADE',
             },
 
             user_id: {
@@ -24,6 +23,7 @@ module.exports = {
                     model: 'User',
                     key: 'user_id',
                 },
+                onDelete: 'CASCADE',
                 allowNull: false,
                 unique: false, // Allow 1 user to play in multiple games
             },

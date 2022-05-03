@@ -1,5 +1,3 @@
-const passwordHandler = require('../controller/handler_password');
-
 module.exports = {
     async up(queryInterface, Sequelize) {
         /**
