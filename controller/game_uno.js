@@ -486,6 +486,19 @@ async function getGameState(game_id) {
 
 gameUno.getGameState = getGameState;
 
+async function drawCard(game_id, player_id) {
+    debugPrinter.printFunction(drawCard.name);
+
+    const result = await dbEngineGameUno.updateCardForPlayerByPlayerID(game_id, player_id);
+    if (!result) {
+        return null;
+    }
+
+    return result;
+}
+
+gameUno.drawCard = drawCard;
+
 module.exports = gameUno;
 
 // TODO REASSIGN player_index WHEN A PLAYER IS OUT. BASCIALLY WHEN THEY CALLED UNO AND THEY ARE NOT A PLAYER IN THE ACTUAL PLAYING OF THE GAME

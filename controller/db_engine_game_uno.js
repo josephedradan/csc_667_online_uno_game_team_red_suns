@@ -1152,19 +1152,47 @@ async function updateGamePlayerIDHostByGameID(game_id, player_id) {
 
 dbEngineGameUno.updateGamePlayerIDHostByGameID = updateGamePlayerIDHostByGameID;
 
-async function drawCardForPlayerByPlayerID(player_id) {
-    debugPrinter.printFunction(drawCardForPlayerByPlayerID.name);
+async function updateCardForPlayerByPlayerID(game_id, player_id) {
+    /*
+    WITH messageRow AS (
+            INSERT INTO "Message" (game_id, player_id, message)
+            VALUES ($1, $2, $3)
+            RETURNING *
+        )
+    */
+    debugPrinter.printFunction(updateCardForPlayerByPlayerID.name);
     const result = await db.any(
         `
+        WITH topDrawCollectionIndex AS (
+            SELECT "Collection".card_state_id
+            FROM "Collection" 
+            JOIN "Cards" ON "Collection".card_state_id = "Cards".card_state_id
+            WHERE "Cards".game_id = $2
+            ORDER BY collection_index DESC LIMIT 1
+        ), topHandCollectionIndex AS (
+            SELECT COUNT(*) as amount
+            FROM "Collection" 
+            JOIN "Cards" ON "Collection".card_state_id = "Cards".card_state_id
+            WHERE "Collection".player_id = $1
+        )
+        UPDATE "Collection" 
+        SET    
+            player_id = $1,
+            collection_info_id = 3,
+            collection_index = (SELECT amount FROM topHandCollectionIndex)
+        FROM topDrawCollectionIndex 
+        WHERE "Collection".card_state_id = topDrawCollectionIndex.card_state_id
+        RETURNING *;
         `,
         [
             player_id,
+            game_id,
         ],
     );
 
-    return result;
+    return result[0];
 }
 
-dbEngineGameUno.drawCardForPlayerByPlayerID = drawCardForPlayerByPlayerID;
+dbEngineGameUno.updateCardForPlayerByPlayerID = updateCardForPlayerByPlayerID;
 
 module.exports = dbEngineGameUno;

@@ -1,8 +1,9 @@
-const gameUno = require("./game_uno");
-const debugPrinter = require("../util/debug_printer");
-const intermediateSocketIOGameUno = require("./intermediate_socket_io_game_uno");
-const dbEngineMessage = require("./db_engine_message");
-const dbEngineGameUno = require("./db_engine_game_uno");
+const gameUno = require('./game_uno');
+const debugPrinter = require('../util/debug_printer');
+const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');
+const dbEngineMessage = require('./db_engine_message');
+const dbEngineGameUno = require('./db_engine_game_uno');
+const { io } = require('../server/server');
 
 const intermediateGameUno = {};
 
@@ -43,7 +44,7 @@ async function createGameWrapped(user_id) {
     }
 
     const game_url = await intermediateGameUno.getRelativeGameURL(
-        gameObject.game.game_id
+        gameObject.game.game_id,
     );
 
     debugPrinter.printBackendGreen(game_url);
@@ -120,13 +121,13 @@ async function sendMessageWrapped(game_id, player_id, message) {
     const messageRow = await dbEngineMessage.createMessageRow(
         game_id,
         player_id,
-        message
+        message,
     );
 
     // Emit client message to everyone in the room
     await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageClient(
         game_id,
-        messageRow
+        messageRow,
     );
 
     return messageRow;
@@ -136,11 +137,11 @@ intermediateGameUno.sendMessageWrapped = sendMessageWrapped;
 
 async function startGameWrapped(game_id, player_id) {
     const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
-    console.log("GAMEROW");
+    console.log('GAMEROW');
     console.log(gameRow);
-    console.log("GAMEROW");
-    console.log("playerid  " + player_id);
-    console.log("gameid " + game_id);
+    console.log('GAMEROW');
+    console.log(`playerid  ${player_id}`);
+    console.log(`gameid ${game_id}`);
     // If player_id is host and if game is not active, make it active
     if (gameRow.player_id_host === player_id && gameRow.is_active === false) {
         await dbEngineGameUno.updateGameIsActiveByGameID(game_id, true);
@@ -149,14 +150,24 @@ async function startGameWrapped(game_id, player_id) {
     // TODO GET THE CARDS
 
     // Emit the gameState to room and get gameState
-    const gameState =
-        await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(
-            game_id
-        );
+    const gameState = await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(
+        game_id,
+    );
 
     return gameState;
 }
 
 intermediateGameUno.startGameWrapped = startGameWrapped;
+
+async function drawCardWrap(game_id, player_id) {
+    const retval = await gameUno.drawCard(game_id, player_id);
+    const gameState = await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(
+        game_id,
+    );
+
+    return retval;
+}
+
+intermediateGameUno.drawCardWrap = drawCardWrap;
 
 module.exports = intermediateGameUno;

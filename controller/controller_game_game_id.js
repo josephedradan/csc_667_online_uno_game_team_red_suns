@@ -18,6 +18,7 @@ const utilCommon = require('./util_common');
 const debugPrinter = require('../util/debug_printer');
 const dbEngineMessage = require('./db_engine_message');
 const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');
+const db = require('../db');
 
 const controllerGameID = {};
 
@@ -30,9 +31,13 @@ const controllerGameID = {};
 async function POSTPlayCard(req, res, next) {
     // TODO: SOCKET HERE
 
+    /* LOOK AT MIGRATION
+    * req.user
+      req.game
+      req.player
+    */
     const {
-        card_id,
-        lobby_id,
+        collection_index,
     } = req.body;
 
     res.json({
@@ -44,15 +49,9 @@ async function POSTPlayCard(req, res, next) {
 controllerGameID.POSTPlayCard = POSTPlayCard;
 
 async function GETDrawCard(req, res, next) {
-    // TODO: SOCKET HERE
-    // grab the player thats drawing the card.
-    // Draw the card from the top of the Draw Stack Collection.
-    const { player_id } = req.player.player_id;
-
-    res.json({
-        status: 'success',
-        message: 'you drew a card (CHANGE ME)', // TODO CHANGE ME
-    });
+    await intermediateGameUno.drawCardWrap(req.game.game_id, req.player.player_id);
+    const retVal = await dbEngineGameUno.getCollectionByPlayerID(req.player.player_id);
+    res.json(retVal);
 }
 
 controllerGameID.GETDrawCard = GETDrawCard;
