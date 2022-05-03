@@ -473,7 +473,7 @@ async function getGameState(game_id) {
     const drawRows = await dbEngineGameUno.getCollectionCollectionIndexRowsDrawByGameID(game_id);
 
     // May be empty
-    const playRows = await dbEngineGameUno.getCollectionByGameIDAndCollectionInfoID(game_id, 1);
+    const playRows = await dbEngineGameUno.getCollectionByGameIDAndCollectionInfoID(game_id, 2);
 
     // Game state
     return {
