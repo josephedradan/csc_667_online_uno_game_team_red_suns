@@ -1152,4 +1152,19 @@ async function updateGamePlayerIDHostByGameID(game_id, player_id) {
 
 dbEngineGameUno.updateGamePlayerIDHostByGameID = updateGamePlayerIDHostByGameID;
 
+async function drawCardForPlayerByPlayerID(player_id) {
+    debugPrinter.printFunction(drawCardForPlayerByPlayerID.name);
+    const result = await db.any(
+        `
+        `,
+        [
+            player_id,
+        ],
+    );
+
+    return result;
+}
+
+dbEngineGameUno.drawCardForPlayerByPlayerID = drawCardForPlayerByPlayerID;
+
 module.exports = dbEngineGameUno;

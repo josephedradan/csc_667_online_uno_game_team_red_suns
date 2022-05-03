@@ -45,6 +45,9 @@ controllerGameID.POSTPlayCard = POSTPlayCard;
 
 async function GETDrawCard(req, res, next) {
     // TODO: SOCKET HERE
+    // grab the player thats drawing the card.
+    // Draw the card from the top of the Draw Stack Collection.
+    const { player_id } = req.player.player_id;
 
     res.json({
         status: 'success',
