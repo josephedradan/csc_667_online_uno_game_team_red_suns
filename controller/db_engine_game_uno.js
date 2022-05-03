@@ -845,7 +845,7 @@ async function getCollectionByGameID(game_id) {
         JOIN "CardInfo" ON "CardInfo".card_info_id = "CardState".card_info_id
         JOIN "CollectionInfo" ON "CollectionInfo".collection_info_id = "Collection".collection_info_id
         WHERE "Cards".game_id = $1
-        ORDER BY "Collection".collection_index
+        ORDER BY "Collection".collection_index ASC;
         `,
         [
             game_id,
@@ -887,7 +887,7 @@ async function getCollectionByPlayerID(player_id) {
         JOIN "CardInfo" ON "CardInfo".card_info_id = "CardState".card_info_id
         JOIN "CollectionInfo" ON "CollectionInfo".collection_info_id = "Collection".collection_info_id
         WHERE "Collection".player_id = $1
-        ORDER BY "Collection".collection_index
+        ORDER BY "Collection".collection_index ASC;
         `,
         [
             player_id,
@@ -931,7 +931,7 @@ async function getCollectionByGameIDAndCollectionInfoID(game_id, collection_info
         JOIN "CollectionInfo" ON "CollectionInfo".collection_info_id = "Collection".collection_info_id
         WHERE "Cards".game_id = $1
         AND "Collection".collection_info_id = $2
-        ORDER BY "Collection".collection_index
+        ORDER BY "Collection".collection_index ASC;
         `,
         [
             game_id,
@@ -1041,6 +1041,7 @@ async function getCollectionCollectionIndexRowsByPlayerID(player_id) {
         SELECT collection_index
         FROM "Collection"
         WHERE "Collection".player_id = $1
+        ORDER BY "Collection".collection_index ASC;
         `,
         [player_id],
     );
@@ -1059,6 +1060,7 @@ async function getCollectionCollectionIndexRowsDrawByGameID(game_id) {
         FROM "Collection"
         JOIN "Cards" ON "Collection".card_state_id = "Cards".card_state_id
         WHERE "Cards".game_id = $1
+        ORDER BY "Collection".collection_index ASC;
         `,
         [game_id],
     );

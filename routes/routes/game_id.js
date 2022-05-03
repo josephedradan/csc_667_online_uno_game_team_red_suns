@@ -23,8 +23,8 @@ routerGameID.get(
 );
 
 routerGameID.get(
-    '/currentGame',
-    controllerGameID.GETCurrentGame,
+    '/gameState',
+    controllerGameID.GETGameState,
 );
 
 /*
