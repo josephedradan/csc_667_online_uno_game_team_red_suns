@@ -362,7 +362,7 @@
     height: 200px;
 }
 
-.cards {
+.cardStateRows {
     display: flex;
     align-content: center;
     align-items: center;
@@ -370,7 +370,7 @@
     flex-basis: max-content;
 }
 
-.cards .cardWrapper {
+.cardStateRows .cardWrapper {
     /*overflow: hidden;*/
     background: none;
     margin-top: auto;
@@ -384,12 +384,12 @@
     max-width: 116px;
 }
 
-.cards .cardWrapper .unoCard {
+.cardStateRows .cardWrapper .unoCard {
     left: 0;
     bottom: 0px;
 }
 
-#playerDeck.cards .cardWrapper > .unoCard {
+#playerHand.cardStateRows .cardWrapper > .unoCard {
     transition-property: transform;
     transition-duration: 0.05s;
     transition-timing-function: ease-in-out;
@@ -397,7 +397,7 @@
 }
 
 .cardWrapper:last-child,
-#playerDeck.cards .cardWrapper:hover {
+#playerHand.cardStateRows .cardWrapper:hover {
     width: 116px;
     overflow: visible;
 }
@@ -435,7 +435,9 @@
     transform: translate(0, -20%);
 }
 
-#playerDeck.cards .cardWrapper:hover .unoCard {
+/* :not([disabled]) */
+
+#playerHand.cardStateRows .cardWrapper:hover .unoCard {
     transform: translateY(-20%);
 }
 

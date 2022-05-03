@@ -1,3 +1,6 @@
+// const { array } = require("joi");
+// const { createCardStateRowsAndCardsRows } = require("../../controller/db_engine_game_uno");
+// TODO: FIX DISABLE ON not TURN  
 class Draggable {
 
     constructor(element, containers, boundary) {
@@ -37,6 +40,14 @@ class Draggable {
     }
     
     dragMouseDown(event) {
+
+        if (this.element.getAttribute("disabled") !== null) {
+            console.log("It was disabled!");
+            return;
+        } else {
+            console.log("It was not disabled");
+        }
+
         event.preventDefault();
 
         document.onmouseup = this.dragMouseUp.bind(this);
@@ -106,7 +117,7 @@ class Draggable {
     }
 }
 
-/*
+
 function createCard() {
     let cardWrapper = document.createElement("div");
     cardWrapper.classList.add("cardWrapper", "dragCard");
@@ -127,19 +138,22 @@ function createCard() {
     return cardWrapper;
 }
 
-let deck = document.getElementById("playerDeck");
+let hand = document.getElementById("playerHand");
 let discard = document.getElementById("discard");
 let drawCard = document.getElementById("drawCard");
 let table = document.getElementById("gameTable");
 
-let draggableCards = document.getElementsByClassName("dragCard");
+let myCards = [];
+for (let i = 0; i < hand.children.length; i++) {
+    myCards.push(hand.children[i]);
+}
 
 let containers = [
-    deck,
+    hand,
     discard,
 ];
 
-for (let card of draggableCards) {
+for (let card of myCards) {
     let draggable = new Draggable(card, containers, table);
     draggable.setCallback((parentContainer) => {
         if (parentContainer === discard) {
@@ -152,13 +166,20 @@ for (let card of draggableCards) {
 }
 
 let drawCardParent = drawCard.parentElement;
-let draggable = new Draggable(drawCard, [deck], table);
+let draggable = new Draggable(drawCard, [hand], table);
 draggable.setCallback((parentContainer) => {
-    if (parentContainer === deck) {
+    if (parentContainer === hand) {
         console.log("Drew a card!");
         drawCardParent.appendChild(drawCard);
         let newCard = createCard();
-        deck.appendChild(newCard);
+        hand.appendChild(newCard);
+        /*
+        myCards.push(newCard);
+
+        for (let card of myCards) {
+            
+        }*/
+
         let draggable = new Draggable(newCard, containers, table);
         draggable.setCallback((parentContainer) => {
             if (parentContainer === discard) {
@@ -167,4 +188,8 @@ draggable.setCallback((parentContainer) => {
         });
     }
 });
-*/
+
+class UnoGame {
+    
+}
+
