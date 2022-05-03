@@ -13,7 +13,7 @@ const fadeOutFlashMessage = (msg) => {
     }, 2000);
 };
 
-const flash_message = document.getElementById("flash-message");
+const flash_message = document.getElementById('flash-message');
 if (flash_message) {
     fadeOutFlashMessage(flash_message);
 }
