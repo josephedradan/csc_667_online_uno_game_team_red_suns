@@ -49,7 +49,7 @@ async function POSTPlayCard(req, res, next) {
 controllerGameID.POSTPlayCard = POSTPlayCard;
 
 async function GETDrawCard(req, res, next) {
-    await intermediateGameUno.drawCardWrap(req.game.game_id, req.player.player_id);
+    await intermediateGameUno.drawCardWrapped(req.game.game_id, req.player.player_id);
     const retVal = await dbEngineGameUno.getCollectionByPlayerID(req.player.player_id);
     res.json(retVal);
 }
@@ -65,6 +65,30 @@ async function POSTStartGame(req, res, next) {
 }
 
 controllerGameID.POSTStartGame = POSTStartGame;
+
+async function POSTLeaveGame(req, res, next) {
+    debugPrinter.printMiddleware(POSTLeaveGame.name);
+
+    const result = await intermediateGameUno.leaveGameWrapped(req.game.game_id, req.user.user_id);
+
+    debugPrinter.printDebug(result);
+
+    res.json(result);
+}
+
+controllerGameID.POSTLeaveGame = POSTLeaveGame;
+
+async function POSTTransferHost(req, res, next) {
+    debugPrinter.printMiddleware(POSTLeaveGame.name);
+
+    const result = await intermediateGameUno.leaveGameWrapped(req.game.game_id, req.user.user_id);
+
+    debugPrinter.printDebug(result);
+
+    res.json(result);
+}
+
+controllerGameID.POSTTransferHost = POSTTransferHost;
 
 async function GETAllMessages(req, res, next) {
     debugPrinter.printMiddleware(GETAllMessages.name);
@@ -124,15 +148,4 @@ async function GETGetHand(req, res, next) {
 
 controllerGameID.GETGetHand = GETGetHand;
 
-async function POSTLeaveGame(req, res, next) {
-    debugPrinter.printMiddleware(POSTLeaveGame.name);
-
-    const result = await intermediateGameUno.leaveGameWrapped(req.game.game_id, req.user.user_id);
-
-    debugPrinter.printDebug(result);
-
-    res.json(result);
-}
-
-controllerGameID.POSTLeaveGame = POSTLeaveGame;
 module.exports = controllerGameID;

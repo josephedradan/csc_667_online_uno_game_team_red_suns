@@ -60,7 +60,7 @@ Number cards, a breakdown:
 // Pull the data for the numbered cards for the following colors; red, blue, yellow, green
 //  make copies of those cards per color following the instructions above.
 // Pull the black cards and make their copies based on instruction above.
-// Shuffle the new deck and insert them in the CardState Table and Card.
+// Shuffle the new deck and insert them in the Card Table and Card.
 
 /**
  * TODO: Make the Deck first and shulffe them.

@@ -90,6 +90,7 @@ Return format
     status
     message
     player
+    game
 {
  */
 async function leaveGameWrapped(game_id, user_id) {
@@ -97,10 +98,16 @@ async function leaveGameWrapped(game_id, user_id) {
 
     const result = await gameUno.leaveGame(game_id, user_id);
 
-    await Promise.all([
-        // intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServer(game_id, )
-        intermediateSocketIOGameUno.emitInRoomSeverIndexGames(),
-    ]);
+    const arrayPromises = [intermediateSocketIOGameUno.emitInRoomSeverIndexGames()];
+
+    if (result.game) {
+        arrayPromises.push(intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServerWrapped(
+            game_id,
+            'The host left, the game is dead, go back to the homepage.',
+        ));
+    }
+
+    await Promise.all(arrayPromises);
 
     return result;
 }
@@ -108,13 +115,15 @@ async function leaveGameWrapped(game_id, user_id) {
 intermediateGameUno.leaveGameWrapped = leaveGameWrapped;
 
 /*
+Return format
+{
     player_id,
     message_id,
     time_stamp_,
     message,
     display_name,
     game_id
-
+}
  */
 async function sendMessageWrapped(game_id, player_id, message) {
     debugPrinter.printFunction(sendMessageWrapped.name);
@@ -136,15 +145,16 @@ async function sendMessageWrapped(game_id, player_id, message) {
 
 intermediateGameUno.sendMessageWrapped = sendMessageWrapped;
 
+/*
+Return format
+{
+    status,
+    message,
+    game
+}
+ */
 async function startGameWrapped(game_id, player_id) {
-    const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
-
-    // If player_id is host and if game is not active, make it active
-    if (gameRow.player_id_host === player_id && gameRow.is_active === false) {
-        await dbEngineGameUno.updateGameIsActiveByGameID(game_id, true);
-    }
-
-    // TODO GET THE CARDS
+    const result = await gameUno.startGame(game_id, player_id);
 
     // Emit the gameState to room and get gameState
     const gameState = await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(
@@ -156,15 +166,17 @@ async function startGameWrapped(game_id, player_id) {
 
 intermediateGameUno.startGameWrapped = startGameWrapped;
 
-async function drawCardWrap(game_id, player_id) {
-    const retval = await gameUno.drawCard(game_id, player_id);
-    const gameState = await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(
+async function drawCardWrapped(game_id, player_id) {
+    const result = await gameUno.drawCard(game_id, player_id);
+
+    // Emit the gameState to room and get gameState
+    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(
         game_id,
     );
 
-    return retval;
+    return result;
 }
 
-intermediateGameUno.drawCardWrap = drawCardWrap;
+intermediateGameUno.drawCardWrapped = drawCardWrapped;
 
 module.exports = intermediateGameUno;

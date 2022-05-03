@@ -8,16 +8,16 @@ module.exports = {
          */
         return queryInterface.createTable('Collection', {
 
-            // *** THIS DOES NOT EXIST YET, THIS SHOULD BE CREATED BY THE MIGRATION card_state ***
-            // card_state_id: {
+            // *** THIS DOES NOT EXIST YET, THIS SHOULD BE CREATED BY THE MIGRATION card ***
+            // card_id: {
             //     type: Sequelize.DataTypes.INTEGER,
-            //     references: { model: 'CardState', key: 'card_state_id' },
+            //     references: { model: 'Card', key: 'card_id' },
             //     allowNull: false,
             //     unique: true,
             // },
 
             // *** THIS DOES NOT EXIST YET, THIS SHOULD BE CREATED BY THE MIGRATION collection_info ***
-            // Collection info id maps to a row telling you what collection the card state is in
+            // Collection info id maps to a row telling you what collection the card is in
             // collection_info_id: {
             //     type: Sequelize.DataTypes.INTEGER,
             //     references: { model: 'CollectionInfo', key: 'collection_info_id' },
@@ -32,11 +32,11 @@ module.exports = {
                     key: 'player_id',
                 },
                 onDelete: 'CASCADE',
-                allowNull: true, // card state may not be in user hand, it can be the deck stack or draw stack
-                unique: false, // Player can have multiple card states
+                allowNull: true, // card may not be in user hand, it can be the deck stack or draw stack
+                unique: false, // Player can have multiple cards
             },
 
-            // Index of the card_state_id in the collection. The collection based on collection_info_id
+            // Index of the card_id in the collection. The collection based on collection_info_id
             collection_index: {
                 type: Sequelize.DataTypes.INTEGER,
                 allowNull: false,
