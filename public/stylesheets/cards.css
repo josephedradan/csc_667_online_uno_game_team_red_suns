@@ -389,7 +389,7 @@
     bottom: 0px;
 }
 
-.cards.playerDeck .cardWrapper > .unoCard {
+#playerDeck.cards .cardWrapper > .unoCard {
     transition-property: transform;
     transition-duration: 0.05s;
     transition-timing-function: ease-in-out;
@@ -397,7 +397,7 @@
 }
 
 .cardWrapper:last-child,
-.cards.playerDeck .cardWrapper:hover {
+#playerDeck.cards .cardWrapper:hover {
     width: 116px;
     overflow: visible;
 }
@@ -414,21 +414,28 @@
 }
 */
 
-.unoCard.flipped.drawCard {
+#discard .cardWrapper {
     position: absolute;
-    left: 50%;
-    top: 50%;
+}
+
+#discard {
+    width: 126px;
+    height: 200px;
+}
+
+#drawCard {
+    position: absolute;
     transition-property: transform;
     transition-duration: 0.075s;
     transition-timing-function: ease-in-out;
-    transform: translate(-50%, -50%) translate(-10px, -10px);
+    transform: none;
 }
 
-.cardWrapper:hover .unoCard.flipped.drawCard {
-    transform: translate(-50%, -70%) translate(-10px, -10px);
+#drawCard.cardWrapper:hover {
+    transform: translate(0, -20%);
 }
 
-.cards.playerDeck .cardWrapper:hover .unoCard {
+#playerDeck.cards .cardWrapper:hover .unoCard {
     transform: translateY(-20%);
 }
 
