@@ -279,6 +279,10 @@ socket.on('server-index-games', (msg) => {
  */
 
 socket.on('server-game-game-id-game-state', (msg) => {
+    console.log(
+        '%cserver-game-game-id-game-state',
+        'color: black;background-color:lawngreen;font-size: 20px;',
+    );
     console.log(msg);
 });
 
