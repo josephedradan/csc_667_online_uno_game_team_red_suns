@@ -1,5 +1,5 @@
 <div class="grid grid-cols-8 gap-3">
-    {{#if game.is_active}}
+    {{#unless game.is_active}}
         <div class="grid grid-cols-3 col-span-6 gap-4" id="list_of_players">
 
         </div>
@@ -353,7 +353,7 @@
 
             </div>
             <div></div>
-            <div class="relative col-span-1 grid content-center">
+            <div class="relative grid content-center col-span-1">
                 <button
                     {{! callUno will be used with tandem with an event listener to call the back }}
                     id="challenge"
@@ -361,7 +361,7 @@
                 >Challenge</button>
             </div>
             <div></div>
-            <div class="relative col-span-1 grid content-center">
+            <div class="relative grid content-center col-span-1">
                 <button
                     {{! callUno will be used with tandem with an event listener to call the back }}
                     id="callUno"
@@ -369,7 +369,7 @@
                 >Uno</button>
             </div>
         </div>
-    {{/if}}
+    {{/unless}}
     {{! Chat Box }}
     <div
         class="flex flex-col space-y-2 col-span-2 h-[calc(100vh_-_112px)] p-2 bg-slate-200"
