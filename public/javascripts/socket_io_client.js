@@ -22,7 +22,7 @@ socket.on('connect', async () => {
         console.log(`game_id: ${game_id}`);
         socket.emit('client-game-game-id-join-room', parseInt(game_id)); // parsed game_id from URL.
         // load all previous messages in lobby.
-        const results = await axios.get(`/game/${game_id}/getAllMessages`);
+        const results = await axios.get(`/game/${game_id}/getMessages`);
         for (const old_msgs of results.data) {
             outputMessage(old_msgs);
         }
@@ -287,6 +287,7 @@ socket.on('server-index-games', (msg) => {
  * Start game logic
  */
 
+/*
 socket.on('server-game-game-id-game-state', (game_state) => {
     console.log(
         '%cserver-game-game-id-game-state',
@@ -323,6 +324,7 @@ socket.on('server-game-game-id-game-state', (game_state) => {
     //let players = axios.get(`/game/${getGameId()}/GETPlayers`)
 
 });
+*/
 
 // const generate_flipped_card = () => {
 //     const cardWrapper = document
@@ -390,34 +392,3 @@ socket.on('server-game-game-id-game-state', (game_state) => {
 //     cardWrapper.append(unoCard);
 //     return cardWrapper;
 // };
-
-var gameRenderer;
-
-window.onload = async () => {
-    let drawContainer = document.getElementById("drawCard");
-    let playContainer = document.getElementById("discard");
-
-    gameRenderer = new UnoGameRenderer(drawContainer, playContainer);
-
-    console.log(gameRenderer);
-    console.log("That was the renderer");
-
-    const players = await axios.get(`/game/${getGameId()}/GETPlayers`);
-    const me = await axios.get(`/game/${getGameId()}/GETPlayer`);
-
-    let offset = 0;
-
-    players.forEach((player, index) => {
-        if (player.player_id === me.player_id) {
-            offset = index;
-        }
-    });
-
-    for (let i = 0; i < players.length; i++) {
-        let handContainer = document.getElementById("player" + i);
-        let player = players[(i + offset) % players.length];
-        gameRenderer.addPlayer(player.player_id, handContainer);
-    }
-
-    gameRenderer.addPlayer();
-}
