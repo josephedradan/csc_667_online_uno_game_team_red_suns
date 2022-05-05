@@ -54,7 +54,7 @@ async function GETDrawCard(req, res, next) {
 
     await intermediateGameUno.drawCardDeckToHandWrapped(req.game.game_id, req.player.player_id);
 
-    const result = await dbEngineGameUno.getCollectionByPlayerID(req.player.player_id);
+    const result = await dbEngineGameUno.getCollectionRowByPlayerID(req.player.player_id);
 
     debugPrinter.printDebug(result);
 
@@ -99,15 +99,15 @@ async function POSTTransferHost(req, res, next) {
 
 controllerGameID.POSTTransferHost = POSTTransferHost;
 
-async function GETAllMessages(req, res, next) {
-    debugPrinter.printMiddleware(GETAllMessages.name);
+async function GETGetMessages(req, res, next) {
+    debugPrinter.printMiddleware(GETGetMessages.name);
 
     const messageRows = await dbEngineMessage.getMessageRowsByGameID(req.game.game_id);
 
     res.json(messageRows);
 }
 
-controllerGameID.GETAllMessages = GETAllMessages;
+controllerGameID.GETGetMessages = GETGetMessages;
 
 /**
  * Get Info about the current game the user is in
@@ -148,7 +148,7 @@ controllerGameID.POSTSendMessage = POSTSendMessage;
 async function GETGetHand(req, res, next) {
     debugPrinter.printMiddleware(GETGetHand.name);
 
-    const result = await dbEngineGameUno.getCollectionByPlayerID(req.player.player_id);
+    const result = await gameUno.getHand(req.player.player_id);
 
     debugPrinter.printDebug(result);
 
@@ -168,5 +168,17 @@ async function GETPlayers(req, res, next) {
 }
 
 controllerGameID.GETPlayers = GETPlayers;
+
+async function GETPlayer(req, res, next) {
+    debugPrinter.printMiddleware(GETPlayer.name);
+
+    const result = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByPlayerID(req.player.player_id);
+
+    debugPrinter.printDebug(result);
+
+    res.json(result);
+}
+
+controllerGameID.GETPlayer = GETPlayer;
 
 module.exports = controllerGameID;

@@ -18,8 +18,8 @@ routerGameID.post(
 );
 
 routerGameID.get(
-    '/getAllMessages',
-    controllerGameID.GETAllMessages, // TODO CLEAN
+    '/getMessages',
+    controllerGameID.GETGetMessages, // TODO CLEAN
 );
 
 routerGameID.get(
@@ -31,6 +31,12 @@ routerGameID.get(
     '/getPlayers',
     controllerGameID.GETPlayers,
 );
+
+routerGameID.get(
+    '/getPlayer',
+    controllerGameID.GETPlayer,
+);
+
 
 /*
 Notes:

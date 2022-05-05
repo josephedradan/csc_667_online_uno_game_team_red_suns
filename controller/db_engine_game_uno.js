@@ -908,7 +908,7 @@ async function getCollectionByPlayerID(player_id) {
     return result;
 }
 
-dbEngineGameUno.getCollectionByPlayerID = getCollectionByPlayerID;
+dbEngineGameUno.getCollectionRowByPlayerID = getCollectionByPlayerID;
 
 /**
  * Get Collection by game_id and collection_info_id
@@ -991,6 +991,35 @@ async function getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, u
 }
 
 dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID = getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID;
+
+async function getPlayerRowJoinPlayersRowJoinGameRowByPlayerID(player_id) {
+    debugPrinter.printFunction(getPlayerRowJoinPlayersRowJoinGameRowByPlayerID.name);
+    const result = await db.any(
+        `
+        SELECT
+            "Player".player_id,
+            "Player".user_id,
+            "Players".game_id,
+            "User".display_name,
+            "UserStatistic".num_wins,
+            "UserStatistic".num_loss
+        FROM "Player"
+        JOIN "Players" ON "Player".player_id = "Players".player_id
+        JOIN "Game" ON "Players".game_id = "Game".game_id
+        JOIN "User" ON "Player".user_id = "User".user_id
+        JOIN "UserStatistic" ON "Player".user_id = "UserStatistic".user_id
+        WHERE "Player".player_id = $1
+        `,
+        [
+            player_id,
+        ],
+    );
+
+    return result[0];
+}
+
+dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByPlayerID = getPlayerRowJoinPlayersRowJoinGameRowByPlayerID;
+
 
 /**
  * Get all Player Rows based the game_id
@@ -1254,14 +1283,19 @@ async function updateCollectionRowHandToPlay(game_id, collection_index, player_i
     const result = await db.any(
         `
         WITH playCardCollectionIndex AS (
-            SELECT "Collection".card_id From "Collection"
+            SELECT "Collection".card_id 
+            From "Collection"
             JOIN "Cards" ON "Collection".card_id = "Cards".card_id
-            WHERE player_id = $3 AND collection_index = $2 AND game_id = $1
+            WHERE player_id = $3 
+            AND collection_index = $2 
+            AND game_id = $1
             ORDER BY collection_index DESC LIMIT 1
         ), playStackCount AS (
-            SELECT COUNT(*) as amount FROM "Collection" 
+            SELECT COUNT(*) as amount 
+            FROM "Collection" 
             JOIN "Cards" ON "Collection".card_id = "Cards".card_id
-            WHERE "Cards".game_id = $1 AND "Collection".collection_info_id = 2
+            WHERE "Cards".game_id = $1 
+            AND "Collection".collection_info_id = 2
         ) 
         UPDATE "Collection" 
             SET    
