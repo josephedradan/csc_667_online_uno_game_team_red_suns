@@ -588,6 +588,20 @@ async function drawCardDeckToHand(game_id, player_id) { // TODO ADD MORE GUARDIN
 
 gameUno.drawCardDeckToHand = drawCardDeckToHand;
 
+async function playHandToPlayDeck(game_id, collection_index, player_id) {
+    debugPrinter.printFunction(playHandToPlayDeck.name);
+
+    const result = await dbEngineGameUno.updateCollectionRowHandToPlay(game_id, collection_index, player_id);
+
+    if (!result) {
+        return null;
+    }
+
+    return result;
+}
+
+gameUno.playHandToPlayDeck = playHandToPlayDeck;
+
 async function drawCardDeckToPlay(game_id) { // TODO ADD MORE GUARDING AND ERROR CHECKING ETC
     debugPrinter.printFunction(drawCardDeckToPlay.name);
 
