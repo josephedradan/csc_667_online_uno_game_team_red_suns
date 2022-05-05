@@ -232,7 +232,7 @@ window.onload = async () => {
             //gameWindow.classList.remove("grid");
         }
     
-        game_state.game.players.forEach((player) => {
+        game_state.players.forEach((player) => {
             gameRenderer.updateHand(player.player_id, player.collection);
         });
     
