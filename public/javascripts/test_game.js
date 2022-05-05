@@ -181,7 +181,3 @@ draggable.setCallback((parentContainer) => {
         });
     }
 });
-
-class UnoGame {
-
-}

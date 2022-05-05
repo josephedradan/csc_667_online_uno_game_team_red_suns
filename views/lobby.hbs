@@ -1,376 +1,66 @@
+<script src="/javascripts/uno_game_render.js"></script>
 <div class="grid grid-cols-8 gap-3">
-    {{#unless game.is_active}}
-        <div class="grid grid-cols-3 col-span-6 gap-4" id="list_of_players">
+    <div class="grid grid-cols-3 col-span-6 gap-4" id="list_of_players">
+        
+    </div>
 
-        </div>
-    {{else}}
-        <div class="grid grid-cols-3 col-span-6" id="gameTable">
-            <div class="col-span-1"></div>
-            <div class="col-span-1 cardStateRows northPlayer">
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-span-1"></div>
-            <div class="col-span-1 cardStateRows westPlayer">
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-            </div>
+    <div class="grid grid-cols-3 col-span-6 invisible hidden" id="game_window">
+        <div class="col-span-1"></div>
 
-            <div
-                class="flex items-center content-center justify-center col-span-1"
-            >
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                    <div class="cardWrapper" id="drawCard">
-                        <div class="unoCard flipped">
-                            <span class="inner">
-                                <span class="mark"></span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div id="discard">
-                    <div class="cardWrapper">
-                        <div class="unoCard num-3 green">
-                            <span class="inner">
-                                <span class="mark"></span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="col-span-1 cardStateRows" id="player2"></div>
 
-            <div class="col-span-1 cardStateRows eastPlayer">
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard flipped">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-span-1"></div>
-            <div class="col-span-1 cardStateRows" id="playerHand">
-                <div class="cardWrapper">
-                    <div class="unoCard num-0 blue">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard num-1 red">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard num-2 red">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard num-3 blue">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard num-4 green">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard num-0 yellow">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard num-6 red">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard skip green">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard num-8 yellow">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard num-9 blue">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                <div class="cardWrapper">
-                    <div class="unoCard reverse blue">
-                        <span class="inner">
-                            <span class="mark"></span>
-                        </span>
-                    </div>
-                </div>
-                {{! wild }}
-                <div class="cardWrapper">
-                    <div class="unoCard wild black">
-                        <span class="inner">
-                            <span class="wildMark">
-                                <div class="wildRed wildCard"></div>
-                                <div class="wildBlue wildCard"></div>
-                                <div class="wildYellow wildCard"></div>
-                                <div class="wildGreen wildCard"></div>
-                            </span>
-                        </span>
-                    </div>
-                </div>
-                {{! wild 4 }}
-                <div class="cardWrapper">
-                    <div class="unoCard wild4 black">
-                        <span class="inner">
-                            <span class="wild4Mark">
-                                <div class="wildRed wildCard"></div>
-                                <div class="wildBlue wildCard"></div>
-                                <div class="wildYellow wildCard"></div>
-                                <div class="wildGreen wildCard"></div>
-                            </span>
-                        </span>
-                    </div>
-                </div>
+        <div class="col-span-1"></div>
 
-                {{! Testing draggable purely html buggy... }}
-                <div
-                    class="cardWrapper"
-                    id="drag1"
-                    draggable="true"
-                    ondragstart="drag(event)"
-                >
-                    <div class="unoCard plus2 blue">
+        <div class="col-span-1 cardStateRows" id="player1"></div>
+
+        <div
+            class="flex items-center content-center justify-center col-span-1"
+        >
+            <div class="cardWrapper">
+                <div class="unoCard flipped">
+                    <span class="inner">
+                        <span class="mark"></span>
+                    </span>
+                </div>
+                <div class="cardWrapper" id="drawCard">
+                    <div class="unoCard flipped">
                         <span class="inner">
                             <span class="mark"></span>
                         </span>
                     </div>
                 </div>
-
             </div>
-            <div></div>
-            <div class="relative grid content-center col-span-1">
-                <button
-                    {{! callUno will be used with tandem with an event listener to call the back }}
-                    id="challenge"
-                    class="absolute bottom-0 right-0 px-4 py-2 mb-4 font-bold text-white rounded bg-sky-500 hover:bg-sky-700"
-                >Challenge</button>
-            </div>
-            <div></div>
-            <div class="relative grid content-center col-span-1">
-                <button
-                    {{! callUno will be used with tandem with an event listener to call the back }}
-                    id="callUno"
-                    class="absolute bottom-0 right-0 px-4 py-2 mb-4 font-bold text-white rounded bg-sky-500 hover:bg-sky-700"
-                >Uno</button>
+            <div id="discard">
+                <div class="cardWrapper">
+                    <div class="unoCard num-3 green">
+                        <span class="inner">
+                            <span class="mark"></span>
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
-    {{/unless}}
-    {{! Chat Box }}
+
+        <div class="col-span-1 cardStateRows" id="player3"></div>
+        <div class="col-span-1"></div>
+        <div class="col-span-1 cardStateRows" id="player0"></div>
+        <div></div>
+        <div class="relative grid content-center col-span-1">
+            <button
+                {{! callUno will be used with tandem with an event listener to call the back }}
+                id="challenge"
+                class="absolute bottom-0 right-0 px-4 py-2 mb-4 font-bold text-white rounded bg-sky-500 hover:bg-sky-700"
+            >Challenge</button>
+        </div>
+        <div></div>
+        <div class="relative grid content-center col-span-1">
+            <button
+                {{! callUno will be used with tandem with an event listener to call the back }}
+                id="callUno"
+                class="absolute bottom-0 right-0 px-4 py-2 mb-4 font-bold text-white rounded bg-sky-500 hover:bg-sky-700"
+            >Uno</button>
+        </div>
+    </div>
     <div
         class="flex flex-col space-y-2 col-span-2 h-[calc(100vh_-_112px)] p-2 bg-slate-200"
     >
