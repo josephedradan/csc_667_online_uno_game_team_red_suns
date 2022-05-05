@@ -1165,8 +1165,8 @@ async function updateGamePlayerIDHostByGameID(game_id, player_id) {
 
 dbEngineGameUno.updateGamePlayerIDHostByGameID = updateGamePlayerIDHostByGameID;
 
-async function updateCollectionRowDrawToPlayerByPlayerID(game_id, player_id) {
-    debugPrinter.printFunction(updateCollectionRowDrawToPlayerByPlayerID.name);
+async function updateCollectionRowDrawToHandByPlayerID(game_id, player_id) {
+    debugPrinter.printFunction(updateCollectionRowDrawToHandByPlayerID.name);
     /*
     WITH messageRow AS (
             INSERT INTO "Message" (game_id, player_id, message)
@@ -1208,7 +1208,7 @@ async function updateCollectionRowDrawToPlayerByPlayerID(game_id, player_id) {
     return result[0];
 }
 
-dbEngineGameUno.updateCollectionRowDrawToPlayerByPlayerID = updateCollectionRowDrawToPlayerByPlayerID;
+dbEngineGameUno.updateCollectionRowDrawToHandByPlayerID = updateCollectionRowDrawToHandByPlayerID;
 
 async function updateCollectionRowDrawToPlay(game_id) {
     debugPrinter.printFunction(updateCollectionRowDrawToPlay.name);
@@ -1247,5 +1247,41 @@ async function updateCollectionRowDrawToPlay(game_id) {
 }
 
 dbEngineGameUno.updateCollectionRowDrawToPlay = updateCollectionRowDrawToPlay;
+
+async function updateCollectionRowHandToPlay(game_id, collection_index, player_id) {
+    debugPrinter.printFunction(updateCollectionRowHandToPlay.name);
+
+    const result = await db.any(
+        `
+        WITH playCardCollectionIndex AS (
+            SELECT "Collection".card_id From "Collection"
+            JOIN "Cards" ON "Collection".card_id = "Cards".card_id
+            WHERE player_id = $3 AND collection_index = $2 AND game_id = $1
+            ORDER BY collection_index DESC LIMIT 1
+        ), playStackCount AS (
+            SELECT COUNT(*) as amount FROM "Collection" 
+            JOIN "Cards" ON "Collection".card_id = "Cards".card_id
+            WHERE "Cards".game_id = $1 AND "Collection".collection_info_id = 2
+        ) 
+        UPDATE "Collection" 
+            SET    
+                player_id = null,
+                collection_info_id = 2,
+                collection_index = (SELECT amount FROM playStackCount)
+        FROM playCardCollectionIndex 
+        WHERE "Collection".card_id = playCardCollectionIndex.card_id
+        RETURNING *;
+        `,
+        [
+            game_id,
+            collection_index,
+            player_id,
+        ],
+    );
+
+    return result[0];
+}
+
+dbEngineGameUno.updateCollectionRowHandToPlay = updateCollectionRowHandToPlay;
 
 module.exports = dbEngineGameUno;

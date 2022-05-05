@@ -67,6 +67,7 @@ async function getGameAndTheirPlayersByGameIDDetailed(game_id) {
         status: null,
         message: null,
         game: null,
+        players: null,
     };
 
     // May be undefined
@@ -74,20 +75,24 @@ async function getGameAndTheirPlayersByGameIDDetailed(game_id) {
 
     // If Game Row does not exist
     if (!gameRow) {
-        return null;
+        result.status = constants.FAILURE;
+        result.message = 'Getting game failed';
+        return result;
     }
+    result.game = gameRow;
 
     // May be empty
     const playerRows = await dbEngineGameUno.getPlayerRowsJoinPlayersRowJoinGameRowByGameID(gameRow.game_id);
 
-    const gameWithPlayersRows = {
-        game: gameRow,
-        players: playerRows,
-    };
+    if (!playerRows) {
+        result.status = constants.FAILURE;
+        result.message = 'Getting players failed';
+        return result;
+    }
+    result.players = playerRows;
 
     result.status = constants.SUCCESS;
     result.message = 'You got the game';
-    result.game = gameRow;
 
     return result;
 }
@@ -572,7 +577,7 @@ gameUno.getGameState = getGameState;
 async function drawCardDeckToHand(game_id, player_id) { // TODO ADD MORE GUARDING AND ERROR CHECKING ETC
     debugPrinter.printFunction(drawCardDeckToHand.name);
 
-    const result = await dbEngineGameUno.updateCollectionRowDrawToPlayerByPlayerID(game_id, player_id);
+    const result = await dbEngineGameUno.updateCollectionRowDrawToHandByPlayerID(game_id, player_id);
 
     if (!result) {
         return null;
