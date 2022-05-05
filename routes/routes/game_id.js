@@ -29,12 +29,17 @@ routerGameID.get(
 
 routerGameID.get(
     '/getPlayers',
-    controllerGameID.GETPlayers,
+    controllerGameID.GETGetGameAndTheirPlayers,
+);
+
+routerGameID.get(
+    '/getGame',
+    controllerGameID.GETGetGameAndTheirPlayers,
 );
 
 routerGameID.get(
     '/getPlayer',
-    controllerGameID.GETPlayer,
+    controllerGameID.GETGetPlayer,
 );
 
 
