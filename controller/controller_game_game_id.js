@@ -37,14 +37,16 @@ async function POSTPlayCard(req, res, next) {
       req.game
       req.player
     */
+    debugPrinter.printMiddleware(POSTPlayCard.name);
     const {
         collection_index,
     } = req.body;
 
-    res.json({
-        status: constants.SUCCESS,
-        message: 'you played a card (CHANGE ME)', // TODO CHANGE ME
-    });
+    const result = await intermediateGameUno.playCardHandToPlayDeckWrapped(req.game.game_id, collection_index, req.player.player_id);
+
+    debugPrinter.printDebug(result);
+
+    res.json(result);
 }
 
 controllerGameID.POSTPlayCard = POSTPlayCard;

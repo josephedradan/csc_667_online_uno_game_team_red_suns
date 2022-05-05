@@ -155,6 +155,17 @@ async function drawCardDeckToHandWrapped(game_id, player_id) {
 
 intermediateGameUno.drawCardDeckToHandWrapped = drawCardDeckToHandWrapped;
 
+async function playCardHandToPlayDeckWrapped(game_id, collection_index, player_id) {
+    const result = await gameUno.playHandToPlayDeck(game_id, collection_index, player_id);
+
+    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(
+        game_id,
+    );
+
+    return result;
+}
+
+intermediateGameUno.playCardHandToPlayDeck = playCardHandToPlayDeckWrapped;
 /*
 Return format
 {
