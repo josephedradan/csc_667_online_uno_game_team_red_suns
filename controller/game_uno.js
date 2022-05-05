@@ -14,6 +14,14 @@ const constants = require('../server/constants');
 
 const gameUno = {};
 
+/*
+Return format
+{
+    status,
+    message,
+    games,
+{
+ */
 /**
  * Get All games and the players in those games
  *
@@ -51,6 +59,15 @@ async function getGamesWithTheirPlayersSimple() {
 
 gameUno.getGamesWithTheirPlayersSimple = getGamesWithTheirPlayersSimple;
 
+/*
+Return format
+{
+    status,
+    message,
+    games,
+    players,
+{
+ */
 /**
  * Notes:
  *      Do not use this in getGamesWithTheirPlayersSimple() because you will be making more db calls
@@ -76,9 +93,10 @@ async function getGameAndTheirPlayersByGameIDDetailed(game_id) {
     // If Game Row does not exist
     if (!gameRow) {
         result.status = constants.FAILURE;
-        result.message = 'Getting game failed';
+        result.message = 'Game does not exist';
         return result;
     }
+
     result.game = gameRow;
 
     // May be empty
@@ -102,9 +120,10 @@ gameUno.getGameAndTheirPlayersByGameIDDetailed = getGameAndTheirPlayersByGameIDD
 /*
 Return format
 {
-    status
-    message
-    player
+    status,
+    message,
+    game,
+    player,
 {
  */
 /**
@@ -112,13 +131,6 @@ Return format
  *
  * Notes:
  *      This function is dependent on if the db is successful
- *
- *      Return format:
- *      {
- *          status
- *          message
- *          player
- *      {
  *
  * @param game_id
  * @param user_id
@@ -132,8 +144,27 @@ async function joinGameIfPossible(game_id, user_id) {
     const result = {
         status: null,
         message: null,
+        game: null,
         player: null,
     };
+
+    const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
+
+    // Check fi gam exists
+    if (!gameRow) {
+        result.status = constants.FAILURE;
+        result.message = 'Game does not exist';
+        return result;
+    }
+
+    result.game = gameRow;
+
+    // If game is active
+    if (gameRow.is_active) {
+        result.status = constants.FAILURE;
+        result.message = `Game ${game_id} is active`;
+        return result;
+    }
 
     // Get player given game_id and user_id (May be undefined)
     const playerRowExists = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
@@ -143,15 +174,6 @@ async function joinGameIfPossible(game_id, user_id) {
         result.status = constants.FAILURE;
         result.message = `Player already exists in game ${game_id}`;
         result.player = playerRowExists;
-        return result;
-    }
-
-    const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
-
-    // If game is active
-    if (gameRow.is_active) {
-        result.status = constants.FAILURE;
-        result.message = `Game ${game_id} is active`;
         return result;
     }
 
@@ -175,18 +197,20 @@ async function joinGameIfPossible(game_id, user_id) {
 
 gameUno.joinGameIfPossible = joinGameIfPossible;
 
+/*
+Return format
+{
+    status,
+    message,
+    player,
+    game,
+{
+ */
 /**
  * Leave a game
  *
  * Notes:
  *      This function is dependent on if the db is successful
- *
- *      Return format:
- *      {
- *          status
- *          message
- *          player
- *      {
  *
  * @param game_id
  * @param user_id
@@ -206,7 +230,7 @@ async function leaveGame(game_id, user_id) {
 
     if (!gameRow) {
         result.status = constants.FAILURE;
-        result.message = `${game_id} does not exist`;
+        result.message = `Game ${game_id} does not exist`;
         return result;
     }
 
@@ -237,84 +261,92 @@ async function leaveGame(game_id, user_id) {
 
 gameUno.leaveGame = leaveGame;
 
-/**
- * Given an array, shuffle it
- *
- * @param array
- * @returns {Promise<*>}
- */
-async function shuffleArray(array) {
-    let itemTemp;
-
-    // eslint-disable-next-line no-plusplus
-    for (let i = array.length - 1; i > 0; i--) {
-        const indexRandom = Math.floor(Math.random() * (i + 1));
-
-        itemTemp = array[i];
-
-        // Swap items at index location
-        // eslint-disable-next-line no-param-reassign
-        array[i] = array[indexRandom];
-        // eslint-disable-next-line no-param-reassign
-        array[indexRandom] = itemTemp;
-    }
-    return array;
-}
-
-/**
- * Generate the initial cards for a game
- *
- * Notes:
- *      Create Player Row
- *      Create Game Row
- *
- *      Create Players Row (Link Player Row to Game Row. The first player should be the host)
- *
- *      Create Card Rows
- *          Create Card Rows based on Card.card_id and CardInfo.card_info_id
- *          Create Cards Rows based on Card.card_id and Game.game_id
- *          Create Collection Rows based on Card.card_id and CollectionInfo.collection_info_id
- *
- * @param game_id
- * @returns {Promise<void>}
- */
-async function createGame(user_id) {
-    debugPrinter.printFunction(createGame.name);
-    debugPrinter.printDebug(user_id);
-
-    // FIXME: WARNING: DANGEROUS AND NOT ACID PROOF
-
-    const playerRow = await dbEngineGameUno.createPlayerRow(user_id);
-    debugPrinter.printDebug(playerRow);
-
-    const gameRow = await dbEngineGameUno.createGameRow(playerRow.player_id);
-    debugPrinter.printDebug(gameRow);
-
-    const playersRow = await dbEngineGameUno.createPlayersRow(gameRow.game_id, playerRow.player_id);
-    debugPrinter.printDebug(playersRow);
-
-    const cardRows = await dbEngineGameUno.createCardRowsAndCardsRows(gameRow.game_id, 2);
-    debugPrinter.printDebug(cardRows);
-
-    // TODO: ADDING TO THE Collection IS NOT WRITTEN, WRITE THE ALGO TO SHUFFLE THE CARDS IN THE DECk
-    // dbEngineGameUno.createCollectionRow(card_id, collection_info_id, collection_index);
-
-    const cardRowsShuffled = await shuffleArray(cardRows);
-    const collection = await Promise.all(cardRowsShuffled.map((element, index) => dbEngineGameUno.createCollectionRow(cardRowsShuffled[index].card_id, 1, index)));
-
-    return {
-        player: playerRow,
-        game: gameRow,
-        players: playersRow,
-        cardRows,
-        collection,
-    };
-}
+//
+// /**
+//  * Given an array, shuffle it
+//  *
+//  * @param array
+//  * @returns {Promise<*>}
+//  */
+// async function shuffleArray(array) {
+//     let itemTemp;
+//
+//     // eslint-disable-next-line no-plusplus
+//     for (let i = array.length - 1; i > 0; i--) {
+//         const indexRandom = Math.floor(Math.random() * (i + 1));
+//
+//         itemTemp = array[i];
+//
+//         // Swap items at index location
+//         // eslint-disable-next-line no-param-reassign
+//         array[i] = array[indexRandom];
+//         // eslint-disable-next-line no-param-reassign
+//         array[indexRandom] = itemTemp;
+//     }
+//     return array;
+// }
+//
+// /**
+//  * Generate the initial cards for a game
+//  *
+//  * Notes:
+//  *      Create Player Row
+//  *      Create Game Row
+//  *
+//  *      Create Players Row (Link Player Row to Game Row. The first player should be the host)
+//  *
+//  *      Create Card Rows
+//  *          Create Card Rows based on Card.card_id and CardInfo.card_info_id
+//  *          Create Cards Rows based on Card.card_id and Game.game_id
+//  *          Create Collection Rows based on Card.card_id and CollectionInfo.collection_info_id
+//  *
+//  * @param game_id
+//  * @returns {Promise<void>}
+//  */
+// async function createGame(user_id) {
+//     debugPrinter.printFunction(createGame.name);
+//     debugPrinter.printDebug(user_id);
+//
+//     // FIXME: WARNING: DANGEROUS AND NOT ACID PROOF
+//
+//     const playerRow = await dbEngineGameUno.createPlayerRow(user_id);
+//     debugPrinter.printDebug(playerRow);
+//
+//     const gameRow = await dbEngineGameUno.createGameRow(playerRow.player_id);
+//     debugPrinter.printDebug(gameRow);
+//
+//     const playersRow = await dbEngineGameUno.createPlayersRow(gameRow.game_id, playerRow.player_id);
+//     debugPrinter.printDebug(playersRow);
+//
+//     const cardRows = await dbEngineGameUno.createCardRowsAndCardsRows(gameRow.game_id, 2);
+//     debugPrinter.printDebug(cardRows);
+//
+//     // TODO: ADDING TO THE Collection IS NOT WRITTEN, WRITE THE ALGO TO SHUFFLE THE CARDS IN THE DECk
+//     // dbEngineGameUno.createCollectionRow(card_id, collection_info_id, collection_index);
+//
+//     const cardRowsShuffled = await shuffleArray(cardRows);
+//     const collection = await Promise.all(cardRowsShuffled.map((element, index) => dbEngineGameUno.createCollectionRow(cardRowsShuffled[index].card_id, 1, index)));
+//
+//     return {
+//         player: playerRow,
+//         game: gameRow,
+//         players: playersRow,
+//         cardRows,
+//         collection,
+//     };
+// }
 
 // gameUno.createGame = createGame;
 
 /*
-
+Return Format
+{
+    status,
+    message,
+    player,
+    game,
+    players,
+}
  */
 /**
  * Generate the initial cards for a game
@@ -326,15 +358,7 @@ async function createGame(user_id) {
  *
  *          Create Players Row
  *
- *      Return format:
- *          {
- *              player,
- *              game,
- *              players,
- *          }
- *
  * @param user_id
- * @param deckMultiplier
  */
 async function createGameV2(user_id) {
     debugPrinter.printFunction(createGameV2.name);
@@ -391,6 +415,14 @@ async function createGameV2(user_id) {
 
 gameUno.createGameV2 = createGameV2;
 
+/*
+{
+    status,
+    message,
+    game,
+    cards,
+}
+ */
 /**
  * Start the game
  *
@@ -412,8 +444,7 @@ gameUno.createGameV2 = createGameV2;
 async function startGame(game_id, player_id, deckMultiplier) {
     debugPrinter.printFunction(startGame.name);
 
-    // TODO: Assign initial cards to players
-    // TODO: Assign player_index to players so you know the turn order
+    // TODO: Assign player_index to players so you know the turn order. Maybe do this because we can use the player_id instead
 
     const result = {
         status: null,
@@ -426,7 +457,7 @@ async function startGame(game_id, player_id, deckMultiplier) {
 
     if (!gameRow) {
         result.status = constants.FAILURE;
-        result.message = 'Game does not exist';
+        result.message = `Game ${game_id} does not exist`;
         return result;
     }
 
@@ -475,6 +506,8 @@ Notes:
     This should not show any information about the actual cards, but only for the
 
 {
+    status,
+    message,
     game:
         {
             game_id,
@@ -540,16 +573,31 @@ Notes:
  * @returns {Promise<{game: *, players: *}>}
  */
 async function getGameState(game_id) {
+    const result = {
+        status: null,
+        message: null,
+        game: null,
+        players: null,
+        collection_draw: null,
+        collection_play: null,
+    };
+
     // May be undefined
     const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
 
     // If Game Row does not exist
     if (!gameRow) {
-        return null;
+        result.status = constants.FAILURE;
+        result.message = `Game ${game_id} does not exist`;
+        return result;
     }
+
+    result.game = gameRow;
 
     // May be empty
     const playerRows = await dbEngineGameUno.getPlayerRowsJoinPlayersRowJoinGameRowByGameID(gameRow.game_id);
+
+    result.players = playerRows;
 
     // eslint-disable-next-line no-restricted-syntax
     for (const playerRow of playerRows) {
@@ -558,40 +606,70 @@ async function getGameState(game_id) {
     }
 
     // May be empty
-    const drawRows = await dbEngineGameUno.getCollectionCollectionIndexRowsDrawByGameID(game_id);
+    result.collection_draw = await dbEngineGameUno.getCollectionCollectionIndexRowsDrawByGameID(game_id);
 
     // May be empty
-    const playRows = await dbEngineGameUno.getCollectionByGameIDAndCollectionInfoID(game_id, 2);
+    result.collection_play = await dbEngineGameUno.getCollectionByGameIDAndCollectionInfoID(game_id, 2);
+
+    result.status = constants.SUCCESS;
+    result.message = 'Game state was successful';
 
     // Game state
-    return {
-        game: gameRow,
-        players: playerRows,
-        collection_draw: drawRows,
-        collection_play: playRows,
-    };
+    return result;
 }
 
 gameUno.getGameState = getGameState;
 
+/*
+{
+    status,
+    message,
+    player,
+    collection,
+}
+ */
 async function drawCardDeckToHand(game_id, player_id) { // TODO ADD MORE GUARDING AND ERROR CHECKING ETC
     debugPrinter.printFunction(drawCardDeckToHand.name);
 
-    const result = await dbEngineGameUno.updateCollectionRowDrawToHandByPlayerID(game_id, player_id);
+    const result = {
+        status: null,
+        message: null,
+        player: null,
+        collection: null,
+    };
 
-    if (!result) {
-        return null;
+    // Get player given game_id and user_id (May be undefined)
+    const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, player_id);
+
+    // If player is exists for the user for the game
+    if (!playerRow) {
+        result.status = constants.FAILURE;
+        result.message = `Player does not exist for game ${game_id}`; // Short circuit because the playerRow is based on the game_id (don't need to check if game exists)
+        return result;
     }
+    result.player = playerRow;
+
+    const collectionRow = await dbEngineGameUno.updateCollectionRowDrawToHandByPlayerID(game_id, player_id);
+
+    if (!collectionRow) {
+        result.status = constants.FAILURE;
+        result.message = `Error in updating player ${player_id}'s collection`;
+        return result;
+    }
+    result.collection = collectionRow;
+
+    result.status = constants.SUCCESS;
+    result.message = `Player ${player_id} has drawn a card from the deck to their hand`;
 
     return result;
 }
 
 gameUno.drawCardDeckToHand = drawCardDeckToHand;
 
-async function drawCardDeckToPlay(game_id) { // TODO ADD MORE GUARDING AND ERROR CHECKING ETC
-    debugPrinter.printFunction(drawCardDeckToPlay.name);
+async function playHandToPlayDeck(game_id, collection_index, player_id) {
+    debugPrinter.printFunction(playHandToPlayDeck.name);
 
-    const result = await dbEngineGameUno.updateCollectionRowDrawToPlay(game_id);
+    const result = await dbEngineGameUno.updateCollectionRowHandToPlay(game_id, collection_index, player_id);
 
     if (!result) {
         return null;
@@ -600,7 +678,86 @@ async function drawCardDeckToPlay(game_id) { // TODO ADD MORE GUARDING AND ERROR
     return result;
 }
 
+gameUno.playHandToPlayDeck = playHandToPlayDeck;
+
+async function drawCardDeckToPlay(game_id) { // TODO ADD MORE GUARDING AND ERROR CHECKING ETC
+    debugPrinter.printFunction(drawCardDeckToPlay.name);
+
+    const result = {
+        status: null,
+        message: null,
+        game: null,
+        collection: null,
+    };
+
+    // May be undefined
+    const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
+
+    // If Game Row does not exist
+    if (!gameRow) {
+        result.status = constants.FAILURE;
+        result.message = `Game ${game_id} does not exist`;
+        return result;
+    }
+
+    const collectionRow = await dbEngineGameUno.updateCollectionRowDrawToPlay(game_id);
+
+    if (!collectionRow) {
+        result.status = constants.FAILURE;
+        result.message = `Error in updating play for Game ${game_id}'s collection`; // TODO FIX THEN
+        return result;
+    }
+    result.collection = collectionRow;
+
+    result.status = constants.SUCCESS;
+    result.message = `A card from draw to the play for Game ${game_id}`; // TODO FIX THEN
+
+
+    return result;
+}
+
 gameUno.drawCardDeckToPlay = drawCardDeckToPlay;
+
+async function getHand(game_id, player_id) {
+    debugPrinter.printFunction(getHand.name);
+
+    const result = {
+        status: null,
+        message: null,
+        player: null,
+        collection: null,
+    };
+
+    // Get player given game_id and user_id (May be undefined)
+    const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, player_id);
+
+    // If player is exists for the user for the game
+    if (!playerRow) {
+        result.status = constants.FAILURE;
+        result.message = `Player does not exist for game ${game_id}`; // Short circuit because the playerRow is based on the game_id (don't need to check if game exists)
+        return result;
+    }
+    result.player = playerRow;
+
+    // May be undefined
+    const collectionRow = await dbEngineGameUno.getCollectionRowByPlayerID(playerRow.player_id);
+
+    // If player is exists for the user for the game
+    if (!collectionRow) {
+        result.status = constants.FAILURE;
+        result.message = `Collection does not exist for player ${playerRow.player_id}`;
+        return result;
+    }
+
+    result.status = constants.SUCCESS;
+    result.message = `Player ${player_id} has gotten their hand`;
+
+    result.collection = collectionRow;
+
+    return result;
+}
+
+gameUno.getHand = getHand;
 
 module.exports = gameUno;
 
