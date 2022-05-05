@@ -554,10 +554,11 @@ async function getGameState(game_id) {
 
 gameUno.getGameState = getGameState;
 
-async function drawCard(game_id, player_id) { // TODO ADD MORE GUARDING AND ERROR CHECKING ETC
-    debugPrinter.printFunction(drawCard.name);
+async function drawCardDeckToHand(game_id, player_id) { // TODO ADD MORE GUARDING AND ERROR CHECKING ETC
+    debugPrinter.printFunction(drawCardDeckToHand.name);
 
-    const result = await dbEngineGameUno.updateCardForPlayerByPlayerID(game_id, player_id);
+    const result = await dbEngineGameUno.updateCollectionRowDrawToPlayerByPlayerID(game_id, player_id);
+
     if (!result) {
         return null;
     }
@@ -565,7 +566,21 @@ async function drawCard(game_id, player_id) { // TODO ADD MORE GUARDING AND ERRO
     return result;
 }
 
-gameUno.drawCard = drawCard;
+gameUno.drawCardDeckToHand = drawCardDeckToHand;
+
+async function drawCardDeckToPlay(game_id) { // TODO ADD MORE GUARDING AND ERROR CHECKING ETC
+    debugPrinter.printFunction(drawCardDeckToPlay.name);
+
+    const result = await dbEngineGameUno.updateCollectionRowDrawToPlay(game_id);
+
+    if (!result) {
+        return null;
+    }
+
+    return result;
+}
+
+gameUno.drawCardDeckToPlay = drawCardDeckToPlay;
 
 module.exports = gameUno;
 

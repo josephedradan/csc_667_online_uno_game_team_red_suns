@@ -145,6 +145,19 @@ async function sendMessageWrapped(game_id, player_id, message) {
 
 intermediateGameUno.sendMessageWrapped = sendMessageWrapped;
 
+async function drawCardWrapped(game_id, player_id) {
+    const result = await gameUno.drawCardDeckToHand(game_id, player_id);
+
+    // Emit the gameState to room and get gameState
+    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(
+        game_id,
+    );
+
+    return result;
+}
+
+intermediateGameUno.drawCardWrapped = drawCardWrapped;
+
 /*
 Return format
 {
@@ -157,6 +170,25 @@ async function startGameWrapped(game_id, player_id) {
     const result = await gameUno.startGame(game_id, player_id, 1);
 
     // Emit the gameState to room and get gameState
+    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState();
+
+    // TODO ADD GUARDING HERE
+
+    const rowPlayers = await dbEngineGameUno.getPlayerRowsJoinPlayersRowJoinGameRowByGameID(game_id);
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const rowPlayer of rowPlayers) {
+        // eslint-disable-next-line no-plusplus
+        for (let i = 0; i < 7; i++) {
+            // eslint-disable-next-line no-await-in-loop
+            await drawCardWrapped(game_id, rowPlayer.player_id);
+        }
+    }
+
+    // FLIP FIRST CARD OF DECK TO PLAY // TODO CLEAN UP
+
+    await gameUno.drawCardDeckToPlay(game_id);
+
     const gameState = await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(
         game_id,
     );
@@ -165,18 +197,5 @@ async function startGameWrapped(game_id, player_id) {
 }
 
 intermediateGameUno.startGameWrapped = startGameWrapped;
-
-async function drawCardWrapped(game_id, player_id) {
-    const result = await gameUno.drawCard(game_id, player_id);
-
-    // Emit the gameState to room and get gameState
-    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(
-        game_id,
-    );
-
-    return result;
-}
-
-intermediateGameUno.drawCardWrapped = drawCardWrapped;
 
 module.exports = intermediateGameUno;
