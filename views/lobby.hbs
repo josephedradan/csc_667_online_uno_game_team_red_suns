@@ -138,6 +138,7 @@
                 </div>
             </div>
 
+            {{! div that contains draw and discard pile }}
             <div
                 class="flex items-center content-center justify-center col-span-1"
             >
@@ -156,6 +157,7 @@
                     </div>
                 </div>
                 <div id="discard">
+
                     <div class="cardWrapper">
                         <div class="unoCard num-3 green">
                             <span class="inner">
@@ -353,7 +355,10 @@
 
             </div>
             <div></div>
-            <div class="relative grid content-center col-span-1">
+            <div
+                id="challenge_button_div"
+                class="relative grid content-center col-span-1"
+            >
                 <button
                     {{! callUno will be used with tandem with an event listener to call the back }}
                     id="challenge"
@@ -361,9 +366,11 @@
                 >Challenge</button>
             </div>
             <div></div>
-            <div class="relative grid content-center col-span-1">
+            <div
+                id="call_uno_div"
+                class="relative grid content-center col-span-1"
+            >
                 <button
-                    {{! callUno will be used with tandem with an event listener to call the back }}
                     id="callUno"
                     class="absolute bottom-0 right-0 px-4 py-2 mb-4 font-bold text-white rounded bg-sky-500 hover:bg-sky-700"
                 >Uno</button>
