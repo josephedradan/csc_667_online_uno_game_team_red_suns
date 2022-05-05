@@ -27,6 +27,11 @@ routerGameID.get(
     controllerGameID.GETGameState,
 );
 
+routerGameID.get(
+    '/getPlayers',
+    controllerGameID.GETPlayers,
+);
+
 /*
 Notes:
     Leaving the game automatically happens if the game.is_active === false and works via socket disconnect.

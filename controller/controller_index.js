@@ -8,6 +8,7 @@ const gameUno = require('./game_uno');
 const intermediateGameUno = require('./intermediate_game_uno');
 const utilCommon = require('./util_common');
 const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');
+const constants = require('../server/constants');
 
 /* ############################################################################################################## */
 
@@ -62,11 +63,11 @@ async function GETIndex(req, res, next) {
     debugPrinter.printMiddleware(GETIndex.name);
     debugPrinter.printBlue(req.user);
 
-    const gamesWithPlayersRows = await gameUno.getGamesAndTheirPlayers();
+    const result = await gameUno.getGamesWithTheirPlayersSimple();
 
-    debugPrinter.printBackendRed(JSON.stringify(gamesWithPlayersRows, null, 2));
+    debugPrinter.printBackendRed(JSON.stringify(result.games, null, 2));
 
-    res.render('index', { game_list: gamesWithPlayersRows });
+    res.render('index', { game_list: result.games });
 }
 
 controllerIndex.GETIndex = GETIndex;
@@ -113,7 +114,7 @@ async function POSTRegistration(req, res, next) {
         if (userByUsername) {
             utilCommon.reqSessionMessageHandler(
                 req,
-                'failure',
+                constants.FAILURE,
                 'Username already exists',
             );
 
@@ -127,7 +128,7 @@ async function POSTRegistration(req, res, next) {
         if (userByDisplayName) {
             utilCommon.reqSessionMessageHandler(
                 req,
-                'failure',
+                constants.FAILURE,
                 'Display name already exists',
             );
 
@@ -146,7 +147,7 @@ async function POSTRegistration(req, res, next) {
 
         debugPrinter.printBackendGreen(user);
 
-        utilCommon.reqSessionMessageHandler(req, 'success', `User "${user.username}" was created`);
+        utilCommon.reqSessionMessageHandler(req, constants.SUCCESS, `User "${user.username}" was created`);
 
         debugPrinter.printBackendGreen('REDIRECTING');
         res.redirect('/');
@@ -165,10 +166,10 @@ async function POSTCreateGame(req, res, next) {
     const result = await intermediateGameUno.createGameWrapped(req.user.user_id);
 
     if (!result) {
-        utilCommon.reqSessionMessageHandler(req, 'failure', 'Game failed to be created');
+        utilCommon.reqSessionMessageHandler(req, constants.FAILURE, 'Game failed to be created');
         res.redirect('back');
     } else {
-        utilCommon.reqSessionMessageHandler(req, 'success', `Game id ${result.game_id} created`);
+        utilCommon.reqSessionMessageHandler(req, constants.SUCCESS, `Game id ${result.game_id} created`);
         res.redirect(result.game_url);
     }
 }

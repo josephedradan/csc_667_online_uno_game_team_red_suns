@@ -84,6 +84,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const dbEngine = require('./db_engine');
 const debugPrinter = require('../util/debug_printer');
 const handlerPassword = require('./handler_password');
+const constants = require('../server/constants');
 
 // These are the fields that passport will look for in req.body
 const REQ_BODY_FIELD_NAMES_TO_LOOK_FOR = {
@@ -139,7 +140,7 @@ async function verifyCallback(username, password, doneCallback) {
                 return doneCallback(
                     null, // error (This must be null to allow the 3rd argument (info) to pass)
                     account, // account
-                    { message: 'Success' }, // info
+                    { message: constants.SUCCESS }, // info
                 );
             }
 

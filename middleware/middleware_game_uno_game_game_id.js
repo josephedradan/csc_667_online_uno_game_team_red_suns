@@ -4,6 +4,7 @@ const gameUno = require('../controller/game_uno');
 const utilCommon = require('../controller/util_common');
 const intermediateSocketIOGameUno = require('../controller/intermediate_socket_io_game_uno');
 const intermediateGameUno = require('../controller/intermediate_game_uno');
+const constants = require('../server/constants');
 
 const middlewareGameUnoGamdID = {};
 
@@ -60,7 +61,7 @@ async function checkIfAllowedToUseAPI(req, res, next) {
     // If the user is not a player in the game
     if (!player) {
         res.json({
-            status: 'failure',
+            status: constants.FAILURE,
             message: 'You are not a player in the game',
         });
         return;
@@ -119,7 +120,7 @@ async function checkIfPlayerIDIsHost(req, res, next) {
         next();
     } else {
         res.json({
-            status: 'failure',
+            status: constants.FAILURE,
             message: 'You are not the host',
         });
     }
