@@ -1165,8 +1165,8 @@ async function updateGamePlayerIDHostByGameID(game_id, player_id) {
 
 dbEngineGameUno.updateGamePlayerIDHostByGameID = updateGamePlayerIDHostByGameID;
 
-async function updateCollectionRowDrawToPlayerByPlayerID(game_id, player_id) {
-    debugPrinter.printFunction(updateCollectionRowDrawToPlayerByPlayerID.name);
+async function updateCollectionRowDrawToHandByPlayerID(game_id, player_id) {
+    debugPrinter.printFunction(updateCollectionRowDrawToHandByPlayerID.name);
     /*
     WITH messageRow AS (
             INSERT INTO "Message" (game_id, player_id, message)
@@ -1208,7 +1208,7 @@ async function updateCollectionRowDrawToPlayerByPlayerID(game_id, player_id) {
     return result[0];
 }
 
-dbEngineGameUno.updateCollectionRowDrawToPlayerByPlayerID = updateCollectionRowDrawToPlayerByPlayerID;
+dbEngineGameUno.updateCollectionRowDrawToHandByPlayerID = updateCollectionRowDrawToHandByPlayerID;
 
 async function updateCollectionRowDrawToPlay(game_id) {
     debugPrinter.printFunction(updateCollectionRowDrawToPlay.name);

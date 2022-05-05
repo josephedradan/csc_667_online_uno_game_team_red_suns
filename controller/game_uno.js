@@ -577,7 +577,7 @@ gameUno.getGameState = getGameState;
 async function drawCardDeckToHand(game_id, player_id) { // TODO ADD MORE GUARDING AND ERROR CHECKING ETC
     debugPrinter.printFunction(drawCardDeckToHand.name);
 
-    const result = await dbEngineGameUno.updateCollectionRowDrawToPlayerByPlayerID(game_id, player_id);
+    const result = await dbEngineGameUno.updateCollectionRowDrawToHandByPlayerID(game_id, player_id);
 
     if (!result) {
         return null;
