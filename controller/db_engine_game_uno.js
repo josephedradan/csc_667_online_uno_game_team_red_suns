@@ -468,10 +468,16 @@ async function createCardRowsAndCardsRowsAndCollectionRowsWithCollectionRandomiz
             cardRows.card_info_id, 
             collectionRows.collection_info_id, 
             collectionRows.player_id,
-            collectionRows.collection_index
+            collectionRows.collection_index,
+            "CardInfo".type AS card_info_type,
+            "CardInfo".content AS card_content,
+            "CardInfo".color AS card_color,
+            "CollectionInfo".type AS collection_info_type
         FROM cardsRows
         LEFT JOIN cardRows ON cardsRows.card_id = cardRows.card_id
         LEFT JOIN collectionRows ON cardsRows.card_id = collectionRows.card_id
+        LEFT JOIN "CardInfo" ON cardRows.card_info_id = "CardInfo".card_info_id
+        LEFT JOIN "CollectionInfo" ON "CollectionInfo".collection_info_id = collectionRows.collection_info_id
         ORDER BY collectionRows.collection_index;
         `,
         [
@@ -1152,7 +1158,7 @@ async function updateGameIsClockwiseByGameID(game_id, boolean) {
 dbEngineGameUno.updateGameIsClockwiseByGameID = updateGameIsClockwiseByGameID;
 
 async function updateGamePlayerIDCurrentTurnByGameID(game_id, player_id) {
-    debugPrinter.printFunction(updateGameIsClockwiseByGameID.name);
+    debugPrinter.printFunction(updateGamePlayerIDCurrentTurnByGameID.name);
 
     const result = await db.any(
         `
@@ -1173,7 +1179,7 @@ async function updateGamePlayerIDCurrentTurnByGameID(game_id, player_id) {
 dbEngineGameUno.updateGamePlayerIDCurrentTurnByGameID = updateGamePlayerIDCurrentTurnByGameID;
 
 async function updateGamePlayerIDHostByGameID(game_id, player_id) {
-    debugPrinter.printFunction(updateGameIsClockwiseByGameID.name);
+    debugPrinter.printFunction(updateGamePlayerIDHostByGameID.name);
 
     const result = await db.any(
         `
@@ -1276,7 +1282,7 @@ async function updateCollectionRowDrawToPlay(game_id) {
 
 dbEngineGameUno.updateCollectionRowDrawToPlay = updateCollectionRowDrawToPlay;
 
-async function updateCollectionRowHandToPlay(game_id, collection_index, player_id) {
+async function updateCollectionRowHandToPlay(game_id, player_id, collection_index) {
     debugPrinter.printFunction(updateCollectionRowHandToPlay.name);
 
     const result = await db.any(
@@ -1285,8 +1291,8 @@ async function updateCollectionRowHandToPlay(game_id, collection_index, player_i
             SELECT "Collection".card_id 
             From "Collection"
             JOIN "Cards" ON "Collection".card_id = "Cards".card_id
-            WHERE player_id = $3 
-            AND collection_index = $2 
+            WHERE player_id = $2 
+            AND collection_index = $3 
             AND game_id = $1
             ORDER BY collection_index DESC LIMIT 1
         ), playStackCount AS (
@@ -1297,18 +1303,18 @@ async function updateCollectionRowHandToPlay(game_id, collection_index, player_i
             AND "Collection".collection_info_id = 2
         ) 
         UPDATE "Collection" 
-            SET    
-                player_id = null,
-                collection_info_id = 2,
-                collection_index = (SELECT amount FROM playStackCount)
+        SET    
+            player_id = null,
+            collection_info_id = 2,
+            collection_index = (SELECT amount FROM playStackCount)
         FROM playCardCollectionIndex 
         WHERE "Collection".card_id = playCardCollectionIndex.card_id
         RETURNING *;
         `,
         [
             game_id,
-            collection_index,
             player_id,
+            collection_index,
         ],
     );
 
