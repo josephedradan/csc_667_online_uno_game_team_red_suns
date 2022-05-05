@@ -6,9 +6,9 @@ module.exports = {
          * Example:
          * await queryInterface.createTable('users', { id: Sequelize.DataTypes.INTEGER });
          */
-        await queryInterface.createTable('CardState', {
+        await queryInterface.createTable('Card', {
 
-            card_state_id: {
+            card_id: {
                 type: Sequelize.DataTypes.INTEGER,
                 primaryKey: true,
                 autoIncrement: true,
@@ -16,7 +16,7 @@ module.exports = {
                 unique: true,
             },
 
-            // Information about what kind of card this card state is
+            // Information about what kind of card this card is
             card_info_id: {
                 type: Sequelize.DataTypes.INTEGER,
                 references: {
@@ -25,16 +25,16 @@ module.exports = {
                 },
                 onDelete: 'CASCADE',
                 allowNull: false, // Required
-                unique: false, // False because you can have duplicates of a card in a game as well as this table tracks all the card states throughout all games
+                unique: false, // False because you can have duplicates of a card in a game as well as this table tracks all the cards throughout all games
             },
 
         });
 
-        return queryInterface.addColumn('Collection', 'card_state_id', {
+        return queryInterface.addColumn('Collection', 'card_id', {
             type: Sequelize.DataTypes.INTEGER,
             references: {
-                model: 'CardState',
-                key: 'card_state_id',
+                model: 'Card',
+                key: 'card_id',
             },
             onDelete: 'CASCADE',
             allowNull: false,
@@ -52,9 +52,9 @@ module.exports = {
 
         await queryInterface.removeColumn(
             'Collection',
-            'card_state_id',
+            'card_id',
         );
 
-        return queryInterface.dropTable('CardState');
+        return queryInterface.dropTable('Card');
     },
 };

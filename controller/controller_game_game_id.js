@@ -18,6 +18,8 @@ const utilCommon = require('./util_common');
 const debugPrinter = require('../util/debug_printer');
 const dbEngineMessage = require('./db_engine_message');
 const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');
+const db = require('../db');
+const constants = require('../server/constants');
 
 const controllerGameID = {};
 
@@ -30,13 +32,17 @@ const controllerGameID = {};
 async function POSTPlayCard(req, res, next) {
     // TODO: SOCKET HERE
 
+    /* LOOK AT MIGRATION
+    * req.user
+      req.game
+      req.player
+    */
     const {
-        card_id,
-        lobby_id,
+        collection_index,
     } = req.body;
 
     res.json({
-        status: 'success',
+        status: constants.SUCCESS,
         message: 'you played a card (CHANGE ME)', // TODO CHANGE ME
     });
 }
@@ -44,25 +50,54 @@ async function POSTPlayCard(req, res, next) {
 controllerGameID.POSTPlayCard = POSTPlayCard;
 
 async function GETDrawCard(req, res, next) {
-    // TODO: SOCKET HERE
+    debugPrinter.printMiddleware(GETDrawCard.name);
 
-    res.json({
-        status: 'success',
-        message: 'you drew a card (CHANGE ME)', // TODO CHANGE ME
-    });
+    await intermediateGameUno.drawCardDeckToHandWrapped(req.game.game_id, req.player.player_id);
+
+    const result = await dbEngineGameUno.getCollectionByPlayerID(req.player.player_id);
+
+    debugPrinter.printDebug(result);
+
+    res.json(result);
 }
 
 controllerGameID.GETDrawCard = GETDrawCard;
 
 async function POSTStartGame(req, res, next) {
-    // If game is not active, make it active
+    debugPrinter.printMiddleware(POSTStartGame.name);
 
-    const gameState = await intermediateGameUno.startGameWrapped(req.game.game_id, req.player.player_id);
+    const result = await intermediateGameUno.startGameWrapped(req.game.game_id, req.player.player_id);
 
-    res.json(gameState);
+    debugPrinter.printDebug(result);
+
+    res.json(result);
 }
 
 controllerGameID.POSTStartGame = POSTStartGame;
+
+async function POSTLeaveGame(req, res, next) {
+    debugPrinter.printMiddleware(POSTLeaveGame.name);
+
+    const result = await intermediateGameUno.leaveGameWrapped(req.game.game_id, req.user.user_id);
+
+    debugPrinter.printDebug(result);
+
+    res.json(result);
+}
+
+controllerGameID.POSTLeaveGame = POSTLeaveGame;
+
+async function POSTTransferHost(req, res, next) {
+    debugPrinter.printMiddleware(POSTLeaveGame.name);
+
+    const result = await intermediateGameUno.leaveGameWrapped(req.game.game_id, req.user.user_id);
+
+    debugPrinter.printDebug(result);
+
+    res.json(result);
+}
+
+controllerGameID.POSTTransferHost = POSTTransferHost;
 
 async function GETAllMessages(req, res, next) {
     debugPrinter.printMiddleware(GETAllMessages.name);
@@ -82,18 +117,17 @@ controllerGameID.GETAllMessages = GETAllMessages;
  * @param next
  * @returns {Promise<void>}
  */
-async function GETCurrentGame(req, res, next) {
-    debugPrinter.printMiddleware(GETCurrentGame.name);
+async function GETGameState(req, res, next) {
+    debugPrinter.printMiddleware(GETGameState.name);
 
-    // TODO: CHANGE ME TO GAME STATE OR SOMETHING IDK
+    const result = await dbEngineGameUno.getGameState(req.game.game_id);
 
-    const result = await dbEngineGameUno.getGameRowByGameIDSimple(req.game.game_id);
     debugPrinter.printDebug(result);
 
     res.json(result);
 }
 
-controllerGameID.GETCurrentGame = GETCurrentGame;
+controllerGameID.GETGameState = GETGameState;
 
 async function POSTSendMessage(req, res, next) {
     debugPrinter.printMiddleware(POSTSendMessage.name);
@@ -123,15 +157,16 @@ async function GETGetHand(req, res, next) {
 
 controllerGameID.GETGetHand = GETGetHand;
 
-async function POSTLeaveGame(req, res, next) {
-    debugPrinter.printMiddleware(POSTLeaveGame.name);
+async function GETPlayers(req, res, next) {
+    debugPrinter.printMiddleware(GETPlayers.name);
 
-    const result = await intermediateGameUno.leaveGameWrapped(req.game.game_id, req.user.user_id);
+    const result = await dbEngineGameUno.getPlayerRowsJoinPlayersRowJoinGameRowByGameID(req.game.game_id);
 
     debugPrinter.printDebug(result);
 
     res.json(result);
 }
 
-controllerGameID.POSTLeaveGame = POSTLeaveGame;
+controllerGameID.GETPlayers = GETPlayers;
+
 module.exports = controllerGameID;

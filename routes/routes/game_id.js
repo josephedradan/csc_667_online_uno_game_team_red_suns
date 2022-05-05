@@ -23,14 +23,20 @@ routerGameID.get(
 );
 
 routerGameID.get(
-    '/currentGame',
-    controllerGameID.GETCurrentGame,
+    '/gameState',
+    controllerGameID.GETGameState,
+);
+
+routerGameID.get(
+    '/getPlayers',
+    controllerGameID.GETPlayers,
 );
 
 /*
 Notes:
-    Leaving the game automatically happens if the game.is_active === false
-    If game.is_active === true then you must explicitly call the below function to leave entirely
+    Leaving the game automatically happens if the game.is_active === false and works via socket disconnect.
+    If game.is_active === true then you must explicitly call the below function to leave entirely.
+    If the player that leaves is the host, then the game dies.
  */
 routerGameID.post(
     '/leaveGame',
@@ -41,6 +47,12 @@ routerGameID.post(
     '/startGame',
     middlewareGameUnoGameGameID.checkIfPlayerIDIsHost,
     controllerGameID.POSTStartGame,
+);
+
+routerGameID.post(
+    '/transferHost',
+    middlewareGameUnoGameGameID.checkIfPlayerIDIsHost,
+    controllerGameID.POSTTransferHost,
 );
 
 routerGameID.use(middlewareGameUnoGameGameID.checkIfPlayerCanDoAction); // TODO WRITE

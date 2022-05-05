@@ -9,12 +9,12 @@ const { io } = connectionContainer;
 async function emitInRoomSeverIndexGames() {
     debugPrinter.printFunction(emitInRoomSeverIndexGames.name);
 
-    const gamesWithPlayersRows = await gameUno.getGamesAndTheirPlayers();
+    const result = await gameUno.getGamesWithTheirPlayersSimple();
 
     io.in(constants.socketIDRoomIndex)
-        .emit('server-index-games', gamesWithPlayersRows);
+        .emit('server-index-games', result.games);
 
-    return gamesWithPlayersRows;
+    return result;
 }
 
 intermediateSocketIOGameUno.emitInRoomSeverIndexGames = emitInRoomSeverIndexGames;

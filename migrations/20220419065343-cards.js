@@ -14,7 +14,7 @@ module.exports = {
             //     autoIncrement: true,
             // },
 
-            // What the card state is tied to
+            // What the card is tied to
             game_id: {
                 type: Sequelize.DataTypes.INTEGER,
                 references: {
@@ -23,18 +23,18 @@ module.exports = {
                 },
                 onDelete: 'CASCADE',
                 allowNull: false,
-                unique: false, // This table is to map the game to the card state so this should be false
+                unique: false, // This table is to map the game to the card so this should be false
             },
 
-            card_state_id: {
+            card_id: {
                 type: Sequelize.DataTypes.INTEGER,
                 references: {
-                    model: 'CardState',
-                    key: 'card_state_id',
+                    model: 'Card',
+                    key: 'card_id',
                 },
                 onDelete: 'CASCADE',
                 allowNull: false,
-                unique: true, // Prevents a card state from being in more than 1 game
+                unique: true, // Prevents a card from being in more than 1 game
             },
 
         });

@@ -1,4 +1,6 @@
-const values = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+const e = require('express');
+
+const values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 const specials = ['skip', 'reverse', 'drawTwo', 'wild', 'wildFour'];
 const colors = ['blue', 'red', 'green', 'yellow', 'black'];
 const NUMBER = 'NUMBER';
@@ -53,7 +55,8 @@ function generateSpecialCards() {
 
 function seedAllCards() {
     let cards = [];
-
+    // eslint-disable-next-line prefer-const
+    let inOrderDeck = [];
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < colors.length - 1; i++) {
         cards = cards.concat(generateColoredNumCard(colors[i], values));
@@ -62,9 +65,34 @@ function seedAllCards() {
     cards = cards.concat(generateColoredSpecialCards());
     cards = cards.concat(generateSpecialCards());
 
-    index = 0;
+    let count = 0;
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < cards.length; i++) {
+        if (cards[i].content === '0') {
+            inOrderDeck.push({
+                // eslint-disable-next-line no-plusplus
+                card_info_id: count++, content: cards[i].content, color: cards[i].color, type: cards[i].type,
+            });
+        } else if (cards[i].content === 'wild' || cards[i].content === 'wildFour') {
+            // eslint-disable-next-line no-plusplus
+            for (let j = 0; j < 4; j++) {
+                inOrderDeck.push({
+                    // eslint-disable-next-line no-plusplus
+                    card_info_id: count++, content: cards[i].content, color: cards[i].color, type: cards[i].type,
+                });
+            }
+        } else if (cards[i].content !== '0') {
+            // eslint-disable-next-line no-plusplus
+            for (let j = 0; j < 2; j++) {
+                inOrderDeck.push({
+                    // eslint-disable-next-line no-plusplus
+                    card_info_id: count++, content: cards[i].content, color: cards[i].color, type: cards[i].type,
+                });
+            }
+        }
+    }
 
-    return cards;
+    return inOrderDeck;
 }
 
 module.exports = {
@@ -78,6 +106,7 @@ module.exports = {
          *   isBetaMember: false
          * }], {});
          */
+
         return queryInterface.bulkInsert('CardInfo', seedAllCards());
     },
 

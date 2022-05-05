@@ -3,6 +3,7 @@ const utilCommon = require('./util_common');
 const gameUno = require('./game_uno');
 const dbEngineGameUno = require('./db_engine_game_uno');
 const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');
+const constants = require('../server/constants');
 
 const controllerGame = {};
 
@@ -18,7 +19,7 @@ async function GETGame(req, res, next) {
 
     utilCommon.reqSessionMessageHandler(
         req,
-        'failure',
+        constants.FAILURE,
         'This page does not exist.',
     );
 

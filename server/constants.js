@@ -13,4 +13,7 @@ constants.dirPublic = path.join(__dirname, '../public');
 
 constants.socketIDRoomIndex = 'index';
 
+constants.FAILURE = 'failure';
+constants.SUCCESS = 'success';
+
 module.exports = constants;

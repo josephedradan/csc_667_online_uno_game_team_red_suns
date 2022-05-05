@@ -1,9 +1,10 @@
-const debugPrinter = require("../util/debug_printer");
-const dbEngineGameUno = require("../controller/db_engine_game_uno");
-const gameUno = require("../controller/game_uno");
-const utilCommon = require("../controller/util_common");
-const intermediateSocketIOGameUno = require("../controller/intermediate_socket_io_game_uno");
-const intermediateGameUno = require("../controller/intermediate_game_uno");
+const debugPrinter = require('../util/debug_printer');
+const dbEngineGameUno = require('../controller/db_engine_game_uno');
+const gameUno = require('../controller/game_uno');
+const utilCommon = require('../controller/util_common');
+const intermediateSocketIOGameUno = require('../controller/intermediate_socket_io_game_uno');
+const intermediateGameUno = require('../controller/intermediate_game_uno');
+const constants = require('../server/constants');
 
 const middlewareGameUnoGamdID = {};
 
@@ -60,8 +61,8 @@ async function checkIfAllowedToUseAPI(req, res, next) {
     // If the user is not a player in the game
     if (!player) {
         res.json({
-            status: "failure",
-            message: "You are not a player in the game",
+            status: constants.FAILURE,
+            message: 'You are not a player in the game',
         });
         return;
     }
@@ -85,23 +86,23 @@ middlewareGameUnoGamdID.checkIfAllowedToUseAPI = checkIfAllowedToUseAPI;
 async function joinGameIfPossible(req, res, next) {
     debugPrinter.printMiddleware(joinGameIfPossible.name);
 
-    // Is the game active (Is the game being played)
-    if (await gameUno.checkIfGameIsActive(req.game.game_id)) {
-        debugPrinter.printDebug("GAME IS ACTIVE");
+    // Join game if possible
+    const responsePlayerObject = await intermediateGameUno.joinGameIfPossibleWrapped(
+        req.game.game_id,
+        req.user.user_id,
+    );
+
+    if (responsePlayerObject.player === null) {
+        debugPrinter.printRed(`${responsePlayerObject.message}`);
 
         utilCommon.reqSessionMessageHandler(
             req,
-            "failure",
-            "Cannot join an active game"
+            responsePlayerObject.status,
+            responsePlayerObject.message,
         );
 
-        res.redirect("back");
+        res.redirect('back');
     } else {
-        const playerObject = await intermediateGameUno.joinGameWrapped(
-            req.game.game_id,
-            req.user.user_id
-        );
-
         next();
     }
 }
@@ -112,15 +113,15 @@ async function checkIfPlayerIDIsHost(req, res, next) {
     debugPrinter.printMiddleware(checkIfPlayerIDIsHost.name);
 
     const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(
-        req.game.game_id
+        req.game.game_id,
     );
 
     if (gameRow.player_id_host === req.player.player_id) {
         next();
     } else {
         res.json({
-            status: "failure",
-            message: "You are not the host",
+            status: constants.FAILURE,
+            message: 'You are not the host',
         });
     }
 }

@@ -1,8 +1,10 @@
-const gameUno = require("./game_uno");
-const debugPrinter = require("../util/debug_printer");
-const intermediateSocketIOGameUno = require("./intermediate_socket_io_game_uno");
-const dbEngineMessage = require("./db_engine_message");
-const dbEngineGameUno = require("./db_engine_game_uno");
+const gameUno = require('./game_uno');
+const debugPrinter = require('../util/debug_printer');
+const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');
+const dbEngineMessage = require('./db_engine_message');
+const dbEngineGameUno = require('./db_engine_game_uno');
+const { io } = require('../server/server');
+const constants = require('../server/constants');
 
 const intermediateGameUno = {};
 
@@ -18,7 +20,7 @@ Return format
     player,
     game,
     players,
-    cardStateRows,
+    cardRows,
     game_url,
 }
  */
@@ -34,25 +36,23 @@ Return format
 async function createGameWrapped(user_id) {
     debugPrinter.printFunction(createGameWrapped.name);
 
-    const gameObject = await gameUno.createGameV2(user_id, 2);
+    const gameObject = await gameUno.createGameV2(user_id); // TODO: Possibly redesign because card generation should happen when you start the game, not create a game
     debugPrinter.printBackendBlue(gameObject);
 
     // If nothing returned
     if (!gameObject) {
-        return null;
+        return gameObject;
     }
 
     const game_url = await intermediateGameUno.getRelativeGameURL(
-        gameObject.game.game_id
+        gameObject.game.game_id,
     );
 
     debugPrinter.printBackendGreen(game_url);
 
     gameObject.game_url = game_url;
 
-    await Promise.all([
-        intermediateSocketIOGameUno.emitInRoomSeverIndexGames(),
-    ]);
+    await intermediateSocketIOGameUno.emitInRoomSeverIndexGames();
 
     return gameObject;
 }
@@ -67,20 +67,19 @@ Return format
     player
 {
  */
-async function joinGameWrapped(game_id, user_id) {
-    debugPrinter.printFunction(joinGameWrapped.name);
+async function joinGameIfPossibleWrapped(game_id, user_id) {
+    debugPrinter.printFunction(joinGameIfPossibleWrapped.name);
 
-    const result = await gameUno.joinGame(game_id, user_id);
-    debugPrinter.printRed(result);
+    const result = await gameUno.joinGameIfPossible(game_id, user_id);
 
-    await Promise.all([
-        intermediateSocketIOGameUno.emitInRoomSeverIndexGames(),
-    ]);
+    debugPrinter.printDebug(result);
+
+    await intermediateSocketIOGameUno.emitInRoomSeverIndexGames();
 
     return result;
 }
 
-intermediateGameUno.joinGameWrapped = joinGameWrapped;
+intermediateGameUno.joinGameIfPossibleWrapped = joinGameIfPossibleWrapped;
 
 /*
 Return format
@@ -88,6 +87,7 @@ Return format
     status
     message
     player
+    game
 {
  */
 async function leaveGameWrapped(game_id, user_id) {
@@ -95,10 +95,16 @@ async function leaveGameWrapped(game_id, user_id) {
 
     const result = await gameUno.leaveGame(game_id, user_id);
 
-    await Promise.all([
-        // intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServer(game_id, )
-        intermediateSocketIOGameUno.emitInRoomSeverIndexGames(),
-    ]);
+    const arrayPromises = [intermediateSocketIOGameUno.emitInRoomSeverIndexGames()];
+
+    if (result.game) {
+        arrayPromises.push(intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServerWrapped(
+            game_id,
+            'The host left, the game is dead, go back to the homepage.',
+        ));
+    }
+
+    await Promise.all(arrayPromises);
 
     return result;
 }
@@ -106,13 +112,15 @@ async function leaveGameWrapped(game_id, user_id) {
 intermediateGameUno.leaveGameWrapped = leaveGameWrapped;
 
 /*
+Return format
+{
     player_id,
     message_id,
     time_stamp_,
     message,
     display_name,
     game_id
-
+}
  */
 async function sendMessageWrapped(game_id, player_id, message) {
     debugPrinter.printFunction(sendMessageWrapped.name);
@@ -120,13 +128,13 @@ async function sendMessageWrapped(game_id, player_id, message) {
     const messageRow = await dbEngineMessage.createMessageRow(
         game_id,
         player_id,
-        message
+        message,
     );
 
     // Emit client message to everyone in the room
     await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageClient(
         game_id,
-        messageRow
+        messageRow,
     );
 
     return messageRow;
@@ -134,27 +142,54 @@ async function sendMessageWrapped(game_id, player_id, message) {
 
 intermediateGameUno.sendMessageWrapped = sendMessageWrapped;
 
-async function startGameWrapped(game_id, player_id) {
-    const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
-    console.log("GAMEROW");
-    console.log(gameRow);
-    console.log("GAMEROW");
-    console.log("playerid  " + player_id);
-    console.log("gameid " + game_id);
-    // If player_id is host and if game is not active, make it active
-    if (gameRow.player_id_host === player_id && gameRow.is_active === false) {
-        await dbEngineGameUno.updateGameIsActiveByGameID(game_id, true);
-    }
-
-    // TODO GET THE CARDS
+async function drawCardDeckToHandWrapped(game_id, player_id) {
+    const result = await gameUno.drawCardDeckToHand(game_id, player_id);
 
     // Emit the gameState to room and get gameState
-    const gameState =
-        await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(
-            game_id
-        );
+    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(
+        game_id,
+    );
 
-    return gameState;
+    return result;
+}
+
+intermediateGameUno.drawCardDeckToHandWrapped = drawCardDeckToHandWrapped;
+
+/*
+Return format
+{
+    status,
+    message,
+    game
+}
+ */
+async function startGameWrapped(game_id, player_id) {
+    const result = await gameUno.startGame(game_id, player_id, 1);
+
+    if (result.status === constants.FAILURE) {
+        return result;
+    }
+
+    // Emit the gameState to room and get gameState
+    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState();
+
+    const rowPlayers = await dbEngineGameUno.getPlayerRowsJoinPlayersRowJoinGameRowByGameID(game_id);
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const rowPlayer of rowPlayers) {
+        // eslint-disable-next-line no-plusplus
+        for (let i = 0; i < 7; i++) {
+            // eslint-disable-next-line no-await-in-loop
+            await drawCardDeckToHandWrapped(game_id, rowPlayer.player_id);
+        }
+    }
+
+    await Promise.all([
+        gameUno.drawCardDeckToPlay(game_id),
+        intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(),
+    ]);
+
+    return result;
 }
 
 intermediateGameUno.startGameWrapped = startGameWrapped;

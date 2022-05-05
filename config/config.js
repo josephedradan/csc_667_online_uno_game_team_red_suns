@@ -8,9 +8,9 @@ require("dotenv").config();
 module.exports = {
     // Development DB should be your local postgres db
     development: {
-        use_env_variable: "DATABASE_URL",
-        dialect: "postgres",
-        timezone: "America/Los_Angeles",
+        use_env_variable: 'DATABASE_URL',
+        dialect: 'postgres',
+        timezone: 'America/Los_Angeles',
         /*
          *FIXME: The below is here so that you can execute db commands to the heroku postgres server from your local machine.
          * Remove the below if you don't want that effect. Obviously, this is not meant to be used in a real production environment.
@@ -46,6 +46,6 @@ module.exports = {
             //     },
             // },
         },
-        timezone: "America/Los_Angeles",
+        // timezone: "America/Los_Angeles",
     },
 };

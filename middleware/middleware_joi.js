@@ -18,6 +18,7 @@ const to = require('await-to-js').default;
 const joiSchemas = require('../controller/joi_schemas');
 const debugPrinter = require('../util/debug_printer');
 const utilCommon = require('../controller/util_common');
+const constants = require('../server/constants');
 
 async function validateCommon(
     req,
@@ -61,7 +62,7 @@ async function validateCommon(
 const middlewareValidation = {};
 
 function callbackValidationErrorCommon(req, res, next, error) {
-    utilCommon.reqSessionMessageHandler(req, 'failure', error);
+    utilCommon.reqSessionMessageHandler(req, constants.FAILURE, error);
 
     res.redirect('back');
     // next();
