@@ -40,7 +40,7 @@ async function createGameWrapped(user_id) {
     debugPrinter.printBackendBlue(gameObject);
 
     // If nothing returned
-    if (!gameObject) {
+    if (gameObject.status === constants.FAILURE) {
         return gameObject;
     }
 
@@ -125,6 +125,8 @@ Return format
 async function sendMessageWrapped(game_id, player_id, message) {
     debugPrinter.printFunction(sendMessageWrapped.name);
 
+    debugPrinter.printFunction(sendMessageWrapped.name);
+
     const messageRow = await dbEngineMessage.createMessageRow(
         game_id,
         player_id,
@@ -142,8 +144,13 @@ async function sendMessageWrapped(game_id, player_id, message) {
 
 intermediateGameUno.sendMessageWrapped = sendMessageWrapped;
 
-async function drawCardDeckToHandWrapped(game_id, player_id) {
-    const result = await gameUno.drawCardDeckToHand(game_id, player_id);
+async function moveCardDrawToHandWrapped(game_id, player_id) {
+    debugPrinter.printFunction(moveCardDrawToHandWrapped.name);
+
+    const result = await gameUno.moveCardDrawToHand(game_id, player_id);
+
+    // TODO GUARD
+    debugPrinter.printDebug(result)
 
     // Emit the gameState to room and get gameState
     await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(
@@ -153,10 +160,12 @@ async function drawCardDeckToHandWrapped(game_id, player_id) {
     return result;
 }
 
-intermediateGameUno.drawCardDeckToHandWrapped = drawCardDeckToHandWrapped;
+intermediateGameUno.moveCardDrawToHandWrapped = moveCardDrawToHandWrapped;
 
 async function playCardHandToPlayDeckWrapped(game_id, collection_index, player_id) {
-    const result = await gameUno.playHandToPlayDeck(game_id, collection_index, player_id);
+    debugPrinter.printFunction(playCardHandToPlayDeckWrapped.name);
+
+    const result = await gameUno.moveCardHandToPlay(game_id, collection_index, player_id);
 
     await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(
         game_id,
@@ -175,9 +184,12 @@ Return format
 }
  */
 async function startGameWrapped(game_id, player_id) {
+    debugPrinter.printFunction(startGameWrapped.name);
+
     const result = await gameUno.startGame(game_id, player_id, 1);
 
     if (result.status === constants.FAILURE) {
+        debugPrinter.printError(result)
         return result;
     }
 
@@ -191,12 +203,13 @@ async function startGameWrapped(game_id, player_id) {
         // eslint-disable-next-line no-plusplus
         for (let i = 0; i < 7; i++) {
             // eslint-disable-next-line no-await-in-loop
-            await drawCardDeckToHandWrapped(game_id, rowPlayer.player_id);
+            await moveCardDrawToHandWrapped(game_id, rowPlayer.player_id);
+            debugPrinter.printError("FUCK")
         }
     }
 
     await Promise.all([
-        gameUno.drawCardDeckToPlay(game_id),
+        gameUno.moveCardDrawToPlay(game_id),
         intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(),
     ]);
 

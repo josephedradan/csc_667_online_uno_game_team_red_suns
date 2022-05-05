@@ -141,7 +141,7 @@ dbEngineGameUno.createPlayersRow = createPlayersRow;
 
 // 1 CALL ACID PROOF JOIN GAME
 async function createPlayerRowAndCreatePlayersRow(user_id, game_id) {
-    debugPrinter.printFunction(createPlayerRow.name);
+    debugPrinter.printFunction(createPlayerRowAndCreatePlayersRow.name);
     const result = await db.any(
         `
         WITH playerRow AS(
@@ -1019,7 +1019,6 @@ async function getPlayerRowJoinPlayersRowJoinGameRowByPlayerID(player_id) {
 }
 
 dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByPlayerID = getPlayerRowJoinPlayersRowJoinGameRowByPlayerID;
-
 
 /**
  * Get all Player Rows based the game_id
