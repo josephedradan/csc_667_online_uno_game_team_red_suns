@@ -10,6 +10,7 @@ const dbEngine = require('./db_engine');
 const dbEngineGameUno = require('./db_engine_game_uno');
 
 const debugPrinter = require('../util/debug_printer');
+const constants = require('../server/constants');
 
 const gameUno = {};
 
@@ -21,8 +22,14 @@ const gameUno = {};
  *
  * @returns {Promise<{game: *, players: *}[]>}
  */
-async function getGamesAndTheirPlayersSimple() {
-    debugPrinter.printFunction(getGamesAndTheirPlayersSimple.name);
+async function getGamesWithTheirPlayersSimple() {
+    debugPrinter.printFunction(getGamesWithTheirPlayersSimple.name);
+
+    const result = {
+        status: null,
+        message: null,
+        games: null,
+    };
 
     // May be empty
     const gameRowsSimple = await dbEngineGameUno.getGameRowsSimple();
@@ -35,14 +42,18 @@ async function getGamesAndTheirPlayersSimple() {
         players: playerRows[index],
     }));
 
-    return gamesWithPlayersRows;
+    result.status = constants.SUCCESS;
+    result.message = 'You got all the games';
+    result.games = gamesWithPlayersRows;
+
+    return result;
 }
 
-gameUno.getGamesAndTheirPlayers = getGamesAndTheirPlayersSimple;
+gameUno.getGamesWithTheirPlayersSimple = getGamesWithTheirPlayersSimple;
 
 /**
  * Notes:
- *      Do not use this in getGamesAndTheirPlayersSimple() because you will be making more db calls
+ *      Do not use this in getGamesWithTheirPlayersSimple() because you will be making more db calls
  *
  *      This function is dependent on if the db is successful
  *
@@ -51,6 +62,12 @@ gameUno.getGamesAndTheirPlayers = getGamesAndTheirPlayersSimple;
  */
 async function getGameAndTheirPlayersByGameIDDetailed(game_id) {
     debugPrinter.printFunction(getGameAndTheirPlayersByGameIDDetailed.name);
+
+    const result = {
+        status: null,
+        message: null,
+        game: null,
+    };
 
     // May be undefined
     const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
@@ -68,32 +85,14 @@ async function getGameAndTheirPlayersByGameIDDetailed(game_id) {
         players: playerRows,
     };
 
-    return gameWithPlayersRows;
+    result.status = constants.SUCCESS;
+    result.message = 'You got the game';
+    result.game = gameRow;
+
+    return result;
 }
 
 gameUno.getGameAndTheirPlayersByGameIDDetailed = getGameAndTheirPlayersByGameIDDetailed;
-
-/**
- * Notes:
- *      This function is dependent on if the db is successful
- *
- * @param game_id
- * @returns {Promise<{defaultValue: boolean, unique: boolean, allowNull: boolean, type: *}>}
- */
-async function checkIfGameIsActive(game_id) {
-    debugPrinter.printFunction(checkIfGameIsActive.name);
-
-    // May be undefined
-    const result = await dbEngineGameUno.getGameRowByGameIDSimple(game_id);
-
-    if (!result) {
-        return null;
-    }
-
-    return result.is_active;
-}
-
-gameUno.checkIfGameIsActive = checkIfGameIsActive;
 
 /*
 Return format
@@ -136,7 +135,7 @@ async function joinGameIfPossible(game_id, user_id) {
 
     // If player is exists for the user for the game
     if (playerRowExists) {
-        result.status = 'failure';
+        result.status = constants.FAILURE;
         result.message = `Player already exists in game ${game_id}`;
         result.player = playerRowExists;
         return result;
@@ -146,7 +145,7 @@ async function joinGameIfPossible(game_id, user_id) {
 
     // If game is active
     if (gameRow.is_active) {
-        result.status = 'failure';
+        result.status = constants.FAILURE;
         result.message = `Game ${game_id} is active`;
         return result;
     }
@@ -157,12 +156,12 @@ async function joinGameIfPossible(game_id, user_id) {
     // If player row was not made
     if (!playerRowNew) {
         debugPrinter.printError('COULD NOT MAKE NEW PLAYER ROW');
-        result.status = 'failure';
+        result.status = constants.FAILURE;
         result.message = `Something went wrong on the server for game ${game_id}`;
         return result;
     }
 
-    result.status = 'success';
+    result.status = constants.SUCCESS;
     result.message = `Player ${playerRowNew.player_id} was made for game ${game_id}`;
     result.player = playerRowNew;
 
@@ -201,7 +200,7 @@ async function leaveGame(game_id, user_id) {
     const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
 
     if (!gameRow) {
-        result.status = 'failure';
+        result.status = constants.FAILURE;
         result.message = `${game_id} does not exist`;
         return result;
     }
@@ -211,7 +210,7 @@ async function leaveGame(game_id, user_id) {
 
     // If playerRow does not exist
     if (!playerRow) {
-        result.status = 'failure';
+        result.status = constants.FAILURE;
         result.message = `Player ${playerRow.player_id} does not exist for game ${game_id}`;
         return result;
     }
@@ -226,7 +225,7 @@ async function leaveGame(game_id, user_id) {
         result.message = `Player ${playerRow.player_id} was removed from game ${game_id}`;
     }
 
-    result.status = 'success';
+    result.status = constants.SUCCESS;
 
     return result;
 }
@@ -334,7 +333,14 @@ async function createGame(user_id) {
  */
 async function createGameV2(user_id) {
     debugPrinter.printFunction(createGameV2.name);
-    debugPrinter.printDebug(user_id);
+
+    const result = {
+        status: null,
+        message: null,
+        player: null,
+        game: null,
+        players: null,
+    };
 
     // FIXME: WARNING: DANGEROUS, NOT ACID PROOF
 
@@ -343,30 +349,39 @@ async function createGameV2(user_id) {
     debugPrinter.printDebug(playerRow);
 
     if (!playerRow) {
-        return null;
+        result.status = constants.FAILURE;
+        result.message = 'Could not create player row';
+        return result;
     }
+    result.game = playerRow;
 
     // May be undefined
     const gameRow = await dbEngineGameUno.createGameRow(playerRow.player_id);
     debugPrinter.printDebug(gameRow);
 
     if (!gameRow) {
-        return null;
+        result.status = constants.FAILURE;
+        result.message = 'Could not create game row';
+        return result;
     }
+    result.game = gameRow;
 
     // May be undefined
     const playersRow = await dbEngineGameUno.createPlayersRow(gameRow.game_id, playerRow.player_id);
     debugPrinter.printDebug(playersRow);
 
     if (!playersRow) {
-        return null;
+        result.status = constants.FAILURE;
+        result.message = 'Could not create players row';
+        return result;
     }
 
-    return {
-        player: playerRow,
-        game: gameRow,
-        players: playersRow,
-    };
+    result.players = playersRow;
+
+    result.status = constants.SUCCESS;
+    result.message = 'Player, game, and players created';
+
+    return result;
 }
 
 gameUno.createGameV2 = createGameV2;
@@ -405,7 +420,7 @@ async function startGame(game_id, player_id, deckMultiplier) {
     const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
 
     if (!gameRow) {
-        result.status = 'failure';
+        result.status = constants.FAILURE;
         result.message = 'Game does not exist';
         return result;
     }
@@ -413,14 +428,14 @@ async function startGame(game_id, player_id, deckMultiplier) {
     result.game = gameRow;
 
     if (gameRow.player_id_host !== player_id) {
-        result.status = 'failure';
+        result.status = constants.FAILURE;
         result.message = 'player_id is not player_id_host';
         return result;
     }
 
     // If player_id is host and if game is not active, make it active
     if (gameRow.is_active === true) {
-        result.status = 'failure';
+        result.status = constants.FAILURE;
         result.message = 'Game is already active';
         return result;
     }
@@ -433,14 +448,14 @@ async function startGame(game_id, player_id, deckMultiplier) {
 
     // Basically if cards not created
     if (!cardRows.length) {
-        result.status = 'failure';
+        result.status = constants.FAILURE;
         result.message = 'Game is probably broken';
         return result;
     }
 
     result.cards = cardRows; // In this case, cardsRows is not cards, but cardRows is cards
 
-    result.status = 'success';
+    result.status = constants.SUCCESS;
     result.message = `Game ${game_id} is not active`;
 
     return result;
@@ -452,7 +467,7 @@ gameUno.startGame = startGame;
 game_state
 
 Notes:
-    This should not show any information about the actual card itself
+    This should not show any information about the actual cards, but only for the
 
 {
     game:
@@ -484,7 +499,7 @@ Notes:
             },
             ...
         ],
-    draw:
+    collection_draw:
         [
             {collection_index: 0},
             {collection_index: 1},
@@ -493,7 +508,7 @@ Notes:
             {collection_index: 4},
             ...
         ],
-    play:
+    collection_play:
         [
             {
                 game_id,

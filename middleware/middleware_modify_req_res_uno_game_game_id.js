@@ -1,6 +1,7 @@
 const debugPrinter = require('../util/debug_printer');
 const dbEngineGameUno = require('../controller/db_engine_game_uno');
 const utilCommon = require('../controller/util_common');
+const constants = require('../server/constants');
 
 const middlewareModifyReqResGameUnoGameID = {};
 
@@ -19,7 +20,7 @@ async function attachGameToRequestAndResponseLocalsIfPossible(req, res, next) {
     const gameRow = await dbEngineGameUno.getGameRowByGameIDSimple(req.params.game_id);
 
     if (!gameRow) {
-        utilCommon.reqSessionMessageHandler(req, 'failure', 'Game does not exist');
+        utilCommon.reqSessionMessageHandler(req, constants.FAILURE, 'Game does not exist');
 
         res.redirect('/');
     } else {
@@ -50,7 +51,7 @@ async function attachPlayerToRequestAndResponseLocalsIfPossible(req, res, next) 
     const rowPlayer = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(req.params.game_id, req.user.user_id);
 
     if (!rowPlayer) {
-        utilCommon.reqSessionMessageHandler(req, 'failure', 'Player does not exist');
+        utilCommon.reqSessionMessageHandler(req, constants.FAILURE, 'Player does not exist');
 
         res.redirect('/');
     } else {

@@ -21,6 +21,7 @@ Reference:
 const passport = require('passport');
 const debugPrinter = require('../util/debug_printer');
 const utilCommon = require('../controller/util_common');
+const constants = require('../server/constants');
 
 const middlewarePassport = {};
 
@@ -38,7 +39,7 @@ middlewarePassport.checkAuthenticated = async (req, res, next) => {
     if (req.isAuthenticated()) {
         next();
     } else {
-        utilCommon.reqSessionMessageHandler(req, 'failure', 'User must be logged in to use this feature');
+        utilCommon.reqSessionMessageHandler(req, constants.FAILURE, 'User must be logged in to use this feature');
 
         res.redirect('back');
         // next();
@@ -59,7 +60,7 @@ middlewarePassport.checkUnauthenticated = async (req, res, next) => {
     if (req.isUnauthenticated()) {
         next();
     } else {
-        utilCommon.reqSessionMessageHandler(req, 'failure', `${req.user.username} you are logged in, you must not be logged in to use this feature`);
+        utilCommon.reqSessionMessageHandler(req, constants.FAILURE, `${req.user.username} you are logged in, you must not be logged in to use this feature`);
 
         res.redirect('back');
         // next();
@@ -132,7 +133,7 @@ function callbackCustomWrapper(req, res, next) {
         if (!attributesAddedToReqUser) {
             // Unsuccessful login response
 
-            utilCommon.reqSessionMessageHandler(req, 'failure', 'Password/Username is invalid'); // If you care about security
+            utilCommon.reqSessionMessageHandler(req, constants.FAILURE, 'Password/Username is invalid'); // If you care about security
 
             res.redirect('back');
             // next();
@@ -169,14 +170,14 @@ function callbackCustomWrapper(req, res, next) {
                 } else {
                     // Successful login response
                     // req.session.message = {
-                    //     status: 'success',
+                    //     status: constants.SUCCESS,
                     //     message: `${req.user.username} has logged in`,
                     //     // user_id: req.user.user_id,
                     //     // username: req.user.username,
                     // };
 
                     // Successful login response
-                    utilCommon.reqSessionMessageHandler(req, 'success', `${req.user.username} has logged in`);
+                    utilCommon.reqSessionMessageHandler(req, constants.SUCCESS, `${req.user.username} has logged in`);
 
                     next();
                 }

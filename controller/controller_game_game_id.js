@@ -19,6 +19,7 @@ const debugPrinter = require('../util/debug_printer');
 const dbEngineMessage = require('./db_engine_message');
 const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');
 const db = require('../db');
+const constants = require('../server/constants');
 
 const controllerGameID = {};
 
@@ -41,7 +42,7 @@ async function POSTPlayCard(req, res, next) {
     } = req.body;
 
     res.json({
-        status: 'success',
+        status: constants.SUCCESS,
         message: 'you played a card (CHANGE ME)', // TODO CHANGE ME
     });
 }
@@ -49,19 +50,27 @@ async function POSTPlayCard(req, res, next) {
 controllerGameID.POSTPlayCard = POSTPlayCard;
 
 async function GETDrawCard(req, res, next) {
-    await intermediateGameUno.drawCardWrapped(req.game.game_id, req.player.player_id);
-    const retVal = await dbEngineGameUno.getCollectionByPlayerID(req.player.player_id);
-    res.json(retVal);
+    debugPrinter.printMiddleware(GETDrawCard.name);
+
+    await intermediateGameUno.drawCardDeckToHandWrapped(req.game.game_id, req.player.player_id);
+
+    const result = await dbEngineGameUno.getCollectionByPlayerID(req.player.player_id);
+
+    debugPrinter.printDebug(result);
+
+    res.json(result);
 }
 
 controllerGameID.GETDrawCard = GETDrawCard;
 
 async function POSTStartGame(req, res, next) {
-    // If game is not active, make it active
+    debugPrinter.printMiddleware(POSTStartGame.name);
 
-    const gameState = await intermediateGameUno.startGameWrapped(req.game.game_id, req.player.player_id);
+    const result = await intermediateGameUno.startGameWrapped(req.game.game_id, req.player.player_id);
 
-    res.json(gameState);
+    debugPrinter.printDebug(result);
+
+    res.json(result);
 }
 
 controllerGameID.POSTStartGame = POSTStartGame;
@@ -147,5 +156,17 @@ async function GETGetHand(req, res, next) {
 }
 
 controllerGameID.GETGetHand = GETGetHand;
+
+async function GETPlayers(req, res, next) {
+    debugPrinter.printMiddleware(GETPlayers.name);
+
+    const result = await dbEngineGameUno.getPlayerRowsJoinPlayersRowJoinGameRowByGameID(req.game.game_id);
+
+    debugPrinter.printDebug(result);
+
+    res.json(result);
+}
+
+controllerGameID.GETPlayers = GETPlayers;
 
 module.exports = controllerGameID;
