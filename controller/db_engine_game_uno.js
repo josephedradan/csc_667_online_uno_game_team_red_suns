@@ -771,7 +771,7 @@ async function getGameRowDetailedByGameID(game_id) {
     debugPrinter.printFunction(getGameRowDetailedByGameID.name);
     const result = await db.any(
         `
-        SELECT game_id, is_active, player_id_current_turn, is_clockwise, player_id_host
+        SELECT game_id, is_active, player_id_turn, is_clockwise, player_id_host
         FROM "Game"
         WHERE "Game".game_id = $1
         `,
@@ -1196,7 +1196,7 @@ async function updateGameIsActiveByGameID(game_id, boolean) {
         UPDATE "Game"
         SET is_active = $2
         WHERE "Game".game_id = $1
-        RETURNING game_id, is_active, player_id_current_turn, is_clockwise, player_id_host;
+        RETURNING game_id, is_active, player_id_turn, is_clockwise, player_id_host;
         `,
         [
             game_id,
@@ -1217,7 +1217,7 @@ async function updateGameIsClockwiseByGameID(game_id, boolean) {
         UPDATE "Game"
         SET is_clockwise = $2
         WHERE "Game".game_id = $1
-        RETURNING game_id, is_active, player_id_current_turn, is_clockwise, player_id_host;
+        RETURNING game_id, is_active, player_id_turn, is_clockwise, player_id_host;
         `,
         [
             game_id,
@@ -1230,15 +1230,15 @@ async function updateGameIsClockwiseByGameID(game_id, boolean) {
 
 dbEngineGameUno.updateGameIsClockwiseByGameID = updateGameIsClockwiseByGameID;
 
-async function updateGamePlayerIDCurrentTurnByGameID(game_id, player_id) {
-    debugPrinter.printFunction(updateGamePlayerIDCurrentTurnByGameID.name);
+async function updateGamePlayerIDTurnByGameID(game_id, player_id) {
+    debugPrinter.printFunction(updateGamePlayerIDTurnByGameID.name);
 
     const result = await db.any(
         `
         UPDATE "Game"
-        SET player_id_current_turn = $2
+        SET player_id_turn = $2
         WHERE "Game".game_id = $1
-        RETURNING game_id, is_active, player_id_current_turn, is_clockwise, player_id_host;
+        RETURNING game_id, is_active, player_id_turn, is_clockwise, player_id_host;
         `,
         [
             game_id,
@@ -1249,7 +1249,7 @@ async function updateGamePlayerIDCurrentTurnByGameID(game_id, player_id) {
     return result;
 }
 
-dbEngineGameUno.updateGamePlayerIDCurrentTurnByGameID = updateGamePlayerIDCurrentTurnByGameID;
+dbEngineGameUno.updateGamePlayerIDTurnByGameID = updateGamePlayerIDTurnByGameID;
 
 async function updateGamePlayerIDHostByGameID(game_id, player_id) {
     debugPrinter.printFunction(updateGamePlayerIDHostByGameID.name);
@@ -1259,7 +1259,7 @@ async function updateGamePlayerIDHostByGameID(game_id, player_id) {
         UPDATE "Game"
         SET player_id_host = $2
         WHERE "Game".game_id = $1
-        RETURNING game_id, is_active, player_id_current_turn, is_clockwise, player_id_host;
+        RETURNING game_id, is_active, player_id_turn, is_clockwise, player_id_host;
         `,
         [
             game_id,

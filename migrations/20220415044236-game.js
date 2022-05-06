@@ -25,7 +25,7 @@ module.exports = {
             },
 
             // Current player's turn determined by the player_id
-            player_id_current_turn: {
+            player_id_turn: {
                 type: Sequelize.DataTypes.INTEGER,
                 references: {
                     model: 'Player',
@@ -55,6 +55,24 @@ module.exports = {
                 type: Sequelize.DataTypes.BOOLEAN,
                 defaultValue: true,
                 allowNull: false,
+                unique: false,
+            },
+
+            type: {
+                type: Sequelize.DataTypes.STRING,
+                allowNull: true,
+                unique: false,
+            },
+
+            content: {
+                type: Sequelize.DataTypes.STRING,
+                allowNull: true,
+                unique: false,
+            },
+
+            color: {
+                type: Sequelize.DataTypes.STRING,
+                allowNull: true,
                 unique: false,
             },
 

@@ -36,9 +36,15 @@ middlewareGameUnoGamdID.validateRequestBody = validateRequestBody;
  */
 async function checkIfPlayerCanDoAction(req, res, next) {
     debugPrinter.printMiddleware(checkIfPlayerCanDoAction.name);
-    // TODO
 
-    next();
+    if (req.game.player_id_turn === req.player.player_id_turn) {
+        next();
+    } else {
+        res.json({
+            status: constants.FAILURE,
+            message: 'It is not your turn',
+        });
+    }
 }
 
 middlewareGameUnoGamdID.checkIfPlayerCanDoAction = checkIfPlayerCanDoAction;
@@ -57,16 +63,14 @@ async function checkIfAllowedToUseAPI(req, res, next) {
     // Get player of the user if they are already in the game
 
     // If the user is not a player in the game
-    if (!req.player) {
+    if (req.player) {
+        next();
+    } else {
         res.json({
             status: constants.FAILURE,
             message: 'You are not a player in the game',
         });
-        return;
     }
-
-    // Go to the next middleware
-    next();
 }
 
 middlewareGameUnoGamdID.checkIfAllowedToUseAPI = checkIfAllowedToUseAPI;
@@ -84,18 +88,18 @@ middlewareGameUnoGamdID.checkIfAllowedToUseAPI = checkIfAllowedToUseAPI;
 async function checkIfInGameOrJoinGameIfPossibleNoPlayerInReqAndGuard(req, res, next) {
     debugPrinter.printMiddleware(checkIfInGameOrJoinGameIfPossibleNoPlayerInReqAndGuard.name);
 
-    const resultPlayerDetailed = await gameUno.getPlayerDetailedByGameIDAndUserID(req.game.game_id, req.user.user_id);
+    const resultPlayerObject = await gameUno.getPlayerDetailedByGameIDAndUserID(req.game.game_id, req.user.user_id);
 
     // If the user is not a player in the game
-    if (resultPlayerDetailed.status === constants.FAILURE) {
-        const resultJoinGame = await intermediateGameUno.joinGameIfPossibleWrapped(req.game.game_id, req.user.user_id);
+    if (resultPlayerObject.status === constants.FAILURE) {
+        const resultJoinGameObject = await intermediateGameUno.joinGameIfPossibleWrapped(req.game.game_id, req.user.user_id);
 
         // If the user failed to join the game as a player
-        if (resultJoinGame.status === constants.FAILURE) {
+        if (resultJoinGameObject.status === constants.FAILURE) {
             utilCommon.reqSessionMessageHandler(
                 req,
-                resultJoinGame.status,
-                resultJoinGame.message,
+                resultJoinGameObject.status,
+                resultJoinGameObject.message,
             );
 
             res.redirect('back');
