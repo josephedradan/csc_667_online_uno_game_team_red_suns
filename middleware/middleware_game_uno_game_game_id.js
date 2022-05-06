@@ -83,10 +83,10 @@ middlewareGameUnoGamdID.checkIfAllowedToUseAPI = checkIfAllowedToUseAPI;
  * @param next
  * @returns {Promise<void>}
  */
-async function joinGameIfPossible(req, res, next) {
-    debugPrinter.printMiddleware(joinGameIfPossible.name);
+async function joinGameIfPossibleNoPlayerInReq(req, res, next) {
+    debugPrinter.printMiddleware(joinGameIfPossibleNoPlayerInReq.name);
 
-    const resultPlayerDetailed = await gameUno.getPlayerDetailed(req.game.game_id, req.user.user_id);
+    const resultPlayerDetailed = await gameUno.getPlayerDetailedByGameIDAndUserID(req.game.game_id, req.user.user_id);
 
     // If the user is not a player in the game
     if (resultPlayerDetailed.status === constants.FAILURE) {
@@ -109,16 +109,12 @@ async function joinGameIfPossible(req, res, next) {
     }
 }
 
-middlewareGameUnoGamdID.joinGameIfPossible = joinGameIfPossible;
+middlewareGameUnoGamdID.joinGameIfPossibleNoPlayerInReq = joinGameIfPossibleNoPlayerInReq;
 
 async function checkIfPlayerIDIsHost(req, res, next) {
     debugPrinter.printMiddleware(checkIfPlayerIDIsHost.name);
 
-    const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(
-        req.game.game_id,
-    );
-
-    if (gameRow.player_id_host === req.player.player_id) {
+    if (req.game.player_id_host === req.player.player_id) {
         next();
     } else {
         res.json({

@@ -158,7 +158,7 @@ intermediateGameUno.moveCardDrawToHandByGameIDAndPlayerIDWrapped = moveCardDrawT
 async function playCardHandToPlayDeckWrapped(game_id, collection_index, player_id) {
     debugPrinter.printFunction(playCardHandToPlayDeckWrapped.name);
 
-    const result = await gameUno.moveCardHandToPlay(game_id, collection_index, player_id);
+    const result = await gameUno.moveCardHandToPlayByGameIDAndUserID(game_id, collection_index, player_id);
 
     await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(game_id);
 

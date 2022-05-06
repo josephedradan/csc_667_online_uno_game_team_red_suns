@@ -20,7 +20,7 @@ async function attachGameToRequestAndResponseLocalsIfPossible(req, res, next) {
     const gameRow = await dbEngineGameUno.getGameRowByGameIDSimple(req.params.game_id);
 
     if (!gameRow) {
-        utilCommon.reqSessionMessageHandler(req, constants.FAILURE, `Game ${game_id} does not exist`);
+        utilCommon.reqSessionMessageHandler(req, constants.FAILURE, 'Game does not exist');
 
         res.redirect('/');
     } else {
