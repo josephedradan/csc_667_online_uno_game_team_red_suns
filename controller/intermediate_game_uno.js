@@ -161,6 +161,9 @@ intermediateGameUno.moveCardDrawToHandByGameIDAndPlayerRowWrapped = moveCardDraw
 async function playCardHandToPlayDeckWrapped(game_id, user_id, collection_index) {
     debugPrinter.printFunction(playCardHandToPlayDeckWrapped.name);
 
+    // TODO HANDLE PLAYING SPECIAL CARDS
+    // TODO CHANGE TURN IF NEEDED
+
     const result = await gameUno.moveCardHandToPlayByGameIDAndUserID(game_id, user_id, collection_index);
 
     await intermediateSocketIOGameUno.emitInRoomServerGameGameIDGameState(game_id);
@@ -191,7 +194,7 @@ async function startGameWrapped(game_id, user_id) {
     // Emit the gameState to room and get gameState
     await intermediateSocketIOGameUno.emitInRoomServerGameGameIDGameState(game_id);
 
-    const rowPlayers = await dbEngineGameUno.getPlayerRowsJoinPlayersRowJoinGameRowByGameID(game_id);
+    const rowPlayers = await dbEngineGameUno.getPlayerRowsDetailedByGameID(game_id);
 
     // eslint-disable-next-line no-restricted-syntax
     for (const rowPlayer of rowPlayers) {
@@ -221,7 +224,7 @@ async function setGamePlayerIDHostWrapped(game_id, user_id) {
         return result;
     }
 
-    const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByPlayerID(result.player.player_id);
+    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByPlayerID(result.player.player_id);
 
     await intermediateSocketIOGameUno.emitInRoomServerGameGameIDMessageServerWrapped(game_id, `${playerRow.display_name} is now the host`);
 
@@ -230,22 +233,23 @@ async function setGamePlayerIDHostWrapped(game_id, user_id) {
 
 intermediateGameUno.setGamePlayerIDHostWrapped = setGamePlayerIDHostWrapped;
 
-async function setGamePlayerIDCurrentTurnWrapped(game_id, user_id) {
-    debugPrinter.printFunction(setGamePlayerIDCurrentTurnWrapped.name);
-
-    const result = await gameUno.setGamePlayerIDCurrentTurn(game_id, user_id);
-
-    if (result.status === constants.FAILURE) {
-        return result;
-    }
-
-    const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByPlayerID(result.player.player_id);
-
-    await intermediateSocketIOGameUno.emitInRoomServerGameGameIDMessageServerWrapped(game_id, `It is ${playerRow.display_name}'s turn`);
-
-    return result;
-}
-
-intermediateGameUno.setGamePlayerIDCurrentTurnWrapped = setGamePlayerIDCurrentTurnWrapped;
+// TODO: DON'T USE THE BELOW FUNCTION BECAUSE IT IS NOT NECESSARY
+// async function setGamePlayerIDCurrentTurnWrapped(game_id, user_id) {
+//     debugPrinter.printFunction(setGamePlayerIDCurrentTurnWrapped.name);
+//
+//     const result = await gameUno.setGamePlayerIDCurrentTurn(game_id, user_id);
+//
+//     if (result.status === constants.FAILURE) {
+//         return result;
+//     }
+//
+//     const playerRow = await dbEngineGameUno.getPlayerRowDetailedByPlayerID(result.player.player_id);
+//
+//     await intermediateSocketIOGameUno.emitInRoomServerGameGameIDMessageServerWrapped(game_id, `It is ${playerRow.display_name}'s turn`);
+//
+//     return result;
+// }
+//
+// intermediateGameUno.setGamePlayerIDCurrentTurnWrapped = setGamePlayerIDCurrentTurnWrapped;
 
 module.exports = intermediateGameUno;

@@ -767,8 +767,8 @@ dbEngineGameUno.deleteGameRow = deleteGame;
  * @param game_id
  * @returns {Promise<any>}
  */
-async function getGameRowByGameIDDetailed(game_id) {
-    debugPrinter.printFunction(getGameRowByGameIDDetailed.name);
+async function getGameRowDetailedByGameID(game_id) {
+    debugPrinter.printFunction(getGameRowDetailedByGameID.name);
     const result = await db.any(
         `
         SELECT game_id, is_active, player_id_current_turn, is_clockwise, player_id_host
@@ -783,7 +783,7 @@ async function getGameRowByGameIDDetailed(game_id) {
     return result[0];
 }
 
-dbEngineGameUno.getGameRowByGameIDDetailed = getGameRowByGameIDDetailed;
+dbEngineGameUno.getGameRowDetailedByGameID = getGameRowDetailedByGameID;
 
 /**
  * Notes:
@@ -968,8 +968,8 @@ dbEngineGameUno.getCollectionByGameIDAndCollectionInfoID = getCollectionByGameID
  * @param user_id
  * @returns {Promise<any>}
  */
-async function getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id) {
-    debugPrinter.printFunction(getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID.name);
+async function getPlayerRowDetailedByGameIDAndUserID(game_id, user_id) {
+    debugPrinter.printFunction(getPlayerRowDetailedByGameIDAndUserID.name);
     const result = await db.any(
         `
         SELECT
@@ -996,10 +996,10 @@ async function getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, u
     return result[0];
 }
 
-dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID = getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID;
+dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID = getPlayerRowDetailedByGameIDAndUserID;
 
-async function getPlayerRowJoinPlayersRowJoinGameRowByPlayerID(player_id) {
-    debugPrinter.printFunction(getPlayerRowJoinPlayersRowJoinGameRowByPlayerID.name);
+async function getPlayerRowDetailedByPlayerID(player_id) {
+    debugPrinter.printFunction(getPlayerRowDetailedByPlayerID.name);
     const result = await db.any(
         `
         SELECT
@@ -1014,7 +1014,7 @@ async function getPlayerRowJoinPlayersRowJoinGameRowByPlayerID(player_id) {
         JOIN "Game" ON "Players".game_id = "Game".game_id
         JOIN "User" ON "Player".user_id = "User".user_id
         JOIN "UserStatistic" ON "Player".user_id = "UserStatistic".user_id
-        WHERE "Player".player_id = $1
+        WHERE "Player".player_id = $1;
         `,
         [
             player_id,
@@ -1024,7 +1024,7 @@ async function getPlayerRowJoinPlayersRowJoinGameRowByPlayerID(player_id) {
     return result[0];
 }
 
-dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByPlayerID = getPlayerRowJoinPlayersRowJoinGameRowByPlayerID;
+dbEngineGameUno.getPlayerRowDetailedByPlayerID = getPlayerRowDetailedByPlayerID;
 
 /**
  * Get all Player Rows based the game_id
@@ -1033,8 +1033,8 @@ dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByPlayerID = getPlayerRowJo
  * @param user_id
  * @returns {Promise<any>}
  */
-async function getPlayerRowsJoinPlayersRowJoinGameRowByGameID(game_id) {
-    debugPrinter.printFunction(getPlayerRowsJoinPlayersRowJoinGameRowByGameID.name);
+async function getPlayerRowsDetailedByGameID(game_id) {
+    debugPrinter.printFunction(getPlayerRowsDetailedByGameID.name);
     const result = await db.any(
         `
         SELECT
@@ -1049,7 +1049,7 @@ async function getPlayerRowsJoinPlayersRowJoinGameRowByGameID(game_id) {
         JOIN "Game" ON "Players".game_id = "Game".game_id
         JOIN "User" ON "Player".user_id = "User".user_id
         JOIN "UserStatistic" ON "Player".user_id = "UserStatistic".user_id
-        WHERE "Players".game_id = $1
+        WHERE "Players".game_id = $1;
         `,
         [
             game_id,
@@ -1059,7 +1059,80 @@ async function getPlayerRowsJoinPlayersRowJoinGameRowByGameID(game_id) {
     return result;
 }
 
-dbEngineGameUno.getPlayerRowsJoinPlayersRowJoinGameRowByGameID = getPlayerRowsJoinPlayersRowJoinGameRowByGameID;
+dbEngineGameUno.getPlayerRowsDetailedByGameID = getPlayerRowsDetailedByGameID;
+
+async function getPlayerRowsGameIsActive(game_id) {
+    debugPrinter.printFunction(getPlayerRowsGameIsActive.name);
+    const result = await db.any(
+        `
+        SELECT
+            "Player".player_id,
+            "Player".user_id,
+            "Players".game_id,
+            "User".display_name
+        FROM "Player"
+        JOIN "Players" ON "Player".player_id = "Players".player_id
+        JOIN "Game" ON "Players".game_id = "Game".game_id
+        JOIN "User" ON "Player".user_id = "User".user_id
+        WHERE "Players".game_id = $1
+        AND "Game".is_active = true
+        AND "Players".in_game = true
+        ORDER BY "Player".player_id ASC;
+        `,
+        [
+            game_id,
+        ],
+    );
+
+    return result;
+}
+
+dbEngineGameUno.getPlayerRowsGameIsActive = getPlayerRowsGameIsActive;
+
+async function updatePlayersInGameRows(game_id, boolean) {
+    debugPrinter.printFunction(updatePlayersInGameRows.name);
+    const result = await db.any(
+        `
+        UPDATE "Players"
+        SET
+            in_game = $2
+        WHERE "Players".game_id = $1
+        RETURNING *;
+        `,
+        [
+            game_id,
+            boolean,
+        ],
+    );
+
+    return result;
+}
+
+dbEngineGameUno.updatePlayersInGameRows = updatePlayersInGameRows;
+
+// TODO CALL THIS WHEN A PLAYER WINS
+async function updatePlayersInGameRowByPlayerID(game_id, player_id, boolean) {
+    debugPrinter.printFunction(updatePlayersInGameRowByPlayerID.name);
+    const result = await db.any(
+        `
+        UPDATE "Players"
+        SET
+            in_game = $3
+        WHERE "Players".game_id = $1
+        AND "Players".player_id = $2
+        RETURNING *;
+        `,
+        [
+            game_id,
+            player_id,
+            boolean,
+        ],
+    );
+
+    return result;
+}
+
+dbEngineGameUno.updatePlayersInGameRowByPlayerID = updatePlayersInGameRowByPlayerID;
 
 async function getNumberOfPlayersRowsByGameID(game_id) {
     debugPrinter.printFunction(getNumberOfPlayersRowsByGameID.name);

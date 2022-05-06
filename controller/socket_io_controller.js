@@ -97,7 +97,7 @@ async function initialSocketJoin(socket) {
                 // eslint-disable-next-line no-param-reassign
                 socket.request.game_id = game_id_client;
 
-                const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(
+                const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(
                     socket.request.game_id,
                     socket.request.user.user_id,
                 );
@@ -137,7 +137,7 @@ async function initialSocketJoin(socket) {
                 const user_recent = await dbEngineGameUno.getUserByPlayerID(socket.request.player_id);
 
                 // get game
-                const game_current = await dbEngineGameUno.getGameRowByGameIDDetailed(socket.request.game_id);
+                const game_current = await dbEngineGameUno.getGameRowDetailedByGameID(socket.request.game_id);
 
                 // If user exists and game exists
                 if (user_recent && game_current) {

@@ -62,7 +62,7 @@ middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocal = attach
 async function attachPlayerToRequestAndResponseLocalsAndGuard(req, res, next) {
     debugPrinter.printMiddleware(attachPlayerToRequestAndResponseLocalsAndGuard.name);
 
-    const rowPlayer = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(req.params.game_id, req.user.user_id);
+    const rowPlayer = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(req.params.game_id, req.user.user_id);
 
     if (!rowPlayer) {
         utilCommon.reqSessionMessageHandler(req, constants.FAILURE, 'Player does not exist');
@@ -84,7 +84,7 @@ middlewareModifyReqResGameUnoGameID.attachPlayerToRequestAndResponseLocalsAndGua
 async function attachPlayerToRequestAndResponseLocals(req, res, next) {
     debugPrinter.printMiddleware(attachPlayerToRequestAndResponseLocals.name);
 
-    const rowPlayer = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(req.params.game_id, req.user.user_id);
+    const rowPlayer = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(req.params.game_id, req.user.user_id);
 
     if (!rowPlayer) {
         req.player = rowPlayer;
