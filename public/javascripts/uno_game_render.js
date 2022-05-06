@@ -257,17 +257,23 @@ window.onload = async () => {
                         playContainer
                     );
 
-                    console.log("Created the renderer");
+                    // console.log("Created the renderer");
 
-                    console.log("Getting players");
-                    //const playersResults = await axios.get(`/game/${getGameId()}/GETPlayers`);
-                    console.log("Getting local player");
-                    //const localPlayerResults = await axios.get(`/game/${getGameId()}/GETPlayer`);
+                    // console.log("Getting players");
+                    //const playersResults = await axios.get(`/game/${getGameId()}/getPlayers`);
+                    // console.log("Getting local player");
+                    // const localPlayerResults = await axios.get(
+                    //     `/game/${getGameId()}/getPlayer`
+                    // );
 
-                    console.log(`/game/${getGameId()}/GETPlayers`);
+                    console.log(
+                        await axios.get(`/game/${getGameId()}/getHand`)
+                    );
+                    // console.log(`/game/${getGameId()}/GETPlayers`);
 
                     //const playersData = playersResults.data;
                     //const players = playersData.players;
+                    // console.log(localPlayerResults);
 
                     const players = game_state.players;
                     //const localPlayer = localPlayerResults.data;
