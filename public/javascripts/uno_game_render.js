@@ -149,6 +149,10 @@ class UnoGameRenderer {
         });
     }
 
+    // updateCurrentPlayer() {
+    //     console.log(this.playerContainer);
+    // }
+
     updateTopCard(cardData) {
         if (!cardData) {
             return;
@@ -267,7 +271,10 @@ class TurnController {
         this.draggables = [];
     }
 
-    startTurn(cardCollection) {
+    startTurn(cardCollection, currentPlayer) {
+        const currentPlayerTarget = document.getElementById("currentPlayer");
+        currentPlayerTarget.textContent = `Current Player: ${currentPlayer.display_name}`;
+
         cardCollection.forEach((cardData, index) => {
             const card = this.handContainer.children.item(index);
             const draggable = new Draggable(card, [this.playContainer]);
@@ -293,15 +300,15 @@ class TurnController {
                         }
                         wildFourUserEvent.children.addEventListener();
                     } else {
-
                         // Make move request
                         // const moveResult = await axios.post(`/game/${getGameId()}/move`, {index}); //or however the heck it's named
-                        
+
                         console.log("Playing a card!");
 
                         console.log("collection_index: " + index);
 
-                        const result = await axios.post(`/game/${getGameId()}/playCard`,
+                        const result = await axios.post(
+                            `/game/${getGameId()}/playCard`,
                             {
                                 collection_index: index,
                             }
@@ -436,8 +443,15 @@ async function renderGameState(game_state) {
                 // if (game_state.player_id_turn === localPlayer.player_id) {
 
                 // }
+                // pass also the current player at the start of turn so we can display that current player
                 if (game_state.game.player_id_turn == localPlayer.player_id) {
-                    turnController.startTurn(playersHand.data.collection);
+                    turnController.startTurn(
+                        playersHand.data.collection,
+                        game_state.players.find(
+                            (e) =>
+                                e.player_id === game_state.game.player_id_turn
+                        )
+                    );
                 }
             }
         }

@@ -41,7 +41,17 @@
                 class="absolute bottom-0 right-0 px-4 py-2 mb-4 font-bold text-white bg-red-500 rounded hover:bg-red-700"
             >Leave</button>
         </div>
-        <div class="relative grid content-center col-span-1"><button
+        <div class="relative grid content-center col-span-1">
+            <p
+                id="currentPlayer"
+                class="absolute w-full px-4 py-2 mb-4 font-bold text-white rounded left-24 bg-sky-500 hover:bg-sky-700"
+            ></p>
+            {{! possible animation uncomment line below to see effect }}
+            {{! <span
+                class="absolute inline-flex w-4/12 h-full rounded-full bg-gradient-to-r from-red-500 to-sky-500 opacity-95 animate-ping"
+            >
+            </span> }}
+            <button
                 id="challenge"
                 class="absolute bottom-0 right-0 px-4 py-2 mb-4 font-bold text-white rounded bg-sky-500 hover:bg-sky-700"
             >Challenge</button>
