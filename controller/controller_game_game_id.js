@@ -30,19 +30,18 @@ const controllerGameID = {};
 // };
 
 async function POSTPlayCard(req, res, next) {
-    // TODO: SOCKET HERE
+    debugPrinter.printMiddleware(POSTPlayCard.name);
 
     /* LOOK AT MIGRATION
     * req.user
       req.game
       req.player
     */
-    debugPrinter.printMiddleware(POSTPlayCard.name);
     const {
         collection_index,
     } = req.body;
 
-    const result = await intermediateGameUno.playCardHandToPlayDeckWrapped(req.game.game_id, collection_index, req.player.player_id);
+    const result = await intermediateGameUno.playCardHandToPlayDeckWrapped(req.game.game_id, req.user.user_id, collection_index);
 
     debugPrinter.printDebug(result);
 
@@ -54,7 +53,7 @@ controllerGameID.POSTPlayCard = POSTPlayCard;
 async function GETDrawCard(req, res, next) {
     debugPrinter.printMiddleware(GETDrawCard.name);
 
-    await intermediateGameUno.moveCardDrawToHandByGameIDAndPlayerIDWrapped(req.game.game_id, req.player.player_id);
+    await intermediateGameUno.moveCardDrawToHandByGameIDAndPlayerRowWrapped(req.game.game_id, req.player.player_id);
 
     const result = await dbEngineGameUno.getCollectionRowByPlayerID(req.player.player_id);
 
@@ -68,7 +67,7 @@ controllerGameID.GETDrawCard = GETDrawCard;
 async function POSTStartGame(req, res, next) {
     debugPrinter.printMiddleware(POSTStartGame.name);
 
-    const result = await intermediateGameUno.startGameWrapped(req.game.game_id, req.player.player_id);
+    const result = await intermediateGameUno.startGameWrapped(req.game.game_id, req.user.user_id);
 
     debugPrinter.printDebug(result);
 

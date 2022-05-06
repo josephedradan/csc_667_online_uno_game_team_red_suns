@@ -51,7 +51,7 @@ async function getGamesWithTheirPlayersSimple() {
     }));
 
     result.status = constants.SUCCESS;
-    result.message = 'Games with their players was returned';
+    result.message = 'Games with their players returned';
     result.games = gamesWithPlayersRows;
 
     return result;
@@ -104,13 +104,13 @@ async function getGameAndTheirPlayersByGameIDDetailed(game_id) {
 
     if (!playerRows) {
         result.status = constants.FAILURE;
-        result.message = `Error in game players for game ${game_id}`;
+        result.message = `Error when getting players for game ${game_id}`;
         return result;
     }
     result.players = playerRows;
 
     result.status = constants.SUCCESS;
-    result.message = `Game ${game_id} and their returned`;
+    result.message = `Game ${game_id} and its players returned`;
 
     return result;
 }
@@ -214,12 +214,12 @@ async function joinGameIfPossible(game_id, user_id) {
     // If player row was not made
     if (!playerRowNew) {
         result.status = constants.FAILURE;
-        result.message = `Player ${playerRowNew.player_id} could not be made for game ${game_id}`;
+        result.message = `Player ${playerRowNew.player_id} could not join game ${game_id}`;
         return result;
     }
 
     result.status = constants.SUCCESS;
-    result.message = `Player ${playerRowNew.player_id} was made for game ${game_id}`;
+    result.message = `Player ${playerRowNew.player_id} was created and joined game ${game_id}`;
     result.player = playerRowNew;
 
     return result;
@@ -277,11 +277,11 @@ async function leaveGame(game_id, user_id) {
     if (playerRow.player_id === gameRow.player_id_host) {
         // May be empty
         result.game = await dbEngineGameUno.deleteGameRow(game_id); // Will also delete players in game
-        result.message = `Game ${game_id} was removed and player ${playerRow.player_id} was removed`;
+        result.message = `Game ${game_id} is removed and player ${playerRow.player_id} is removed`;
     } else {
         // May be empty
         result.player = await dbEngineGameUno.deletePlayerRowByPlayerID(playerRow.player_id);
-        result.message = `Player ${playerRow.player_id} was removed from game ${game_id}`;
+        result.message = `Player ${playerRow.player_id} is removed from game ${game_id}`;
     }
 
     result.status = constants.SUCCESS;
@@ -441,7 +441,7 @@ async function createGameV2(user_id) {
     result.players = playersRow;
 
     result.status = constants.SUCCESS;
-    result.message = `Game ${gameRow.game_id}, player ${playersRow.player_id}, and players were created`;
+    result.message = `Game ${gameRow.game_id}, player ${playersRow.player_id}, game's players were created`;
 
     return result;
 }
@@ -478,7 +478,7 @@ gameUno.createGameV2 = createGameV2;
  * @param player_id
  * @returns {Promise<null|{game: null, message: null, status: null}>}
  */
-async function startGame(game_id, player_id, deckMultiplier) {
+async function startGame(game_id, user_id, deckMultiplier) {
     debugPrinter.printFunction(startGame.name);
 
     // TODO: Assign player_index to players so you know the turn order. Maybe do this because we can use the player_id instead
@@ -487,6 +487,7 @@ async function startGame(game_id, player_id, deckMultiplier) {
         status: null,
         message: null,
         game: null,
+        player: null,
         cards: null,
     };
 
@@ -500,11 +501,16 @@ async function startGame(game_id, player_id, deckMultiplier) {
 
     result.game = gameRow;
 
-    if (gameRow.player_id_host !== player_id) {
+    // Get player given game_id and user_id (May be undefined)
+    const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByPlayerID(game_id, user_id);
+
+    // If player is exists for the user for the game
+    if (!playerRow) {
         result.status = constants.FAILURE;
-        result.message = `Player ${player_id} is not the host for game ${game_id}`;
+        result.message = `Player does not exist for game ${game_id}`;
         return result;
     }
+    result.player = playerRow;
 
     // If player_id is host and if game is not active, make it active
     if (gameRow.is_active === true) {
@@ -532,7 +538,7 @@ async function startGame(game_id, player_id, deckMultiplier) {
     result.cards = cardRows; // In this case, cardsRows is not cards, but cardRows is cards
 
     result.status = constants.SUCCESS;
-    result.message = `Game ${game_id} has started`;
+    result.message = `Game ${game_id} started`;
 
     return result;
 }
@@ -652,7 +658,7 @@ async function getGameState(game_id) {
     result.collection_play = await dbEngineGameUno.getCollectionByGameIDAndCollectionInfoID(game_id, 2);
 
     result.status = constants.SUCCESS;
-    result.message = 'Game state was successful';
+    result.message = 'Game state returned';
 
     // Game state
     return result;
@@ -660,7 +666,7 @@ async function getGameState(game_id) {
 
 gameUno.getGameState = getGameState;
 
-async function moveCardDrawToHandHelper(game_id, playerRow) {
+async function moveCardDrawToHandByGameIDAndPlayerRow(game_id, playerRow) {
     const result = {
         status: null,
         message: null,
@@ -691,24 +697,7 @@ async function moveCardDrawToHandHelper(game_id, playerRow) {
     return result;
 }
 
-/*
-{
-    status,
-    message,
-    player,
-    collection,
-}
- */
-async function moveCardDrawToHandByGameIDAndPlayerID(game_id, player_id) { // TODO ADD MORE GUARDING AND ERROR CHECKING ETC
-    debugPrinter.printFunction(moveCardDrawToHandByGameIDAndPlayerID.name);
-
-    // Get player given game_id and user_id (May be undefined)
-    const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByPlayerID(player_id);
-
-    return moveCardDrawToHandHelper(game_id, playerRow);
-}
-
-gameUno.moveCardDrawToHandByGameIDAndPlayerID = moveCardDrawToHandByGameIDAndPlayerID;
+gameUno.moveCardDrawToHandByGameIDAndPlayerRow = moveCardDrawToHandByGameIDAndPlayerRow;
 
 /*
 {
@@ -724,7 +713,7 @@ async function moveCardDrawToHandByGameIDAndUserID(game_id, user_id) {
     // Get player given game_id and user_id (May be undefined)
     const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
 
-    return moveCardDrawToHandHelper(game_id, playerRow);
+    return moveCardDrawToHandByGameIDAndPlayerRow(game_id, playerRow);
 }
 
 gameUno.moveCardDrawToHandByGameIDAndUserID = moveCardDrawToHandByGameIDAndUserID;
@@ -753,7 +742,7 @@ async function moveCardDrawToPlay(game_id) { // TODO ADD MORE GUARDING AND ERROR
 
     if (!collectionRow) {
         result.status = constants.FAILURE;
-        result.message = `Error in updating PLAY's collection for Game ${game_id}`; // TODO FIX THEN
+        result.message = `Error when updating PLAY's collection for Game ${game_id}`; // TODO FIX THEN
         return result;
     }
     result.collection = collectionRow;
@@ -791,7 +780,7 @@ async function moveCardHandToPlayByGameIDAndUserID(game_id, user_id, collection_
 
     if (!collectionRow) {
         result.status = constants.FAILURE;
-        result.message = `Error in updating PLAY's collection for Game ${game_id}`;
+        result.message = `Error when updating PLAY's collection for Game ${game_id}`;
         return result;
     }
     result.collection = collectionRow;
@@ -847,7 +836,7 @@ async function getHand(game_id, user_id) {
     }
 
     result.status = constants.SUCCESS;
-    result.message = `Player ${playerRow.player_id} has gotten their hand`;
+    result.message = `Player ${playerRow.player_id}'s hand returned`;
 
     result.collection = collectionRow;
 
@@ -856,14 +845,17 @@ async function getHand(game_id, user_id) {
 
 gameUno.getHand = getHand;
 
-async function getPlayerDetailedHelper(game_id, playerRow) {
-    debugPrinter.printFunction(getPlayerDetailedHelper.name);
+async function getPlayerDetailedByGameIDAndUserID(game_id, user_id) {
+    debugPrinter.printFunction(getPlayerDetailedByGameIDAndUserID.name);
 
     const result = {
         status: null,
         message: null,
         player: null,
     };
+
+    // Get player given game_id and user_id (May be undefined)
+    const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
 
     // If player is exists for the user for the game
     if (!playerRow) {
@@ -874,32 +866,12 @@ async function getPlayerDetailedHelper(game_id, playerRow) {
     result.player = playerRow;
 
     result.status = constants.SUCCESS;
-    result.message = `Player ${playerRow.player_id} was returned`;
+    result.message = `Player ${playerRow.player_id} returned`;
 
     return result;
 }
 
-async function getPlayerDetailedByGameIDAndUserID(game_id, user_id) {
-    debugPrinter.printFunction(getPlayerDetailedByGameIDAndUserID.name);
-
-    // Get player given game_id and user_id (May be undefined)
-    const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
-
-    return getPlayerDetailedHelper(game_id, playerRow);
-}
-
 gameUno.getPlayerDetailedByGameIDAndUserID = getPlayerDetailedByGameIDAndUserID;
-
-async function getPlayerDetailedByGameIDAndPlayerID(game_id, player_id) {
-    debugPrinter.printFunction(getPlayerDetailedByGameIDAndUserID.name);
-
-    // Get player given game_id and user_id (May be undefined)
-    const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByPlayerID(game_id, player_id);
-
-    return getPlayerDetailedHelper(game_id, playerRow);
-}
-
-gameUno.getPlayerDetailedByGameIDAndPlayerID = getPlayerDetailedByGameIDAndPlayerID;
 
 async function setGamePlayerIDHost(game_id, user_id) {
     debugPrinter.printFunction(setGamePlayerIDHost.name);
@@ -968,7 +940,7 @@ async function setGamePlayerIDCurrentTurn(game_id, user_id) {
     result.game = await dbEngineGameUno.updateGameIsClockwiseByGameID(game_id, playerRow.player_id);
 
     result.status = constants.SUCCESS;
-    result.message = `It is Player ${playerRow.player_id}'s turn for game ${game_id}`;
+    result.message = `Player ${playerRow.player_id}'s has the turn for game ${game_id}`;
 
     return result;
 }

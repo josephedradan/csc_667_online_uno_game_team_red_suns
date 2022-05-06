@@ -6,8 +6,8 @@ const debugPrinter = require('../util/debug_printer');
 const intermediateSocketIOGameUno = {};
 const { io } = connectionContainer;
 
-async function emitInRoomSeverIndexGames() {
-    debugPrinter.printFunction(emitInRoomSeverIndexGames.name);
+async function emitInRoomServerIndexGames() {
+    debugPrinter.printFunction(emitInRoomServerIndexGames.name);
 
     const result = await gameUno.getGamesWithTheirPlayersSimple();
 
@@ -17,10 +17,10 @@ async function emitInRoomSeverIndexGames() {
     return result;
 }
 
-intermediateSocketIOGameUno.emitInRoomSeverIndexGames = emitInRoomSeverIndexGames;
+intermediateSocketIOGameUno.emitInRoomServerIndexGames = emitInRoomServerIndexGames;
 
-async function emitInRoomSeverGameGameIDPlayers(game_id) {
-    debugPrinter.printFunction(emitInRoomSeverGameGameIDPlayers.name);
+async function emitInRoomServerGameGameIDPlayers(game_id) {
+    debugPrinter.printFunction(emitInRoomServerGameGameIDPlayers.name);
 
     // This may be null
     const gameWithPlayersRows = await gameUno.getGameAndTheirPlayersByGameIDDetailed(game_id);
@@ -31,7 +31,7 @@ async function emitInRoomSeverGameGameIDPlayers(game_id) {
     return gameWithPlayersRows;
 }
 
-intermediateSocketIOGameUno.emitInRoomSeverGameGameIDPlayers = emitInRoomSeverGameGameIDPlayers;
+intermediateSocketIOGameUno.emitInRoomServerGameGameIDPlayers = emitInRoomServerGameGameIDPlayers;
 
 /*
 
@@ -44,8 +44,8 @@ intermediateSocketIOGameUno.emitInRoomSeverGameGameIDPlayers = emitInRoomSeverGa
 
 }
  */
-async function emitInRoomSeverGameGameIDMessageClient(game_id, messageObject) {
-    debugPrinter.printFunction(emitInRoomSeverGameGameIDMessageClient.name);
+async function emitInRoomServerGameGameIDMessageClient(game_id, messageObject) {
+    debugPrinter.printFunction(emitInRoomServerGameGameIDMessageClient.name);
 
     io.in(game_id)
         .emit('server-game-game-id-message-client', messageObject);
@@ -53,7 +53,7 @@ async function emitInRoomSeverGameGameIDMessageClient(game_id, messageObject) {
     return messageObject;
 }
 
-intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageClient = emitInRoomSeverGameGameIDMessageClient;
+intermediateSocketIOGameUno.emitInRoomServerGameGameIDMessageClient = emitInRoomServerGameGameIDMessageClient;
 
 /*
 
@@ -63,8 +63,8 @@ intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageClient = emitInRoomS
 }
  */
 // TODO: WARNING, THIS IS NOT RECORDED BY THE SERVER
-async function emitInRoomSeverGameGameIDMessageServer(game_id, messageObject) {
-    debugPrinter.printFunction(emitInRoomSeverGameGameIDMessageServer.name);
+async function emitInRoomServerGameGameIDMessageServer(game_id, messageObject) {
+    debugPrinter.printFunction(emitInRoomServerGameGameIDMessageServer.name);
 
     io.in(game_id)
         .emit('server-game-game-id-message-server', messageObject);
@@ -72,12 +72,12 @@ async function emitInRoomSeverGameGameIDMessageServer(game_id, messageObject) {
     return messageObject;
 }
 
-intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServer = emitInRoomSeverGameGameIDMessageServer;
+intermediateSocketIOGameUno.emitInRoomServerGameGameIDMessageServer = emitInRoomServerGameGameIDMessageServer;
 
-async function emitInRoomSeverGameGameIDMessageServerWrapped(game_id, message) {
-    debugPrinter.printFunction(emitInRoomSeverGameGameIDMessageServer.name);
+async function emitInRoomServerGameGameIDMessageServerWrapped(game_id, message) {
+    debugPrinter.printFunction(emitInRoomServerGameGameIDMessageServer.name);
 
-    return emitInRoomSeverGameGameIDMessageServer(
+    return emitInRoomServerGameGameIDMessageServer(
         game_id,
         {
             display_name: 'Server',
@@ -86,10 +86,10 @@ async function emitInRoomSeverGameGameIDMessageServerWrapped(game_id, message) {
     );
 }
 
-intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServerWrapped = emitInRoomSeverGameGameIDMessageServerWrapped;
+intermediateSocketIOGameUno.emitInRoomServerGameGameIDMessageServerWrapped = emitInRoomServerGameGameIDMessageServerWrapped;
 
-async function emitInRoomSeverMessage(game_id, messageObject) {
-    debugPrinter.printFunction(emitInRoomSeverMessage.name);
+async function emitInRoomServerMessage(game_id, messageObject) {
+    debugPrinter.printFunction(emitInRoomServerMessage.name);
 
     io.in(game_id)
         .emit('server-message', messageObject);
@@ -97,10 +97,10 @@ async function emitInRoomSeverMessage(game_id, messageObject) {
     return messageObject;
 }
 
-intermediateSocketIOGameUno.emitInRoomSeverMessage = emitInRoomSeverMessage;
+intermediateSocketIOGameUno.emitInRoomServerMessage = emitInRoomServerMessage;
 
-async function emitInRoomSeverGameGameIDGameState(game_id) {
-    debugPrinter.printFunction(emitInRoomSeverGameGameIDGameState.name);
+async function emitInRoomServerGameGameIDGameState(game_id) {
+    debugPrinter.printFunction(emitInRoomServerGameGameIDGameState.name);
 
     const gameState = await gameUno.getGameState(game_id);
 
@@ -110,6 +110,6 @@ async function emitInRoomSeverGameGameIDGameState(game_id) {
     return gameState;
 }
 
-intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState = emitInRoomSeverGameGameIDGameState;
+intermediateSocketIOGameUno.emitInRoomServerGameGameIDGameState = emitInRoomServerGameGameIDGameState;
 
 module.exports = intermediateSocketIOGameUno;

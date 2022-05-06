@@ -3,7 +3,7 @@
 WARNING:
     DO NOT CHANGE THE NAME OF THIS FILE OR YOU WILL BREAK MIGRATIONS
  */
-require("dotenv").config();
+require('dotenv').config();
 
 module.exports = {
     // Development DB should be your local postgres db
@@ -26,14 +26,14 @@ module.exports = {
 
     // Test DB is not used nor created
     test: {
-        use_env_variable: "DATABASE_URL_TEST",
-        dialect: "postgres",
+        use_env_variable: 'DATABASE_URL_TEST',
+        dialect: 'postgres',
     },
 
     // Production DB is the DB used in production. Heroku's DATABASE_URL === DATABASE_URL_PRODUCTION
     production: {
-        use_env_variable: "DATABASE_URL_PRODUCTION",
-        dialect: "postgres",
+        use_env_variable: 'DATABASE_URL_PRODUCTION',
+        dialect: 'postgres',
         dialectOptions: {
             ssl: {
                 require: true,

@@ -14,8 +14,8 @@ const middlewareModifyReqResGameUnoGameID = {};
  * @param next
  * @returns {Promise<void>}
  */
-async function attachGameToRequestAndResponseLocalsIfPossible(req, res, next) {
-    debugPrinter.printMiddleware(attachGameToRequestAndResponseLocalsIfPossible.name);
+async function attachGameToRequestAndResponseLocalAndGuard(req, res, next) {
+    debugPrinter.printMiddleware(attachGameToRequestAndResponseLocalAndGuard.name);
 
     const gameRow = await dbEngineGameUno.getGameRowByGameIDSimple(req.params.game_id);
 
@@ -34,7 +34,21 @@ async function attachGameToRequestAndResponseLocalsIfPossible(req, res, next) {
     }
 }
 
-middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocalsIfPossible = attachGameToRequestAndResponseLocalsIfPossible;
+middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocalAndGuard = attachGameToRequestAndResponseLocalAndGuard;
+
+async function attachGameToRequestAndResponseLocal(req, res, next) {
+    debugPrinter.printMiddleware(attachGameToRequestAndResponseLocal.name);
+
+    const gameRow = await dbEngineGameUno.getGameRowByGameIDSimple(req.params.game_id);
+
+    if (gameRow) {
+        req.game = gameRow;
+        res.locals.game = req.game;
+    }
+    next();
+}
+
+middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocal = attachGameToRequestAndResponseLocal;
 
 /**
  * NOTES:
@@ -45,8 +59,8 @@ middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocalsIfPossib
  * @param next
  * @returns {Promise<void>}
  */
-async function attachPlayerToRequestAndResponseLocalsIfPossible(req, res, next) {
-    debugPrinter.printMiddleware(attachGameToRequestAndResponseLocalsIfPossible.name);
+async function attachPlayerToRequestAndResponseLocalsAndGuard(req, res, next) {
+    debugPrinter.printMiddleware(attachPlayerToRequestAndResponseLocalsAndGuard.name);
 
     const rowPlayer = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(req.params.game_id, req.user.user_id);
 
@@ -65,6 +79,21 @@ async function attachPlayerToRequestAndResponseLocalsIfPossible(req, res, next) 
     }
 }
 
-middlewareModifyReqResGameUnoGameID.attachPlayerToRequestAndResponseLocalsIfPossible = attachPlayerToRequestAndResponseLocalsIfPossible;
+middlewareModifyReqResGameUnoGameID.attachPlayerToRequestAndResponseLocalsAndGuard = attachPlayerToRequestAndResponseLocalsAndGuard;
+
+async function attachPlayerToRequestAndResponseLocals(req, res, next) {
+    debugPrinter.printMiddleware(attachPlayerToRequestAndResponseLocals.name);
+
+    const rowPlayer = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(req.params.game_id, req.user.user_id);
+
+    if (!rowPlayer) {
+        req.player = rowPlayer;
+        res.locals.player = req.player;
+    }
+
+    next();
+}
+
+middlewareModifyReqResGameUnoGameID.attachPlayerToRequestAndResponseLocals = attachPlayerToRequestAndResponseLocals;
 
 module.exports = middlewareModifyReqResGameUnoGameID;

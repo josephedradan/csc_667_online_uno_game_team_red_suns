@@ -114,11 +114,11 @@ async function initialSocketJoin(socket) {
 
                     await Promise.all(
                         [
-                            intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServerWrapped(
+                            intermediateSocketIOGameUno.emitInRoomServerGameGameIDMessageServerWrapped(
                                 socket.request.game_id,
                                 `${user_recent.display_name} has joined.`,
                             ),
-                            intermediateSocketIOGameUno.emitInRoomSeverGameGameIDPlayers(socket.request.game_id),
+                            intermediateSocketIOGameUno.emitInRoomServerGameGameIDPlayers(socket.request.game_id),
                         ],
                     );
                 }
@@ -141,11 +141,11 @@ async function initialSocketJoin(socket) {
 
                 // If user exists and game exists
                 if (user_recent && game_current) {
-                    let emitInRoomSeverMessage;
+                    let emitInRoomServerMessage;
 
                     // If the game is active, then the player can rejoin
                     if (game_current.is_active) {
-                        emitInRoomSeverMessage = intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServerWrapped(
+                        emitInRoomServerMessage = intermediateSocketIOGameUno.emitInRoomServerGameGameIDMessageServerWrapped(
                             socket.request.game_id,
                             `${user_recent.display_name} has left (They can rejoin).`,
 
@@ -154,7 +154,7 @@ async function initialSocketJoin(socket) {
                         // Make the player leave the game
                         await intermediateGameUno.leaveGameWrapped(socket.request.game_id, socket.request.user.user_id);
 
-                        emitInRoomSeverMessage = intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServerWrapped(
+                        emitInRoomServerMessage = intermediateSocketIOGameUno.emitInRoomServerGameGameIDMessageServerWrapped(
                             socket.request.game_id,
                             `${user_recent.display_name} has left.`,
 
@@ -163,8 +163,8 @@ async function initialSocketJoin(socket) {
 
                     await Promise.all(
                         [
-                            emitInRoomSeverMessage,
-                            intermediateSocketIOGameUno.emitInRoomSeverGameGameIDPlayers(socket.request.game_id),
+                            emitInRoomServerMessage,
+                            intermediateSocketIOGameUno.emitInRoomServerGameGameIDPlayers(socket.request.game_id),
                         ],
                     );
                 }

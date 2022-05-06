@@ -47,7 +47,7 @@ async function createGameWrapped(user_id) {
 
     gameObject.game_url = game_url;
 
-    await intermediateSocketIOGameUno.emitInRoomSeverIndexGames();
+    await intermediateSocketIOGameUno.emitInRoomServerIndexGames();
 
     return gameObject;
 }
@@ -69,7 +69,7 @@ async function joinGameIfPossibleWrapped(game_id, user_id) {
 
     debugPrinter.printDebug(result);
 
-    await intermediateSocketIOGameUno.emitInRoomSeverIndexGames();
+    await intermediateSocketIOGameUno.emitInRoomServerIndexGames();
 
     return result;
 }
@@ -90,10 +90,10 @@ async function leaveGameWrapped(game_id, user_id) {
 
     const result = await gameUno.leaveGame(game_id, user_id);
 
-    const arrayPromises = [intermediateSocketIOGameUno.emitInRoomSeverIndexGames()];
+    const arrayPromises = [intermediateSocketIOGameUno.emitInRoomServerIndexGames()];
 
     if (result.game) {
-        arrayPromises.push(intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageServerWrapped(
+        arrayPromises.push(intermediateSocketIOGameUno.emitInRoomServerGameGameIDMessageServerWrapped(
             game_id,
             'The host left, the game is dead, go back to the homepage.',
         ));
@@ -129,7 +129,7 @@ async function sendMessageWrapped(game_id, player_id, message) {
     );
 
     // Emit client message to everyone in the room
-    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDMessageClient(
+    await intermediateSocketIOGameUno.emitInRoomServerGameGameIDMessageClient(
         game_id,
         messageRow,
     );
@@ -139,28 +139,31 @@ async function sendMessageWrapped(game_id, player_id, message) {
 
 intermediateGameUno.sendMessageWrapped = sendMessageWrapped;
 
-async function moveCardDrawToHandByGameIDAndPlayerIDWrapped(game_id, player_id) {
-    debugPrinter.printFunction(moveCardDrawToHandByGameIDAndPlayerIDWrapped.name);
+async function moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow) {
+    debugPrinter.printFunction(moveCardDrawToHandByGameIDAndPlayerRowWrapped.name);
 
-    const result = await gameUno.moveCardDrawToHandByGameIDAndPlayerID(game_id, player_id);
+    const result = await gameUno.moveCardDrawToHandByGameIDAndPlayerRow(game_id, playerRow);
 
-    // TODO GUARD
     debugPrinter.printDebug(result);
 
+    if (result.status === constants.FAILURE) {
+        return result;
+    }
+
     // Emit the gameState to room and get gameState
-    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(game_id);
+    await intermediateSocketIOGameUno.emitInRoomServerGameGameIDGameState(game_id);
 
     return result;
 }
 
-intermediateGameUno.moveCardDrawToHandByGameIDAndPlayerIDWrapped = moveCardDrawToHandByGameIDAndPlayerIDWrapped;
+intermediateGameUno.moveCardDrawToHandByGameIDAndPlayerRowWrapped = moveCardDrawToHandByGameIDAndPlayerRowWrapped;
 
-async function playCardHandToPlayDeckWrapped(game_id, collection_index, player_id) {
+async function playCardHandToPlayDeckWrapped(game_id, user_id, collection_index) {
     debugPrinter.printFunction(playCardHandToPlayDeckWrapped.name);
 
-    const result = await gameUno.moveCardHandToPlayByGameIDAndUserID(game_id, collection_index, player_id);
+    const result = await gameUno.moveCardHandToPlayByGameIDAndUserID(game_id, user_id, collection_index);
 
-    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(game_id);
+    await intermediateSocketIOGameUno.emitInRoomServerGameGameIDGameState(game_id);
 
     return result;
 }
@@ -175,18 +178,18 @@ Return format
     game
 }
  */
-async function startGameWrapped(game_id, player_id) {
+async function startGameWrapped(game_id, user_id) {
     debugPrinter.printFunction(startGameWrapped.name);
 
     // WARNING: DO NOT RETURN THE RESULT OF THIS FUNCTION TO USERS BECAUSE IT RETURNS EVERYTHING ABOUT THE CARDS
-    const result = await gameUno.startGame(game_id, player_id, 1);
+    const result = await gameUno.startGame(game_id, user_id, 1);
 
     if (result.status === constants.FAILURE) {
         return gameUno.getGameState(game_id);
     }
 
     // Emit the gameState to room and get gameState
-    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(game_id);
+    await intermediateSocketIOGameUno.emitInRoomServerGameGameIDGameState(game_id);
 
     const rowPlayers = await dbEngineGameUno.getPlayerRowsJoinPlayersRowJoinGameRowByGameID(game_id);
 
@@ -195,14 +198,14 @@ async function startGameWrapped(game_id, player_id) {
         // eslint-disable-next-line no-plusplus
         for (let i = 0; i < 7; i++) {
             // eslint-disable-next-line no-await-in-loop
-            await moveCardDrawToHandByGameIDAndPlayerIDWrapped(game_id, rowPlayer.player_id);
+            await moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, rowPlayer);
         }
     }
 
     //
     await gameUno.moveCardDrawToPlay(game_id);
 
-    const resultNew = intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(game_id);
+    const resultNew = intermediateSocketIOGameUno.emitInRoomServerGameGameIDGameState(game_id);
 
     return resultNew;
 }

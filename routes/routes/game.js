@@ -24,9 +24,9 @@ routerGame.get(
 
 routerGame.use(
     '/:game_id',
-    middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocalsIfPossible,
-    middlewareGameUnoGameGameID.joinGameIfPossibleNoPlayerInReq,
-    middlewareModifyReqResGameUnoGameID.attachPlayerToRequestAndResponseLocalsIfPossible,
+    middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocalAndGuard,
+    middlewareGameUnoGameGameID.checkIfInGameOrJoinGameIfPossibleNoPlayerInReqAndGuard,
+    middlewareModifyReqResGameUnoGameID.attachPlayerToRequestAndResponseLocalsAndGuard, // Do not use to reduce db calls
 );
 
 routerGame.get('/:game_id', controllerGame.GETGameByGameId);
