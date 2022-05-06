@@ -40,10 +40,8 @@ class Draggable {
 
     dragMouseDown(event) {
         if (this.element.getAttribute("disabled") !== null) {
-            console.log("It was disabled!");
             return;
         }
-        console.log("It was not disabled");
 
         event.preventDefault();
 
@@ -85,12 +83,14 @@ class Draggable {
 
         for (const container of this.containers) {
             const rect = container.getBoundingClientRect();
+            /*
             console.log(
                 `${parseInt(rect.left, 10)} ${parseInt(
                     rect.right,
                     10
                 )} ${parseInt(rect.top, 10)} ${parseInt(rect.bottom, 10)}`
             );
+            */
             if (
                 mouseX > parseInt(rect.left, 10) &&
                 mouseX < parseInt(rect.right, 10) &&
@@ -271,7 +271,7 @@ class TurnController {
         cardCollection.forEach((cardData, index) => {
             const card = this.handContainer.children.item(index);
             const draggable = new Draggable(card, [this.playContainer]);
-            draggable.setCallback((newParent) => {
+            draggable.setCallback(async (newParent) => {
                 if (newParent == this.playContainer) {
                     // if card is a wild card, prompt with modal and request the move
                     if (cardData.card_color == "black") {
@@ -293,8 +293,22 @@ class TurnController {
                         }
                         wildFourUserEvent.children.addEventListener();
                     } else {
+
                         // Make move request
                         // const moveResult = await axios.post(`/game/${getGameId()}/move`, {index}); //or however the heck it's named
+                        
+                        console.log("Playing a card!");
+
+                        console.log("collection_index: " + index);
+
+                        const result = await axios.post(`/game/${getGameId()}/playCard`,
+                            {
+                                collection_index: index,
+                            }
+                        );
+
+                        console.log(result);
+
                         this.endTurn();
                     }
                 }
@@ -422,8 +436,9 @@ async function renderGameState(game_state) {
                 // if (game_state.player_id_turn === localPlayer.player_id) {
 
                 // }
-
-                turnController.startTurn(playersHand.data.collection);
+                if (game_state.game.player_id_turn == localPlayer.player_id) {
+                    turnController.startTurn(playersHand.data.collection);
+                }
             }
         }
 
