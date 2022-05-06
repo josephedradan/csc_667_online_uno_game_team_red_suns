@@ -22,12 +22,9 @@ routerGame.get(
 //     controllerGame.getTestGame,
 // );
 
-routerGame.use(
-    '/:game_id',
-    middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocalAndGuard,
-    middlewareGameUnoGameGameID.checkIfInGameOrJoinGameIfPossibleNoPlayerInReqAndGuard,
-    middlewareModifyReqResGameUnoGameID.attachPlayerToRequestAndResponseLocalsAndGuard, // Do not use to reduce db calls
-);
+routerGame.use('/:game_id', middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocalAndGuard);
+routerGame.use('/', middlewareGameUnoGameGameID.checkIfInGameOrJoinGameIfPossibleNoPlayerInReqAndGuard);
+routerGame.use('/:game_id', middlewareModifyReqResGameUnoGameID.attachPlayerToRequestAndResponseLocalsAndGuard);
 
 routerGame.get('/:game_id', controllerGame.GETGameByGameId);
 

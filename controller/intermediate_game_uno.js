@@ -47,7 +47,7 @@ async function createGameWrapped(user_id) {
 
     gameObject.game_url = game_url;
 
-    await intermediateSocketIOGameUno.emitInRoomServerIndexGames();
+    await intermediateSocketIOGameUno.emitInRoom_ServerIndex_Games();
 
     return gameObject;
 }
@@ -69,7 +69,7 @@ async function joinGameIfPossibleWrapped(game_id, user_id) {
 
     debugPrinter.printDebug(result);
 
-    await intermediateSocketIOGameUno.emitInRoomServerIndexGames();
+    await intermediateSocketIOGameUno.emitInRoom_ServerIndex_Games();
 
     return result;
 }
@@ -90,10 +90,10 @@ async function leaveGameWrapped(game_id, user_id) {
 
     const result = await gameUno.leaveGame(game_id, user_id);
 
-    const arrayPromises = [intermediateSocketIOGameUno.emitInRoomServerIndexGames()];
+    const arrayPromises = [intermediateSocketIOGameUno.emitInRoom_ServerIndex_Games()];
 
     if (result.game) {
-        arrayPromises.push(intermediateSocketIOGameUno.emitInRoomServerGameGameIDMessageServerWrapped(
+        arrayPromises.push(intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_MessageServer_Wrapped(
             game_id,
             'The host left, the game is dead, go back to the homepage.',
         ));
@@ -129,7 +129,7 @@ async function sendMessageWrapped(game_id, player_id, message) {
     );
 
     // Emit client message to everyone in the room
-    await intermediateSocketIOGameUno.emitInRoomServerGameGameIDMessageClient(
+    await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_MessageClient(
         game_id,
         messageRow,
     );
@@ -151,7 +151,7 @@ async function moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow)
     }
 
     // Emit the gameState to room and get gameState
-    await intermediateSocketIOGameUno.emitInRoomServerGameGameIDGameState(game_id);
+    await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 
     return result;
 }
@@ -166,7 +166,7 @@ async function playCardHandToPlayDeckWrapped(game_id, user_id, collection_index)
 
     const result = await gameUno.moveCardHandToPlayByGameIDAndUserID(game_id, user_id, collection_index);
 
-    await intermediateSocketIOGameUno.emitInRoomServerGameGameIDGameState(game_id);
+    await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 
     return result;
 }
@@ -192,7 +192,7 @@ async function startGameWrapped(game_id, user_id) {
     }
 
     // Emit the gameState to room and get gameState
-    await intermediateSocketIOGameUno.emitInRoomServerGameGameIDGameState(game_id);
+    await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 
     const rowPlayers = await dbEngineGameUno.getPlayerRowsDetailedByGameID(game_id);
 
@@ -205,10 +205,9 @@ async function startGameWrapped(game_id, user_id) {
         }
     }
 
-    //
     await gameUno.moveCardDrawToPlay(game_id);
 
-    const resultNew = intermediateSocketIOGameUno.emitInRoomServerGameGameIDGameState(game_id);
+    const resultNew = intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 
     return resultNew;
 }
@@ -226,7 +225,7 @@ async function setGamePlayerIDHostWrapped(game_id, user_id) {
 
     const playerRow = await dbEngineGameUno.getPlayerRowDetailedByPlayerID(result.player.player_id);
 
-    await intermediateSocketIOGameUno.emitInRoomServerGameGameIDMessageServerWrapped(game_id, `${playerRow.display_name} is now the host`);
+    await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_MessageServer_Wrapped(game_id, `${playerRow.display_name} is now the host`);
 
     return result;
 }
@@ -234,10 +233,10 @@ async function setGamePlayerIDHostWrapped(game_id, user_id) {
 intermediateGameUno.setGamePlayerIDHostWrapped = setGamePlayerIDHostWrapped;
 
 // TODO: DON'T USE THE BELOW FUNCTION BECAUSE IT IS NOT NECESSARY
-// async function setGamePlayerIDCurrentTurnWrapped(game_id, user_id) {
-//     debugPrinter.printFunction(setGamePlayerIDCurrentTurnWrapped.name);
+// async function setGamePlayerIDTurnWrapped(game_id, user_id) {
+//     debugPrinter.printFunction(setGamePlayerIDTurnWrapped.name);
 //
-//     const result = await gameUno.setGamePlayerIDCurrentTurn(game_id, user_id);
+//     const result = await gameUno.setGamePlayerIDTurn(game_id, user_id);
 //
 //     if (result.status === constants.FAILURE) {
 //         return result;
@@ -250,6 +249,6 @@ intermediateGameUno.setGamePlayerIDHostWrapped = setGamePlayerIDHostWrapped;
 //     return result;
 // }
 //
-// intermediateGameUno.setGamePlayerIDCurrentTurnWrapped = setGamePlayerIDCurrentTurnWrapped;
+// intermediateGameUno.setGamePlayerIDTurnWrapped = setGamePlayerIDTurnWrapped;
 
 module.exports = intermediateGameUno;

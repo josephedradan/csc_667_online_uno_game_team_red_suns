@@ -38,15 +38,15 @@ async function changeTurnAndGetPlayerRowDetailedByGameID(game_id, skipAmount) {
     }
 
     // If there is no player_id for the game
-    if (gameRow.player_id_current_turn === null) { // TODO: Maybe use "Players".player_index in the future
-        await dbEngineGameUno.updateGamePlayerIDCurrentTurnByGameID(game_id, playerRows[0].player_id);
+    if (gameRow.player_id_turn === null) { // TODO: Maybe use "Players".player_index in the future
+        await dbEngineGameUno.updateGamePlayerIDTurnByGameID(game_id, playerRows[0].player_id);
         return dbEngineGameUno.getPlayerRowDetailedByPlayerID(playerRows[0].player_id);
     }
 
     let indexOfCurrentPlayer = null; // FIXME ME, MIGHT BE DANGEROUS
 
     playerRows.forEach((playerRow, index) => {
-        if (gameRow.player_id_current_turn === playerRow.player_index) {
+        if (gameRow.player_id_turn === playerRow.player_index) {
             indexOfCurrentPlayer = index;
         }
     });
@@ -54,9 +54,9 @@ async function changeTurnAndGetPlayerRowDetailedByGameID(game_id, skipAmount) {
     const indexOfNextPlayer = ((indexOfCurrentPlayer + 1 + skipAmount) % playerRows.length);
 
     const user_id_current_turn_new = playerRows[indexOfNextPlayer].user_id;
-    const player_id_current_turn_new = playerRows[indexOfNextPlayer].player_id;
+    const player_id_turn_new = playerRows[indexOfNextPlayer].player_id;
 
-    await dbEngineGameUno.updateGamePlayerIDCurrentTurnByGameID(game_id, player_id_current_turn_new);
+    await dbEngineGameUno.updateGamePlayerIDTurnByGameID(game_id, player_id_turn_new);
 
     // eslint-disable-next-line no-use-before-define
     return getPlayerDetailedByGameIDAndUserID(game_id, user_id_current_turn_new);
@@ -336,7 +336,7 @@ async function leaveGame(game_id, user_id) {
         result.player = await dbEngineGameUno.deletePlayerRowByPlayerID(playerRow.player_id);
         result.message = `Player ${playerRow.player_id} is removed from game ${game_id}`;
 
-        if (gameRow.player_id_current_turn === playerRow.player_id) {
+        if (gameRow.player_id_turn === playerRow.player_id) {
             result.player_current_turn_new = await changeTurnAndGetPlayerRowDetailedByGameID(game_id, 0);
         }
     }
@@ -636,7 +636,7 @@ Notes:
         {
             game_id,
             is_active,
-            player_id_current_turn,
+            player_id_turn,
             is_clockwise,
             player_id_host,
         },
@@ -1018,8 +1018,8 @@ async function setGamePlayerIDHost(game_id, user_id) {
 gameUno.setGamePlayerIDHost = setGamePlayerIDHost;
 
 // TODO: DON'T USE THE BELOW FUNCTION BECAUSE IT IS NOT NECESSARY
-// async function setGamePlayerIDCurrentTurn(game_id, user_id) {
-//     debugPrinter.printFunction(setGamePlayerIDCurrentTurn.name);
+// async function setGamePlayerIDTurn(game_id, user_id) {
+//     debugPrinter.printFunction(setGamePlayerIDTurn.name);
 //
 //     const result = {
 //         status: null,
@@ -1049,7 +1049,7 @@ gameUno.setGamePlayerIDHost = setGamePlayerIDHost;
 //     }
 //     result.player = playerRow;
 //
-//     const gameRowNew = await dbEngineGameUno.updateGamePlayerIDCurrentTurnByGameID(game_id, playerRow.player_id);
+//     const gameRowNew = await dbEngineGameUno.updateGamePlayerIDTurnByGameID(game_id, playerRow.player_id);
 //
 //     if (!gameRowNew) {
 //         result.status = constants.FAILURE;
@@ -1064,7 +1064,7 @@ gameUno.setGamePlayerIDHost = setGamePlayerIDHost;
 //     return result;
 // }
 //
-// gameUno.setGamePlayerIDCurrentTurn = setGamePlayerIDCurrentTurn;
+// gameUno.setGamePlayerIDTurn = setGamePlayerIDTurn;
 
 module.exports = gameUno;
 

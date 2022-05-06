@@ -22,7 +22,7 @@ async function attachGameToRequestAndResponseLocalAndGuard(req, res, next) {
     if (!gameRow) {
         utilCommon.reqSessionMessageHandler(req, constants.FAILURE, 'Game does not exist');
 
-        res.redirect('/');
+        res.redirect('back');
     } else {
         req.game = gameRow;
 
@@ -67,7 +67,7 @@ async function attachPlayerToRequestAndResponseLocalsAndGuard(req, res, next) {
     if (!rowPlayer) {
         utilCommon.reqSessionMessageHandler(req, constants.FAILURE, 'Player does not exist');
 
-        res.redirect('/');
+        res.redirect('back');
     } else {
         req.player = rowPlayer;
 
@@ -86,7 +86,7 @@ async function attachPlayerToRequestAndResponseLocals(req, res, next) {
 
     const rowPlayer = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(req.params.game_id, req.user.user_id);
 
-    if (!rowPlayer) {
+    if (rowPlayer) {
         req.player = rowPlayer;
         res.locals.player = req.player;
     }

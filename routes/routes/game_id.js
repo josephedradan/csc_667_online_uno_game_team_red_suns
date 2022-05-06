@@ -65,7 +65,7 @@ routerGameID.post(
     controllerGameID.POSTTransferHost,
 );
 
-routerGameID.use(middlewareGameUnoGameGameID.checkIfPlayerCanDoAction); // TODO WRITE
+routerGameID.use(middlewareGameUnoGameGameID.checkIfPlayerCanDoAction);
 
 routerGameID.post(
     '/playCard',

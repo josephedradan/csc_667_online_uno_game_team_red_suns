@@ -23,12 +23,6 @@ const constants = require('../server/constants');
 
 const controllerGameID = {};
 
-// controllerGameID.initializeDrawStack = async () => {
-//     const newDeck = [];
-//     const coloredNumCards = await dbEngine.getCardTableOnType('NUMBER');
-//     const blackWildCards = await dbEngine.getCardTableOnType('SPECIAL');
-// };
-
 async function POSTPlayCard(req, res, next) {
     debugPrinter.printMiddleware(POSTPlayCard.name);
 

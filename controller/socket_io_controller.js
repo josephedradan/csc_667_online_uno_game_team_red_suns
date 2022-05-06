@@ -114,11 +114,11 @@ async function initialSocketJoin(socket) {
 
                     await Promise.all(
                         [
-                            intermediateSocketIOGameUno.emitInRoomServerGameGameIDMessageServerWrapped(
+                            intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_MessageServer_Wrapped(
                                 socket.request.game_id,
                                 `${user_recent.display_name} has joined.`,
                             ),
-                            intermediateSocketIOGameUno.emitInRoomServerGameGameIDPlayers(socket.request.game_id),
+                            intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_Players(socket.request.game_id),
                         ],
                     );
                 }
@@ -145,7 +145,7 @@ async function initialSocketJoin(socket) {
 
                     // If the game is active, then the player can rejoin
                     if (game_current.is_active) {
-                        emitInRoomServerMessage = intermediateSocketIOGameUno.emitInRoomServerGameGameIDMessageServerWrapped(
+                        emitInRoomServerMessage = intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_MessageServer_Wrapped(
                             socket.request.game_id,
                             `${user_recent.display_name} has left (They can rejoin).`,
 
@@ -154,7 +154,7 @@ async function initialSocketJoin(socket) {
                         // Make the player leave the game
                         await intermediateGameUno.leaveGameWrapped(socket.request.game_id, socket.request.user.user_id);
 
-                        emitInRoomServerMessage = intermediateSocketIOGameUno.emitInRoomServerGameGameIDMessageServerWrapped(
+                        emitInRoomServerMessage = intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_MessageServer_Wrapped(
                             socket.request.game_id,
                             `${user_recent.display_name} has left.`,
 
@@ -164,7 +164,7 @@ async function initialSocketJoin(socket) {
                     await Promise.all(
                         [
                             emitInRoomServerMessage,
-                            intermediateSocketIOGameUno.emitInRoomServerGameGameIDPlayers(socket.request.game_id),
+                            intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_Players(socket.request.game_id),
                         ],
                     );
                 }
