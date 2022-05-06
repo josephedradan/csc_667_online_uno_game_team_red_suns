@@ -41,15 +41,17 @@
         <div></div>
         <div class="relative grid content-center col-span-1">
             <button
-                {{! callUno will be used with tandem with an event listener to call the back }}
+                id="leaveGame"
+                class="absolute bottom-0 right-0 px-4 py-2 mb-4 font-bold text-white bg-red-500 rounded hover:bg-red-700"
+            >Leave</button>
+        </div>
+        <div class="relative grid content-center col-span-1"><button
                 id="challenge"
                 class="absolute bottom-0 right-0 px-4 py-2 mb-4 font-bold text-white rounded bg-sky-500 hover:bg-sky-700"
             >Challenge</button>
         </div>
-        <div></div>
         <div class="relative grid content-center col-span-1">
             <button
-                {{! callUno will be used with tandem with an event listener to call the back }}
                 id="callUno"
                 class="absolute bottom-0 right-0 px-4 py-2 mb-4 font-bold text-white rounded bg-sky-500 hover:bg-sky-700"
             >Uno</button>
@@ -81,7 +83,5 @@
         </div>
     </div>
 </div>
-<!--
-<script src="/javascripts/test_game.js"></script>
--->
+{{! <script src="/javascripts/test_game.js"></script> }}
 <script src="/javascripts/uno_game_render.js"></script>
