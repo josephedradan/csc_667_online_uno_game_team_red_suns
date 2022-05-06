@@ -60,19 +60,19 @@ module.exports = {
 
             type: {
                 type: Sequelize.DataTypes.STRING,
-                allowNull: false,
+                allowNull: true,
                 unique: false,
             },
 
             content: {
                 type: Sequelize.DataTypes.STRING,
-                allowNull: false,
+                allowNull: true,
                 unique: false,
             },
 
             color: {
                 type: Sequelize.DataTypes.STRING,
-                allowNull: false,
+                allowNull: true,
                 unique: false,
             },
 
