@@ -1,5 +1,3 @@
-// var socket = io();
-
 class UnoGameRenderer {
     constructor(drawContainer, playContainer) {
         this.drawContainer = drawContainer;
@@ -14,78 +12,48 @@ class UnoGameRenderer {
         this.handContainers[userId] = container;
         this.hands[userId] = [];
     }
-    /*
-    playCard(cardId) {
-        // Post request with card id
-    }
-    */
-
-    /*
-        collection:
-        [
-            {collection_index: 0},
-            ...
-        ]
-    */
 
     updateHand(playerId, cardCollection) {
-        console.log("Updating hand!!");
+ 
+        // If player not in game, don't render
         if (!this.hands[playerId]) {
             return;
         }
-        // If is local player, get card info (cuz we have to see what kind of card)
-        // POST getHand
-        // handle logic separately
 
-        // ELSE (it should be flipped and generic)
+        // Empty the container
+        this.handContainers[playerId].innerHTML = "";
+        this.hands[playerId] = [];
 
-        // Create additional cards if additional exist (animate later from draw)
-        console.log("card collection");
-        console.log(cardCollection.length);
-        console.log("this hands playerId");
-        console.log(this.hands[playerId].length);
-        console.log(cardCollection);
-        for (
-            let i = this.hands[playerId].length;
-            i < cardCollection.length;
-            i++
-        ) {
-            // console.log("Building a new card!!!");
-            // Add new flipped card to hand (animate later)
-            // let card;
-            // if (cardCollection[i].card_info_type === "NUMBER") {
-            // }
-            let card = this.generate_flipped_card();
+        // Loop through cards and render
+        cardCollection.forEach((cardData, index) => {
+            let card = this.generate_card(cardData);
 
-            // console.log(card + " cardd");
-            this.hands[playerId].push(card);
-            // console.log(this.hands + " this.hands");
+            // Add the card to the hand and the handContainer
             this.handContainers[playerId].appendChild(card);
-            // console.log(this.handContainers[playerId] + " this.handContainers[playerId]");
-        }
-
-        // If missing card, move to play pile (animate later to play)
-        for (
-            let i = cardCollection.length;
-            i < this.hands[playerId].length;
-            i++
-        ) {
-            console.log("Destroying it!!!");
-            // Reparent card to discard pile (animate later)
-            // this.playContainer.appendChild(this.hands[playerId][i]);
-            // this.playPile.push(this.hands[playerId].pop());
-            this.hands[playerId][i].remove();
-            this.hands[playerId].splice(i, 1);
-        }
+            this.hands[playerId].push(card);
+        });
     }
 
-    updateTopCard(cardInfo) {
+    updateTopCard(cardData) {
         // Destroy all but the top card
         this.playContainer.innerHTML = "";
-        const newCard = null; // Generate card with card info
+        const newCard = this.generate_card(cardData); // Generate card with card info
         this.playContainer.appendChild(newCard);
+    }
 
-        // Post request
+    generate_card(cardData) {
+        let card;
+        // Figure out what kind of card and render
+        if (cardData.card_info_type === undefined) {
+            card = this.generate_flipped_card();
+        } else if(cardData.card_color === "black") {
+            card = this.generate_wild_black((cardData.card_content === "wild"));
+        } else if (cardData.card_info_type == "NUMBER") {
+            card = this.generate_color_card("num-" + cardData.card_content, cardData.card_color);
+        } else {
+            card = this.generate_color_card(cardData.card_content, cardData.card_color);
+        }
+        return card;
     }
 
     /*
@@ -155,11 +123,11 @@ class UnoGameRenderer {
         return cardWrapper;
     };
 
-    generate_user_card = (number, color) => {
+    generate_color_card = (value, color) => {
         const cardWrapper = document.createElement("div");
         cardWrapper.classList.add("cardWrapper");
         const unoCard = document.createElement("div");
-        unoCard.classList.add("unoCard", `number-${number}`, color);
+        unoCard.classList.add("unoCard", value, color);
         const shadow = document.createElement("div");
         shadow.classList.add("cardShadow");
         const inner = document.createElement("span");
@@ -173,17 +141,17 @@ class UnoGameRenderer {
         return cardWrapper;
     };
 
-    generate_wild_black = (is_wild /* or is_wild4 */) => {
+    generate_wild_black = (is_wild /* or is_wildFour */) => {
         const cardWrapper = document.createElement("div");
         cardWrapper.classList.add("cardWrapper");
         const unoCard = document.createElement("div");
-        unoCard.classList.add("unoCard", is_wild ? "wild" : "wild4", "black");
+        unoCard.classList.add("unoCard", is_wild ? "wild" : "wildFour", "black");
         const shadow = document.createElement("div");
         shadow.classList.add("cardShadow");
         const inner = document.createElement("span");
         inner.classList.add("inner");
         const wildMark = document.createElement("span");
-        wildMark.classList.add(is_wild ? "wildMark" : "wild4Mark");
+        wildMark.classList.add(is_wild ? "wildMark" : "wildFourMark");
 
         // 4 colors
         const wildRed = document.createElement("div");
@@ -195,11 +163,10 @@ class UnoGameRenderer {
         const wildGreen = document.createElement("div");
         wildGreen.classList.add("wildGreen", "wildCard");
 
-        wildMark
-            .append(wildRed)
-            .append(wildBlue)
-            .append(wildYellow)
-            .append(wildGreen);
+        wildMark.append(wildRed);
+        wildMark.append(wildBlue);
+        wildMark.append(wildYellow);
+        wildMark.append(wildGreen);
         inner.append(wildMark);
         unoCard.append(shadow);
         unoCard.append(inner);
@@ -214,7 +181,7 @@ const gameStateQueue = [];
 let queueActive = false;
 const playerMapping = new Map();
 playerMapping.set(2, [0, 2]);
-playerMapping.set(3, [0, 1, 2]);    // 0, 1, 3 maybe?
+playerMapping.set(3, [0, 1, 3]);
 playerMapping.set(4, [0, 1, 2, 3]);
 
 async function renderGameState(game_state) {
@@ -229,7 +196,7 @@ async function renderGameState(game_state) {
     );
     console.log(game_state);
 
-    // Ohhh this is gonna cause problems potentially.
+    // Ohhh this is gonna cause problems potentially. Maybe.
     const playersHand = await axios.get(`/game/${getGameId()}/getHand`);
 
     gameStateQueue.push([
@@ -237,36 +204,25 @@ async function renderGameState(game_state) {
         playersHand,
     ]);
 
-    console.log("Pushed a state");
-
     if (!queueActive) {
         queueActive = true;
-        console.log("queue active!");
 
         while (gameStateQueue.length > 0) {
-            console.log("looping");
-            console.log("Queue size was" + gameStateQueue.length);
             let [game_state, playersHand] = gameStateQueue.shift();
 
             let gameWindow = document.getElementById("game_window");
             let playerList = document.getElementById("list_of_players");
 
-            console.log("Checking if game is active!!!");
-
             if (game_state.game.is_active) {
                 gameWindow.classList.remove("invisible");
                 gameWindow.classList.remove("hidden");
-                //gameWindow.classList.add("grid");
                 playerList.classList.add("invisible");
                 playerList.classList.add("hidden");
-                //playerList.classList.remove("grid");
             } else {
                 playerList.classList.remove("invisible");
                 playerList.classList.remove("hidden");
-                //playerList.classList.add("grid");
                 gameWindow.classList.add("invisible");
                 gameWindow.classList.add("hidden");
-                //gameWindow.classList.remove("grid");
             }
 
             if (game_state.game.is_active) {
@@ -300,39 +256,49 @@ async function renderGameState(game_state) {
                     }
                 }
 
-                console.log("Updating hand");
                 game_state.players.forEach((player) => {
-                    gameRenderer.updateHand(
-                        player.player_id,
-                        playersHand.data.collection // eric added this for all cards
-                    );
+                    if (player.player_id == localPlayer.player_id) {
+                        
+                        gameRenderer.updateHand(
+                            player.player_id,
+                            playersHand.data.collection // eric added this for all cards
+                        );
+                    } else {
+                        gameRenderer.updateHand(
+                            player.player_id,
+                            player.collection // eric added this for all cards
+                        );
+                    }
                 });
+
+                gameRenderer.updateTopCard(game_state.collection_play[game_state.collection_play.length - 1]);
+
+                // If its my turn
+                    // make my cards draggable loop
+                        // draggable for this card, disconnect all others upon callback
+                        // callback is if card is black, modal, then request
+                        // else request
+                //if (game_state.player_id_current_turn === localPlayer.player_id) {
+
+                //}
             }
         }
 
         queueActive = false;
-        console.log("queue inactive!");
     }
-
-    console.log("Done");
 }
 
+// Wait for the window to load so we have the DOM and access to socket from a script that loads later than this one
 window.onload = async () => {
-    
-    const localPlayer = (await axios.get(
-        `/game/${getGameId()}/getPlayer`
-    )).data.player;
 
-    console.log(localPlayer);
-
+    // Set up a listener for future incoming game states (the next incoming state could be several seconds/minutes away)
     socket.on("server-game-game-id-game-state", renderGameState);
 
+    // Request the game state right now because we need one now
     const gameState = (await axios.get(
         `/game/${getGameId()}/getGameState`
     )).data;
 
+    // Manually force a rerender
     renderGameState(gameState);
-
-    // make a request to getgamestate
-    // pass the game_state to renderGameState();
 };

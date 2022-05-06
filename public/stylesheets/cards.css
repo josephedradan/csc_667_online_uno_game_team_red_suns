@@ -79,7 +79,7 @@
     line-height: 1.4;
 }
 
-.unoCard.wild > .inner > .wild4Mark {
+.unoCard.wild > .inner > .wildFourMark {
     display: inline-block;
     vertical-align: middle;
     position: absolute;
@@ -96,7 +96,7 @@
     line-height: 1.4;
 }
 
-.unoCard.wild4 > .inner > .wild4Mark {
+.unoCard.wildFour > .inner > .wildFourMark {
     display: inline-block;
     vertical-align: middle;
     position: absolute;
@@ -237,7 +237,7 @@
     background: #e6ca1e;
     border-radius: 0% 0% 0% 100%;
 }
-/* For wild4 card */
+/* For wildFour card */
 .unoCard > .inner > .mark::after {
     background: none;
     vertical-align: middle;
@@ -336,20 +336,20 @@
     font-size: 90%;
 }
 
-.unoCard.wild4::before,
-.unoCard.wild4::after {
+.unoCard.wildFour::before,
+.unoCard.wildFour::after {
     content: "+4";
     font-style: normal;
 }
 
-.unoCard.plus2::before,
-.unoCard.plus2::after,
-.unoCard.plus2 .mark::after {
+.unoCard.drawTwo::before,
+.unoCard.drawTwo::after,
+.unoCard.drawTwo .mark::after {
     content: "+2";
     font-style: italic;
 }
 
-.unoCard.plus2 > .inner > .mark::after {
+.unoCard.drawTwo > .inner > .mark::after {
     font-size: 80%;
 }
 
