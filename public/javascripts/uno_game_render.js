@@ -259,6 +259,12 @@ class UnoGameRenderer {
     };
 }
 
+<<<<<<< HEAD
+=======
+/**
+ * TurnController is used to start or end a turn.
+ */
+>>>>>>> 566b3f081f6a53a6941124b74d9e28ba6a7ccf08
 class TurnController {
     constructor(drawContainer, playContainer, handContainer) {
         this.drawContainer = drawContainer;
@@ -277,9 +283,21 @@ class TurnController {
                     if (cardData.card_color == "black") {
                         // Modal!
                         // On modal callback, make move request and end turn
+                        // /game/id/playCard pass in index 
+                        // TODO: add api call to the backend calling /game/id/
+                        const wildFourUserEvent = document.getElementById("wildFourUserEvent");
+                        wildFourUserEvent.classList.toggle("hidden");
+                        for (const colorSelectedByID of document.querySelectorAll("#wildFourUserEvent div")) {
+                            colorSelectedByID.addEventListener("click", (e) => {
+                                const selectedColor = e.target.getAttribute("id")
+                                // const result = axios.post(`/game/${getGameId()}/someCallWithRoutePassingInIndex`)
+                            })
+                        }
+                        wildFourUserEvent.children.addEventListener()
+
                     } else {
                         // Make move request
-                        // const moveResult = await axios.post(`/game/${getGameId()}/move`, {index});
+                        // const moveResult = await axios.post(`/game/${getGameId()}/move`, {index}); //or however the heck it's named
                         this.endTurn();
                     }
                 }
@@ -306,6 +324,8 @@ playerMapping.set(2, [0, 2]);
 playerMapping.set(3, [0, 1, 3]);
 playerMapping.set(4, [0, 1, 2, 3]);
 
+
+// I'll clean this up, ik it's bad
 async function renderGameState(game_state) {
     const localPlayer = (await axios.get(`/game/${getGameId()}/getPlayer`)).data
         .player;
@@ -415,8 +435,7 @@ async function renderGameState(game_state) {
     }
 }
 
-// Wait for the window to load so we have the DOM and access to socket from a script that loads later than this one
-window.onload = async () => {
+async function setup() {
     // Set up a listener for future incoming game states (the next incoming state could be several seconds/minutes away)
     socket.on("server-game-game-id-game-state", renderGameState);
 
@@ -426,4 +445,10 @@ window.onload = async () => {
 
     // Manually force a rerender
     renderGameState(gameState);
-};
+}
+
+// Wait for the window to load so we have the DOM and access to socket from a script that loads later than this one
+window.addEventListener("load", setup);
+
+// This is not as widely supported as window.onload
+//document.addEventListener("DOMContentLoaded", setup);
