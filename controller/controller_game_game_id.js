@@ -33,9 +33,16 @@ async function POSTPlayCard(req, res, next) {
     */
     const {
         collection_index, // TODO DO VALIDATION
+        type,
+        content,
+        color,
     } = req.body;
 
-    const result = await intermediateGameUno.playCardHandToPlayDeckWrapped(req.game.game_id, req.user.user_id, collection_index);
+    const result = await intermediateGameUno.playCardHandToPlayDeckWrapped(
+        req.game.game_id,
+        req.user.user_id,
+        req.body,
+    );
 
     // debugPrinter.printError(result)
 

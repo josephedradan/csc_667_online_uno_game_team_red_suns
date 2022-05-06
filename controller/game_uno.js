@@ -838,7 +838,7 @@ async function moveCardDrawToPlay(game_id) { // TODO ADD MORE GUARDING AND ERROR
 
 gameUno.moveCardDrawToPlay = moveCardDrawToPlay;
 
-async function moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_index) {
+async function moveCardHandToPlayByCollectionIndex(game_id, user_id, body) {
     debugPrinter.printFunction(moveCardHandToPlayByCollectionIndex.name);
 
     const result = {
@@ -861,7 +861,7 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_
     result.player = playerRow;
 
     // May be empty
-    const collectionRow = await dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollection(game_id, playerRow.player_id, collection_index);
+    const collectionRow = await dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollection(game_id, playerRow.player_id, body.collection_index);
     result.collection = collectionRow;
 
     // TODO FIXME WARNING THIS DOES NOT HANDLE SPECIAL CARDS, PUT LOGIC OF THAT HERE
