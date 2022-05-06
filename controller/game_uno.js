@@ -502,7 +502,7 @@ async function startGame(game_id, user_id, deckMultiplier) {
     result.game = gameRow;
 
     // Get player given game_id and user_id (May be undefined)
-    const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByPlayerID(game_id, user_id);
+    const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
 
     // If player is exists for the user for the game
     if (!playerRow) {

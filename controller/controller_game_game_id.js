@@ -91,11 +91,14 @@ controllerGameID.POSTLeaveGame = POSTLeaveGame;
 async function POSTTransferHost(req, res, next) { // TODO THIS
     debugPrinter.printMiddleware(POSTLeaveGame.name);
 
-    // const result = await intermediateGameUno.leaveGameWrapped(req.game.game_id, req.user.user_id);
-    //
-    // debugPrinter.printDebug(result);
+    // Give user_id to transfer host
+    const { user_id } = req.body;
 
-    res.json('TODO');
+    const result = await intermediateGameUno.setGamePlayerIDHostWrapped(req.game.game_id, user_id);
+
+    debugPrinter.printDebug(result);
+
+    res.json(result);
 }
 
 controllerGameID.POSTTransferHost = POSTTransferHost;
@@ -118,8 +121,8 @@ controllerGameID.GETGetMessages = GETGetMessages;
  * @param next
  * @returns {Promise<void>}
  */
-async function GETGameState(req, res, next) {
-    debugPrinter.printMiddleware(GETGameState.name);
+async function GETGetGameState(req, res, next) {
+    debugPrinter.printMiddleware(GETGetGameState.name);
 
     const result = await gameUno.getGameState(req.game.game_id);
 
@@ -128,7 +131,7 @@ async function GETGameState(req, res, next) {
     res.json(result);
 }
 
-controllerGameID.GETGameState = GETGameState;
+controllerGameID.GETGetGameState = GETGetGameState;
 
 async function POSTSendMessage(req, res, next) {
     debugPrinter.printMiddleware(POSTSendMessage.name);

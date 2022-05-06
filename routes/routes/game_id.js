@@ -24,7 +24,7 @@ routerGameID.get(
 
 routerGameID.get(
     '/getGameState',
-    controllerGameID.GETGameState,
+    controllerGameID.GETGetGameState,
 );
 
 routerGameID.get(

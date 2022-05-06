@@ -218,16 +218,34 @@ async function setGamePlayerIDHostWrapped(game_id, user_id) {
     const result = await gameUno.setGamePlayerIDHost(game_id, user_id);
 
     if (result.status === constants.FAILURE) {
-        return gameUno.getGameState(game_id);
+        return result;
     }
 
-    await gameUno.moveCardDrawToPlay(game_id);
+    const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByPlayerID(result.player.player_id);
 
-    const resultNew = intermediateSocketIOGameUno.emitInRoomServerGameGameIDGameState(game_id);
+    await intermediateSocketIOGameUno.emitInRoomServerGameGameIDMessageServerWrapped(game_id, `${playerRow.display_name} is now the host`);
 
-    return resultNew;
+    return result;
 }
 
 intermediateGameUno.setGamePlayerIDHostWrapped = setGamePlayerIDHostWrapped;
+
+async function setGamePlayerIDCurrentTurnWrapped(game_id, user_id) {
+    debugPrinter.printFunction(setGamePlayerIDCurrentTurnWrapped.name);
+
+    const result = await gameUno.setGamePlayerIDCurrentTurn(game_id, user_id);
+
+    if (result.status === constants.FAILURE) {
+        return result;
+    }
+
+    const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByPlayerID(result.player.player_id);
+
+    await intermediateSocketIOGameUno.emitInRoomServerGameGameIDMessageServerWrapped(game_id, `It is ${playerRow.display_name}'s turn`);
+
+    return result;
+}
+
+intermediateGameUno.setGamePlayerIDCurrentTurnWrapped = setGamePlayerIDCurrentTurnWrapped;
 
 module.exports = intermediateGameUno;
