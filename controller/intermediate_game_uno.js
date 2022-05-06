@@ -39,16 +39,11 @@ async function createGameWrapped(user_id) {
     const gameObject = await gameUno.createGameV2(user_id); // TODO: Possibly redesign because card generation should happen when you start the game, not create a game
     debugPrinter.printBackendBlue(gameObject);
 
-    // If nothing returned
     if (gameObject.status === constants.FAILURE) {
         return gameObject;
     }
 
-    const game_url = await intermediateGameUno.getRelativeGameURL(
-        gameObject.game.game_id,
-    );
-
-    debugPrinter.printBackendGreen(game_url);
+    const game_url = await intermediateGameUno.getRelativeGameURL(gameObject.game.game_id);
 
     gameObject.game_url = game_url;
 
@@ -144,37 +139,34 @@ async function sendMessageWrapped(game_id, player_id, message) {
 
 intermediateGameUno.sendMessageWrapped = sendMessageWrapped;
 
-async function moveCardDrawToHandWrapped(game_id, player_id) {
-    debugPrinter.printFunction(moveCardDrawToHandWrapped.name);
+async function moveCardDrawToHandByGameIDAndPlayerIDWrapped(game_id, player_id) {
+    debugPrinter.printFunction(moveCardDrawToHandByGameIDAndPlayerIDWrapped.name);
 
-    const result = await gameUno.moveCardDrawToHand(game_id, player_id);
+    const result = await gameUno.moveCardDrawToHandByGameIDAndPlayerID(game_id, player_id);
 
     // TODO GUARD
-    debugPrinter.printDebug(result)
+    debugPrinter.printDebug(result);
 
     // Emit the gameState to room and get gameState
-    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(
-        game_id,
-    );
+    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(game_id);
 
     return result;
 }
 
-intermediateGameUno.moveCardDrawToHandWrapped = moveCardDrawToHandWrapped;
+intermediateGameUno.moveCardDrawToHandByGameIDAndPlayerIDWrapped = moveCardDrawToHandByGameIDAndPlayerIDWrapped;
 
 async function playCardHandToPlayDeckWrapped(game_id, collection_index, player_id) {
     debugPrinter.printFunction(playCardHandToPlayDeckWrapped.name);
 
     const result = await gameUno.moveCardHandToPlay(game_id, collection_index, player_id);
 
-    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(
-        game_id,
-    );
+    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(game_id);
 
     return result;
 }
 
 intermediateGameUno.playCardHandToPlayDeck = playCardHandToPlayDeckWrapped;
+
 /*
 Return format
 {
@@ -186,15 +178,15 @@ Return format
 async function startGameWrapped(game_id, player_id) {
     debugPrinter.printFunction(startGameWrapped.name);
 
+    // WARNING: DO NOT RETURN THE RESULT OF THIS FUNCTION TO USERS BECAUSE IT RETURNS EVERYTHING ABOUT THE CARDS
     const result = await gameUno.startGame(game_id, player_id, 1);
 
     if (result.status === constants.FAILURE) {
-        debugPrinter.printError(result)
-        return result;
+        return gameUno.getGameState(game_id);
     }
 
     // Emit the gameState to room and get gameState
-    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState();
+    await intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(game_id);
 
     const rowPlayers = await dbEngineGameUno.getPlayerRowsJoinPlayersRowJoinGameRowByGameID(game_id);
 
@@ -203,17 +195,16 @@ async function startGameWrapped(game_id, player_id) {
         // eslint-disable-next-line no-plusplus
         for (let i = 0; i < 7; i++) {
             // eslint-disable-next-line no-await-in-loop
-            await moveCardDrawToHandWrapped(game_id, rowPlayer.player_id);
-            debugPrinter.printError("FUCK")
+            await moveCardDrawToHandByGameIDAndPlayerIDWrapped(game_id, rowPlayer.player_id);
         }
     }
 
-    await Promise.all([
-        gameUno.moveCardDrawToPlay(game_id),
-        intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(),
-    ]);
+    //
+    await gameUno.moveCardDrawToPlay(game_id);
 
-    return result;
+    const resultNew = intermediateSocketIOGameUno.emitInRoomSeverGameGameIDGameState(game_id);
+
+    return resultNew;
 }
 
 intermediateGameUno.startGameWrapped = startGameWrapped;
