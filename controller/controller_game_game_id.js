@@ -150,7 +150,7 @@ controllerGameID.POSTSendMessage = POSTSendMessage;
 async function GETGetHand(req, res, next) {
     debugPrinter.printMiddleware(GETGetHand.name);
 
-    const result = await gameUno.getHand(req.player.player_id);
+    const result = await gameUno.getHand(req.game.game_id, req.user.user_id);
 
     debugPrinter.printDebug(result);
 
@@ -174,7 +174,7 @@ controllerGameID.GETGetGameAndTheirPlayers = GETGetGameAndTheirPlayers;
 async function GETGetPlayer(req, res, next) {
     debugPrinter.printMiddleware(GETGetPlayer.name);
 
-    const result = await gameUno.getPlayerDetailed(req.game.game_id, req.player.player_id);
+    const result = await gameUno.getPlayerDetailed(req.game.game_id, req.user.user_id);
 
     debugPrinter.printDebug(result);
 
