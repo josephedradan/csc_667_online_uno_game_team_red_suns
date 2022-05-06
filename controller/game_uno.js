@@ -31,14 +31,11 @@ async function changeTurnAndGetPlayerRowDetailedByGameID(game_id, skipAmount) {
         return null;
     }
 
-    debugPrinter.printError(playerRows)
-
     const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
 
     if (!gameRow) {
         return null;
     }
-    debugPrinter.printError(gameRow)
 
     // If there is no player_id for the game
     if (gameRow.player_id_turn === null) { // TODO: Maybe use "Players".player_index in the future
@@ -46,24 +43,18 @@ async function changeTurnAndGetPlayerRowDetailedByGameID(game_id, skipAmount) {
         return dbEngineGameUno.getPlayerRowDetailedByPlayerID(playerRows[0].player_id);
     }
 
-    debugPrinter.printError(gameRow)
-
     let indexOfCurrentPlayer = null; // FIXME ME, MIGHT BE DANGEROUS
 
     playerRows.forEach((playerRow, index) => {
-        if (gameRow.player_id_turn === playerRow.player_index) {
+        if (gameRow.player_id_turn === playerRow.player_id) {
             indexOfCurrentPlayer = index;
         }
     });
 
     const indexOfNextPlayer = ((indexOfCurrentPlayer + 1 + skipAmount) % playerRows.length);
-    debugPrinter.printError(indexOfNextPlayer)
 
     const user_id_current_turn_new = playerRows[indexOfNextPlayer].user_id;
     const player_id_turn_new = playerRows[indexOfNextPlayer].player_id;
-    debugPrinter.printDebug('FSDFSDF')
-    debugPrinter.printError(user_id_current_turn_new)
-    debugPrinter.printError(player_id_turn_new)
 
     await dbEngineGameUno.updateGamePlayerIDTurnByGameID(game_id, player_id_turn_new);
 
@@ -877,7 +868,9 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_
     result.player_current_turn_new = await changeTurnAndGetPlayerRowDetailedByGameID(game_id, 0);
 
     result.status = constants.SUCCESS;
-    result.message = `Card (collection_index ${collection_index}) from player ${playerRow.display_name} (player_id ${playerRow.player_id})'s collection moved to PLAY's collection's top for Game ${game_id}`;
+
+    result.message = `Card (collection_index ${collection_index}) from player ${playerRow.display_name} (player_id ${playerRow.player_id})'s 
+    collection moved to PLAY's collection's top for Game ${game_id}`;
 
     return result;
 }

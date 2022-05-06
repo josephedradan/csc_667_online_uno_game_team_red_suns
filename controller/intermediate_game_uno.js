@@ -201,7 +201,6 @@ async function startGameWrapped(game_id, user_id) {
         // eslint-disable-next-line no-plusplus
         for (let i = 0; i < 7; i++) {
             // eslint-disable-next-line no-await-in-loop
-            debugPrinter.printError(game_id);
             await moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow);
         }
     }
