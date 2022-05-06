@@ -389,7 +389,7 @@
     bottom: 0px;
 }
 
-#playerHand.cardStateRows .cardWrapper > .unoCard {
+#player0.cardStateRows .cardWrapper > .unoCard {
     transition-property: transform;
     transition-duration: 0.05s;
     transition-timing-function: ease-in-out;
@@ -397,7 +397,7 @@
 }
 
 .cardWrapper:last-child,
-#playerHand.cardStateRows .cardWrapper:hover {
+#player0.cardStateRows .cardWrapper:hover {
     width: 116px;
     overflow: visible;
 }
@@ -437,18 +437,18 @@
 
 /* :not([disabled]) */
 
-#playerHand.cardStateRows .cardWrapper:hover .unoCard {
+#player0.cardStateRows .cardWrapper:hover .unoCard {
     transform: translateY(-20%);
 }
 
-.northPlayer {
+#player2 {
     /* transform: rotate(180deg); */
 }
 
-.westPlayer {
+#player1 {
     transform: rotate(90deg);
 }
 
-.eastPlayer {
+#player3 {
     transform: rotate(270deg);
 }

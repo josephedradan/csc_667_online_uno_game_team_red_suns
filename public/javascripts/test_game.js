@@ -8,7 +8,6 @@ class Draggable {
         this.element = element;
         this.callback = null;
         this.boundary = boundary;
-
         this.element.onmousedown = this.dragMouseDown.bind(this);
     }
 
@@ -71,7 +70,6 @@ class Draggable {
 
         document.onmouseup = null;
         document.onmousemove = null;
-
         this.element.style.top = null;
         this.element.style.left = null;
         this.element.style.position = null;
@@ -99,7 +97,6 @@ class Draggable {
                 break;
             }
         }
-
         if (!parented) {
             this.parent.appendChild(this.element);
         }
@@ -184,7 +181,3 @@ draggable.setCallback((parentContainer) => {
         });
     }
 });
-
-class UnoGame {
-
-}
