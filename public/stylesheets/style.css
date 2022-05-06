@@ -49,3 +49,10 @@ body {
     padding: 10px;
     color: black;
 }
+
+.custom-inset {
+    top: 36%;
+    right: 50%;
+    bottom: 50%;
+    left: 32%;
+}
