@@ -37,7 +37,7 @@ async function POSTPlayCard(req, res, next) {
 
     const result = await intermediateGameUno.playCardHandToPlayDeckWrapped(req.game.game_id, req.user.user_id, collection_index);
 
-    debugPrinter.printError(result)
+    // debugPrinter.printError(result)
 
     // debugPrinter.printDebug(result);
 

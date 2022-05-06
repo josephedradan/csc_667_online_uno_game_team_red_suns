@@ -142,7 +142,7 @@ intermediateGameUno.sendMessageWrapped = sendMessageWrapped;
 async function moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow) {
     debugPrinter.printFunction(moveCardDrawToHandByGameIDAndPlayerRowWrapped.name);
 
-    const result = await gameUno.moveCardDrawToHandTop(game_id, playerRow);
+    const result = await gameUno.moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow);
 
     debugPrinter.printDebug(result);
 
@@ -194,14 +194,15 @@ async function startGameWrapped(game_id, user_id) {
     // Emit the gameState to room and get gameState
     await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 
-    const rowPlayers = await dbEngineGameUno.getPlayerRowsDetailedByGameID(game_id);
+    const playersRow = await dbEngineGameUno.getPlayerRowsDetailedByGameID(game_id);
 
     // eslint-disable-next-line no-restricted-syntax
-    for (const rowPlayer of rowPlayers) {
+    for (const playerRow of playersRow) {
         // eslint-disable-next-line no-plusplus
         for (let i = 0; i < 7; i++) {
             // eslint-disable-next-line no-await-in-loop
-            await moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, rowPlayer);
+            debugPrinter.printError(game_id);
+            await moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow);
         }
     }
 

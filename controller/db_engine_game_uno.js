@@ -1349,8 +1349,8 @@ async function updateCollectionRowDrawToPlayTop(game_id) {
 
 dbEngineGameUno.updateCollectionRowDrawToPlayTop = updateCollectionRowDrawToPlayTop;
 
-async function updateCollectionRowHandToPlayByCollectionIndex(game_id, player_id, collection_index) {
-    debugPrinter.printFunction(updateCollectionRowHandToPlayByCollectionIndex.name);
+async function updateCollectionRowHandToPlayByCollectionIndexAndGetCollection(game_id, player_id, collection_index) {
+    debugPrinter.printFunction(updateCollectionRowHandToPlayByCollectionIndexAndGetCollection.name);
 
     const result = await db.any(
         `
@@ -1359,7 +1359,7 @@ async function updateCollectionRowHandToPlayByCollectionIndex(game_id, player_id
                 From "Collection"
                 JOIN "Cards" ON "Collection".card_id = "Cards".card_id
                 WHERE player_id = $2
-                AND collection_index = 3
+                AND collection_index = $3
             ), collectionPlayNumberOfRows AS (
                 SELECT COUNT(*) as indexMax
                 FROM "Collection"
@@ -1403,9 +1403,9 @@ async function updateCollectionRowHandToPlayByCollectionIndex(game_id, player_id
         ],
     );
 
-    return result[0];
+    return result;
 }
 
-dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndex = updateCollectionRowHandToPlayByCollectionIndex;
+dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollection = updateCollectionRowHandToPlayByCollectionIndexAndGetCollection;
 
 module.exports = dbEngineGameUno;

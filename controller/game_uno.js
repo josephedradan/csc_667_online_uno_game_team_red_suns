@@ -31,17 +31,22 @@ async function changeTurnAndGetPlayerRowDetailedByGameID(game_id, skipAmount) {
         return null;
     }
 
+    debugPrinter.printError(playerRows)
+
     const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
 
     if (!gameRow) {
         return null;
     }
+    debugPrinter.printError(gameRow)
 
     // If there is no player_id for the game
     if (gameRow.player_id_turn === null) { // TODO: Maybe use "Players".player_index in the future
         await dbEngineGameUno.updateGamePlayerIDTurnByGameID(game_id, playerRows[0].player_id);
         return dbEngineGameUno.getPlayerRowDetailedByPlayerID(playerRows[0].player_id);
     }
+
+    debugPrinter.printError(gameRow)
 
     let indexOfCurrentPlayer = null; // FIXME ME, MIGHT BE DANGEROUS
 
@@ -52,9 +57,13 @@ async function changeTurnAndGetPlayerRowDetailedByGameID(game_id, skipAmount) {
     });
 
     const indexOfNextPlayer = ((indexOfCurrentPlayer + 1 + skipAmount) % playerRows.length);
+    debugPrinter.printError(indexOfNextPlayer)
 
     const user_id_current_turn_new = playerRows[indexOfNextPlayer].user_id;
     const player_id_turn_new = playerRows[indexOfNextPlayer].player_id;
+    debugPrinter.printDebug('FSDFSDF')
+    debugPrinter.printError(user_id_current_turn_new)
+    debugPrinter.printError(player_id_turn_new)
 
     await dbEngineGameUno.updateGamePlayerIDTurnByGameID(game_id, player_id_turn_new);
 
@@ -697,6 +706,8 @@ Notes:
  * @returns {Promise<{game: *, players: *}>}
  */
 async function getGameState(game_id) {
+    debugPrinter.printFunction(getGameState.name);
+
     const result = {
         status: null,
         message: null,
@@ -744,7 +755,9 @@ async function getGameState(game_id) {
 
 gameUno.getGameState = getGameState;
 
-async function moveCardDrawToHandTop(game_id, playerRow) {
+async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow) {
+    debugPrinter.printFunction(moveCardDrawToHandTopByGameIDAndPlayerRow.name);
+
     const result = {
         status: null,
         message: null,
@@ -776,7 +789,7 @@ async function moveCardDrawToHandTop(game_id, playerRow) {
     return result;
 }
 
-gameUno.moveCardDrawToHandTop = moveCardDrawToHandTop;
+gameUno.moveCardDrawToHandTopByGameIDAndPlayerRow = moveCardDrawToHandTopByGameIDAndPlayerRow;
 
 /*
 {
@@ -786,16 +799,16 @@ gameUno.moveCardDrawToHandTop = moveCardDrawToHandTop;
     collection,
 }
  */
-async function moveCardDrawToHandTop(game_id, user_id) {
-    debugPrinter.printFunction(moveCardDrawToHandTop.name);
+async function moveCardDrawToHandTopByGameIdAndUseID(game_id, user_id) {
+    debugPrinter.printFunction(moveCardDrawToHandTopByGameIdAndUseID.name);
 
     // Get player given game_id and user_id (May be undefined)
     const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(game_id, user_id);
 
-    return moveCardDrawToHandTop(game_id, playerRow);
+    return moveCardDrawToHandTopByGameIdAndUseID(game_id, playerRow);
 }
 
-gameUno.moveCardDrawToHandTop = moveCardDrawToHandTop;
+gameUno.moveCardDrawToHandTopByGameIdAndUseID = moveCardDrawToHandTopByGameIdAndUseID;
 
 async function moveCardDrawToPlay(game_id) { // TODO ADD MORE GUARDING AND ERROR CHECKING ETC
     debugPrinter.printFunction(moveCardDrawToPlay.name);
@@ -856,13 +869,8 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_
     }
     result.player = playerRow;
 
-    const collectionRow = await dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndex(game_id, playerRow.player_id, collection_index);
-
-    if (!collectionRow) {
-        result.status = constants.FAILURE;
-        result.message = `Error when updating PLAY's collection for Game ${game_id}`;
-        return result;
-    }
+    // May be empty
+    const collectionRow = await dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollection(game_id, playerRow.player_id, collection_index);
     result.collection = collectionRow;
 
     // TODO FIXME WARNING THIS DOES NOT HANDLE SPECIAL CARDS, PUT LOGIC OF THAT HERE
