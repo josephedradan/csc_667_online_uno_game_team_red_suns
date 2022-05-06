@@ -6,19 +6,30 @@
     height: 178px;
     float: left;
     background: #fff;
-    border-radius: 5px;
+    border-radius: 10px;
     display: table;
     box-sizing: border-box;
     padding: 5px;
-    margin: 10px;
+    margin: 0;/*10px;*/
     font-family: "Source Sans Pro", sans-serif;
     font-size: 100px;
     text-shadow: 1px 1px 0 #000000, -1px -1px 0 #000000, -1px 1px 0 #000000,
         1px -1px 0 #000000, 1px 0 0 #000000, -1px 0 0 #000000, 0 -1px 0 #000000,
         0 1px 0 #000000, 4px 4px 0 #000000;
-    box-shadow: 0 0 10px #aaaaaa;
     text-align: center;
     position: relative;
+}
+
+.unoCard .cardShadow {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
+    background: none;
+    box-shadow: 0 0 10px #aaaaaa;
 }
 
 .unoCard > .inner {

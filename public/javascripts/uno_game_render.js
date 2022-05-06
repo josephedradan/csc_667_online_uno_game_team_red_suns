@@ -142,12 +142,15 @@ class UnoGameRenderer {
         cardWrapper.classList.add("cardWrapper");
         const unoCard = document.createElement("div");
         unoCard.classList.add("unoCard", "flipped");
+        const shadow = document.createElement("div");
+        shadow.classList.add("cardShadow");
         const inner = document.createElement("span");
         inner.classList.add("inner");
         const mark = document.createElement("span");
         mark.classList.add("mark");
         inner.append(mark);
         unoCard.append(inner);
+        unoCard.append(shadow);
         cardWrapper.append(unoCard);
         return cardWrapper;
     };
@@ -157,12 +160,15 @@ class UnoGameRenderer {
         cardWrapper.classList.add("cardWrapper");
         const unoCard = document.createElement("div");
         unoCard.classList.add("unoCard", `number-${number}`, color);
+        const shadow = document.createElement("div");
+        shadow.classList.add("cardShadow");
         const inner = document.createElement("span");
         inner.classList.add("inner");
         const mark = document.createElement("span");
         mark.classList.add("mark");
         inner.append(mark);
         unoCard.append(inner);
+        unoCard.append(shadow);
         cardWrapper.append(unoCard);
         return cardWrapper;
     };
@@ -172,6 +178,8 @@ class UnoGameRenderer {
         cardWrapper.classList.add("cardWrapper");
         const unoCard = document.createElement("div");
         unoCard.classList.add("unoCard", is_wild ? "wild" : "wild4", "black");
+        const shadow = document.createElement("div");
+        shadow.classList.add("cardShadow");
         const inner = document.createElement("span");
         inner.classList.add("inner");
         const wildMark = document.createElement("span");
@@ -193,6 +201,7 @@ class UnoGameRenderer {
             .append(wildYellow)
             .append(wildGreen);
         inner.append(wildMark);
+        unoCard.append(shadow);
         unoCard.append(inner);
         cardWrapper.append(unoCard);
         return cardWrapper;
@@ -205,89 +214,74 @@ const gameStateQueue = [];
 let queueActive = false;
 const playerMapping = new Map();
 playerMapping.set(2, [0, 2]);
-playerMapping.set(3, [0, 1, 2]);
-playerMapping.set(3, [0, 1, 2, 3]);
+playerMapping.set(3, [0, 1, 2]);    // 0, 1, 3 maybe?
+playerMapping.set(4, [0, 1, 2, 3]);
 
-window.onload = async () => {
-    socket.on("server-game-game-id-game-state", async (game_state) => {
-        console.log(
-            "%cserver-game-game-id-game-state",
-            "color: black;background-color:lawngreen;font-size: 20px;"
-        );
-        console.log(game_state);
+async function renderGameState(game_state) {
 
-        gameStateQueue.push(game_state);
+    const localPlayer = (await axios.get(
+        `/game/${getGameId()}/getPlayer`
+    )).data.player;
 
-        const playersHand = await axios.get(`/game/${getGameId()}/getHand`);
+    console.log(
+        "%cserver-game-game-id-game-state",
+        "color: black;background-color:lawngreen;font-size: 20px;"
+    );
+    console.log(game_state);
 
-        if (!queueActive) {
-            queueActive = true;
+    // Ohhh this is gonna cause problems potentially.
+    const playersHand = await axios.get(`/game/${getGameId()}/getHand`);
 
-            while (gameStateQueue.length > 0) {
-                const game_state = gameStateQueue.shift();
+    gameStateQueue.push([
+        game_state,
+        playersHand,
+    ]);
 
-                const gameWindow = document.getElementById("game_window");
-                const playerList = document.getElementById("list_of_players");
+    console.log("Pushed a state");
 
-                console.log(gameWindow);
-                console.log(playerList);
+    if (!queueActive) {
+        queueActive = true;
+        console.log("queue active!");
 
-                if (game_state.game.is_active) {
-                    gameWindow.classList.remove("invisible");
-                    gameWindow.classList.remove("hidden");
-                    // gameWindow.classList.add("grid");
-                    playerList.classList.add("invisible");
-                    playerList.classList.add("hidden");
-                    // playerList.classList.remove("grid");
-                } else {
-                    playerList.classList.remove("invisible");
-                    playerList.classList.remove("hidden");
-                    // playerList.classList.add("grid");
-                    gameWindow.classList.add("invisible");
-                    gameWindow.classList.add("hidden");
-                    // gameWindow.classList.remove("grid");
-                }
+        while (gameStateQueue.length > 0) {
+            console.log("looping");
+            console.log("Queue size was" + gameStateQueue.length);
+            let [game_state, playersHand] = gameStateQueue.shift();
 
-                if (!game_state.game.is_active) {
-                    return;
-                }
+            let gameWindow = document.getElementById("game_window");
+            let playerList = document.getElementById("list_of_players");
 
-                // console.log(gameRenderer);
+            console.log("Checking if game is active!!!");
 
+            if (game_state.game.is_active) {
+                gameWindow.classList.remove("invisible");
+                gameWindow.classList.remove("hidden");
+                //gameWindow.classList.add("grid");
+                playerList.classList.add("invisible");
+                playerList.classList.add("hidden");
+                //playerList.classList.remove("grid");
+            } else {
+                playerList.classList.remove("invisible");
+                playerList.classList.remove("hidden");
+                //playerList.classList.add("grid");
+                gameWindow.classList.add("invisible");
+                gameWindow.classList.add("hidden");
+                //gameWindow.classList.remove("grid");
+            }
+
+            if (game_state.game.is_active) {
                 if (gameRenderer == null) {
-                    const drawContainer = document.getElementById("drawCard");
-                    const playContainer = document.getElementById("discard");
+                    let drawContainer = document.getElementById("drawCard");
+                    let playContainer = document.getElementById("discard");
 
                     gameRenderer = new UnoGameRenderer(
                         drawContainer,
                         playContainer
                     );
 
-                    // console.log("Created the renderer");
-
-                    // console.log("Getting players");
-                    // const playersResults = await axios.get(`/game/${getGameId()}/getPlayers`);
-                    // console.log("Getting local player");
-                    // const localPlayerResults = await axios.get(
-                    //     `/game/${getGameId()}/getPlayer`
-                    // );
-
-                    console.log(
-                        await axios.get(`/game/${getGameId()}/getHand`)
-                    );
-                    // console.log(`/game/${getGameId()}/GETPlayers`);
-
-                    // const playersData = playersResults.data;
-                    // const players = playersData.players;
-                    // console.log(localPlayerResults);
-
-                    const { players } = game_state;
-                    // const localPlayer = localPlayerResults.data;
-                    const localPlayer = players[0];
+                    const players = game_state.players;
 
                     let offset = 0;
-
-                    // console.log(playersData);
 
                     players.forEach((player, index) => {
                         if (player.player_id === localPlayer.player_id) {
@@ -299,13 +293,11 @@ window.onload = async () => {
                     const newPos = playerMapping.get(players.length);
                     for (let i = 0; i < newPos.length; i++) {
                         const handContainer = document.getElementById(
-                            `player${newPos[i]}`
+                            "player" + newPos[i]
                         );
                         const player = players[(i + offset) % players.length];
                         gameRenderer.addPlayer(player.player_id, handContainer);
                     }
-
-                    console.log("Added players");
                 }
 
                 console.log("Updating hand");
@@ -315,13 +307,32 @@ window.onload = async () => {
                         playersHand.data.collection // eric added this for all cards
                     );
                 });
-
-                // let players = axios.get(`/game/${getGameId()}/GETPlayers`)
             }
-
-            queueActive = false;
         }
 
-        console.log("Done");
-    });
+        queueActive = false;
+        console.log("queue inactive!");
+    }
+
+    console.log("Done");
+}
+
+window.onload = async () => {
+    
+    const localPlayer = (await axios.get(
+        `/game/${getGameId()}/getPlayer`
+    )).data.player;
+
+    console.log(localPlayer);
+
+    socket.on("server-game-game-id-game-state", renderGameState);
+
+    const gameState = (await axios.get(
+        `/game/${getGameId()}/getGameState`
+    )).data;
+
+    renderGameState(gameState);
+
+    // make a request to getgamestate
+    // pass the game_state to renderGameState();
 };
