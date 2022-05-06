@@ -44,7 +44,7 @@ class UnoGameRenderer {
         console.log(cardCollection.length);
         console.log("this hands playerId");
         console.log(this.hands[playerId].length);
-
+        console.log(cardCollection);
         for (
             let i = this.hands[playerId].length;
             i < cardCollection.length;
@@ -52,7 +52,11 @@ class UnoGameRenderer {
         ) {
             // console.log("Building a new card!!!");
             // Add new flipped card to hand (animate later)
+            // let card;
+            // if (cardCollection[i].card_info_type === "NUMBER") {
+            // }
             let card = this.generate_flipped_card();
+
             // console.log(card + " cardd");
             this.hands[playerId].push(card);
             // console.log(this.hands + " this.hands");
@@ -214,6 +218,8 @@ window.onload = async () => {
 
         gameStateQueue.push(game_state);
 
+        const playersHand = await axios.get(`/game/${getGameId()}/getHand`);
+
         if (!queueActive) {
             queueActive = true;
 
@@ -246,7 +252,7 @@ window.onload = async () => {
                     return;
                 }
 
-                console.log(gameRenderer);
+                // console.log(gameRenderer);
 
                 if (gameRenderer == null) {
                     let drawContainer = document.getElementById("drawCard");
@@ -265,12 +271,7 @@ window.onload = async () => {
                     // const localPlayerResults = await axios.get(
                     //     `/game/${getGameId()}/getPlayer`
                     // );
-
-                    console.log(
-                        await axios.get(`/game/${getGameId()}/getHand`)
-                    );
                     // console.log(`/game/${getGameId()}/GETPlayers`);
-
                     //const playersData = playersResults.data;
                     //const players = playersData.players;
                     // console.log(localPlayerResults);
@@ -281,27 +282,19 @@ window.onload = async () => {
 
                     let offset = 0;
 
-                    //console.log(playersData);
-
                     players.forEach((player, index) => {
                         if (player.player_id === localPlayer.player_id) {
                             offset = index;
                         }
                     });
 
-                    // for (let i = 0; i <  players.length; i++) {
-                    //     let handContainer = document.getElementById(
-                    //         "player" + i
-                    //     );
-                    //     let player = players[(i + offset) % players.length];
-                    //     gameRenderer.addPlayer(player.player_id, handContainer);
-                    // }
+                    // placement of players based on how many
                     const newPos = playerMapping.get(players.length);
                     for (let i = 0; i < newPos.length; i++) {
-                        let handContainer = document.getElementById(
+                        const handContainer = document.getElementById(
                             "player" + newPos[i]
                         );
-                        let player = players[(i + offset) % players.length];
+                        const player = players[(i + offset) % players.length];
                         gameRenderer.addPlayer(player.player_id, handContainer);
                     }
 
@@ -312,7 +305,7 @@ window.onload = async () => {
                 game_state.players.forEach((player) => {
                     gameRenderer.updateHand(
                         player.player_id,
-                        player.collection
+                        playersHand.data.collection // eric added this for all cards
                     );
                 });
 
