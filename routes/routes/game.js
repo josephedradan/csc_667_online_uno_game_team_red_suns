@@ -25,7 +25,7 @@ routerGame.get(
 routerGame.use(
     '/:game_id',
     middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocalsIfPossible,
-    middlewareGameUnoGameGameID.joinGameIfPossible,
+    middlewareGameUnoGameGameID.joinGameIfPossibleNoPlayerInReq,
     middlewareModifyReqResGameUnoGameID.attachPlayerToRequestAndResponseLocalsIfPossible,
 );
 

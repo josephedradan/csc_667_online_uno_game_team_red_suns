@@ -203,7 +203,7 @@ async function joinGameIfPossible(game_id, user_id) {
     // If player is exists for the user for the game
     if (playerRowExists) {
         result.status = constants.FAILURE;
-        result.message = `Player already exists for game ${game_id}`;
+        result.message = `Player ${playerRowExists.player_id} already exists for game ${game_id}`;
         result.player = playerRowExists;
         return result;
     }
@@ -214,7 +214,7 @@ async function joinGameIfPossible(game_id, user_id) {
     // If player row was not made
     if (!playerRowNew) {
         result.status = constants.FAILURE;
-        result.message = `Player could not be made for game ${game_id}`;
+        result.message = `Player ${playerRowNew.player_id} could not be made for game ${game_id}`;
         return result;
     }
 
@@ -441,7 +441,7 @@ async function createGameV2(user_id) {
     result.players = playersRow;
 
     result.status = constants.SUCCESS;
-    result.message = 'Player, game, and players were created';
+    result.message = `Game ${gameRow.game_id}, player ${playersRow.player_id}, and players were created`;
 
     return result;
 }
@@ -502,7 +502,7 @@ async function startGame(game_id, player_id, deckMultiplier) {
 
     if (gameRow.player_id_host !== player_id) {
         result.status = constants.FAILURE;
-        result.message = `Player is not the host for game ${game_id}`;
+        result.message = `Player ${player_id} is not the host for game ${game_id}`;
         return result;
     }
 
@@ -766,8 +766,8 @@ async function moveCardDrawToPlay(game_id) { // TODO ADD MORE GUARDING AND ERROR
 
 gameUno.moveCardDrawToPlay = moveCardDrawToPlay;
 
-async function moveCardHandToPlay(game_id, user_id, collection_index) {
-    debugPrinter.printFunction(moveCardHandToPlay.name);
+async function moveCardHandToPlayByGameIDAndUserID(game_id, user_id, collection_index) {
+    debugPrinter.printFunction(moveCardHandToPlayByGameIDAndUserID.name);
 
     const result = {
         status: null,
@@ -802,7 +802,7 @@ async function moveCardHandToPlay(game_id, user_id, collection_index) {
     return result;
 }
 
-gameUno.moveCardHandToPlay = moveCardHandToPlay;
+gameUno.moveCardHandToPlayByGameIDAndUserID = moveCardHandToPlayByGameIDAndUserID;
 
 async function getHand(game_id, user_id) {
     debugPrinter.printFunction(getHand.name);
@@ -856,17 +856,14 @@ async function getHand(game_id, user_id) {
 
 gameUno.getHand = getHand;
 
-async function getPlayerDetailed(game_id, user_id) {
-    debugPrinter.printFunction(getPlayerDetailed.name);
+async function getPlayerDetailedHelper(game_id, playerRow) {
+    debugPrinter.printFunction(getPlayerDetailedHelper.name);
 
     const result = {
         status: null,
         message: null,
         player: null,
     };
-
-    // Get player given game_id and user_id (May be undefined)
-    const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
 
     // If player is exists for the user for the game
     if (!playerRow) {
@@ -882,7 +879,27 @@ async function getPlayerDetailed(game_id, user_id) {
     return result;
 }
 
-gameUno.getPlayerDetailed = getPlayerDetailed;
+async function getPlayerDetailedByGameIDAndUserID(game_id, user_id) {
+    debugPrinter.printFunction(getPlayerDetailedByGameIDAndUserID.name);
+
+    // Get player given game_id and user_id (May be undefined)
+    const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
+
+    return getPlayerDetailedHelper(game_id, playerRow);
+}
+
+gameUno.getPlayerDetailedByGameIDAndUserID = getPlayerDetailedByGameIDAndUserID;
+
+async function getPlayerDetailedByGameIDAndPlayerID(game_id, player_id) {
+    debugPrinter.printFunction(getPlayerDetailedByGameIDAndUserID.name);
+
+    // Get player given game_id and user_id (May be undefined)
+    const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByPlayerID(game_id, player_id);
+
+    return getPlayerDetailedHelper(game_id, playerRow);
+}
+
+gameUno.getPlayerDetailedByGameIDAndPlayerID = getPlayerDetailedByGameIDAndPlayerID;
 
 async function setGamePlayerIDHost(game_id, user_id) {
     debugPrinter.printFunction(setGamePlayerIDHost.name);

@@ -174,7 +174,7 @@ controllerGameID.GETGetGameAndTheirPlayers = GETGetGameAndTheirPlayers;
 async function GETGetPlayer(req, res, next) {
     debugPrinter.printMiddleware(GETGetPlayer.name);
 
-    const result = await gameUno.getPlayerDetailed(req.game.game_id, req.user.user_id);
+    const result = await gameUno.getPlayerDetailedByGameIDAndUserID(req.game.game_id, req.user.user_id);
 
     debugPrinter.printDebug(result);
 

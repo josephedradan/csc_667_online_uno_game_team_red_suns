@@ -883,7 +883,7 @@ dbEngineGameUno.getCollectionByGameID = getCollectionByGameID;
  * @param player_id
  * @returns {Promise<any[]>}
  */
-async function getCollectionByPlayerID(player_id) {
+async function getCollectionRowByPlayerID(player_id) {
     debugPrinter.printFunction(getCollectionByGameID.name);
     const result = await db.any(
         `
@@ -914,7 +914,7 @@ async function getCollectionByPlayerID(player_id) {
     return result;
 }
 
-dbEngineGameUno.getCollectionRowByPlayerID = getCollectionByPlayerID;
+dbEngineGameUno.getCollectionRowByPlayerID = getCollectionRowByPlayerID;
 
 /**
  * Get Collection by game_id and collection_info_id
