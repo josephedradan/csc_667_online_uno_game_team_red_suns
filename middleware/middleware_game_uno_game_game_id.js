@@ -6,7 +6,17 @@ const intermediateSocketIOGameUno = require('../controller/intermediate_socket_i
 const intermediateGameUno = require('../controller/intermediate_game_uno');
 const constants = require('../server/constants');
 
-const middlewareGameUnoGamdID = {};
+const middlewareGameUnoGameGameID = {};
+
+async function checkIfRouteExists(req, res, next) { // TODO RENAME AND CLEAN UP FIX
+    if (isNaN(req.params.game_id)) {
+        res.redirect('back');
+    } else {
+        next();
+    }
+}
+
+middlewareGameUnoGameGameID.checkIfRouteExists = checkIfRouteExists;
 
 /**
  * Validate if the req.body is correct using joi
@@ -22,7 +32,7 @@ async function validateRequestBody(req, res, next) {
     next();
 }
 
-middlewareGameUnoGamdID.validateRequestBody = validateRequestBody;
+middlewareGameUnoGameGameID.validateRequestBody = validateRequestBody;
 
 /**
  * Check if the player can execute an action.
@@ -47,7 +57,7 @@ async function checkIfPlayerCanDoAction(req, res, next) {
     }
 }
 
-middlewareGameUnoGamdID.checkIfPlayerCanDoAction = checkIfPlayerCanDoAction;
+middlewareGameUnoGameGameID.checkIfPlayerCanDoAction = checkIfPlayerCanDoAction;
 
 /**
  *
@@ -73,7 +83,7 @@ async function checkIfAllowedToUseAPI(req, res, next) {
     }
 }
 
-middlewareGameUnoGamdID.checkIfAllowedToUseAPI = checkIfAllowedToUseAPI;
+middlewareGameUnoGameGameID.checkIfAllowedToUseAPI = checkIfAllowedToUseAPI;
 
 /**
  * IMPORTANT NOTES:
@@ -111,7 +121,7 @@ async function checkIfInGameOrJoinGameIfPossibleNoPlayerInReqAndGuard(req, res, 
     }
 }
 
-middlewareGameUnoGamdID.checkIfInGameOrJoinGameIfPossibleNoPlayerInReqAndGuard = checkIfInGameOrJoinGameIfPossibleNoPlayerInReqAndGuard;
+middlewareGameUnoGameGameID.checkIfInGameOrJoinGameIfPossibleNoPlayerInReqAndGuard = checkIfInGameOrJoinGameIfPossibleNoPlayerInReqAndGuard;
 
 async function checkIfPlayerIDIsHost(req, res, next) {
     debugPrinter.printMiddleware(checkIfPlayerIDIsHost.name);
@@ -126,6 +136,6 @@ async function checkIfPlayerIDIsHost(req, res, next) {
     }
 }
 
-middlewareGameUnoGamdID.checkIfPlayerIDIsHost = checkIfPlayerIDIsHost;
+middlewareGameUnoGameGameID.checkIfPlayerIDIsHost = checkIfPlayerIDIsHost;
 
-module.exports = middlewareGameUnoGamdID;
+module.exports = middlewareGameUnoGameGameID;

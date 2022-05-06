@@ -32,12 +32,14 @@ async function POSTPlayCard(req, res, next) {
       req.player
     */
     const {
-        collection_index,
+        collection_index, // TODO DO VALIDATION
     } = req.body;
 
     const result = await intermediateGameUno.playCardHandToPlayDeckWrapped(req.game.game_id, req.user.user_id, collection_index);
 
-    debugPrinter.printDebug(result);
+    debugPrinter.printError(result)
+
+    // debugPrinter.printDebug(result);
 
     res.json(result);
 }
@@ -51,7 +53,7 @@ async function GETDrawCard(req, res, next) {
 
     const result = await dbEngineGameUno.getCollectionRowByPlayerID(req.player.player_id);
 
-    debugPrinter.printDebug(result);
+    // debugPrinter.printDebug(result);
 
     res.json(result);
 }
@@ -63,7 +65,7 @@ async function POSTStartGame(req, res, next) {
 
     const result = await intermediateGameUno.startGameWrapped(req.game.game_id, req.user.user_id);
 
-    debugPrinter.printDebug(result);
+    // debugPrinter.printDebug(result);
 
     res.json(result);
 }
@@ -148,7 +150,7 @@ async function GETGetHand(req, res, next) {
 
     const result = await gameUno.getHand(req.game.game_id, req.user.user_id);
 
-    debugPrinter.printDebug(result);
+    // debugPrinter.printDebug(result);
 
     res.json(result);
 }

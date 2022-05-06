@@ -322,7 +322,7 @@ async function leaveGame(game_id, user_id) {
     // If playerRow does not exist
     if (!playerRow) {
         result.status = constants.FAILURE;
-        result.message = `Player ${playerRow.player_id} does not exist for game ${game_id}`;
+        result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id}) does not exist for game ${game_id}`;
         return result;
     }
     result.player = playerRow;
@@ -330,11 +330,11 @@ async function leaveGame(game_id, user_id) {
     if (playerRow.player_id === gameRow.player_id_host) {
         // May be empty
         result.game = await dbEngineGameUno.deleteGameRow(game_id); // Will also delete players in game
-        result.message = `Game ${game_id} is removed and player ${playerRow.player_id} is removed`;
+        result.message = `Game ${game_id} is removed and player ${playerRow.display_name} (player_id ${playerRow.player_id}) is removed`;
     } else {
         // May be empty
         result.player = await dbEngineGameUno.deletePlayerRowByPlayerID(playerRow.player_id);
-        result.message = `Player ${playerRow.player_id} is removed from game ${game_id}`;
+        result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id}) is removed from game ${game_id}`;
 
         if (gameRow.player_id_turn === playerRow.player_id) {
             result.player_current_turn_new = await changeTurnAndGetPlayerRowDetailedByGameID(game_id, 0);
@@ -744,7 +744,7 @@ async function getGameState(game_id) {
 
 gameUno.getGameState = getGameState;
 
-async function moveCardDrawToHandByGameIDAndPlayerRow(game_id, playerRow) {
+async function moveCardDrawToHandTop(game_id, playerRow) {
     const result = {
         status: null,
         message: null,
@@ -761,22 +761,22 @@ async function moveCardDrawToHandByGameIDAndPlayerRow(game_id, playerRow) {
     result.player = playerRow;
 
     // My be undefined
-    const collectionRow = await dbEngineGameUno.updateCollectionRowDrawToHandByPlayerID(game_id, playerRow.player_id);
+    const collectionRow = await dbEngineGameUno.updateCollectionRowDrawToHandTop(game_id, playerRow.player_id);
 
     if (!collectionRow) {
         result.status = constants.FAILURE;
-        result.message = `Error in updating player ${playerRow.player_id}'s collection`;
+        result.message = `Error in updating player ${playerRow.display_name} (player_id ${playerRow.player_id})'s collection`;
         return result;
     }
     result.collection = collectionRow;
 
     result.status = constants.SUCCESS;
-    result.message = `A card from DRAW's collection moved to player ${playerRow.player_id}'s collection for Game ${game_id}`; // TODO FIX THEN
+    result.message = `A card from DRAW's collection moved to player ${playerRow.display_name} (player_id ${playerRow.player_id})'s collection's top for Game ${game_id}`;
 
     return result;
 }
 
-gameUno.moveCardDrawToHandByGameIDAndPlayerRow = moveCardDrawToHandByGameIDAndPlayerRow;
+gameUno.moveCardDrawToHandTop = moveCardDrawToHandTop;
 
 /*
 {
@@ -786,16 +786,16 @@ gameUno.moveCardDrawToHandByGameIDAndPlayerRow = moveCardDrawToHandByGameIDAndPl
     collection,
 }
  */
-async function moveCardDrawToHandByGameIDAndUserID(game_id, user_id) {
-    debugPrinter.printFunction(moveCardDrawToHandByGameIDAndUserID.name);
+async function moveCardDrawToHandTop(game_id, user_id) {
+    debugPrinter.printFunction(moveCardDrawToHandTop.name);
 
     // Get player given game_id and user_id (May be undefined)
     const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(game_id, user_id);
 
-    return moveCardDrawToHandByGameIDAndPlayerRow(game_id, playerRow);
+    return moveCardDrawToHandTop(game_id, playerRow);
 }
 
-gameUno.moveCardDrawToHandByGameIDAndUserID = moveCardDrawToHandByGameIDAndUserID;
+gameUno.moveCardDrawToHandTop = moveCardDrawToHandTop;
 
 async function moveCardDrawToPlay(game_id) { // TODO ADD MORE GUARDING AND ERROR CHECKING ETC
     debugPrinter.printFunction(moveCardDrawToPlay.name);
@@ -817,7 +817,7 @@ async function moveCardDrawToPlay(game_id) { // TODO ADD MORE GUARDING AND ERROR
         return result;
     }
 
-    const collectionRow = await dbEngineGameUno.updateCollectionRowDrawToPlay(game_id);
+    const collectionRow = await dbEngineGameUno.updateCollectionRowDrawToPlayTop(game_id);
 
     if (!collectionRow) {
         result.status = constants.FAILURE;
@@ -827,15 +827,15 @@ async function moveCardDrawToPlay(game_id) { // TODO ADD MORE GUARDING AND ERROR
     result.collection = collectionRow;
 
     result.status = constants.SUCCESS;
-    result.message = `A card from DRAW's collection moved to PLAY's collection for Game ${game_id}`; // TODO FIX THEN
+    result.message = `A card from DRAW's collection moved to PLAY's collection's top for Game ${game_id}`; // TODO FIX THEN
 
     return result;
 }
 
 gameUno.moveCardDrawToPlay = moveCardDrawToPlay;
 
-async function moveCardHandToPlayByGameIDAndUserID(game_id, user_id, collection_index) {
-    debugPrinter.printFunction(moveCardHandToPlayByGameIDAndUserID.name);
+async function moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_index) {
+    debugPrinter.printFunction(moveCardHandToPlayByCollectionIndex.name);
 
     const result = {
         status: null,
@@ -846,7 +846,7 @@ async function moveCardHandToPlayByGameIDAndUserID(game_id, user_id, collection_
     };
 
     // Get player given game_id and user_id (May be undefined)
-    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByPlayerID(game_id, user_id);
+    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(game_id, user_id);
 
     // If player is exists for the user for the game
     if (!playerRow) {
@@ -856,7 +856,7 @@ async function moveCardHandToPlayByGameIDAndUserID(game_id, user_id, collection_
     }
     result.player = playerRow;
 
-    const collectionRow = await dbEngineGameUno.updateCollectionRowHandToPlay(game_id, collection_index, playerRow.player_id);
+    const collectionRow = await dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndex(game_id, playerRow.player_id, collection_index);
 
     if (!collectionRow) {
         result.status = constants.FAILURE;
@@ -866,15 +866,15 @@ async function moveCardHandToPlayByGameIDAndUserID(game_id, user_id, collection_
     result.collection = collectionRow;
 
     // TODO FIXME WARNING THIS DOES NOT HANDLE SPECIAL CARDS, PUT LOGIC OF THAT HERE
-    result.player_current_turn_new = changeTurnAndGetPlayerRowDetailedByGameID(game_id, 0);
+    result.player_current_turn_new = await changeTurnAndGetPlayerRowDetailedByGameID(game_id, 0);
 
     result.status = constants.SUCCESS;
-    result.message = `A card from ${playerRow.player_id}'s collection moved to PLAY's collection for Game ${game_id}`;
+    result.message = `Card (collection_index ${collection_index}) from player ${playerRow.display_name} (player_id ${playerRow.player_id})'s collection moved to PLAY's collection's top for Game ${game_id}`;
 
     return result;
 }
 
-gameUno.moveCardHandToPlayByGameIDAndUserID = moveCardHandToPlayByGameIDAndUserID;
+gameUno.moveCardHandToPlayByCollectionIndex = moveCardHandToPlayByCollectionIndex;
 
 async function getHand(game_id, user_id) {
     debugPrinter.printFunction(getHand.name);
@@ -914,12 +914,12 @@ async function getHand(game_id, user_id) {
     // If player is exists for the user for the game
     if (!collectionRow) {
         result.status = constants.FAILURE;
-        result.message = `Collection does not exist for player ${playerRow.player_id}`;
+        result.message = `Collection does not exist for player ${playerRow.display_name} (player_id ${playerRow.player_id})`;
         return result;
     }
 
     result.status = constants.SUCCESS;
-    result.message = `Player ${playerRow.player_id}'s hand returned`;
+    result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id})'s hand returned`;
 
     result.collection = collectionRow;
 
@@ -961,7 +961,7 @@ async function getPlayerDetailedByGameIDAndUserID(game_id, user_id) {
     result.player = playerRow;
 
     result.status = constants.SUCCESS;
-    result.message = `Player ${playerRow.player_id} returned`;
+    result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id}) returned`;
 
     return result;
 }
@@ -1010,7 +1010,7 @@ async function setGamePlayerIDHost(game_id, user_id) {
     result.game = gameRowNew;
 
     result.status = constants.SUCCESS;
-    result.message = `Player ${playerRow.player_id} is not the host of game ${game_id}`;
+    result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id}) is not the host of game ${game_id}`;
 
     return result;
 }

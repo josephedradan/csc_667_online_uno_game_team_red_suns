@@ -142,7 +142,7 @@ intermediateGameUno.sendMessageWrapped = sendMessageWrapped;
 async function moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow) {
     debugPrinter.printFunction(moveCardDrawToHandByGameIDAndPlayerRowWrapped.name);
 
-    const result = await gameUno.moveCardDrawToHandByGameIDAndPlayerRow(game_id, playerRow);
+    const result = await gameUno.moveCardDrawToHandTop(game_id, playerRow);
 
     debugPrinter.printDebug(result);
 
@@ -164,7 +164,7 @@ async function playCardHandToPlayDeckWrapped(game_id, user_id, collection_index)
     // TODO HANDLE PLAYING SPECIAL CARDS
     // TODO CHANGE TURN IF NEEDED
 
-    const result = await gameUno.moveCardHandToPlayByGameIDAndUserID(game_id, user_id, collection_index);
+    const result = await gameUno.moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_index);
 
     await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 
