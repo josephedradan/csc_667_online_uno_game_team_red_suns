@@ -212,4 +212,22 @@ async function startGameWrapped(game_id, user_id) {
 
 intermediateGameUno.startGameWrapped = startGameWrapped;
 
+async function setGamePlayerIDHostWrapped(game_id, user_id) {
+    debugPrinter.printFunction(setGamePlayerIDHostWrapped.name);
+
+    const result = await gameUno.setGamePlayerIDHost(game_id, user_id);
+
+    if (result.status === constants.FAILURE) {
+        return gameUno.getGameState(game_id);
+    }
+
+    await gameUno.moveCardDrawToPlay(game_id);
+
+    const resultNew = intermediateSocketIOGameUno.emitInRoomServerGameGameIDGameState(game_id);
+
+    return resultNew;
+}
+
+intermediateGameUno.setGamePlayerIDHostWrapped = setGamePlayerIDHostWrapped;
+
 module.exports = intermediateGameUno;

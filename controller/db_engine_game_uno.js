@@ -1123,7 +1123,7 @@ async function updateGameIsActiveByGameID(game_id, boolean) {
         UPDATE "Game"
         SET is_active = $2
         WHERE "Game".game_id = $1
-        RETURNING *;
+        RETURNING game_id, is_active, player_id_current_turn, is_clockwise, player_id_host;
         `,
         [
             game_id,
@@ -1144,7 +1144,7 @@ async function updateGameIsClockwiseByGameID(game_id, boolean) {
         UPDATE "Game"
         SET is_clockwise = $2
         WHERE "Game".game_id = $1
-        RETURNING *;
+        RETURNING game_id, is_active, player_id_current_turn, is_clockwise, player_id_host;
         `,
         [
             game_id,
@@ -1165,7 +1165,7 @@ async function updateGamePlayerIDCurrentTurnByGameID(game_id, player_id) {
         UPDATE "Game"
         SET player_id_current_turn = $2
         WHERE "Game".game_id = $1
-        RETURNING *;
+        RETURNING game_id, is_active, player_id_current_turn, is_clockwise, player_id_host;
         `,
         [
             game_id,
@@ -1186,7 +1186,7 @@ async function updateGamePlayerIDHostByGameID(game_id, player_id) {
         UPDATE "Game"
         SET player_id_host = $2
         WHERE "Game".game_id = $1
-        RETURNING *;
+        RETURNING game_id, is_active, player_id_current_turn, is_clockwise, player_id_host;
         `,
         [
             game_id,

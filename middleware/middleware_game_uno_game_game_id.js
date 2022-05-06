@@ -55,11 +55,9 @@ middlewareGameUnoGamdID.checkIfPlayerCanDoAction = checkIfPlayerCanDoAction;
  */
 async function checkIfAllowedToUseAPI(req, res, next) {
     // Get player of the user if they are already in the game
-    const { player } = req;
-    // TODO
 
     // If the user is not a player in the game
-    if (!player) {
+    if (!req.player) {
         res.json({
             status: constants.FAILURE,
             message: 'You are not a player in the game',

@@ -851,8 +851,20 @@ async function getPlayerDetailedByGameIDAndUserID(game_id, user_id) {
     const result = {
         status: null,
         message: null,
+        game: null,
         player: null,
     };
+
+    const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
+
+    // Check if game exists
+    if (!gameRow) {
+        result.status = constants.FAILURE;
+        result.message = `Game ${game_id} does not exist`;
+        return result;
+    }
+
+    result.game = gameRow;
 
     // Get player given game_id and user_id (May be undefined)
     const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
@@ -883,6 +895,16 @@ async function setGamePlayerIDHost(game_id, user_id) {
         player: null,
     };
 
+    const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
+
+    // Check if game exists
+    if (!gameRow) {
+        result.status = constants.FAILURE;
+        result.message = `Game ${game_id} does not exist`;
+        return result;
+    }
+    result.game = gameRow;
+
     // Get player given game_id and user_id (May be undefined)
     const playerRow = await dbEngineGameUno.getPlayerRowJoinPlayersRowJoinGameRowByGameIDAndUserID(game_id, user_id);
 
@@ -895,7 +917,14 @@ async function setGamePlayerIDHost(game_id, user_id) {
     }
     result.player = playerRow;
 
-    result.game = await dbEngineGameUno.updateGamePlayerIDHostByGameID(game_id, playerRow.player_id);
+    const gameRowNew = await dbEngineGameUno.updateGamePlayerIDHostByGameID(game_id, playerRow.player_id);
+
+    if (!gameRowNew) {
+        result.status = constants.FAILURE;
+        result.message = `Could not update game ${game_id}'s player turn`;
+        return result;
+    }
+    result.game = gameRowNew;
 
     result.status = constants.SUCCESS;
     result.message = `Player ${playerRow.player_id} is not the host of game ${game_id}`;
@@ -923,7 +952,6 @@ async function setGamePlayerIDCurrentTurn(game_id, user_id) {
         result.message = `Game ${game_id} does not exist`;
         return result;
     }
-
     result.game = gameRow;
 
     // Get player given game_id and user_id (May be undefined)
@@ -937,7 +965,14 @@ async function setGamePlayerIDCurrentTurn(game_id, user_id) {
     }
     result.player = playerRow;
 
-    result.game = await dbEngineGameUno.updateGameIsClockwiseByGameID(game_id, playerRow.player_id);
+    const gameRowNew = await dbEngineGameUno.updateGamePlayerIDCurrentTurnByGameID(game_id, playerRow.player_id);
+
+    if (!gameRowNew) {
+        result.status = constants.FAILURE;
+        result.message = `Could not update game ${game_id}'s player turn`;
+        return result;
+    }
+    result.game = gameRowNew;
 
     result.status = constants.SUCCESS;
     result.message = `Player ${playerRow.player_id}'s has the turn for game ${game_id}`;
