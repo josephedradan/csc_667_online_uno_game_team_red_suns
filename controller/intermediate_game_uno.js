@@ -165,7 +165,7 @@ async function playCardHandToPlayDeckWrapped(game_id, collection_index, player_i
     return result;
 }
 
-intermediateGameUno.playCardHandToPlayDeck = playCardHandToPlayDeckWrapped;
+intermediateGameUno.playCardHandToPlayDeckWrapped = playCardHandToPlayDeckWrapped;
 
 /*
 Return format
