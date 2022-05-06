@@ -1,111 +1,172 @@
+class Draggable {
+    constructor(element, containers, boundary) {
+        this.containers = containers;
+        this.parent = element.parentElement;
+        this.element = element;
+        this.callback = null;
+        this.boundary = boundary;
+        this.element.onmousedown = this.dragMouseDown.bind(this);
+    }
+
+    moveToPosition(x, y) {
+        const computedStyle = window.getComputedStyle(this.element);
+        const offsetX = -parseInt(computedStyle.width, 10) / 2 - parseInt(computedStyle.marginLeft, 10);
+        const offsetY = -parseInt(computedStyle.height, 10) / 2 - parseInt(computedStyle.marginTop, 10);
+
+        let posX = (x + offsetX);
+        let posY = (y + offsetY);
+
+        if (this.boundary) {
+            const boundaryRect = this.boundary.getBoundingClientRect();
+            if (posX < boundaryRect.left) {
+                posX = boundaryRect.left;
+            } else if (posX > boundaryRect.right + 2 * offsetX) {
+                posX = boundaryRect.right + 2 * offsetX;
+            }
+            if (posY < boundaryRect.top) {
+                posY = boundaryRect.top;
+            } else if (posY > boundaryRect.bottom + 2 * offsetY) {
+                posY = boundaryRect.bottom + 2 * offsetY;
+            }
+        }
+
+        this.element.style.left = `${posX}px`;
+        this.element.style.top = `${posY}px`;
+    }
+
+    dragMouseDown(event) {
+        if (this.element.getAttribute('disabled') !== null) {
+            console.log('It was disabled!');
+            return;
+        }
+        console.log('It was not disabled');
+
+        event.preventDefault();
+
+        document.onmouseup = this.dragMouseUp.bind(this);
+        document.onmousemove = this.dragMouseMove.bind(this);
+
+        this.parent = this.element.parentElement;
+        this.element.style.position = 'absolute';
+        this.element.style.transform = 'none';
+        this.element.style.width = 'auto';
+        this.element.style.height = 'auto';
+        document.body.appendChild(this.element);
+
+        this.moveToPosition(event.clientX, event.clientY);
+    }
+
+    dragMouseMove(event) {
+        event.preventDefault();
+
+        this.moveToPosition(event.clientX, event.clientY);
+    }
+
+    dragMouseUp(event) {
+        event.preventDefault();
+
+        document.onmouseup = null;
+        document.onmousemove = null;
+        this.element.style.top = null;
+        this.element.style.left = null;
+        this.element.style.position = null;
+        this.element.style.transform = null;
+        this.element.style.width = null;
+        this.element.style.height = null;
+
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
+
+        let parented = false;
+
+        for (const container of this.containers) {
+            const rect = container.getBoundingClientRect();
+            console.log(parseInt(rect.left, 10) + " " + parseInt(rect.right, 10) + " " + parseInt(rect.top, 10) + " " + parseInt(rect.bottom, 10));
+            if (mouseX > parseInt(rect.left, 10)
+                    && mouseX < parseInt(rect.right, 10)
+                    && mouseY > parseInt(rect.top, 10)
+                    && mouseY < parseInt(rect.bottom, 10)) {
+                container.appendChild(this.element);
+                this.parent = this.element.parentElement;
+                parented = true;
+                if (this.callback) {
+                    this.callback(this.parent);
+                }
+                break;
+            }
+        }
+        if (!parented) {
+            this.parent.appendChild(this.element);
+        }
+    }
+
+    setCallback(func) {
+        this.callback = func;
+    }
+
+    destroy() {
+        this.element.onmousedown = null;
+    }
+}
+
+
+
 class UnoGameRenderer {
     constructor(drawContainer, playContainer) {
         this.drawContainer = drawContainer;
         this.playContainer = playContainer;
         this.handContainers = {};
-        this.hands = {}; // [player_id] = [element, element, element]
-        this.drawPile = []; // [element, element, element]
-        this.playPile = []; // [element, element, element]
     }
 
     addPlayer(userId, container) {
         this.handContainers[userId] = container;
-        this.hands[userId] = [];
     }
 
     updateHand(playerId, cardCollection) {
  
         // If player not in game, don't render
-        if (!this.hands[playerId]) {
+        if (!this.handContainers[playerId]) {
             return;
         }
 
         // Empty the container
         this.handContainers[playerId].innerHTML = "";
-        this.hands[playerId] = [];
 
         // Loop through cards and render
         cardCollection.forEach((cardData, index) => {
-            let card = this.generate_card(cardData);
+            let card = this.#generate_card(cardData);
 
             // Add the card to the hand and the handContainer
             this.handContainers[playerId].appendChild(card);
-            this.hands[playerId].push(card);
         });
     }
 
     updateTopCard(cardData) {
+        if (!cardData) { return; }
         // Destroy all but the top card
         this.playContainer.innerHTML = "";
-        const newCard = this.generate_card(cardData); // Generate card with card info
+        const newCard = this.#generate_card(cardData); // Generate card with card info
         this.playContainer.appendChild(newCard);
     }
 
-    generate_card(cardData) {
+    //* ************************** Card Templates */
+
+    #generate_card(cardData) {
         let card;
         // Figure out what kind of card and render
         if (cardData.card_info_type === undefined) {
-            card = this.generate_flipped_card();
+            card = this.#generate_flipped_card();
         } else if(cardData.card_color === "black") {
-            card = this.generate_wild_black((cardData.card_content === "wild"));
+            card = this.#generate_wild_black((cardData.card_content === "wild"));
         } else if (cardData.card_info_type == "NUMBER") {
-            card = this.generate_color_card("num-" + cardData.card_content, cardData.card_color);
+            card = this.#generate_color_card("num-" + cardData.card_content, cardData.card_color);
         } else {
-            card = this.generate_color_card(cardData.card_content, cardData.card_color);
+            card = this.#generate_color_card(cardData.card_content, cardData.card_color);
         }
         return card;
     }
 
-    /*
-    updateGameState(gameState) {
-        // Get play pile cards, update on callback?
-        // Get my hand cards, update on callback?
-
-        // Do we need to do anything with the draw pile?
-
-        // Iterate through player hands
-        gameState.players.forEach((player) => {
-            // If new card, add (animate from draw pile later)
-            for (
-                let i = player.collection.length;
-                i < this.hands[player.player_id].length;
-                i++
-            ) {
-                // Add card to hand
-            }
-            // If missing card, move to play pile (animate later)
-            for (
-                let i = this.hands[player.player_id].length;
-                i < player.collection.length;
-                i++
-            ) {
-                // Reparent card to play pile
-            }
-        });
-    }
-    */
-
-    /*
-
-    startTurn() {
-        //let myHand =
-        // Make draw stack draggable
-        //if () {
-        //}
-        // Make my cards draggable
-        // Hook up draggable callback to play card?
-        // Submit move and end turn
-    }
-
-    endTurn() {
-        // Make cards no longer draggable
-    }
-
-    */
-
-    //* ************************** Card Templates */
-
-    generate_flipped_card = () => {
+    #generate_flipped_card = () => {
         const cardWrapper = document.createElement("div");
         cardWrapper.classList.add("cardWrapper");
         const unoCard = document.createElement("div");
@@ -123,7 +184,7 @@ class UnoGameRenderer {
         return cardWrapper;
     };
 
-    generate_color_card = (value, color) => {
+    #generate_color_card = (value, color) => {
         const cardWrapper = document.createElement("div");
         cardWrapper.classList.add("cardWrapper");
         const unoCard = document.createElement("div");
@@ -141,7 +202,7 @@ class UnoGameRenderer {
         return cardWrapper;
     };
 
-    generate_wild_black = (is_wild /* or is_wildFour */) => {
+    #generate_wild_black = (is_wild /* or is_wildFour */) => {
         const cardWrapper = document.createElement("div");
         cardWrapper.classList.add("cardWrapper");
         const unoCard = document.createElement("div");
@@ -175,7 +236,53 @@ class UnoGameRenderer {
     };
 }
 
+
+
+
+class TurnController {
+    constructor (drawContainer, playContainer, handContainer) {
+        this.drawContainer = drawContainer;
+        this.playContainer = playContainer;
+        this.handContainer = handContainer;
+        this.draggables = [];
+    }
+
+    startTurn(cardCollection) {
+        cardCollection.forEach((cardData, index) => {
+            let card = this.handContainer.children.item(index);
+            const draggable = new Draggable(card, [this.playContainer]);
+            draggable.setCallback((newParent) => {
+                if (newParent == this.playContainer) {
+
+                    // if card is a wild card, prompt with modal and request the move
+                    if (cardData.card_color == "black") {
+                        // Modal!
+                        // On modal callback, make move request and end turn
+                    } else {
+                        // Make move request
+                        // const moveResult = await axios.post(`/game/${getGameId()}/move`, {index});
+                        this.endTurn();
+                    }
+
+                }
+            });
+            this.draggables.push(draggable);
+        });
+    }
+
+    endTurn() {
+        this.draggables.forEach((draggable) => {
+            draggable.destroy();
+        });
+        this.draggables = [];
+    }
+}
+
+
+
+
 let gameRenderer;
+let turnController;
 
 const gameStateQueue = [];
 let queueActive = false;
@@ -213,17 +320,11 @@ async function renderGameState(game_state) {
             let gameWindow = document.getElementById("game_window");
             let playerList = document.getElementById("list_of_players");
 
-            if (game_state.game.is_active) {
-                gameWindow.classList.remove("invisible");
-                gameWindow.classList.remove("hidden");
-                playerList.classList.add("invisible");
-                playerList.classList.add("hidden");
-            } else {
-                playerList.classList.remove("invisible");
-                playerList.classList.remove("hidden");
-                gameWindow.classList.add("invisible");
-                gameWindow.classList.add("hidden");
-            }
+            // Display the proper panel depending on game state
+            gameWindow.classList.toggle("invisible", !game_state.game.is_active);
+            gameWindow.classList.toggle("hidden", !game_state.game.is_active);
+            playerList.classList.toggle("invisible", game_state.game.is_active);
+            playerList.classList.toggle("hidden", game_state.game.is_active);
 
             if (game_state.game.is_active) {
                 if (gameRenderer == null) {
@@ -233,6 +334,12 @@ async function renderGameState(game_state) {
                     gameRenderer = new UnoGameRenderer(
                         drawContainer,
                         playContainer
+                    );
+
+                    turnController = new TurnController(
+                        drawContainer,
+                        playContainer,
+                        document.getElementById("player0")
                     );
 
                     const players = game_state.players;
@@ -271,7 +378,9 @@ async function renderGameState(game_state) {
                     }
                 });
 
-                gameRenderer.updateTopCard(game_state.collection_play[game_state.collection_play.length - 1]);
+                if (game_state.collection_play.length > 0) {
+                    gameRenderer.updateTopCard(game_state.collection_play[game_state.collection_play.length - 1]);
+                }
 
                 // If its my turn
                     // make my cards draggable loop
@@ -281,6 +390,8 @@ async function renderGameState(game_state) {
                 //if (game_state.player_id_current_turn === localPlayer.player_id) {
 
                 //}
+
+                turnController.startTurn(playersHand.data.collection);
             }
         }
 
