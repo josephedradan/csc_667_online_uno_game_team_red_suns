@@ -91,6 +91,16 @@ class Draggable {
                 )} ${parseInt(rect.top, 10)} ${parseInt(rect.bottom, 10)}`
             );
             */
+
+            // console.log(mouseX);
+            // console.log(parseInt(rect.right, 10));
+            // console.log(mouseX > parseInt(rect.left, 10));
+            // console.log(mouseX < parseInt(rect.right, 10));
+            // console.log(mouseY > parseInt(rect.top, 10));
+            // console.log(mouseY < parseInt(rect.bottom, 10));
+
+            // WARNING: this logic will only work if it's full screen.
+            // We have to be careful when teaching
             if (
                 mouseX > parseInt(rect.left, 10) &&
                 mouseX < parseInt(rect.right, 10) &&
@@ -271,16 +281,14 @@ class TurnController {
         this.draggables = [];
     }
 
-    startTurn(cardCollection, currentPlayer) {
-        const currentPlayerTarget = document.getElementById("currentPlayer");
-        currentPlayerTarget.textContent = `Current Player: ${currentPlayer.display_name}`;
-
+    startTurn(cardCollection) {
         cardCollection.forEach((cardData, index) => {
             const card = this.handContainer.children.item(index);
             const draggable = new Draggable(card, [this.playContainer]);
             draggable.setCallback(async (newParent) => {
                 if (newParent == this.playContainer) {
                     // if card is a wild card, prompt with modal and request the move
+                    console.log(cardData);
                     if (cardData.card_color == "black") {
                         // Modal!
                         // On modal callback, make move request and end turn
@@ -305,7 +313,7 @@ class TurnController {
 
                         console.log("Playing a card!");
 
-                        console.log("collection_index: " + index);
+                        console.log(`collection_index: ${index}`);
 
                         const result = await axios.post(
                             `/game/${getGameId()}/playCard`,
@@ -313,9 +321,8 @@ class TurnController {
                                 collection_index: index,
                             }
                         );
-
                         console.log(result);
-
+                        // display_current_player();
                         this.endTurn();
                     }
                 }
@@ -444,6 +451,15 @@ async function renderGameState(game_state) {
 
                 // }
                 // pass also the current player at the start of turn so we can display that current player
+                // console.log(game_state.game.player_id_turn);
+
+                // search game state for current player id, match and return name
+                display_current_player(
+                    game_state.players.find(
+                        (player) =>
+                            player.player_id === game_state.game.player_id_turn
+                    ).display_name
+                );
                 if (game_state.game.player_id_turn == localPlayer.player_id) {
                     turnController.startTurn(
                         playersHand.data.collection,
@@ -459,6 +475,11 @@ async function renderGameState(game_state) {
         queueActive = false;
     }
 }
+
+const display_current_player = (display_name) => {
+    const currentPlayerTarget = document.getElementById("currentPlayer");
+    currentPlayerTarget.textContent = `Current Player: ${display_name}`;
+};
 
 async function setup() {
     // Set up a listener for future incoming game states (the next incoming state could be several seconds/minutes away)
@@ -476,4 +497,4 @@ async function setup() {
 window.addEventListener("load", setup);
 
 // This is not as widely supported as window.onload
-//document.addEventListener("DOMContentLoaded", setup);
+// document.addEventListener("DOMContentLoaded", setup);
