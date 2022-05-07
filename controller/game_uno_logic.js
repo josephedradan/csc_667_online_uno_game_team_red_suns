@@ -92,7 +92,7 @@ async function doGameLogic(gameRow, playObject) {
     }
 
     result.status = constants.SUCCESS;
-    result.message = ' YAYAYAYAYYA';
+    result.message = 'YAYAYAYAYYA';
     return result;
 }
 
