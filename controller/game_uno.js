@@ -596,11 +596,16 @@ Notes:
     message,
     game:
         {
+            card_color_legal,
+            card_content_legal,
+            card_type_legal,
+            draw_amount,
             game_id,
             is_active,
-            player_id_turn,
             is_clockwise,
             player_id_host,
+            player_id_turn,
+            skip_amount,
         },
     players:
         [
@@ -636,14 +641,14 @@ Notes:
         [
             {
                 game_id,
-                card_info_type,
-                card_color,
-                card_content,
                 player_id: null,
-                collection_index,
+                type,
+                color,
+                content,
                 card_id,
-                collection_info_id,
                 card_info_id,
+                collection_index,
+                collection_info_id,
                 collection_info_type,
             },
             ...
