@@ -230,6 +230,10 @@ dbEngineGameUno.createGameDataRow = createGameDataRow;
 
 /**
  * Create Card rows based on deckMultiplier
+ *
+ * IMPORTANT NOTES:
+ *      Use createCardRowsAndCardsRowsAndCollectionRowsWithCollectionRandomized instead
+ *
  * Notes:
  *      This function assumes that the CardInfo table is filled out correctly
  *
@@ -244,31 +248,34 @@ dbEngineGameUno.createGameDataRow = createGameDataRow;
  * @param deckMultiplier
  * @returns {Promise<any>}
  */
-async function createCardRows(deckMultiplier) {
-    debugPrinter.printFunction(createCardRows.name);
-    const result = await db.any(
-        `
-        INSERT INTO "Card" (card_info_id)
-        SELECT temp.card_info_id
-        FROM (
-            SELECT card_info_id
-            FROM "CardInfo"
-            CROSS JOIN generate_series(0, $1)
-        ) AS temp
-        RETURNING *;
-        `,
-        [
-            deckMultiplier,
-        ],
-    );
-
-    return result;
-}
-
+// async function createCardRows(deckMultiplier) {
+//     debugPrinter.printFunction(createCardRows.name);
+//     const result = await db.any(
+//         `
+//         INSERT INTO "Card" (card_info_id)
+//         SELECT temp.card_info_id
+//         FROM (
+//             SELECT card_info_id
+//             FROM "CardInfo"
+//             CROSS JOIN generate_series(0, $1)
+//         ) AS temp
+//         RETURNING *;
+//         `,
+//         [
+//             deckMultiplier,
+//         ],
+//     );
+//
+//     return result;
+// }
+//
 // dbEngineGameUno.createCardRows = createCardRows; // Don't use this
 
 /**
  * Create Card rows and Cards rows at the same time
+ *
+ * IMPORTANT NOTES:
+ *      Use createCardRowsAndCardsRowsAndCollectionRowsWithCollectionRandomized instead
  *
  * Notes:
  *      Inserts rows for Cards based on the inserted rows from Card
@@ -302,45 +309,48 @@ async function createCardRows(deckMultiplier) {
  * @param deckMultiplier
  * @returns {Promise<any>}
  */
-async function createCardRowsAndCardsRows(game_id, deckMultiplier) {
-    debugPrinter.printFunction(createCardRowsAndCardsRows.name);
-    const result = await db.any(
-        `
-        WITH cardRows AS (
-            INSERT INTO "Card" (card_info_id)
-            SELECT temp.card_info_id
-            FROM (
-                SELECT card_info_id
-                FROM "CardInfo"
-                CROSS JOIN generate_series(1, $1)
-            ) AS temp
-            RETURNING *
-        ), cardsRows AS(
-            INSERT INTO "Cards" (game_id, card_id)
-            SELECT $2, cardRows.card_id
-            FROM cardRows
-            RETURNING *
-        )
-        SELECT 
-            cardsRows.game_id, 
-            cardRows.card_id, 
-            cardRows.card_info_id
-        FROM cardsRows
-        LEFT JOIN cardRows ON cardsRows.card_id = cardRows.card_id;
-        `,
-        [
-            deckMultiplier,
-            game_id,
-        ],
-    );
-
-    return result;
-}
-
-dbEngineGameUno.createCardRowsAndCardsRows = createCardRowsAndCardsRows;
+// async function createCardRowsAndCardsRows(game_id, deckMultiplier) {
+//     debugPrinter.printFunction(createCardRowsAndCardsRows.name);
+//     const result = await db.any(
+//         `
+//         WITH cardRows AS (
+//             INSERT INTO "Card" (card_info_id)
+//             SELECT temp.card_info_id
+//             FROM (
+//                 SELECT card_info_id
+//                 FROM "CardInfo"
+//                 CROSS JOIN generate_series(1, $1)
+//             ) AS temp
+//             RETURNING *
+//         ), cardsRows AS(
+//             INSERT INTO "Cards" (game_id, card_id)
+//             SELECT $2, cardRows.card_id
+//             FROM cardRows
+//             RETURNING *
+//         )
+//         SELECT
+//             cardsRows.game_id,
+//             cardRows.card_id,
+//             cardRows.card_info_id
+//         FROM cardsRows
+//         LEFT JOIN cardRows ON cardsRows.card_id = cardRows.card_id;
+//         `,
+//         [
+//             deckMultiplier,
+//             game_id,
+//         ],
+//     );
+//
+//     return result;
+// }
+//
+// dbEngineGameUno.createCardRowsAndCardsRows = createCardRowsAndCardsRows; // Don't use this
 
 /**
  * Create Collection Row based on card_id, collection_info_id, collection_index
+ *
+ * IMPORTANT NOTES:
+ *      Use createCardRowsAndCardsRowsAndCollectionRowsWithCollectionRandomized instead
  *
  * Notes:
  *      This function is made primarily because shuffling the indies of the Card Rows is difficult, so the job
@@ -351,24 +361,24 @@ dbEngineGameUno.createCardRowsAndCardsRows = createCardRowsAndCardsRows;
  * @param collection_index
  * @returns {Promise<void>}
  */
-async function createCollectionRow(card_id, collection_info_id, collection_index) {
-    const result = await db.any(
-        `
-        INSERT INTO "Collection" (card_id, collection_info_id, collection_index)
-        VALUES ($1, $2, $3)
-        RETURNING *
-        `,
-        [
-            card_id,
-            collection_info_id,
-            collection_index,
-        ],
-    );
-
-    return result[0];
-}
-
-dbEngineGameUno.createCollectionRow = createCollectionRow;
+// async function createCollectionRow(card_id, collection_info_id, collection_index) {
+//     const result = await db.any(
+//         `
+//         INSERT INTO "Collection" (card_id, collection_info_id, collection_index)
+//         VALUES ($1, $2, $3)
+//         RETURNING *
+//         `,
+//         [
+//             card_id,
+//             collection_info_id,
+//             collection_index,
+//         ],
+//     );
+//
+//     return result[0];
+// }
+//
+// dbEngineGameUno.createCollectionRow = createCollectionRow; // Don't use this
 
 /**
  * Create Card Rows, Collection Rows, and Cards Rows for a game_id without randomizing the Collection.collection_index
@@ -376,7 +386,7 @@ dbEngineGameUno.createCollectionRow = createCollectionRow;
  *
  * IMPORTANT NOTES:
  *      This will set the collection_index of all Collection Rows as 0
- *
+ *      Use createCardRowsAndCardsRowsAndCollectionRowsWithCollectionRandomized instead
  * Notes:
  *      Create Card Rows
  *          Create Card Rows based on Card.card_id and CardInfo.card_info_id
@@ -387,50 +397,50 @@ dbEngineGameUno.createCollectionRow = createCollectionRow;
  * @param deckMultiplier
  * @returns {Promise<any[]>}
  */
-async function createCardRowsAndCardsRowsAndCollectionRows(game_id, deckMultiplier) {
-    debugPrinter.printFunction(createCardRowsAndCardsRowsAndCollectionRows.name);
-    const result = await db.any(
-        `
-        WITH cardRows AS (
-            INSERT INTO "Card" (card_info_id)
-            SELECT temp.card_info_id
-            FROM (
-                SELECT card_info_id
-                FROM "CardInfo"
-                CROSS JOIN generate_series(1, $2)
-                ) AS temp
-            RETURNING *
-        ), collectionRows AS (
-            INSERT INTO "Collection" (card_id, collection_info_id, collection_index)
-            SELECT card_id, 1, 0
-            FROM cardRows
-            RETURNING *
-        ), cardsRows AS(
-            INSERT INTO "Cards" (game_id, card_id)
-            SELECT $1, cardRows.card_id
-            FROM cardRows
-            RETURNING *
-        )
-        SELECT 
-            cardsRows.game_id, 
-            cardRows.card_id, 
-            cardRows.card_info_id, 
-            collectionRows.collection_info_id, 
-            collectionRows.player_id,
-            collectionRows.collection_index
-        FROM cardsRows
-        LEFT JOIN cardRows ON cardsRows.card_id = cardRows.card_id
-        LEFT JOIN collectionRows ON cardsRows.card_id = collectionRows.card_id;
-        `,
-        [
-            game_id,
-            deckMultiplier,
-        ],
-    );
-
-    return result;
-}
-
+// async function createCardRowsAndCardsRowsAndCollectionRows(game_id, deckMultiplier) {
+//     debugPrinter.printFunction(createCardRowsAndCardsRowsAndCollectionRows.name);
+//     const result = await db.any(
+//         `
+//         WITH cardRows AS (
+//             INSERT INTO "Card" (card_info_id)
+//             SELECT temp.card_info_id
+//             FROM (
+//                 SELECT card_info_id
+//                 FROM "CardInfo"
+//                 CROSS JOIN generate_series(1, $2)
+//                 ) AS temp
+//             RETURNING *
+//         ), collectionRows AS (
+//             INSERT INTO "Collection" (card_id, collection_info_id, collection_index)
+//             SELECT card_id, 1, 0
+//             FROM cardRows
+//             RETURNING *
+//         ), cardsRows AS(
+//             INSERT INTO "Cards" (game_id, card_id)
+//             SELECT $1, cardRows.card_id
+//             FROM cardRows
+//             RETURNING *
+//         )
+//         SELECT
+//             cardsRows.game_id,
+//             cardRows.card_id,
+//             cardRows.card_info_id,
+//             collectionRows.collection_info_id,
+//             collectionRows.player_id,
+//             collectionRows.collection_index
+//         FROM cardsRows
+//         LEFT JOIN cardRows ON cardsRows.card_id = cardRows.card_id
+//         LEFT JOIN collectionRows ON cardsRows.card_id = collectionRows.card_id;
+//         `,
+//         [
+//             game_id,
+//             deckMultiplier,
+//         ],
+//     );
+//
+//     return result;
+// }
+//
 // dbEngineGameUno.createCardRowsAndCardsRowsAndCollectionRows = createCardRowsAndCardsRowsAndCollectionRows; // Don't use this
 
 /**
@@ -554,8 +564,8 @@ dbEngineGameUno.createCardRowsAndCardsRowsAndCollectionRowsWithCollectionRandomi
  * @param player_id
  * @returns {Promise<any>}
  */
-async function randomizeCollectionByGameIDAndPlayerID(game_id, player_id) {
-    debugPrinter.printFunction(randomizeCollectionByGameIDAndPlayerID.name);
+async function randomizeCollectionRowsByGameIDAndPlayerID(game_id, player_id) {
+    debugPrinter.printFunction(randomizeCollectionRowsByGameIDAndPlayerID.name);
     const result = await db.any(
         `
         WITH cardsRows AS(
@@ -563,19 +573,20 @@ async function randomizeCollectionByGameIDAndPlayerID(game_id, player_id) {
             FROM "Collection"
             JOIN "Cards" ON "Collection".card_id = "Cards".card_id
             WHERE "Cards".game_id = $1
+            AND "Collection".player_id = $2
             ORDER BY RANDOM()
-        ), cardsRowsRandomized AS(
+        ), cardsRowsWithRowNumber AS(
             SELECT *, ROW_NUMBER() OVER() AS row_number
             FROM cardsRows
-        ), cardsRowsUpdated AS(
-            UPDATE "Collection"
-            SET collection_index = cardsRowsRandomized.row_number - 1
-            FROM cardsRowsRandomized
-            WHERE cardsRowsRandomized.game_id = $1
-            AND cardsRowsRandomized.card_id = "Collection".card_id
-            AND "Collection".player_id = $2
-            RETURNING *
         )
+        UPDATE "Collection"
+        SET collection_index = cardsRowsWithRowNumber.row_number - 1
+        FROM cardsRowsWithRowNumber
+        WHERE cardsRowsWithRowNumber.game_id = $1
+        AND cardsRowsWithRowNumber.card_id = "Collection".card_id
+        AND "Collection".player_id = $2
+        RETURNING *;
+        
         SELECT 
             "Cards".game_id,
             "CardInfo".type,
@@ -594,7 +605,7 @@ async function randomizeCollectionByGameIDAndPlayerID(game_id, player_id) {
         JOIN "CollectionInfo" ON "CollectionInfo".collection_info_id = "Collection".collection_info_id
         WHERE "Cards".game_id = $1
         AND "Collection".player_id = $2
-        ORDER BY "Collection".collection_index
+        ORDER BY "Collection".collection_index;
         `,
         [
             game_id,
@@ -605,7 +616,7 @@ async function randomizeCollectionByGameIDAndPlayerID(game_id, player_id) {
     return result;
 }
 
-dbEngineGameUno.randomizeCollectionByGameIDAndPlayerID = randomizeCollectionByGameIDAndPlayerID;
+dbEngineGameUno.randomizeCollectionRowsByGameIDAndPlayerID = randomizeCollectionRowsByGameIDAndPlayerID;
 
 /**
  * Randomize Collection (DRAW | PLAY | HAND) by game_id and collection_info_id
@@ -615,8 +626,8 @@ dbEngineGameUno.randomizeCollectionByGameIDAndPlayerID = randomizeCollectionByGa
  * @param collection_info_id
  * @returns {Promise<any>}
  */
-async function randomizeCollectionByGameIDAndCollectionInfoID(game_id, collection_info_id) {
-    debugPrinter.printFunction(randomizeCollectionByGameIDAndCollectionInfoID.name);
+async function randomizeCollectionRowsByGameIDAndCollectionInfoID(game_id, collection_info_id) {
+    debugPrinter.printFunction(randomizeCollectionRowsByGameIDAndCollectionInfoID.name);
     const result = await db.any(
         `
         WITH cardsRows AS(
@@ -624,19 +635,20 @@ async function randomizeCollectionByGameIDAndCollectionInfoID(game_id, collectio
             FROM "Collection"
             JOIN "Cards" ON "Collection".card_id = "Cards".card_id
             WHERE "Cards".game_id = $1
+            AND "Collection".collection_info_id = $2
             ORDER BY RANDOM()
-        ), cardsRowsRandomized AS(
+        ), cardsRowsWithRowNumber AS(
             SELECT *, ROW_NUMBER() OVER() AS row_number
             FROM cardsRows
-        ), cardsRowsUpdated AS(
-            UPDATE "Collection"
-            SET collection_index = cardsRowsRandomized.row_number - 1
-            FROM cardsRowsRandomized
-            WHERE cardsRowsRandomized.game_id = $1
-            AND cardsRowsRandomized.card_id = "Collection".card_id
-            AND "Collection".collection_info_id = $2
-            RETURNING *
         )
+        UPDATE "Collection"
+        SET collection_index = cardsRowsWithRowNumber.row_number - 1
+        FROM cardsRowsWithRowNumber
+        WHERE cardsRowsWithRowNumber.game_id = $1
+        AND cardsRowsWithRowNumber.card_id = "Collection".card_id
+        AND "Collection".collection_info_id = $2
+        RETURNING *;
+        
         SELECT 
             "Cards".game_id,
             "CardInfo".type,
@@ -655,7 +667,7 @@ async function randomizeCollectionByGameIDAndCollectionInfoID(game_id, collectio
         JOIN "CollectionInfo" ON "CollectionInfo".collection_info_id = "Collection".collection_info_id
         WHERE "Cards".game_id = $1
         AND "Collection".collection_info_id = $2
-        ORDER BY "Collection".collection_index
+        ORDER BY "Collection".collection_index;
         `,
         [
             game_id,
@@ -666,53 +678,118 @@ async function randomizeCollectionByGameIDAndCollectionInfoID(game_id, collectio
     return result;
 }
 
-dbEngineGameUno.randomizeCollectionByGameIDAndCollectionInfoID = randomizeCollectionByGameIDAndCollectionInfoID;
+dbEngineGameUno.randomizeCollectionRowsByGameIDAndCollectionInfoID = randomizeCollectionRowsByGameIDAndCollectionInfoID;
 
 /**
  * Randomize Collection (DRAW | PLAY | HAND) by game_id
  *
+ * IMPORTANT NOTES:
+ *      DO NOT USE BECAUSE THE RANDOMIZED WILL MIX UP ALL THE COLLECTIONS TOGETHER WITHOUT CHANGING THEIR INDICES WITH RESPECT TO THE NEW COLLECTION THEY ARE IN.
+ *      BASICALLY, CARD INDICES WILL BE WITH RESPECT TO ALL THE CARDS IN THE GAME WHICH WILL MESS UP PLAYING CARDS LOGIC.
+ *
  * @param game_id
  * @returns {Promise<any>}
  */
-async function randomizeCollectionByGameID(game_id) {
-    debugPrinter.printFunction(randomizeCollectionByGameID.name);
+// async function randomizeCollectionRowsByGameID(game_id) {
+//     debugPrinter.printFunction(randomizeCollectionRowsByGameID.name);
+//     const result = await db.any(
+//         `
+//         WITH cardsRows AS(
+//             SELECT game_id, "Collection".card_id
+//             FROM "Collection"
+//             JOIN "Cards" ON "Collection".card_id = "Cards".card_id
+//             WHERE "Cards".game_id = $1
+//             ORDER BY RANDOM()
+//         ), cardsRowsWithRowNumber AS(
+//             SELECT *, ROW_NUMBER() OVER() AS row_number
+//             FROM cardsRows
+//         )
+//         UPDATE "Collection"
+//         SET collection_index = cardsRowsWithRowNumber.row_number - 1
+//         FROM cardsRowsWithRowNumber
+//         WHERE cardsRowsWithRowNumber.game_id = $1
+//         AND cardsRowsWithRowNumber.card_id = "Collection".card_id
+//         RETURNING *;
+//
+//         SELECT
+//             "Cards".game_id,
+//             "CardInfo".type,
+//             "CardInfo".color,
+//             "CardInfo".content,
+//             "Collection".player_id,
+//             "Collection".collection_index,
+//             "Collection".card_id,
+//             "Collection".collection_info_id,
+//             "Card".card_info_id,
+//             "CollectionInfo".type AS collection_info_type
+//         FROM "Collection"
+//         JOIN "Cards" ON "Collection".card_id = "Cards".card_id
+//         JOIN "Card" ON "Collection".card_id = "Card".card_id
+//         JOIN "CardInfo" ON "CardInfo".card_info_id = "Card".card_info_id
+//         JOIN "CollectionInfo" ON "CollectionInfo".collection_info_id = "Collection".collection_info_id
+//         WHERE "Cards".game_id = $1
+//         ORDER BY "Collection".collection_index;
+//         `,
+//         [
+//             game_id,
+//         ],
+//     );
+//
+//     return result;
+// }
+//
+// dbEngineGameUno.randomizeCollectionRowsByGameID = randomizeCollectionRowsByGameID;
+
+async function updateCollectionRowPlayToDrawAndRandomizedByGameID(game_id) {
+    debugPrinter.printFunction(updateCollectionRowPlayToDrawAndRandomizedByGameID.name);
     const result = await db.any(
         `
-        WITH cardsRows AS(
-            SELECT game_id, "Collection".card_id
+            UPDATE "Collection"
+            SET 
+                collection_info_id = 1,
+                player_id = null
+            FROM "Cards"
+            WHERE "Cards".card_id = "Collection".card_id
+            AND "Cards".game_id = $1
+            AND "Collection".collection_info_id = 2;
+                
+            WITH cardsRows AS(
+                SELECT game_id, "Collection".card_id
+                FROM "Collection"
+                JOIN "Cards" ON "Collection".card_id = "Cards".card_id
+                WHERE "Cards".game_id = $1
+                ORDER BY RANDOM()
+            ), cardsRowsWithRowNumber AS(
+                SELECT *, ROW_NUMBER() OVER() AS row_number
+                FROM cardsRows
+            )
+            UPDATE "Collection"
+            SET collection_index = cardsRowsWithRowNumber.row_number - 1
+            FROM cardsRowsWithRowNumber
+            WHERE cardsRowsWithRowNumber.game_id = $1
+            AND cardsRowsWithRowNumber.card_id = "Collection".card_id
+            AND "Collection".collection_info_id = 1
+            RETURNING *;
+            
+            SELECT 
+                "Cards".game_id,
+                "CardInfo".type,
+                "CardInfo".color,
+                "CardInfo".content,
+                "Collection".player_id,
+                "Collection".collection_index,
+                "Collection".card_id,
+                "Collection".collection_info_id,
+                "Card".card_info_id,
+                "CollectionInfo".type AS collection_info_type
             FROM "Collection"
             JOIN "Cards" ON "Collection".card_id = "Cards".card_id
+            JOIN "Card" ON "Collection".card_id = "Card".card_id
+            JOIN "CardInfo" ON "CardInfo".card_info_id = "Card".card_info_id
+            JOIN "CollectionInfo" ON "CollectionInfo".collection_info_id = "Collection".collection_info_id
             WHERE "Cards".game_id = $1
-            ORDER BY RANDOM()
-        ), cardsRowsRandomized AS(
-            SELECT *, ROW_NUMBER() OVER() AS row_number
-            FROM cardsRows
-        ), cardsRowsUpdated AS(
-            UPDATE "Collection"
-            SET collection_index = cardsRowsRandomized.row_number - 1
-            FROM cardsRowsRandomized
-            WHERE cardsRowsRandomized.game_id = $1
-            AND cardsRowsRandomized.card_id = "Collection".card_id
-            RETURNING *
-        )
-        SELECT 
-            "Cards".game_id,
-            "CardInfo".type,
-            "CardInfo".color,
-            "CardInfo".content,
-            "Collection".player_id,
-            "Collection".collection_index,
-            "Collection".card_id,
-            "Collection".collection_info_id,
-            "Card".card_info_id,
-            "CollectionInfo".type AS collection_info_type
-        FROM "Collection"
-        JOIN "Cards" ON "Collection".card_id = "Cards".card_id
-        JOIN "Card" ON "Collection".card_id = "Card".card_id
-        JOIN "CardInfo" ON "CardInfo".card_info_id = "Card".card_info_id
-        JOIN "CollectionInfo" ON "CollectionInfo".collection_info_id = "Collection".collection_info_id
-        WHERE "Cards".game_id = $1
-        ORDER BY "Collection".collection_index
+            AND "Collection".collection_info_id = 1
+            ORDER BY "Collection".collection_index;
         `,
         [
             game_id,
@@ -722,7 +799,7 @@ async function randomizeCollectionByGameID(game_id) {
     return result;
 }
 
-dbEngineGameUno.randomizeCollectionByGameID = randomizeCollectionByGameID;
+dbEngineGameUno.updateCollectionRowPlayToDrawAndRandomizedByGameID = updateCollectionRowPlayToDrawAndRandomizedByGameID;
 
 async function deletePlayersRowByUserID(user_id) {
     debugPrinter.printFunction(deletePlayersRowByUserID.name);
@@ -1306,14 +1383,14 @@ async function updateCollectionRowDrawToHandTop(game_id, player_id) {
 
     const result = await db.any(
         `
-        WITH collectionDrawRowTop AS (
+        WITH collectionRowDrawTop AS (
             SELECT "Collection".card_id
             FROM "Collection" 
             JOIN "Cards" ON "Collection".card_id = "Cards".card_id
             WHERE "Cards".game_id = $1
             AND "Collection".collection_info_id = 1
             ORDER BY collection_index DESC LIMIT 1
-        ), collectionHandNumberOfRows AS (
+        ), collectionRowHandNumberOfRows AS (
             SELECT COUNT(*) as amount
             FROM "Collection" 
             JOIN "Cards" ON "Collection".card_id = "Cards".card_id
@@ -1324,9 +1401,9 @@ async function updateCollectionRowDrawToHandTop(game_id, player_id) {
         SET    
             player_id = $2,
             collection_info_id = 3,
-            collection_index = (SELECT amount FROM collectionHandNumberOfRows)
-        FROM collectionDrawRowTop 
-        WHERE "Collection".card_id = collectionDrawRowTop.card_id
+            collection_index = (SELECT amount FROM collectionRowHandNumberOfRows)
+        FROM collectionRowDrawTop 
+        WHERE "Collection".card_id = collectionRowDrawTop.card_id
         RETURNING *;
         `,
         [
@@ -1345,14 +1422,14 @@ async function updateCollectionRowDrawToPlayTop(game_id) {
 
     const result = await db.any(
         `
-        WITH collectionDrawRowTop AS (
+        WITH collectionRowDrawTop AS (
             SELECT "Collection".card_id
             FROM "Collection" 
             JOIN "Cards" ON "Collection".card_id = "Cards".card_id
             WHERE "Cards".game_id = $1
             AND "Collection".collection_info_id = 1
             ORDER BY collection_index DESC LIMIT 1
-        ), collectionPlayNumberOfRows AS (
+        ), collectionRowPlayNumberOfRows AS (
             SELECT COUNT(*) as amount
             FROM "Collection" 
             JOIN "Cards" ON "Collection".card_id = "Cards".card_id
@@ -1363,9 +1440,9 @@ async function updateCollectionRowDrawToPlayTop(game_id) {
         SET    
             player_id = null,
             collection_info_id = 2,
-            collection_index = (SELECT amount FROM collectionPlayNumberOfRows)
-        FROM collectionDrawRowTop 
-        WHERE "Collection".card_id = collectionDrawRowTop.card_id
+            collection_index = (SELECT amount FROM collectionRowPlayNumberOfRows)
+        FROM collectionRowDrawTop 
+        WHERE "Collection".card_id = collectionRowDrawTop.card_id
         RETURNING *;
         `,
         [
@@ -1397,6 +1474,7 @@ async function getCollectionRowSimpleHandByCollectionIndex(player_id, collection
 
     return result[0];
 }
+
 dbEngineGameUno.getCollectionRowSimpleHandByCollectionIndex = getCollectionRowSimpleHandByCollectionIndex;
 
 async function updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed(game_id, player_id, collection_index) {
@@ -1404,13 +1482,13 @@ async function updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRow
 
     const result = await db.any(
         `
-            WITH collectionHandRowByIndex AS (
+            WITH collectionRowHandRowByIndex AS (
                 SELECT player_id, collection_index, "Collection".card_id, game_id
                 From "Collection"
                 JOIN "Cards" ON "Collection".card_id = "Cards".card_id
                 WHERE player_id = $2
                 AND collection_index = $3
-            ), collectionPlayNumberOfRows AS (
+            ), collectionRowPlayNumberOfRows AS (
                 SELECT COUNT(*) as indexMax
                 FROM "Collection"
                 JOIN "Cards" ON "Collection".card_id = "Cards".card_id
@@ -1421,12 +1499,12 @@ async function updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRow
             SET
                 player_id = null,
                 collection_info_id = 2,
-                collection_index = (SELECT indexMax FROM collectionPlayNumberOfRows)
-            FROM collectionHandRowByIndex
-            WHERE "Collection".card_id = collectionHandRowByIndex.card_id
+                collection_index = (SELECT indexMax FROM collectionRowPlayNumberOfRows)
+            FROM collectionRowHandRowByIndex
+            WHERE "Collection".card_id = collectionRowHandRowByIndex.card_id
             RETURNING *;
             
-            WITH collectionHandWithRowNumber AS (
+            WITH collectionRowHandWithRowNumber AS (
                 SELECT "Collection".card_id, ROW_NUMBER() OVER() AS row_number
                 From "Collection"
                 JOIN "Cards" ON "Collection".card_id = "Cards".card_id
@@ -1434,9 +1512,9 @@ async function updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRow
             )
             UPDATE "Collection"
             SET
-                collection_index = collectionHandWithRowNumber.row_number - 1
-            FROM collectionHandWithRowNumber
-            WHERE collectionHandWithRowNumber.card_id = "Collection".card_id
+                collection_index = collectionRowHandWithRowNumber.row_number - 1
+            FROM collectionRowHandWithRowNumber
+            WHERE collectionRowHandWithRowNumber.card_id = "Collection".card_id
             AND "Collection".player_id = $2
             RETURNING *;
             

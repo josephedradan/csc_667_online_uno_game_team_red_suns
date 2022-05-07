@@ -779,7 +779,7 @@ async function moveCardDrawToHandTopByGameIdAndUseID(game_id, user_id) {
     // Get player given game_id and user_id (May be undefined)
     const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(game_id, user_id);
 
-    return moveCardDrawToHandTopByGameIdAndUseID(game_id, playerRow);
+    return moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow);
 }
 
 gameUno.moveCardDrawToHandTopByGameIdAndUseID = moveCardDrawToHandTopByGameIdAndUseID;
