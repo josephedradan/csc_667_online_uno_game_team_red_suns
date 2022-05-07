@@ -1,8 +1,6 @@
-const leaveGame = document.getElementById('leaveGame');
+const leaveGame = document.getElementById("leaveGame");
 
-console.log(getGameId());
-
-leaveGame.addEventListener('click', async () => {
+leaveGame.addEventListener("click", async () => {
     await axios.post(`${getGameId()}/leaveGame`, {});
-    window.location.pathname = '/';
+    window.location.pathname = "/";
 });

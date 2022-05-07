@@ -1,130 +1,3 @@
-/*
-class Draggable {
-    constructor(element, containers, boundary) {
-        this.containers = containers;
-        this.parent = null;
-        this.childIndex = 0;
-        this.element = element;
-        this.callback = null;
-        this.boundary = boundary;
-        this.element.onmousedown = this.dragMouseDown.bind(this);
-    }
-
-    moveToPosition(x, y) {
-        const computedStyle = window.getComputedStyle(this.element);
-        const offsetX =
-            -parseInt(computedStyle.width, 10) / 2 -
-            parseInt(computedStyle.marginLeft, 10);
-        const offsetY =
-            -parseInt(computedStyle.height, 10) / 2 -
-            parseInt(computedStyle.marginTop, 10);
-
-        let posX = x + offsetX;
-        let posY = y + offsetY;
-
-        if (this.boundary) {
-            const boundaryRect = this.boundary.getBoundingClientRect();
-            if (posX < boundaryRect.left) {
-                posX = boundaryRect.left;
-            } else if (posX > boundaryRect.right + 2 * offsetX) {
-                posX = boundaryRect.right + 2 * offsetX;
-            }
-            if (posY < boundaryRect.top) {
-                posY = boundaryRect.top;
-            } else if (posY > boundaryRect.bottom + 2 * offsetY) {
-                posY = boundaryRect.bottom + 2 * offsetY;
-            }
-        }
-
-        this.element.style.left = `${posX}px`;
-        this.element.style.top = `${posY}px`;
-    }
-
-    dragMouseDown(event) {
-        // If not left click, do nothing
-        if (event.which != 1) { return; }
-
-        if (this.element.getAttribute("disabled") !== null) {
-            return;
-        }
-
-        event.preventDefault();
-
-        document.onmouseup = this.dragMouseUp.bind(this);
-        document.onmousemove = this.dragMouseMove.bind(this);
-
-        this.parent = this.element.parentElement;
-        this.childIndex = Array.from(this.parent.children).indexOf(this.element);
-        this.element.style.position = "absolute";
-        this.element.style.transform = "none";
-        this.element.style.width = "auto";
-        this.element.style.height = "auto";
-        this.boundary.appendChild(this.element);
-
-        this.moveToPosition(event.clientX, event.clientY);
-    }
-
-    dragMouseMove(event) {
-        // If not left click, do nothing
-        if (event.which != 1) { return; }
-
-        event.preventDefault();
-
-        //const mouseX = event.clientX;
-        //const mouseY = event.clientY;
-        
-        //console.log(mouseX + " " + mouseY);
-
-        this.moveToPosition(event.clientX, event.clientY);
-    }
-
-    dragMouseUp(event) {
-        // If not left click, do nothing
-        if (event.which != 1) { return; }
-
-        event.preventDefault();
-
-        document.onmouseup = null;
-        document.onmousemove = null;
-        this.element.style.top = null;
-        this.element.style.left = null;
-        this.element.style.position = null;
-        this.element.style.transform = null;
-        this.element.style.width = null;
-        this.element.style.height = null;
-
-        const mouseX = event.clientX;
-        const mouseY = event.clientY;
-
-        let parented = false;
-
-        for (const container of this.containers) {
-            const rect = container.getBoundingClientRect();
-            console.log(window.getComputedStyle(container).left);
-            console.log(container);
-            console.log(rect);
-            console.log(mouseX + " " + mouseY);
-            if (
-                mouseX > rect.left &&
-                mouseX < rect.right &&
-                mouseY > rect.top &&
-                mouseY < rect.bottom
-            ) {
-                container.appendChild(this.element);
-                this.parent = this.element.parentElement;
-                parented = true;
-                if (this.callback) {
-                    this.callback(this.parent);
-                }
-                break;
-            }
-        }
-        if (!parented) {
-            this.parent.insertBefore(this.element, this.parent.children[this.childIndex]);
-        }
-    }
-    */
-
 class Draggable {
     constructor(element, containers, boundary) {
         this.dragging = false;
@@ -175,8 +48,12 @@ class Draggable {
 
     dragMouseDown(event) {
         // If not left click, do nothing
-        if (event.which != 1) { return; }
-        if (this.dragging) { return; }
+        if (event.which != 1) {
+            return;
+        }
+        if (this.dragging) {
+            return;
+        }
         if (this.element.getAttribute("disabled") !== null) {
             return;
         }
@@ -189,7 +66,9 @@ class Draggable {
         document.addEventListener("mousemove", this.dragMouseMove);
 
         this.parent = this.element.parentElement;
-        this.childIndex = Array.from(this.parent.children).indexOf(this.element);
+        this.childIndex = Array.from(this.parent.children).indexOf(
+            this.element
+        );
         this.element.style.position = "absolute";
         this.element.style.transform = "none";
         this.element.style.width = "auto";
@@ -201,7 +80,9 @@ class Draggable {
 
     dragMouseMove(event) {
         // If not left click, do nothing
-        if (event.which != 1) { return; }
+        if (event.which != 1) {
+            return;
+        }
 
         event.preventDefault();
         console.log(event.clientX + " " + event.clientY);
@@ -210,7 +91,9 @@ class Draggable {
 
     dragMouseUp(event) {
         // If not left click, do nothing
-        if (event.which != 1) { return; }
+        if (event.which != 1) {
+            return;
+        }
 
         this.dragging = false;
 
@@ -254,7 +137,10 @@ class Draggable {
             }
         }
         if (!parented) {
-            this.parent.insertBefore(this.element, this.parent.children[this.childIndex]);
+            this.parent.insertBefore(
+                this.element,
+                this.parent.children[this.childIndex]
+            );
         }
     }
 
@@ -432,30 +318,18 @@ class TurnController {
     startTurn(cardCollection) {
         cardCollection.forEach((cardData, index) => {
             const card = this.handContainer.children.item(index);
-            const draggable = new Draggable(card, [this.playContainer], this.gameWindow);
+            const draggable = new Draggable(
+                card,
+                [this.playContainer],
+                this.gameWindow
+            );
             draggable.setCallback(async (newParent) => {
                 if (newParent == this.playContainer) {
                     // if card is a wild card, prompt with modal and request the move
-                    console.log(cardData);
+                    // console.log(cardData);
                     if (cardData.card_color == "black") {
                         // Modal!
-                        // On modal callback, make move request and end turn
-                        // /game/id/playCard pass in index
-                        // TODO: add api call to the backend calling /game/id/
-                        const wildFourUserEvent =
-                            document.getElementById("wildFourUserEvent");
-                        wildFourUserEvent.classList.toggle("hidden");
-                        const colorSelectionChildren =
-                            document.querySelectorAll("#wildFourUserEvent div");
-                        for (const colorSelectedByID of colorSelectionChildren) {
-                            colorSelectedByID.addEventListener("click", (e) => {
-                                const selectedColor =
-                                    e.target.getAttribute("id");
-                                console.log(selectedColor);
-                                // const result = axios.post(`/game/${getGameId()}/someCallWithRoutePassingInIndex`)
-                            });
-                        }
-                        // wildFourUserEvent.children.addEventListener();
+                        this.handleBlackCardAction();
                     } else {
                         // Make move request
                         // const moveResult = await axios.post(`/game/${getGameId()}/move`, {index}); //or however the heck it's named
@@ -463,6 +337,8 @@ class TurnController {
                         console.log("Playing a card!");
 
                         console.log(`collection_index: ${index}`);
+
+                        // console.log(cardData.card_color);
 
                         const result = await axios.post(
                             `/game/${getGameId()}/playCard`,
@@ -481,14 +357,16 @@ class TurnController {
 
         const drawCard = document.getElementById("drawCard");
         const drawParent = drawCard.parentElement;
-        const draggable = new Draggable(drawCard, [this.handContainer], this.gameWindow);
+        const draggable = new Draggable(
+            drawCard,
+            [this.handContainer],
+            this.gameWindow
+        );
         draggable.setCallback(async (newParent) => {
             if (newParent == this.handContainer) {
                 drawParent.appendChild(drawCard);
 
-                const result = await axios.get(
-                    `/game/${getGameId()}/drawCard`
-                );
+                const result = await axios.get(`/game/${getGameId()}/drawCard`);
 
                 console.log(result);
 
@@ -496,6 +374,24 @@ class TurnController {
             }
         });
         this.draggables.push(draggable);
+    }
+
+    handleBlackCardAction() {
+        const wildFourUserEvent = document.getElementById("wildFourUserEvent");
+        wildFourUserEvent.classList.toggle("hidden", false);
+        const colorSelectionChildren = document.querySelectorAll(
+            "#wildFourUserEvent div"
+        );
+        for (const colorSelectedByID of colorSelectionChildren) {
+            colorSelectedByID.addEventListener("click", async (e) => {
+                const selectedColor = e.target.getAttribute("id");
+                await axios.post(`/game/${getGameId()}/playCard`, {
+                    collection_index: index,
+                    color: selectedColor, // selected color
+                });
+                wildFourUserEvent.classList.toggle("hidden", true);
+            });
+        }
     }
 
     endTurn() {
@@ -654,7 +550,7 @@ async function setup() {
     socket.on("server-game-game-id-game-state", renderGameState);
     socket.on("server-game-game-id-object", (object) => {
         console.log(object);
-    })
+    });
     // Request the game state right now because we need one now
     const gameState = (await axios.get(`/game/${getGameId()}/getGameState`))
         .data;
