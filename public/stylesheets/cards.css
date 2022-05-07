@@ -373,7 +373,7 @@
     height: 200px;
 }
 
-.cardStateRows {
+.unoHand {
     display: flex;
     align-content: center;
     align-items: center;
@@ -381,7 +381,7 @@
     flex-basis: max-content;
 }
 
-.cardStateRows .cardWrapper {
+.unoHand .cardWrapper {
     /*overflow: hidden;*/
     background: none;
     margin-top: auto;
@@ -395,12 +395,12 @@
     max-width: 116px;
 }
 
-.cardStateRows .cardWrapper .unoCard {
+.unoHand .cardWrapper .unoCard {
     left: 0;
     bottom: 0px;
 }
 
-#player0.cardStateRows .cardWrapper > .unoCard {
+#player0.unoHand .cardWrapper > .unoCard {
     transition-property: transform;
     transition-duration: 0.05s;
     transition-timing-function: ease-in-out;
@@ -408,7 +408,7 @@
 }
 
 .cardWrapper:last-child,
-#player0.cardStateRows .cardWrapper:hover {
+#player0.unoHand .cardWrapper:hover {
     width: 116px;
     overflow: visible;
 }
@@ -432,6 +432,7 @@
 #discard {
     width: 126px;
     height: 200px;
+    flex-shrink: 0;
 }
 
 #drawCard {
@@ -448,13 +449,15 @@
 
 /* :not([disabled]) */
 
-#player0.cardStateRows .cardWrapper:hover .unoCard {
+#player0.unoHand .cardWrapper:hover .unoCard {
     transform: translateY(-20%);
 }
 
+/*
 #player2 {
-    /* transform: rotate(180deg); */
+     transform: rotate(180deg); 
 }
+*/
 
 #player1 {
     transform: rotate(90deg);
@@ -462,4 +465,8 @@
 
 #player3 {
     transform: rotate(270deg);
+}
+
+#gameWindow {
+    overflow: hidden;
 }
