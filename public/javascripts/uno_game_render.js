@@ -209,19 +209,19 @@ class UnoGameRenderer {
     #generate_card(cardData) {
         let card;
         // Figure out what kind of card and render
-        if (cardData.card_info_type === undefined) {
+        if (cardData.type === undefined) {
             card = this.#generate_flipped_card();
-        } else if (cardData.card_color === 'black') {
-            card = this.#generate_wild_black(cardData.card_content === 'wild');
-        } else if (cardData.card_info_type == 'NUMBER') {
+        } else if (cardData.color === 'black') {
+            card = this.#generate_wild_black(cardData.content === 'wild');
+        } else if (cardData.type == 'NUMBER') {
             card = this.#generate_color_card(
-                `num-${cardData.card_content}`,
-                cardData.card_color,
+                `num-${cardData.content}`,
+                cardData.color,
             );
         } else {
             card = this.#generate_color_card(
-                cardData.card_content,
-                cardData.card_color,
+                cardData.content,
+                cardData.color,
             );
         }
         return card;
@@ -325,7 +325,7 @@ class TurnController {
                 if (newParent == this.playContainer) {
                     // if card is a wild card, prompt with modal and request the move
                     // console.log(cardData);
-                    if (cardData.card_color == 'black') {
+                    if (cardData.color == 'black') {
                         // Modal!
                         this.handleBlackCardAction();
                     } else {
@@ -336,7 +336,7 @@ class TurnController {
 
                         console.log(`collection_index: ${index}`);
 
-                        // console.log(cardData.card_color);
+                        // console.log(cardData.color);
 
                         const result = await axios.post(
                             `/game/${getGameId()}/playCard`,
