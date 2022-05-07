@@ -487,9 +487,9 @@ async function createCardRowsAndCardsRowsAndCollectionRowsWithCollectionRandomiz
             collectionRows.collection_info_id, 
             collectionRows.player_id,
             collectionRows.collection_index,
-            "CardInfo".type AS card_info_type,
-            "CardInfo".content AS card_content,
-            "CardInfo".color AS card_color,
+            "CardInfo".type,
+            "CardInfo".content,
+            "CardInfo".color,
             "CollectionInfo".type AS collection_info_type
         FROM cardsRows
         LEFT JOIN cardRows ON cardsRows.card_id = cardRows.card_id
@@ -578,9 +578,9 @@ async function randomizeCollectionByGameIDAndPlayerID(game_id, player_id) {
         )
         SELECT 
             "Cards".game_id,
-            "CardInfo".type AS card_info_type,
-            "CardInfo".color AS card_color,
-            "CardInfo".content AS card_content,
+            "CardInfo".type,
+            "CardInfo".color,
+            "CardInfo".content,
             "Collection".player_id,
             "Collection".collection_index,
             "Collection".card_id,
@@ -639,9 +639,9 @@ async function randomizeCollectionByGameIDAndCollectionInfoID(game_id, collectio
         )
         SELECT 
             "Cards".game_id,
-            "CardInfo".type AS card_info_type,
-            "CardInfo".color AS card_color,
-            "CardInfo".content AS card_content,
+            "CardInfo".type,
+            "CardInfo".color,
+            "CardInfo".content,
             "Collection".player_id,
             "Collection".collection_index,
             "Collection".card_id,
@@ -697,9 +697,9 @@ async function randomizeCollectionByGameID(game_id) {
         )
         SELECT 
             "Cards".game_id,
-            "CardInfo".type AS card_info_type,
-            "CardInfo".color AS card_color,
-            "CardInfo".content AS card_content,
+            "CardInfo".type,
+            "CardInfo".color,
+            "CardInfo".content,
             "Collection".player_id,
             "Collection".collection_index,
             "Collection".card_id,
@@ -876,9 +876,9 @@ async function getCollectionRowDetailedByGameID(game_id) {
         `
         SELECT 
             "Cards".game_id,
-            "CardInfo".type AS card_info_type,
-            "CardInfo".color AS card_color,
-            "CardInfo".content AS card_content,
+            "CardInfo".type,
+            "CardInfo".color,
+            "CardInfo".content,
             "Collection".player_id,
             "Collection".collection_index,
             "Collection".card_id,
@@ -918,9 +918,9 @@ async function getCollectionRowDetailedByPlayerID(player_id) {
         `
         SELECT 
             "Cards".game_id,
-            "CardInfo".type AS card_info_type,
-            "CardInfo".color AS card_color,
-            "CardInfo".content AS card_content,
+            "CardInfo".type,
+            "CardInfo".color,
+            "CardInfo".content,
             "Collection".player_id,
             "Collection".collection_index,
             "Collection".card_id,
@@ -961,9 +961,9 @@ async function getCollectionRowDetailedByGameIDAndCollectionInfoID(game_id, coll
         `
         SELECT 
             "Cards".game_id,
-            "CardInfo".type AS card_info_type,
-            "CardInfo".color AS card_color,
-            "CardInfo".content AS card_content,
+            "CardInfo".type,
+            "CardInfo".color,
+            "CardInfo".content,
             "Collection".player_id,
             "Collection".collection_index,
             "Collection".card_id,
