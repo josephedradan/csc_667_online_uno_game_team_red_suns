@@ -58,7 +58,7 @@ async function GETDrawCard(req, res, next) {
 
     await intermediateGameUno.moveCardDrawToHandByGameIDAndPlayerRowWrapped(req.game.game_id, req.player.player_id);
 
-    const result = await dbEngineGameUno.getCollectionRowByPlayerID(req.player.player_id);
+    const result = await dbEngineGameUno.getCollectionRowDetailedByPlayerID(req.player.player_id);
 
     // debugPrinter.printDebug(result);
 
