@@ -56,9 +56,9 @@ controllerGameID.POSTPlayCard = POSTPlayCard;
 async function GETDrawCard(req, res, next) {
     debugPrinter.printMiddleware(GETDrawCard.name);
 
-    await intermediateGameUno.moveCardDrawToHandByGameIDAndPlayerRowWrapped(req.game.game_id, req.player.player_id);
+    const result = await intermediateGameUno.moveCardDrawToHandByGameIDAndPlayerRowWrapped(req.game.game_id, req.player);
 
-    const result = await dbEngineGameUno.getCollectionRowDetailedByPlayerID(req.player.player_id);
+    // const result = await dbEngineGameUno.getCollectionRowDetailedByPlayerID(req.player.player_id);
 
     // debugPrinter.printDebug(result);
 
