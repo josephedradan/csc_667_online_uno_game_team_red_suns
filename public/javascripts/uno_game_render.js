@@ -314,8 +314,10 @@ class TurnController {
     }
 
     startTurn(cardCollection) {
-        cardCollection.forEach((cardData, index) => {
-            const card = this.handContainer.children.item(index);
+        cardCollection.forEach((cardData) => {
+            console.log(cardData);
+            console.log(cardData.collection_index);
+            const card = this.handContainer.children.item(cardData.collection_index);
             const draggable = new Draggable(
                 card,
                 [this.playContainer],
@@ -327,21 +329,21 @@ class TurnController {
                     // console.log(cardData);
                     if (cardData.color == 'black') {
                         // Modal!
-                        this.handleBlackCardAction();
+                        this.handleBlackCardAction(cardData);
                     } else {
                         // Make move request
-                        // const moveResult = await axios.post(`/game/${getGameId()}/move`, {index}); //or however the heck it's named
+                        // const moveResult = await axios.post(`/game/${getGameId()}/move`, {cardData.collection_index}); //or however the heck it's named
 
                         console.log('Playing a card!');
 
-                        console.log(`collection_index: ${index}`);
+                        console.log(`collection_index: ${cardData.collection_index}`);
 
                         // console.log(cardData.color);
 
                         const result = await axios.post(
                             `/game/${getGameId()}/playCard`,
                             {
-                                collection_index: index,
+                                collection_index: cardData.collection_index,
                             },
                         );
                         console.log(result);
@@ -374,7 +376,7 @@ class TurnController {
         this.draggables.push(draggable);
     }
 
-    handleBlackCardAction() {
+    handleBlackCardAction(cardData) {
         const wildFourUserEvent = document.getElementById('wildFourUserEvent');
         wildFourUserEvent.classList.toggle('hidden', false);
         const colorSelectionChildren = document.querySelectorAll(
@@ -384,7 +386,7 @@ class TurnController {
             colorSelectedByID.addEventListener('click', async (e) => {
                 const selectedColor = e.target.getAttribute('id');
                 await axios.post(`/game/${getGameId()}/playCard`, {
-                    collection_index: index,
+                    collection_index: cardData.collection_index,
                     color: selectedColor, // selected color
                 });
                 wildFourUserEvent.classList.toggle('hidden', true);
