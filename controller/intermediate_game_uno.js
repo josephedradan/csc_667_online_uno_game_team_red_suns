@@ -93,9 +93,20 @@ async function leaveGameWrapped(game_id, user_id) {
     const arrayPromises = [intermediateSocketIOGameUno.emitInRoom_ServerIndex_Games()];
 
     if (result.game) {
+        const message = 'The host left, the game is dead, go back to the homepage.';
+
         arrayPromises.push(intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_MessageServer_Wrapped(
             game_id,
-            'The host left, the game is dead, go back to the homepage.',
+            message,
+        ));
+
+        arrayPromises.push(intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_Object(
+            game_id,
+            {
+                status: constants.SUCCESS,
+                message,
+                url: '/',
+            },
         ));
     }
 
@@ -158,13 +169,13 @@ async function moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow)
 
 intermediateGameUno.moveCardDrawToHandByGameIDAndPlayerRowWrapped = moveCardDrawToHandByGameIDAndPlayerRowWrapped;
 
-async function playCardHandToPlayDeckWrapped(game_id, user_id, collection_index) {
+async function playCardHandToPlayDeckWrapped(game_id, user_id, body) {
     debugPrinter.printFunction(playCardHandToPlayDeckWrapped.name);
 
     // TODO HANDLE PLAYING SPECIAL CARDS
     // TODO CHANGE TURN IF NEEDED
 
-    const result = await gameUno.moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_index);
+    const result = await gameUno.moveCardHandToPlayByCollectionIndex(game_id, user_id, body);
 
     await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 

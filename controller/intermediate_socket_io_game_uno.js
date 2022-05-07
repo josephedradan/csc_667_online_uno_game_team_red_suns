@@ -112,4 +112,15 @@ async function emitInRoom_ServerGameGameID_GameState(game_id) {
 
 intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState = emitInRoom_ServerGameGameID_GameState;
 
+async function emitInRoom_ServerGameGameID_Object(game_id, object) {
+    debugPrinter.printFunction(emitInRoom_ServerGameGameID_Object.name);
+
+    io.in(game_id)
+        .emit('server-game-game-id-object', object);
+
+    return object;
+}
+
+intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_Object = emitInRoom_ServerGameGameID_Object;
+
 module.exports = intermediateSocketIOGameUno;

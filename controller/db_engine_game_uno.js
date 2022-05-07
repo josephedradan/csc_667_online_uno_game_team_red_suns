@@ -210,6 +210,24 @@ async function createGameRow(player_id_host) {
 
 dbEngineGameUno.createGameRow = createGameRow;
 
+async function createGameDataRow(game_id) {
+    debugPrinter.printFunction(createGameDataRow.name);
+    const result = await db.any(
+        `
+        INSERT INTO "GameData" (game_id)
+        VALUES ($1)
+        RETURNING *;
+        `,
+        [
+            game_id,
+        ],
+    );
+
+    return result[0];
+}
+
+dbEngineGameUno.createGameDataRow = createGameDataRow;
+
 /**
  * Create Card rows based on deckMultiplier
  * Notes:
@@ -370,7 +388,7 @@ dbEngineGameUno.createCollectionRow = createCollectionRow;
  * @returns {Promise<any[]>}
  */
 async function createCardRowsAndCardsRowsAndCollectionRows(game_id, deckMultiplier) {
-    debugPrinter.printFunction(createCardRowsAndCardsRows.name);
+    debugPrinter.printFunction(createCardRowsAndCardsRowsAndCollectionRows.name);
     const result = await db.any(
         `
         WITH cardRows AS (
@@ -432,7 +450,7 @@ async function createCardRowsAndCardsRowsAndCollectionRows(game_id, deckMultipli
  * @returns {Promise<any[]>}
  */
 async function createCardRowsAndCardsRowsAndCollectionRowsWithCollectionRandomized(game_id, deckMultiplier) {
-    debugPrinter.printFunction(createCardRowsAndCardsRows.name);
+    debugPrinter.printFunction(createCardRowsAndCardsRowsAndCollectionRowsWithCollectionRandomized.name);
     const result = await db.any(
         `
         WITH cardRows AS (
@@ -706,8 +724,8 @@ async function randomizeCollectionByGameID(game_id) {
 
 dbEngineGameUno.randomizeCollectionByGameID = randomizeCollectionByGameID;
 
-async function deletePlayerRowsByUserID(user_id) {
-    debugPrinter.printFunction(deletePlayerRowsByUserID.name);
+async function deletePlayersRowByUserID(user_id) {
+    debugPrinter.printFunction(deletePlayersRowByUserID.name);
     const result = await db.any(
         `
         DELETE FROM "Player"
@@ -722,10 +740,10 @@ async function deletePlayerRowsByUserID(user_id) {
     return result[0];
 }
 
-dbEngineGameUno.deletePlayerRowsByUserID = deletePlayerRowsByUserID;
+dbEngineGameUno.deletePlayersRowByUserID = deletePlayersRowByUserID;
 
 async function deletePlayerRowByPlayerID(player_id) {
-    debugPrinter.printFunction(deletePlayerRowsByUserID.name);
+    debugPrinter.printFunction(deletePlayerRowByPlayerID.name);
     const result = await db.any(
         `
         DELETE FROM "Player"
@@ -771,8 +789,19 @@ async function getGameRowDetailedByGameID(game_id) {
     debugPrinter.printFunction(getGameRowDetailedByGameID.name);
     const result = await db.any(
         `
-        SELECT game_id, is_active, player_id_turn, is_clockwise, player_id_host, type, content, color
+        SELECT 
+            "Game".game_id, 
+            "Game".is_active, 
+            "Game".player_id_host, 
+            "GameData".player_id_turn, 
+            "GameData".is_clockwise, 
+            "GameData".card_type_legal, 
+            "GameData".card_content_legal,
+            "GameData".card_color_legal,
+            "GameData".skip_amount,
+            "GameData".draw_amount
         FROM "Game"
+        JOIN "GameData" ON "Game".game_id = "GameData".game_id
         WHERE "Game".game_id = $1
         `,
         [
@@ -841,8 +870,8 @@ dbEngineGameUno.getGameRowsSimple = getGameRowsSimple;
  * @param game_id
  * @returns {Promise<any[]>}
  */
-async function getCollectionByGameID(game_id) {
-    debugPrinter.printFunction(getCollectionByGameID.name);
+async function getCollectionRowDetailedByGameID(game_id) {
+    debugPrinter.printFunction(getCollectionRowDetailedByGameID.name);
     const result = await db.any(
         `
         SELECT 
@@ -872,7 +901,7 @@ async function getCollectionByGameID(game_id) {
     return result;
 }
 
-dbEngineGameUno.getCollectionByGameID = getCollectionByGameID;
+dbEngineGameUno.getCollectionRowDetailedByGameID = getCollectionRowDetailedByGameID;
 
 /**
  * Get Collection by player_id
@@ -883,8 +912,8 @@ dbEngineGameUno.getCollectionByGameID = getCollectionByGameID;
  * @param player_id
  * @returns {Promise<any[]>}
  */
-async function getCollectionRowByPlayerID(player_id) {
-    debugPrinter.printFunction(getCollectionByGameID.name);
+async function getCollectionRowDetailedByPlayerID(player_id) {
+    debugPrinter.printFunction(getCollectionRowDetailedByPlayerID.name);
     const result = await db.any(
         `
         SELECT 
@@ -914,7 +943,7 @@ async function getCollectionRowByPlayerID(player_id) {
     return result;
 }
 
-dbEngineGameUno.getCollectionRowByPlayerID = getCollectionRowByPlayerID;
+dbEngineGameUno.getCollectionRowDetailedByPlayerID = getCollectionRowDetailedByPlayerID;
 
 /**
  * Get Collection by game_id and collection_info_id
@@ -926,8 +955,8 @@ dbEngineGameUno.getCollectionRowByPlayerID = getCollectionRowByPlayerID;
  * @param collection_info_id
  * @returns {Promise<any[]>}
  */
-async function getCollectionByGameIDAndCollectionInfoID(game_id, collection_info_id) {
-    debugPrinter.printFunction(getCollectionByGameID.name);
+async function getCollectionRowDetailedByGameIDAndCollectionInfoID(game_id, collection_info_id) {
+    debugPrinter.printFunction(getCollectionRowDetailedByGameIDAndCollectionInfoID.name);
     const result = await db.any(
         `
         SELECT 
@@ -959,7 +988,7 @@ async function getCollectionByGameIDAndCollectionInfoID(game_id, collection_info
     return result;
 }
 
-dbEngineGameUno.getCollectionByGameIDAndCollectionInfoID = getCollectionByGameIDAndCollectionInfoID;
+dbEngineGameUno.getCollectionRowDetailedByGameIDAndCollectionInfoID = getCollectionRowDetailedByGameIDAndCollectionInfoID;
 
 /**
  * Get a player based on their game_id and user_id
@@ -1170,7 +1199,7 @@ async function getCollectionCollectionIndexRowsByPlayerID(player_id) {
 dbEngineGameUno.getCollectionCollectionIndexRowsByPlayerID = getCollectionCollectionIndexRowsByPlayerID;
 
 async function getCollectionCollectionIndexRowsDrawByGameID(game_id) {
-    debugPrinter.printFunction(getCollectionCollectionIndexRowsByPlayerID.name);
+    debugPrinter.printFunction(getCollectionCollectionIndexRowsDrawByGameID.name);
 
     const result = await db.any(
         `
@@ -1196,7 +1225,7 @@ async function updateGameIsActiveByGameID(game_id, boolean) {
         UPDATE "Game"
         SET is_active = $2
         WHERE "Game".game_id = $1
-        RETURNING game_id, is_active, player_id_turn, is_clockwise, player_id_host, type, content, color;
+        RETURNING game_id, is_active, player_id_host;
         `,
         [
             game_id,
@@ -1209,15 +1238,15 @@ async function updateGameIsActiveByGameID(game_id, boolean) {
 
 dbEngineGameUno.updateGameIsActiveByGameID = updateGameIsActiveByGameID;
 
-async function updateGameIsClockwiseByGameID(game_id, boolean) {
-    debugPrinter.printFunction(updateGameIsClockwiseByGameID.name);
+async function updateGameDataIsClockwiseByGameID(game_id, boolean) {
+    debugPrinter.printFunction(updateGameDataIsClockwiseByGameID.name);
 
     const result = await db.any(
         `
-        UPDATE "Game"
+        UPDATE "GameData"
         SET is_clockwise = $2
-        WHERE "Game".game_id = $1
-        RETURNING game_id, is_active, player_id_turn, is_clockwise, player_id_host, type, content, color;
+        WHERE "GameData".game_id = $1
+        RETURNING *;
         `,
         [
             game_id,
@@ -1228,17 +1257,17 @@ async function updateGameIsClockwiseByGameID(game_id, boolean) {
     return result;
 }
 
-dbEngineGameUno.updateGameIsClockwiseByGameID = updateGameIsClockwiseByGameID;
+dbEngineGameUno.updateGameDataIsClockwiseByGameID = updateGameDataIsClockwiseByGameID;
 
-async function updateGamePlayerIDTurnByGameID(game_id, player_id) {
-    debugPrinter.printFunction(updateGamePlayerIDTurnByGameID.name);
+async function updateGameDataPlayerIDTurnByGameID(game_id, player_id) {
+    debugPrinter.printFunction(updateGameDataPlayerIDTurnByGameID.name);
 
     const result = await db.any(
         `
-        UPDATE "Game"
+        UPDATE "GameData"
         SET player_id_turn = $2
-        WHERE "Game".game_id = $1
-        RETURNING game_id, is_active, player_id_turn, is_clockwise, player_id_host, type, content, color;
+        WHERE "GameData".game_id = $1
+        RETURNING *;
         `,
         [
             game_id,
@@ -1249,7 +1278,7 @@ async function updateGamePlayerIDTurnByGameID(game_id, player_id) {
     return result;
 }
 
-dbEngineGameUno.updateGamePlayerIDTurnByGameID = updateGamePlayerIDTurnByGameID;
+dbEngineGameUno.updateGameDataPlayerIDTurnByGameID = updateGameDataPlayerIDTurnByGameID;
 
 async function updateGamePlayerIDHostByGameID(game_id, player_id) {
     debugPrinter.printFunction(updateGamePlayerIDHostByGameID.name);
@@ -1259,7 +1288,7 @@ async function updateGamePlayerIDHostByGameID(game_id, player_id) {
         UPDATE "Game"
         SET player_id_host = $2
         WHERE "Game".game_id = $1
-        RETURNING game_id, is_active, player_id_turn, is_clockwise, player_id_host, type, content, color;
+        RETURNING game_id, is_active, player_id_host;
         `,
         [
             game_id,
@@ -1349,8 +1378,29 @@ async function updateCollectionRowDrawToPlayTop(game_id) {
 
 dbEngineGameUno.updateCollectionRowDrawToPlayTop = updateCollectionRowDrawToPlayTop;
 
-async function updateCollectionRowHandToPlayByCollectionIndexAndGetCollection(game_id, player_id, collection_index) {
-    debugPrinter.printFunction(updateCollectionRowHandToPlayByCollectionIndexAndGetCollection.name);
+async function getCollectionRowSimpleHandByCollectionIndex(player_id, collection_index) {
+    debugPrinter.printFunction(getCollectionRowSimpleHandByCollectionIndex.name);
+
+    const result = await db.any(
+        `
+        SELECT player_id, collection_index, "Collection".card_id, game_id
+        From "Collection"
+        JOIN "Cards" ON "Collection".card_id = "Cards".card_id
+        WHERE player_id = $1
+        AND collection_index = $2
+        `,
+        [
+            player_id,
+            collection_index,
+        ],
+    );
+
+    return result[0];
+}
+dbEngineGameUno.getCollectionRowSimpleHandByCollectionIndex = getCollectionRowSimpleHandByCollectionIndex;
+
+async function updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed(game_id, player_id, collection_index) {
+    debugPrinter.printFunction(updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed.name);
 
     const result = await db.any(
         `
@@ -1406,6 +1456,6 @@ async function updateCollectionRowHandToPlayByCollectionIndexAndGetCollection(ga
     return result;
 }
 
-dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollection = updateCollectionRowHandToPlayByCollectionIndexAndGetCollection;
+dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed = updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed;
 
 module.exports = dbEngineGameUno;
