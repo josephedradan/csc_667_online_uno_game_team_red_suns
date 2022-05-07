@@ -90,6 +90,10 @@ async function doGameLogic(gameRow, playObject) {
         result.message = changeTurnObject.message;
         return result;
     }
+
+    result.status = constants.SUCCESS;
+    result.message = ' YAYAYAYAYYA';
+    return result;
 }
 
 gameUnoLogic.doGameLogic = doGameLogic;
