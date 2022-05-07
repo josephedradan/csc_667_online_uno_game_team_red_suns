@@ -297,16 +297,17 @@ class TurnController {
                         const wildFourUserEvent =
                             document.getElementById("wildFourUserEvent");
                         wildFourUserEvent.classList.toggle("hidden");
-                        for (const colorSelectedByID of document.querySelectorAll(
-                            "#wildFourUserEvent div"
-                        )) {
+                        const colorSelectionChildren =
+                            document.querySelectorAll("#wildFourUserEvent div");
+                        for (const colorSelectedByID of colorSelectionChildren) {
                             colorSelectedByID.addEventListener("click", (e) => {
                                 const selectedColor =
                                     e.target.getAttribute("id");
+                                console.log(selectedColor);
                                 // const result = axios.post(`/game/${getGameId()}/someCallWithRoutePassingInIndex`)
                             });
                         }
-                        wildFourUserEvent.children.addEventListener();
+                        // wildFourUserEvent.children.addEventListener();
                     } else {
                         // Make move request
                         // const moveResult = await axios.post(`/game/${getGameId()}/move`, {index}); //or however the heck it's named
