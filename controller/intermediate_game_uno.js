@@ -93,9 +93,20 @@ async function leaveGameWrapped(game_id, user_id) {
     const arrayPromises = [intermediateSocketIOGameUno.emitInRoom_ServerIndex_Games()];
 
     if (result.game) {
+        const message = 'The host left, the game is dead, go back to the homepage.';
+
         arrayPromises.push(intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_MessageServer_Wrapped(
             game_id,
-            'The host left, the game is dead, go back to the homepage.',
+            message,
+        ));
+
+        arrayPromises.push(intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_Object(
+            game_id,
+            {
+                status: constants.SUCCESS,
+                message,
+                url: '/',
+            },
         ));
     }
 

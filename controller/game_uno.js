@@ -332,7 +332,6 @@ async function leaveGame(game_id, user_id) {
         result.game = await dbEngineGameUno.deleteGameRow(game_id); // Will also delete players in game
         result.message = `Game ${game_id} is removed and player ${playerRow.display_name} (player_id ${playerRow.player_id}) is removed`;
     } else {
-
         // WARNING, MUST CHANGE TURN BEFORE LEAVING OR ELSE THE GAME WILL CRASH
         if (gameRow.player_id_turn === playerRow.player_id) {
             result.player_current_turn_new = await changeTurnAndGetPlayerRowDetailedByGameID(game_id, 0);
@@ -341,7 +340,6 @@ async function leaveGame(game_id, user_id) {
         // May be empty
         result.player = await dbEngineGameUno.deletePlayerRowByPlayerID(playerRow.player_id);
         result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id}) is removed from game ${game_id}`;
-
     }
 
     result.status = constants.SUCCESS;
