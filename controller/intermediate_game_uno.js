@@ -169,13 +169,13 @@ async function moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow)
 
 intermediateGameUno.moveCardDrawToHandByGameIDAndPlayerRowWrapped = moveCardDrawToHandByGameIDAndPlayerRowWrapped;
 
-async function playCardHandToPlayDeckWrapped(game_id, user_id, body) {
+async function playCardHandToPlayDeckWrapped(game_id, user_id, playObject) {
     debugPrinter.printFunction(playCardHandToPlayDeckWrapped.name);
 
     // TODO HANDLE PLAYING SPECIAL CARDS
     // TODO CHANGE TURN IF NEEDED
 
-    const result = await gameUno.moveCardHandToPlayByCollectionIndex(game_id, user_id, body);
+    const result = await gameUno.moveCardHandToPlayByCollectionIndex(game_id, user_id, playObject);
 
     await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 

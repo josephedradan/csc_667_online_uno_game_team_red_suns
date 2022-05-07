@@ -11,58 +11,9 @@ const dbEngineGameUno = require('./db_engine_game_uno');
 
 const debugPrinter = require('../util/debug_printer');
 const constants = require('../server/constants');
+const gameUnoLogic = require('./game_uno_logic');
 
 const gameUno = {};
-
-/* #################################################################################################### */
-
-/**
- * IMPORTANT NOTES:
- *      USE THIS FUNCTION IN THIS FILE ONLY
- *
- * @param game_id
- * @returns {Promise<void>}
- */
-async function changeTurnAndGetPlayerRowDetailedByGameID(game_id, skipAmount) {
-    debugPrinter.printFunction(changeTurnAndGetPlayerRowDetailedByGameID.name);
-
-    const playerRows = await dbEngineGameUno.getPlayerRowsGameIsActive(game_id);
-    if (!playerRows.length) {
-        return null;
-    }
-
-    const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
-
-    if (!gameRow) {
-        return null;
-    }
-
-    // If there is no player_id for the game
-    if (gameRow.player_id_turn === null) { // TODO: Maybe use "Players".player_index in the future
-        await dbEngineGameUno.updateGameDataPlayerIDTurnByGameID(game_id, playerRows[0].player_id);
-        return dbEngineGameUno.getPlayerRowDetailedByPlayerID(playerRows[0].player_id);
-    }
-
-    let indexOfCurrentPlayer = null; // FIXME ME, MIGHT BE DANGEROUS
-
-    playerRows.forEach((playerRow, index) => {
-        if (gameRow.player_id_turn === playerRow.player_id) {
-            indexOfCurrentPlayer = index;
-        }
-    });
-
-    const indexOfNextPlayer = ((indexOfCurrentPlayer + 1 + skipAmount) % playerRows.length);
-
-    const user_id_current_turn_new = playerRows[indexOfNextPlayer].user_id;
-    const player_id_turn_new = playerRows[indexOfNextPlayer].player_id;
-
-    await dbEngineGameUno.updateGameDataPlayerIDTurnByGameID(game_id, player_id_turn_new);
-
-    // eslint-disable-next-line no-use-before-define
-    return getPlayerDetailedByGameIDAndUserID(game_id, user_id_current_turn_new);
-}
-
-/* #################################################################################################### */
 
 /*
 Return format
@@ -334,7 +285,7 @@ async function leaveGame(game_id, user_id) {
     } else {
         // WARNING, MUST CHANGE TURN BEFORE LEAVING OR ELSE THE GAME WILL CRASH
         if (gameRow.player_id_turn === playerRow.player_id) {
-            result.player_current_turn_new = await changeTurnAndGetPlayerRowDetailedByGameID(game_id, 0);
+            result.player_current_turn_new = await gameUnoLogic.changeTurnAndGetPlayerRowDetailedByGameID(game_id, 0);
         }
 
         // May be empty
@@ -624,7 +575,7 @@ async function startGame(game_id, user_id, deckMultiplier) {
     }
     result.players = playerRows;
 
-    result.player_current_turn_new = await changeTurnAndGetPlayerRowDetailedByGameID(game_id, 0);
+    result.player_current_turn_new = await gameUnoLogic.changeTurnAndGetPlayerRowDetailedByGameID(game_id, 0);
 
     result.status = constants.SUCCESS;
     result.message = `Game ${game_id} started`;
@@ -849,7 +800,15 @@ async function moveCardDrawToPlay(game_id) { // TODO ADD MORE GUARDING AND ERROR
 
 gameUno.moveCardDrawToPlay = moveCardDrawToPlay;
 
-async function moveCardHandToPlayByCollectionIndex(game_id, user_id, body) {
+/**
+ * Play card
+ *
+ * @param game_id
+ * @param user_id
+ * @param playObject
+ * @returns {Promise<{player_current_turn_new: null, game: null, collection: null, message: null, status: null, player: null}>}
+ */
+async function moveCardHandToPlayByCollectionIndex(game_id, user_id, playObject) {
     debugPrinter.printFunction(moveCardHandToPlayByCollectionIndex.name);
 
     const result = {
@@ -884,25 +843,28 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, body) {
     result.player = playerRow;
 
     // May be undefined
-    const collectionRowByIndex = await dbEngineGameUno.getCollectionRowSimpleHandByCollectionIndex(playerRow.player_id, body.collection_index);
+    const collectionRowByIndex = await dbEngineGameUno.getCollectionRowSimpleHandByCollectionIndex(playerRow.player_id, playObject.collection_index);
 
     if (!collectionRowByIndex) {
         result.status = constants.FAILURE;
         result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id})'s 
-        Card (collection_index ${body.collection_index}) does not exist`; // Can be used as a short circuit because the playerRow is based on the game_id (don't need to check if game exists)
+        Card (collection_index ${playObject.collection_index}) does not exist`; // Can be used as a short circuit because the playerRow is based on the game_id (don't need to check if game exists)
         return result;
     }
 
     // May be empty
-    const collectionRow = await dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed(game_id, playerRow.player_id, body.collection_index);
+    const collectionRow = await dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed(game_id, playerRow.player_id, playObject.collection_index);
     result.collection = collectionRow;
 
     // TODO FIXME WARNING THIS DOES NOT HANDLE SPECIAL CARDS, PUT LOGIC OF THAT HERE
-    result.player_current_turn_new = await changeTurnAndGetPlayerRowDetailedByGameID(game_id, 0);
+
+    await gameUnoLogic.doGameLogicStuffIDK();
+
+    result.player_current_turn_new = await gameUnoLogic.changeTurnAndGetPlayerRowDetailedByGameID(game_id, 0);
 
     result.status = constants.SUCCESS;
 
-    result.message = `Card (collection_index ${body.collection_index}) from player ${playerRow.display_name} (player_id ${playerRow.player_id})'s 
+    result.message = `Card (collection_index ${playObject.collection_index}) from player ${playerRow.display_name} (player_id ${playerRow.player_id})'s 
     collection moved to PLAY's collection's top for Game ${game_id}`;
 
     return result;
