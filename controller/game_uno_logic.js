@@ -1,6 +1,6 @@
 const debugPrinter = require('../util/debug_printer');
 const dbEngineGameUno = require('./db_engine_game_uno');
-const gameUno = require('./game_uno');
+const constants = require('../server/constants');
 
 const gameUnoLogic = {};
 
@@ -11,54 +11,87 @@ const gameUnoLogic = {};
  * @param game_id
  * @returns {Promise<void>}
  */
-async function changeTurnAndGetPlayerRowDetailedByGameID(game_id, skipAmount) {
+async function changeTurnAndGetPlayerRowDetailedByGameID(gameRow) {
     debugPrinter.printFunction(changeTurnAndGetPlayerRowDetailedByGameID.name);
 
-    let playerRows = await dbEngineGameUno.getPlayerRowsGameIsActive(game_id);
-    if (!playerRows.length) {
-        return null;
-    }
+    const result = {
+        status: null,
+        message: null,
+        game: gameRow,
+        game_data: null,
+        players_active: null,
+        player_id_turn: null,
+        user_id_turn: null,
+    };
 
-    const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
+    // May be empty
+    let playerRowsActive = await dbEngineGameUno.getPlayerRowsGameIsActive(gameRow.game_id);
 
-    if (!gameRow) {
-        return null;
+    if (!playerRowsActive.length) {
+        result.status = constants.FAILURE;
+        result.message = `No active players in game ${gameRow.game_id}`;
+        return result;
     }
 
     // If there is no player_id for the game
     if (gameRow.player_id_turn === null) { // TODO: Maybe use "Players".player_index in the future
-        await dbEngineGameUno.updateGameDataPlayerIDTurnByGameID(game_id, playerRows[0].player_id);
-        return dbEngineGameUno.getPlayerRowDetailedByPlayerID(playerRows[0].player_id);
+        await dbEngineGameUno.updateGameDataPlayerIDTurnByGameID(gameRow.game_id, playerRowsActive[0].player_id);
+        result.status = constants.SUCCESS;
+        result.message = `Game ${gameRow.game_id}'s player_id_turn was null, player ${playerRowsActive[0].player_id} will have the turn`;
+        result.player_id_turn = playerRowsActive[0].player_id;
+        result.user_id_turn = playerRowsActive[0].user_id;
+        return result;
     }
 
     if (gameRow.is_clockwise !== false) {
-        playerRows = playerRows.reverse();
+        playerRowsActive = playerRowsActive.reverse();
     }
+
+    result.players_active = playerRowsActive;
 
     let indexOfCurrentPlayer = null; // FIXME ME, MIGHT BE DANGEROUS
 
-    playerRows.forEach((playerRow, index) => {
+    playerRowsActive.forEach((playerRow, index) => {
         if (gameRow.player_id_turn === playerRow.player_id) {
             indexOfCurrentPlayer = index;
         }
     });
 
-    const indexOfNextPlayer = ((indexOfCurrentPlayer + 1 + skipAmount) % playerRows.length);
+    const indexOfNextPlayerInPlayerRowsActive = ((indexOfCurrentPlayer + 1 + gameRow.skip_amount) % playerRowsActive.length);
 
-    const user_id_current_turn_new = playerRows[indexOfNextPlayer].user_id;
-    const player_id_turn_new = playerRows[indexOfNextPlayer].player_id;
+    result.user_id_turn = playerRowsActive[indexOfNextPlayerInPlayerRowsActive].user_id;
+    result.player_id_turn = playerRowsActive[indexOfNextPlayerInPlayerRowsActive].player_id;
 
-    await dbEngineGameUno.updateGameDataPlayerIDTurnByGameID(game_id, player_id_turn_new);
+    result.game_data = await dbEngineGameUno.updateGameDataPlayerIDTurnByGameID(gameRow.game_id, result.player_id_turn);
 
-    // eslint-disable-next-line no-use-before-define
-    return gameUno.getPlayerDetailedByGameIDAndUserID(game_id, user_id_current_turn_new);
+    result.status = constants.SUCCESS;
+    result.message = `Player ${result.player_id_turn} has the turn`;
+
+    return result;
 }
 
 gameUnoLogic.changeTurnAndGetPlayerRowDetailedByGameID = changeTurnAndGetPlayerRowDetailedByGameID;
 
-async function doGameLogicStuffIDK() {
+async function doGameLogic(gameRow, playObject) {
+    const result = {
+        status: null,
+        message: null,
+        game: gameRow,
+        // game_data: null,
+        // players_active: null,
+        // player_id_turn: null,
+        // user_id_turn: null,
+    };
 
+    const changeTurnObject = await gameUnoLogic.changeTurnAndGetPlayerRowDetailedByGameID(gameRow);
+
+    if (changeTurnObject.status === constants.FAILURE) {
+        result.status = changeTurnObject.status;
+        result.message = changeTurnObject.message;
+        return result;
+    }
 }
-gameUnoLogic.doGameLogicStuffIDK = doGameLogicStuffIDK;
+
+gameUnoLogic.doGameLogic = doGameLogic;
 
 module.exports = gameUnoLogic;

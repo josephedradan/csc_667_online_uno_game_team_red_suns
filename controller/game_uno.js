@@ -255,7 +255,7 @@ async function leaveGame(game_id, user_id) {
         message: null,
         game: null,
         player: null,
-        player_current_turn_new: null,
+        change_turn: null,
     };
 
     const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
@@ -285,7 +285,15 @@ async function leaveGame(game_id, user_id) {
     } else {
         // WARNING, MUST CHANGE TURN BEFORE LEAVING OR ELSE THE GAME WILL CRASH
         if (gameRow.player_id_turn === playerRow.player_id) {
-            result.player_current_turn_new = await gameUnoLogic.changeTurnAndGetPlayerRowDetailedByGameID(game_id, 0);
+            const changeTurnObject = await gameUnoLogic.changeTurnAndGetPlayerRowDetailedByGameID(gameRow);
+
+            if (changeTurnObject.status === constants.FAILURE) {
+                result.status = changeTurnObject.status;
+                result.message = changeTurnObject.message;
+                // return result; // Do not return here
+            }
+
+            result.change_turn = changeTurnObject;
         }
 
         // May be empty
@@ -510,7 +518,7 @@ async function startGame(game_id, user_id, deckMultiplier) {
         player: null,
         cards: null,
         players: null,
-        player_current_turn_new: null,
+        change_turn: null,
     };
 
     const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
@@ -575,7 +583,15 @@ async function startGame(game_id, user_id, deckMultiplier) {
     }
     result.players = playerRows;
 
-    result.player_current_turn_new = await gameUnoLogic.changeTurnAndGetPlayerRowDetailedByGameID(game_id, 0);
+    const changeTurnObject = await gameUnoLogic.changeTurnAndGetPlayerRowDetailedByGameID(gameRow);
+
+    if (changeTurnObject.status === constants.FAILURE) {
+        result.status = changeTurnObject.status;
+        result.message = changeTurnObject.message;
+        return result;
+    }
+
+    result.change_turn = changeTurnObject;
 
     result.status = constants.SUCCESS;
     result.message = `Game ${game_id} started`;
@@ -822,7 +838,7 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, playObject)
         player: null,
         collection: null,
         game: null,
-        player_current_turn_new: null,
+        game_logic: null,
     };
 
     // May be undefined
@@ -848,9 +864,9 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, playObject)
     result.player = playerRow;
 
     // May be undefined
-    const collectionRowByIndex = await dbEngineGameUno.getCollectionRowSimpleHandByCollectionIndex(playerRow.player_id, playObject.collection_index);
+    const collectionRowHandByCollectionIndex = await dbEngineGameUno.getCollectionRowSimpleHandByCollectionIndex(playerRow.player_id, playObject.collection_index);
 
-    if (!collectionRowByIndex) {
+    if (!collectionRowHandByCollectionIndex) {
         result.status = constants.FAILURE;
         result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id})'s 
         Card (collection_index ${playObject.collection_index}) does not exist`; // Can be used as a short circuit because the playerRow is based on the game_id (don't need to check if game exists)
@@ -858,14 +874,23 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, playObject)
     }
 
     // May be empty
-    const collectionRow = await dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed(game_id, playerRow.player_id, playObject.collection_index);
-    result.collection = collectionRow;
+    const collectionRowHandUpdated = await dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed(
+        game_id,
+        playerRow.player_id,
+        playObject.collection_index,
+    );
 
-    // TODO FIXME WARNING THIS DOES NOT HANDLE SPECIAL CARDS, PUT LOGIC OF THAT HERE
+    result.collection = collectionRowHandUpdated;
 
-    await gameUnoLogic.doGameLogicStuffIDK();
+    const gameLogic = await gameUnoLogic.doGameLogic(gameRow, playObject);
 
-    result.player_current_turn_new = await gameUnoLogic.changeTurnAndGetPlayerRowDetailedByGameID(game_id, 0);
+    if (gameLogic.status === constants.FAILURE) {
+        result.status = gameLogic.status;
+        result.message = gameLogic.message;
+        return result;
+    }
+
+    result.game_logic = gameLogic;
 
     result.status = constants.SUCCESS;
 
