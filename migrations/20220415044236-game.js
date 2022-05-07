@@ -25,15 +25,15 @@ module.exports = {
             },
 
             // Current player's turn determined by the player_id
-            player_id_turn: {
-                type: Sequelize.DataTypes.INTEGER,
-                references: {
-                    model: 'Player',
-                    key: 'player_id',
-                },
-                allowNull: true,
-                unique: true, // Enforce rule to prevent the same player from playing in multiple games
-            },
+            // player_id_turn: {
+            //     type: Sequelize.DataTypes.INTEGER,
+            //     references: {
+            //         model: 'Player',
+            //         key: 'player_id',
+            //     },
+            //     allowNull: true,
+            //     unique: true, // Enforce rule to prevent the same player from playing in multiple games
+            // },
 
             /*
             Host of the game
@@ -51,30 +51,30 @@ module.exports = {
                 unique: true, // Enforce rule to prevent the same player from being a host for multiple games
             },
 
-            is_clockwise: {
-                type: Sequelize.DataTypes.BOOLEAN,
-                defaultValue: true,
-                allowNull: false,
-                unique: false,
-            },
-
-            type: {
-                type: Sequelize.DataTypes.STRING,
-                allowNull: true,
-                unique: false,
-            },
-
-            content: {
-                type: Sequelize.DataTypes.STRING,
-                allowNull: true,
-                unique: false,
-            },
-
-            color: {
-                type: Sequelize.DataTypes.STRING,
-                allowNull: true,
-                unique: false,
-            },
+            // is_clockwise: {
+            //     type: Sequelize.DataTypes.BOOLEAN,
+            //     defaultValue: true,
+            //     allowNull: false,
+            //     unique: false,
+            // },
+            //
+            // type: {
+            //     type: Sequelize.DataTypes.STRING,
+            //     allowNull: true,
+            //     unique: false,
+            // },
+            //
+            // content: {
+            //     type: Sequelize.DataTypes.STRING,
+            //     allowNull: true,
+            //     unique: false,
+            // },
+            //
+            // color: {
+            //     type: Sequelize.DataTypes.STRING,
+            //     allowNull: true,
+            //     unique: false,
+            // },
 
             password: {
                 type: Sequelize.DataTypes.STRING,

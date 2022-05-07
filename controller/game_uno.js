@@ -39,7 +39,7 @@ async function changeTurnAndGetPlayerRowDetailedByGameID(game_id, skipAmount) {
 
     // If there is no player_id for the game
     if (gameRow.player_id_turn === null) { // TODO: Maybe use "Players".player_index in the future
-        await dbEngineGameUno.updateGamePlayerIDTurnByGameID(game_id, playerRows[0].player_id);
+        await dbEngineGameUno.updateGameDataPlayerIDTurnByGameID(game_id, playerRows[0].player_id);
         return dbEngineGameUno.getPlayerRowDetailedByPlayerID(playerRows[0].player_id);
     }
 
@@ -56,7 +56,7 @@ async function changeTurnAndGetPlayerRowDetailedByGameID(game_id, skipAmount) {
     const user_id_current_turn_new = playerRows[indexOfNextPlayer].user_id;
     const player_id_turn_new = playerRows[indexOfNextPlayer].player_id;
 
-    await dbEngineGameUno.updateGamePlayerIDTurnByGameID(game_id, player_id_turn_new);
+    await dbEngineGameUno.updateGameDataPlayerIDTurnByGameID(game_id, player_id_turn_new);
 
     // eslint-disable-next-line no-use-before-define
     return getPlayerDetailedByGameIDAndUserID(game_id, user_id_current_turn_new);
@@ -457,6 +457,7 @@ async function createGameV2(user_id) {
         message: null,
         player: null,
         game: null,
+        game_data: null,
         players: null,
     };
 
@@ -483,6 +484,15 @@ async function createGameV2(user_id) {
         return result;
     }
     result.game = gameRow;
+
+    const gameData = await dbEngineGameUno.createGameDataRow(gameRow.game_id);
+
+    if (!gameData) {
+        result.status = constants.FAILURE;
+        result.message = 'Could not create game row when creating game';
+        return result;
+    }
+    result.game_data = gameData;
 
     // May be undefined
     const playersRow = await dbEngineGameUno.createPlayersRow(gameRow.game_id, playerRow.player_id);
