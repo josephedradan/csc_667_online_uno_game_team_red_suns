@@ -659,8 +659,8 @@ Notes:
                 game_id,
                 player_id: null,
                 type,
-                color,
                 content,
+                color,
                 card_id,
                 card_info_id,
                 collection_index,
@@ -715,7 +715,7 @@ async function getGameState(game_id) {
     }
 
     // May be empty
-    result.collection_draw = await dbEngineGameUno.getCollectionRowDetailedByGameIDAndCollectionInfoID(game_id, 1);
+    result.collection_draw = await dbEngineGameUno.getCollectionRowCollectionIndexByGameIDAndCollectionInfoID(game_id, 1);
 
     // May be empty
     result.collection_play = await dbEngineGameUno.getCollectionRowDetailedByGameIDAndCollectionInfoID(game_id, 2);
@@ -836,7 +836,6 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, playObject)
         status: null,
         message: null,
         player: null,
-        collection: null,
         game: null,
         game_logic: null,
     };
@@ -863,26 +862,9 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, playObject)
     }
     result.player = playerRow;
 
-    // May be undefined
-    const collectionRowHandByCollectionIndex = await dbEngineGameUno.getCollectionRowSimpleHandByCollectionIndex(playerRow.player_id, playObject.collection_index);
+    // TODO FUCK
 
-    if (!collectionRowHandByCollectionIndex) {
-        result.status = constants.FAILURE;
-        result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id})'s 
-        Card (collection_index ${playObject.collection_index}) does not exist`; // Can be used as a short circuit because the playerRow is based on the game_id (don't need to check if game exists)
-        return result;
-    }
-
-    // May be empty
-    const collectionRowHandUpdated = await dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed(
-        game_id,
-        playerRow.player_id,
-        playObject.collection_index,
-    );
-
-    result.collection = collectionRowHandUpdated;
-
-    const gameLogic = await gameUnoLogic.doGameLogic(gameRow, playObject);
+    const gameLogic = await gameUnoLogic.doMoveCardHandToPlayByCollectionIndexLogic(gameRow, playerRow, playObject);
 
     if (gameLogic.status === constants.FAILURE) {
         result.status = gameLogic.status;
