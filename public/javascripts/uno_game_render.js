@@ -5,7 +5,8 @@ class Draggable {
         this.parent = element.parentElement;
         this.childIndex = 0;
         this.element = element;
-        this.callback = null;
+        this.dragBeginCallback = null;
+        this.dragEndCallback = null;
         this.boundary = boundary;
         // Some hacky way to implement adding and removing listeners
         this.dragMouseDown = this.dragMouseDown.bind(this);
@@ -76,6 +77,10 @@ class Draggable {
         document.body.appendChild(this.element);
 
         this.moveToPosition(event.clientX, event.clientY);
+
+        if (this.dragBeginCallback) {
+            this.dragBeginCallback();
+        }
     }
 
     dragMouseMove(event) {
@@ -83,7 +88,6 @@ class Draggable {
         if (event.which != 1) {
             return;
         }
-        this.element.classList.remove("animate-bounce");
         event.preventDefault();
         // console.log(`${event.clientX} ${event.clientY}`);
         this.moveToPosition(event.clientX, event.clientY);
@@ -130,8 +134,8 @@ class Draggable {
                 container.appendChild(this.element);
                 this.parent = this.element.parentElement;
                 parented = true;
-                if (this.callback) {
-                    this.callback(this.parent);
+                if (this.dragEndCallback) {
+                    this.dragEndCallback(this.parent);
                 }
                 break;
             }
@@ -141,11 +145,18 @@ class Draggable {
                 this.element,
                 this.parent.children[this.childIndex]
             );
+            if (this.dragEndCallback) {
+                this.dragEndCallback(this.parent);
+            }
         }
     }
 
-    setCallback(func) {
-        this.callback = func;
+    setDragBeginCallback(func) {
+        this.dragBeginCallback = func;
+    }
+
+    setDragEndCallback(func) {
+        this.dragEndCallback = func;
     }
 
     destroy() {
@@ -306,7 +317,7 @@ class TurnController {
 
     startTurn(cardCollection, playCollection) {
         this.endTurn();
-        cardCollection.forEach((cardData, idx) => {
+        cardCollection.forEach((cardData) => {
             // console.log(cardData); // card data last element has the discard card
             // console.log(cardData.collection_index);
             const card = this.handContainer.children.item(
@@ -317,7 +328,24 @@ class TurnController {
                 [this.playContainer],
                 this.gameWindow
             );
-            draggable.setCallback(async (newParent) => {
+            // kill the animation
+            draggable.setDragBeginCallback(async () => {
+                // kill card bounce
+                removeBounceAnimation(card);
+                for (const [idx, reapplyCard] of Object.entries(
+                    this.handContainer.children
+                )) {
+                    removeBounceAnimation(reapplyCard);
+                    /*applyBounceAnimation(
+                        reapplyCard,
+                        playCollection,
+                        cardCollection[idx]
+                    );*/
+                }
+            });
+
+            // restart the animation
+            draggable.setDragEndCallback(async (newParent) => {
                 if (newParent == this.playContainer) {
                     // if card is a wild card, prompt with modal and request the move
                     // console.log(cardData);
@@ -327,7 +355,6 @@ class TurnController {
                     } else {
                         // Make move request
                         // const moveResult = await axios.post(`/game/${getGameId()}/move`, {cardData.collection_index}); //or however the heck it's named
-
                         console.log("Playing a card!");
 
                         console.log(
@@ -344,32 +371,22 @@ class TurnController {
                         );
                         console.log(result);
                     }
+                } else {
+                    for (const [idx, reapplyCard] of Object.entries(
+                        this.handContainer.children
+                    )) {
+                        //removeBounceAnimation(reapplyCard);
+                        applyBounceAnimation(
+                            reapplyCard,
+                            playCollection,
+                            cardCollection[idx]
+                        );
+                    }
                 }
             });
 
             this.draggables.push(draggable);
-            // console.log(cardData);
-            // console.log(playCollection);
-            if (!playCollection[playCollection.length - 1]) return;
-            if (
-                cardData.color ===
-                playCollection[playCollection.length - 1].color
-            ) {
-                this.handContainer.childNodes[idx].classList.add(
-                    "animate-bounce"
-                );
-            } else if (
-                cardData.content ===
-                playCollection[playCollection.length - 1].content
-            ) {
-                this.handContainer.childNodes[idx].classList.add(
-                    "animate-bounce"
-                );
-            } else if (cardData.color === "black") {
-                this.handContainer.childNodes[idx].classList.add(
-                    "animate-bounce"
-                );
-            }
+            applyBounceAnimation(card, playCollection, cardData);
         });
 
         const drawCard = document.getElementById("drawCard");
@@ -379,7 +396,7 @@ class TurnController {
             [this.handContainer],
             this.gameWindow
         );
-        draggable.setCallback(async (newParent) => {
+        draggable.setDragEndCallback(async (newParent) => {
             if (newParent == this.handContainer) {
                 drawParent.appendChild(drawCard);
 
@@ -414,6 +431,7 @@ class TurnController {
         for (const colorSelectedByID of colorSelectionChildren) {
             colorSelectedByID.addEventListener("click", async (e) => {
                 const selectedColor = e.target.getAttribute("id");
+                console.log(selectedColor);
                 await axios.post(`/game/${getGameId()}/playCard`, {
                     collection_index: cardData.collection_index,
                     color: selectedColor, // selected color
@@ -451,7 +469,7 @@ async function renderGameState(game_state) {
 
     gameStateQueue.push([game_state, playersHand]);
 
-    console.log(game_state.collection_play.length !== 0);
+    // this check is to allow for the rendering of the host. since we're rendering
     if (
         game_state.collection_play.length !== 0 ||
         !game_state.collection_play
@@ -581,6 +599,25 @@ const display_current_player = (display_name) => {
 const applyCurrentColorToGameScreen = (color) => {
     const currentColor = document.getElementById("currentColor");
     currentColor.classList.add(`bg-${color}-500`);
+};
+
+const applyBounceAnimation = (card, playCollection, cardData) => {
+    if (!playCollection[playCollection.length - 1]) return;
+    if (cardData.color === playCollection[playCollection.length - 1].color) {
+        card.classList.add("animate-bounce");
+    } else if (
+        cardData.content === playCollection[playCollection.length - 1].content
+    ) {
+        card.classList.add("animate-bounce");
+    } else if (cardData.color === "black") {
+        card.classList.add("animate-bounce");
+    } else {
+        card.classList.add("brightness-75");
+    }
+};
+
+const removeBounceAnimation = (card) => {
+    card.classList.remove("animate-bounce");
 };
 
 async function setup() {

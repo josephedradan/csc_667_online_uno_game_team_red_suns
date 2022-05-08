@@ -1,6 +1,30 @@
 @import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:900);
 @import url(https://fonts.googleapis.com/css?family=Cabin:400);
 
+/* @keyframes glow {
+    0%,
+    100% {
+        brightness: 1;
+    }
+    50% {
+        brightness: 0.75;
+    }
+}
+
+@-webkit-keyframes glow {
+    0%,
+    100% {
+        brightness: 1;
+    }
+    50% {
+        brightness: 0.75;
+    }
+}
+
+.animate-glow {
+    animation: glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+} */
+
 .unoCard {
     width: 116px;
     height: 178px;
@@ -10,7 +34,7 @@
     display: table;
     box-sizing: border-box;
     padding: 5px;
-    margin: 0;/*10px;*/
+    margin: 0; /*10px;*/
     font-family: "Source Sans Pro", sans-serif;
     font-size: 100px;
     text-shadow: 1px 1px 0 #000000, -1px -1px 0 #000000, -1px 1px 0 #000000,
