@@ -1122,7 +1122,7 @@ async function getCollectionRowTopDetailedByGameIDAndCollectionInfoID(game_id, c
         ],
     );
 
-    return result;
+    return result[0];
 }
 
 dbEngineGameUno.getCollectionRowTopDetailedByGameIDAndCollectionInfoID = getCollectionRowTopDetailedByGameIDAndCollectionInfoID;
@@ -1495,7 +1495,7 @@ async function getCollectionRowHandDetailedByCollectionIndex(player_id, collecti
         JOIN "CardInfo" ON "CardInfo".card_info_id = "Card".card_info_id
         JOIN "CollectionInfo" ON "CollectionInfo".collection_info_id = "Collection".collection_info_id
         WHERE "Collection".player_id = $1
-        AND "Collection".collection_info_id = $2
+        AND "Collection".collection_index = $2
         `,
         [
             player_id,
@@ -1624,8 +1624,8 @@ async function updateGameDataCardLegal(game_id, card_type_legal, card_content_le
         `
         UPDATE "GameData"
         SET 
-            card_type_legal = $2
-            card_content_legal = $3 
+            card_type_legal = $2,
+            card_content_legal = $3, 
             card_color_legal = $4
         WHERE "GameData".game_id = $1
         RETURNING *;

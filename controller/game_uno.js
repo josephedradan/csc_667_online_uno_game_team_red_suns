@@ -521,7 +521,7 @@ async function startGame(game_id, user_id, deckMultiplier) {
         change_turn: null,
     };
 
-    const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
+    let gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
 
     if (!gameRow) {
         result.status = constants.FAILURE;
@@ -592,6 +592,10 @@ async function startGame(game_id, user_id, deckMultiplier) {
     }
 
     result.change_turn = changeTurnObject;
+
+    // New Game Row
+    gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
+    result.game = gameRow;
 
     result.status = constants.SUCCESS;
     result.message = `Game ${game_id} started`;
@@ -856,8 +860,9 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, playObject)
     // If player is exists for the user for the game
     if (!playerRow) {
         result.status = constants.FAILURE;
-        result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id}) 
-        does not exist for game ${game_id}`; // Can be used as a short circuit because the playerRow is based on the game_id (don't need to check if game exists)
+        result.message = `Player ${playerRow.display_name} 
+                        (player_id ${playerRow.player_id}) does not exist for game ${game_id}`;
+        // Can be used as a short circuit because the playerRow is based on the game_id (don't need to check if game exists)
         return result;
     }
     result.player = playerRow;
