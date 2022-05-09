@@ -1,8 +1,11 @@
 <div class="grid grid-cols-4">
     <div class="grid grid-cols-3 col-span-3 gap-4" id="list_of_players">
     </div>
-<!-- justify-items-center items-center -->
-    <div class="p-4 grid invisible hidden grid-cols-3 col-span-3 gap-4" id="game_window">
+    <!-- justify-items-center items-center -->
+    <div
+        class="grid invisible hidden grid-cols-3 col-span-3 gap-4 p-4"
+        id="game_window"
+    >
         <div>
             <button
                 id="leaveGame"
@@ -10,7 +13,7 @@
             >Leave</button>
         </div>
 
-        <div class="unoHand self-start" id="player2"></div>
+        <div class="self-start unoHand" id="player2"></div>
         <div class="justify-self-end">
             <div
                 id="currentColor"
@@ -22,7 +25,7 @@
         <div
             class="flex items-center content-center justify-center col-span-1 space-x-4"
         >
-            <div class="cardWrapper flex-none">
+            <div class="flex-none cardWrapper">
                 <div class="unoCard flipped">
                     <span class="inner">
                         <span class="mark"></span>
@@ -43,18 +46,18 @@
 
         <div class="unoHand justify-self-end" id="player3"></div>
         <div></div>
-        <div class="unoHand self-end" id="player0"></div>
+        <div class="self-end unoHand" id="player0"></div>
         <div></div>
         <div class="relative grid">
             <button
                 id="challenge"
-                class="justify-self-center self-center px-4 py-2 mb-4 font-bold text-white rounded bg-sky-500 hover:bg-sky-700"
+                class="self-center px-4 py-2 mb-4 font-bold text-white rounded justify-self-center bg-sky-500 hover:bg-sky-700"
             >Challenge</button>
         </div>
         <div class="relative grid">
             <p
                 id="currentPlayer"
-                class="justify-self-center self-center px-4 py-2 mb-4 font-bold text-white rounded left-24 bg-sky-500"
+                class="self-center px-4 py-2 mb-4 font-bold text-white rounded justify-self-center left-24 bg-sky-500"
             ></p>
             {{! possible animation uncomment line below to see effect }}
             {{! <span
@@ -65,12 +68,12 @@
         <div class="relative grid content-center">
             <button
                 id="callUno"
-                class="justify-self-center self-center px-4 py-2 mb-4 font-bold text-white rounded bg-sky-500 hover:bg-sky-700"
+                class="self-center px-4 py-2 mb-4 font-bold text-white rounded justify-self-center bg-sky-500 hover:bg-sky-700"
             >Uno</button>
         </div>
     </div>
     <div
-        class="flex flex-col space-y-2 h-[calc(100vh_-_68px)] p-2 bg-sky-200 rounded"
+        class="flex flex-col space-y-2 h-[calc(100vh_-_68px)] p-2 message_window"
     >
         <div class="flex flex-row font-bold text-black">
             <p class="w-full text-center">Chat</p>

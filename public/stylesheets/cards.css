@@ -30,15 +30,20 @@
     height: 178px;
 }
 
-.unoCard, #discard {
+.unoCard,
+#discard {
     width: 116px;
 }
 
-.unoCard, #discard, #player0, #player2 {
+.unoCard,
+#discard,
+#player0,
+#player2 {
     height: 178px;
 }
 
-#player1, #player3 {
+#player1,
+#player3 {
     width: 178px;
 }
 
@@ -419,7 +424,8 @@
     flex-basis: max-content;
 }
 
-#player0.unoHand .cardWrapper, #player2.unoHand .cardWrapper {
+#player0.unoHand .cardWrapper,
+#player2.unoHand .cardWrapper {
     height: 178px;
     width: 10%;
     min-width: 20px;
@@ -461,13 +467,15 @@
     transition-timing-function: ease-in-out;
 }
 
-#player0.unoHand .cardWrapper, #player2.unoHand .cardWrapper {
+#player0.unoHand .cardWrapper,
+#player2.unoHand .cardWrapper {
     margin-top: auto;
     margin-bottom: auto;
     transition-property: min-width;
 }
 
-#player1.unoHand .cardWrapper, #player3.unoHand .cardWrapper {
+#player1.unoHand .cardWrapper,
+#player3.unoHand .cardWrapper {
     margin-left: auto;
     margin-right: auto;
     transition-property: height;
@@ -596,9 +604,27 @@
     grid-template-rows: 178px auto 178px 178px;
     grid-template-columns: 178px auto 178px;
     */
-    background: rgb(255,255,255);
-    background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(226,232,240,1) 100%);
-    background: radial-gradient(circle, rgba(248,250,251,1) 0%, rgba(229,236,242,1) 39%, rgba(144,174,198,1) 100%);
+    background: rgb(255, 255, 255);
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 1) 0%,
+        rgba(226, 232, 240, 1) 100%
+    );
+    background: radial-gradient(
+        circle,
+        rgba(248, 250, 251, 1) 0%,
+        rgba(229, 236, 242, 1) 39%,
+        rgba(144, 174, 198, 1) 100%
+    );
     /*background: radial-gradient(circle, rgba(255,244,183,1) 0%, rgba(241,198,154,1) 100%);*/
     /*background: radial-gradient(circle, rgba(255,241,145,1) 0%, rgba(233,178,115,1) 100%);*/
+}
+
+.message_window {
+    background: radial-gradient(
+        circle,
+        rgba(248, 250, 251, 1) 0%,
+        rgba(229, 236, 242, 1) 39%,
+        rgba(144, 174, 198, 1) 100%
+    );
 }
