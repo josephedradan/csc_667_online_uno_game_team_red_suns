@@ -628,3 +628,12 @@
         rgba(144, 174, 198, 1) 100%
     );
 }
+
+.game_bar {
+    background: radial-gradient(
+        circle,
+        rgba(248, 250, 251, 1) 0%,
+        rgba(229, 236, 242, 1) 39%,
+        rgba(144, 174, 198, 1) 100%
+    );
+}
