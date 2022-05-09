@@ -1,18 +1,28 @@
-<div class="grid grid-cols-8 gap-3">
-    <div class="grid grid-cols-3 col-span-6 gap-4" id="list_of_players">
+<div class="grid grid-cols-4">
+    <div class="grid grid-cols-3 col-span-3 gap-4" id="list_of_players">
     </div>
+<!-- justify-items-center items-center -->
+    <div class="p-4 grid invisible hidden grid-cols-3 col-span-3 gap-4" id="game_window">
+        <div>
+            <button
+                id="leaveGame"
+                class="px-4 py-2 mb-4 font-bold text-white bg-red-500 rounded hover:bg-red-700"
+            >Leave</button>
+        </div>
 
-    <div class="grid invisible hidden grid-cols-3 col-span-6" id="game_window">
-        <div class="col-span-1"></div>
-
-        <div class="col-span-1 unoHand" id="player2"></div>
-        <div class="col-span-1"></div>
-        <div class="col-span-1 unoHand" id="player1"></div>
+        <div class="unoHand self-start" id="player2"></div>
+        <div class="justify-self-end">
+            <div
+                id="currentColor"
+                class="w-10 h-10 rounded-lg bottom-10 right-1/2 animate-spin"
+            ></div>
+        </div>
+        <div class="unoHand justify-self-start" id="player1"></div>
 
         <div
             class="flex items-center content-center justify-center col-span-1 space-x-4"
         >
-            <div class="cardWrapper">
+            <div class="cardWrapper flex-none">
                 <div class="unoCard flipped">
                     <span class="inner">
                         <span class="mark"></span>
@@ -28,47 +38,39 @@
                     </div>
                 </div>
             </div>
-            <div id="discard"></div>
+            <div class="flex-none" id="discard"></div>
         </div>
 
-        <div class="col-span-1 unoHand" id="player3"></div>
-        <div class="col-span-1"></div>
-        <div class="col-span-1 unoHand" id="player0"></div>
+        <div class="unoHand justify-self-end" id="player3"></div>
         <div></div>
-        <div class="relative grid content-center col-span-1">
+        <div class="unoHand self-end" id="player0"></div>
+        <div></div>
+        <div class="relative grid">
             <button
-                id="leaveGame"
-                class="absolute bottom-0 right-0 px-4 py-2 mb-4 font-bold text-white bg-red-500 rounded hover:bg-red-700"
-            >Leave</button>
+                id="challenge"
+                class="justify-self-center self-center px-4 py-2 mb-4 font-bold text-white rounded bg-sky-500 hover:bg-sky-700"
+            >Challenge</button>
         </div>
-        <div class="relative grid content-center col-span-1">
+        <div class="relative grid">
             <p
                 id="currentPlayer"
-                class="absolute px-4 py-2 mb-4 font-bold text-white rounded left-24 bg-sky-500 hover:bg-sky-700"
+                class="justify-self-center self-center px-4 py-2 mb-4 font-bold text-white rounded left-24 bg-sky-500"
             ></p>
             {{! possible animation uncomment line below to see effect }}
             {{! <span
                 class="absolute inline-flex w-4/12 h-full rounded-full bg-gradient-to-r from-red-500 to-sky-500 opacity-95 animate-ping"
             >
             </span> }}
-            <button
-                id="challenge"
-                class="absolute bottom-0 right-0 px-4 py-2 mb-4 font-bold text-white rounded bg-sky-500 hover:bg-sky-700"
-            >Challenge</button>
         </div>
-        <div class="relative grid content-center col-span-1">
-            <div
-                id="currentColor"
-                class="absolute w-10 h-10 rounded-lg bottom-10 right-1/2 animate-spin"
-            ></div>
+        <div class="relative grid content-center">
             <button
                 id="callUno"
-                class="absolute bottom-0 right-0 px-4 py-2 mb-4 font-bold text-white rounded bg-sky-500 hover:bg-sky-700"
+                class="justify-self-center self-center px-4 py-2 mb-4 font-bold text-white rounded bg-sky-500 hover:bg-sky-700"
             >Uno</button>
         </div>
     </div>
     <div
-        class="flex flex-col space-y-2 col-span-2 h-[calc(100vh_-_112px)] p-2 bg-sky-200 rounded"
+        class="flex flex-col space-y-2 h-[calc(100vh_-_68px)] p-2 bg-sky-200 rounded"
     >
         <div class="flex flex-row font-bold text-black">
             <p class="w-full text-center">Chat</p>

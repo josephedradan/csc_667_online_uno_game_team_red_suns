@@ -25,6 +25,23 @@
     animation: glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 } */
 
+.cardWrapper {
+    width: 116px;
+    height: 178px;
+}
+
+.unoCard, #discard {
+    width: 116px;
+}
+
+.unoCard, #discard, #player0, #player2 {
+    height: 178px;
+}
+
+#player1, #player3 {
+    width: 178px;
+}
+
 .unoCard {
     width: 116px;
     height: 178px;
@@ -41,7 +58,8 @@
         1px -1px 0 #000000, 1px 0 0 #000000, -1px 0 0 #000000, 0 -1px 0 #000000,
         0 1px 0 #000000, 4px 4px 0 #000000;
     text-align: center;
-    position: relative;
+    position: absolute;
+    transform-origin: center;
 }
 
 .unoCard .cardShadow {
@@ -393,10 +411,6 @@
     transform: translate(-65%, -55%);
 }
 
-.cardWrapper {
-    height: 200px;
-}
-
 .unoHand {
     display: flex;
     align-content: center;
@@ -405,35 +419,77 @@
     flex-basis: max-content;
 }
 
-.unoHand .cardWrapper {
-    /*overflow: hidden;*/
-    background: none;
-    margin-top: auto;
-    margin-bottom: auto;
-    position: relative;
-    height: 200px;
-    transition-property: width;
-    transition-duration: 0.05s;
-    transition-timing-function: ease-in-out;
+#player0.unoHand .cardWrapper, #player2.unoHand .cardWrapper {
+    height: 178px;
     width: 10%;
+    min-width: 20px;
     max-width: 116px;
+    left: 0;
+    top: 0;
+    transform: none;
+}
+
+#player1.unoHand .cardWrapper {
+    width: 178px;
+    height: 10%;
+    min-height: 20px;
+    max-height: 116px;
+    left: 0;
+    top: 0;
+    transform: none;
+}
+
+#player3.unoHand .cardWrapper {
+    width: 178px;
+    height: 10%;
+    max-height: 116px;
+    right: 0;
+    bottom: 0;
+    transform: none;
 }
 
 .unoHand .cardWrapper .unoCard {
-    left: 0;
+    transform-origin: center;
+    position: absolute;
     bottom: 0px;
+}
+
+.unoHand .cardWrapper {
+    background: none;
+    position: relative;
+    transition-duration: 0.05s;
+    transition-timing-function: ease-in-out;
+}
+
+#player0.unoHand .cardWrapper, #player2.unoHand .cardWrapper {
+    margin-top: auto;
+    margin-bottom: auto;
+    transition-property: min-width;
+}
+
+#player1.unoHand .cardWrapper, #player3.unoHand .cardWrapper {
+    margin-left: auto;
+    margin-right: auto;
+    transition-property: height;
 }
 
 #player0.unoHand .cardWrapper > .unoCard {
     transition-property: transform;
     transition-duration: 0.05s;
     transition-timing-function: ease-in-out;
-    transform: translateY(0%);
 }
 
-.cardWrapper:last-child,
+#player0 .cardWrapper:last-child,
+#player2 .cardWrapper:last-child,
 #player0.unoHand .cardWrapper:hover {
-    width: 116px;
+    min-width: 116px;
+    overflow: visible;
+}
+
+#player1 .cardWrapper:last-child,
+#player3 .cardWrapper:last-child {
+    height: 116px;
+    max-height: 116px;
     overflow: visible;
 }
 
@@ -454,27 +510,66 @@
 }
 
 #discard {
-    width: 126px;
-    height: 200px;
     flex-shrink: 0;
 }
 
 #drawCard {
     position: absolute;
+}
+
+#drawCard.cardWrapper .unoCard {
     transition-property: transform;
     transition-duration: 0.075s;
     transition-timing-function: ease-in-out;
     transform: none;
 }
 
-#drawCard.cardWrapper:hover {
+.cardWrapper #drawCard.cardWrapper:hover .unoCard {
     transform: translate(0, -20%);
 }
 
 /* :not([disabled]) */
 
 #player0.unoHand .cardWrapper:hover .unoCard {
-    transform: translateY(-20%);
+    transform: translate(0, -20%);
+}
+
+#player1.unoHand .cardWrapper .unoCard {
+    left: 50%;
+    top: 0;
+    transform-origin: center;
+    transform: translate(-50%, -50%) rotate(90deg) translate(50%, 0);
+}
+
+#player2.unoHand .cardWrapper .unoCard {
+    right: 0;
+    top: 50%;
+    transform-origin: center;
+    transform: translate(50%, -50%) rotate(180deg) translate(50%, 0);
+}
+
+#player3.unoHand .cardWrapper .unoCard {
+    left: 50%;
+    bottom: 0;
+    transform-origin: center;
+    transform: translate(-50%, 50%) rotate(270deg) translate(50%, 0);
+}
+
+#player1.unoHand #player3.unoHand .cardWrapper {
+    width: 178px;
+    height: 116px;
+}
+
+#player1.unoHand {
+    flex-direction: column;
+}
+
+#player2.unoHand {
+    flex-direction: row-reverse;
+}
+
+#player3.unoHand {
+    flex-direction: column-reverse;
 }
 
 /*
@@ -483,6 +578,7 @@
 }
 */
 
+/*
 #player1 {
     transform: rotate(90deg);
 }
@@ -490,7 +586,19 @@
 #player3 {
     transform: rotate(270deg);
 }
+*/
 
-#gameWindow {
+#game_window {
     overflow: hidden;
+    /*
+    display: grid;
+    column-span: 3;
+    grid-template-rows: 178px auto 178px 178px;
+    grid-template-columns: 178px auto 178px;
+    */
+    background: rgb(255,255,255);
+    background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(226,232,240,1) 100%);
+    background: radial-gradient(circle, rgba(248,250,251,1) 0%, rgba(229,236,242,1) 39%, rgba(144,174,198,1) 100%);
+    /*background: radial-gradient(circle, rgba(255,244,183,1) 0%, rgba(241,198,154,1) 100%);*/
+    /*background: radial-gradient(circle, rgba(255,241,145,1) 0%, rgba(233,178,115,1) 100%);*/
 }

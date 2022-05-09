@@ -72,8 +72,6 @@ class Draggable {
         );
         this.element.style.position = "absolute";
         this.element.style.transform = "none";
-        this.element.style.width = "auto";
-        this.element.style.height = "auto";
         document.body.appendChild(this.element);
 
         this.moveToPosition(event.clientX, event.clientY);
@@ -109,8 +107,6 @@ class Draggable {
         this.element.style.left = null;
         this.element.style.position = null;
         this.element.style.transform = null;
-        this.element.style.width = null;
-        this.element.style.height = null;
 
         const mouseX = event.clientX;
         const mouseY = event.clientY;
