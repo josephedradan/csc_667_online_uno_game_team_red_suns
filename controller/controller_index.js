@@ -10,7 +10,7 @@ const utilCommon = require('./util_common');
 const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');
 const constants = require('../server/constants');
 
-/* ############################################################################################################## */
+/* ############################################################################################################# */
 
 const controllerIndex = {};
 
