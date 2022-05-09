@@ -1,4 +1,5 @@
 const gameUno = require('./game_uno');
+const gameUnoLogic = require('./game_uno_logic');
 const debugPrinter = require('../util/debug_printer');
 const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');
 const dbEngineMessage = require('./db_engine_message');
@@ -169,7 +170,6 @@ async function moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow)
 
 intermediateGameUno.moveCardDrawToHandByGameIDAndPlayerRowWrapped = moveCardDrawToHandByGameIDAndPlayerRowWrapped;
 
-
 async function playCardHandToPlayDeckWrapped(game_id, user_id, playObject) {
     debugPrinter.printFunction(playCardHandToPlayDeckWrapped.name);
 
@@ -218,6 +218,18 @@ async function startGameWrapped(game_id, user_id) {
     }
 
     await gameUno.moveCardDrawToPlay(game_id);
+
+    let gameData = null;
+
+    // FXIME: VERY DANGEROUS LOOP
+    while (!gameData || gameData.status === constants.FAILURE) {
+        gameData = await gameUnoLogic.updateGameData(result.game, {});
+
+        if (gameData.status === constants.FAILURE) {
+            await updateCollectionRowPlayToDrawAndRandomizedByGameID(game_id);
+            await gameUno.moveCardDrawToPlay(game_id);
+        }
+    }
 
     const resultNew = intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 

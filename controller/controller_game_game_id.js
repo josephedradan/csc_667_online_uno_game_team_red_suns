@@ -44,7 +44,7 @@ async function POSTPlayCard(req, res, next) {
         req.body,
     );
 
-    // debugPrinter.printError(result)
+    debugPrinter.printError(result);
 
     // debugPrinter.printDebug(result);
 
@@ -72,7 +72,7 @@ async function POSTStartGame(req, res, next) {
 
     const result = await intermediateGameUno.startGameWrapped(req.game.game_id, req.user.user_id);
 
-    // debugPrinter.printDebug(result);
+    debugPrinter.printDebug(result);
 
     res.json(result);
 }

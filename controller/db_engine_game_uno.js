@@ -621,6 +621,8 @@ dbEngineGameUno.randomizeCollectionRowsByGameIDAndPlayerID = randomizeCollection
 /**
  * Randomize Collection (DRAW | PLAY | HAND) by game_id and collection_info_id
  *
+ * Notes:
+ *      FIXME: WARNING, DO NOT DO THIS CALL THIS ON collection_info_id === 3, IT WILL BREAK THE INDICES FOR THE ENTIRE COLLECTION OF THE GAME
  *
  * @param game_id
  * @param collection_info_id
@@ -1067,6 +1069,64 @@ async function getCollectionRowDetailedByGameIDAndCollectionInfoID(game_id, coll
 
 dbEngineGameUno.getCollectionRowDetailedByGameIDAndCollectionInfoID = getCollectionRowDetailedByGameIDAndCollectionInfoID;
 
+async function getCollectionRowCollectionIndexByGameIDAndCollectionInfoID(game_id, collection_info_id) {
+    debugPrinter.printFunction(getCollectionRowCollectionIndexByGameIDAndCollectionInfoID.name);
+    const result = await db.any(
+        `
+        SELECT 
+            "Collection".collection_index
+        FROM "Collection"
+        JOIN "Cards" ON "Collection".card_id = "Cards".card_id
+        WHERE "Cards".game_id = $1
+        AND "Collection".collection_info_id = $2
+        ORDER BY "Collection".collection_index ASC;
+        `,
+        [
+            game_id,
+            collection_info_id,
+        ],
+    );
+
+    return result;
+}
+
+dbEngineGameUno.getCollectionRowCollectionIndexByGameIDAndCollectionInfoID = getCollectionRowCollectionIndexByGameIDAndCollectionInfoID;
+
+async function getCollectionRowTopDetailedByGameIDAndCollectionInfoID(game_id, collection_info_id) {
+    debugPrinter.printFunction(getCollectionRowTopDetailedByGameIDAndCollectionInfoID.name);
+    const result = await db.any(
+        `
+        SELECT 
+            "Cards".game_id,
+            "CardInfo".type,
+            "CardInfo".color,
+            "CardInfo".content,
+            "Collection".player_id,
+            "Collection".collection_index,
+            "Collection".card_id,
+            "Collection".collection_info_id,
+            "Card".card_info_id,
+            "CollectionInfo".type AS collection_info_type
+        FROM "Collection"
+        JOIN "Cards" ON "Collection".card_id = "Cards".card_id
+        JOIN "Card" ON "Collection".card_id = "Card".card_id
+        JOIN "CardInfo" ON "CardInfo".card_info_id = "Card".card_info_id
+        JOIN "CollectionInfo" ON "CollectionInfo".collection_info_id = "Collection".collection_info_id
+        WHERE "Cards".game_id = $1
+        AND "Collection".collection_info_id = $2
+        ORDER BY "Collection".collection_index DESC LIMIT 1;
+        `,
+        [
+            game_id,
+            collection_info_id,
+        ],
+    );
+
+    return result[0];
+}
+
+dbEngineGameUno.getCollectionRowTopDetailedByGameIDAndCollectionInfoID = getCollectionRowTopDetailedByGameIDAndCollectionInfoID;
+
 /**
  * Get a player based on their game_id and user_id
  *
@@ -1315,48 +1375,6 @@ async function updateGameIsActiveByGameID(game_id, boolean) {
 
 dbEngineGameUno.updateGameIsActiveByGameID = updateGameIsActiveByGameID;
 
-async function updateGameDataIsClockwiseByGameID(game_id, boolean) {
-    debugPrinter.printFunction(updateGameDataIsClockwiseByGameID.name);
-
-    const result = await db.any(
-        `
-        UPDATE "GameData"
-        SET is_clockwise = $2
-        WHERE "GameData".game_id = $1
-        RETURNING *;
-        `,
-        [
-            game_id,
-            boolean,
-        ],
-    );
-
-    return result;
-}
-
-dbEngineGameUno.updateGameDataIsClockwiseByGameID = updateGameDataIsClockwiseByGameID;
-
-async function updateGameDataPlayerIDTurnByGameID(game_id, player_id) {
-    debugPrinter.printFunction(updateGameDataPlayerIDTurnByGameID.name);
-
-    const result = await db.any(
-        `
-        UPDATE "GameData"
-        SET player_id_turn = $2
-        WHERE "GameData".game_id = $1
-        RETURNING *;
-        `,
-        [
-            game_id,
-            player_id,
-        ],
-    );
-
-    return result;
-}
-
-dbEngineGameUno.updateGameDataPlayerIDTurnByGameID = updateGameDataPlayerIDTurnByGameID;
-
 async function updateGamePlayerIDHostByGameID(game_id, player_id) {
     debugPrinter.printFunction(updateGamePlayerIDHostByGameID.name);
 
@@ -1455,16 +1473,29 @@ async function updateCollectionRowDrawToPlayTop(game_id) {
 
 dbEngineGameUno.updateCollectionRowDrawToPlayTop = updateCollectionRowDrawToPlayTop;
 
-async function getCollectionRowSimpleHandByCollectionIndex(player_id, collection_index) {
-    debugPrinter.printFunction(getCollectionRowSimpleHandByCollectionIndex.name);
+async function getCollectionRowHandDetailedByCollectionIndex(player_id, collection_index) {
+    debugPrinter.printFunction(getCollectionRowHandDetailedByCollectionIndex.name);
 
     const result = await db.any(
         `
-        SELECT player_id, collection_index, "Collection".card_id, game_id
-        From "Collection"
+        SELECT 
+            "Cards".game_id,
+            "CardInfo".type,
+            "CardInfo".color,
+            "CardInfo".content,
+            "Collection".player_id,
+            "Collection".collection_index,
+            "Collection".card_id,
+            "Collection".collection_info_id,
+            "Card".card_info_id,
+            "CollectionInfo".type AS collection_info_type
+        FROM "Collection"
         JOIN "Cards" ON "Collection".card_id = "Cards".card_id
-        WHERE player_id = $1
-        AND collection_index = $2
+        JOIN "Card" ON "Collection".card_id = "Card".card_id
+        JOIN "CardInfo" ON "CardInfo".card_info_id = "Card".card_info_id
+        JOIN "CollectionInfo" ON "CollectionInfo".collection_info_id = "Collection".collection_info_id
+        WHERE "Collection".player_id = $1
+        AND "Collection".collection_index = $2
         `,
         [
             player_id,
@@ -1475,7 +1506,7 @@ async function getCollectionRowSimpleHandByCollectionIndex(player_id, collection
     return result[0];
 }
 
-dbEngineGameUno.getCollectionRowSimpleHandByCollectionIndex = getCollectionRowSimpleHandByCollectionIndex;
+dbEngineGameUno.getCollectionRowHandDetailedByCollectionIndex = getCollectionRowHandDetailedByCollectionIndex;
 
 async function updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed(game_id, player_id, collection_index) {
     debugPrinter.printFunction(updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed.name);
@@ -1535,5 +1566,125 @@ async function updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRow
 }
 
 dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed = updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed;
+
+/*
+##############################################################################################################
+GameData Related
+##############################################################################################################
+*/
+
+async function updateGameDataIsClockwise(game_id, boolean) {
+    debugPrinter.printFunction(updateGameDataIsClockwise.name);
+
+    const result = await db.any(
+        `
+        UPDATE "GameData"
+        SET 
+            is_clockwise = $2
+        WHERE "GameData".game_id = $1
+        RETURNING *;
+        `,
+        [
+            game_id,
+            boolean,
+        ],
+    );
+
+    return result[0];
+}
+
+dbEngineGameUno.updateGameDataIsClockwise = updateGameDataIsClockwise;
+
+async function updateGameDataPlayerIDTurn(game_id, player_id) {
+    debugPrinter.printFunction(updateGameDataPlayerIDTurn.name);
+
+    const result = await db.any(
+        `
+        UPDATE "GameData"
+        SET 
+            player_id_turn = $2
+        WHERE "GameData".game_id = $1
+        RETURNING *;
+        `,
+        [
+            game_id,
+            player_id,
+        ],
+    );
+
+    return result[0];
+}
+
+dbEngineGameUno.updateGameDataPlayerIDTurn = updateGameDataPlayerIDTurn;
+
+async function updateGameDataCardLegal(game_id, card_type_legal, card_content_legal, card_color_legal) {
+    debugPrinter.printFunction(updateGameDataCardLegal.name);
+
+    const result = await db.any(
+        `
+        UPDATE "GameData"
+        SET 
+            card_type_legal = $2,
+            card_content_legal = $3, 
+            card_color_legal = $4
+        WHERE "GameData".game_id = $1
+        RETURNING *;
+        `,
+        [
+            game_id,
+            card_type_legal,
+            card_content_legal,
+            card_color_legal,
+        ],
+    );
+
+    return result[0];
+}
+
+dbEngineGameUno.updateGameDataCardLegal = updateGameDataCardLegal;
+
+async function updateGameDataSkipAmount(game_id, skipAmount) {
+    debugPrinter.printFunction(updateGameDataSkipAmount.name);
+
+    const result = await db.any(
+        `
+        UPDATE "GameData"
+        SET 
+            skip_amount = $2
+        WHERE "GameData".game_id = $1
+        RETURNING *;
+        `,
+        [
+            game_id,
+            skipAmount,
+        ],
+    );
+
+    return result[0];
+}
+
+dbEngineGameUno.updateGameDataSkipAmount = updateGameDataSkipAmount;
+
+async function updateGameDataDrawAmount(game_id, drawAmount) {
+    debugPrinter.printFunction(updateGameDataDrawAmount.name);
+
+    const result = await db.any(
+        `
+        UPDATE "GameData"
+        SET 
+            draw_amount = $2
+        WHERE "GameData".game_id = $1
+        RETURNING *;
+        `,
+        [
+            game_id,
+            drawAmount,
+        ],
+    );
+
+    return result[0];
+}
+
+dbEngineGameUno.updateGameDataDrawAmount = updateGameDataDrawAmount;
 
 module.exports = dbEngineGameUno;
