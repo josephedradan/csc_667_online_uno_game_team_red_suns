@@ -314,7 +314,7 @@ class TurnController {
         this.gameWindow = gameWindow;
         this.draggables = [];
     }
-
+    // note for callbacks that you want to use arrow functions for any form of callbacks if you're using this keyword
     startTurn(cardCollection, playCollection) {
         this.endTurn();
         cardCollection.forEach((cardData) => {
@@ -346,7 +346,9 @@ class TurnController {
 
             // restart the animation
             draggable.setDragEndCallback(async (newParent) => {
+                // debugger;
                 if (newParent == this.playContainer) {
+                    // debugger;
                     // if card is a wild card, prompt with modal and request the move
                     // console.log(cardData);
                     if (cardData.color == "black") {
@@ -369,6 +371,7 @@ class TurnController {
                                 collection_index: cardData.collection_index,
                             }
                         );
+                        // debugger;
                         console.log(result);
                     }
                 } else {
@@ -412,7 +415,6 @@ class TurnController {
 
     // clean up
     endTurn() {
-        // TODO: toggle animation here
         this.handContainer.childNodes.forEach((e) =>
             e.classList.remove("animate-bounce")
         );
@@ -470,6 +472,7 @@ async function renderGameState(game_state) {
     gameStateQueue.push([game_state, playersHand]);
 
     // this check is to allow for the rendering of the host. since we're rendering
+    // TODO: legal_color will be used instead to render the current color being played
     if (
         game_state.collection_play.length !== 0 ||
         !game_state.collection_play
@@ -586,10 +589,15 @@ async function renderGameState(game_state) {
                 }
             }
         }
-
+        forceScrollDown();
         queueActive = false;
     }
 }
+
+const forceScrollDown = () => {
+    document.querySelector("#sandbox_message_box").scrollTop =
+        document.querySelector("#sandbox_message_box").scrollHeight;
+};
 
 const display_current_player = (display_name) => {
     const currentPlayerTarget = document.getElementById("currentPlayer");
@@ -613,6 +621,7 @@ const applyBounceAnimation = (card, playCollection, cardData) => {
         card.classList.add("animate-bounce");
     } else {
         card.classList.add("brightness-75");
+        card.toggleAttribute("disabled", true); // ERIC, added disabled as well.
     }
 };
 
