@@ -1567,6 +1567,28 @@ async function updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRow
 
 dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed = updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed;
 
+async function updateGameDataRowByGameIdAndGameState(game_id, game_state) {
+    debugPrinter.printFunction(updateGameDataRowByGameIdAndGameState.name);
+    const result = await db.any(
+        `
+            UPDATE "GameData" 
+            SET 
+            card_content_legal = $1,
+            card_color_legal = $2
+            WHERE "GameData".game_id = $3 
+        `,
+        [
+            game_state.content_legal,
+            game_state.color_legal,
+            game_id,
+        ],
+    );
+
+    return result;
+}
+
+dbEngineGameUno.updateGameDataRowByGameIdAndGameState = updateGameDataRowByGameIdAndGameState;
+
 /*
 ##############################################################################################################
 GameData Related

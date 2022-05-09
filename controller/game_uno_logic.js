@@ -165,7 +165,7 @@ gameUnoLogic.updateGameData = updateGameData;
 
 // Helpers for : doMoveCardHandToPlayByCollectionIndexLogic
 // eslint-disable-next-line no-shadow
-const applyAndAcceptPlay = async (result, gameRow, playerRow, playObject) => {
+const applyAndAcceptPlay = async (result, gameRow, playerRow, playObject, playCard) => {
     // Update Player's collection & Update PLAY's collection (May be empty)
     debugPrinter.printFunction(applyAndAcceptPlay.name);
     const collectionRowHandUpdated = await dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed(
@@ -174,12 +174,30 @@ const applyAndAcceptPlay = async (result, gameRow, playerRow, playObject) => {
         playObject.collection_index,
     );
 
+    const newGameData = await dbEngineGameUno.updateGameDataRowByGameIdAndGameState(
+        gameRow.game_id,
+        {
+            content_legal: playCard.content,
+            color_legal: playCard.color,
+        },
+    );
+
     if (!collectionRowHandUpdated) {
         // eslint-disable-next-line no-param-reassign
         result.status = constants.FAILURE;
         // eslint-disable-next-line no-param-reassign
         result.message = `Failed to update Collection ${gameRow.game_id}`;
     }
+
+    /*
+    if (!newGameData) {
+        // eslint-disable-next-line no-param-reassign
+        result.status = constants.FAILURE;
+        // eslint-disable-next-line no-param-reassign
+        result.message = `Failed to update ${gameRow.game_id}`;
+    }
+    */
+
 
     // eslint-disable-next-line no-param-reassign
     result.status = constants.SUCCESS;
@@ -242,20 +260,21 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRow, playerRow, pl
      * }
      *
      */
-
+    console.log("collectionHand: " + collectionRowHandByCollectionIndex.color + ":" + collectionRowHandByCollectionIndex.content);
+    console.log("gameRow: " + gameRow.card_color_legal + ":" + gameRow.card_content_legal);
     if (collectionRowHandByCollectionIndex.color === 'black') {
         // - verify the player's hand to see if the has no legal cards left to play
         // 'wild' accept the play
         if (collectionRowHandByCollectionIndex.content === 'wild') {
-            applyAndAcceptPlay(result, gameRow, playerRow, playObject);
+            applyAndAcceptPlay(result, gameRow, playerRow, playObject, collectionRowHandByCollectionIndex);
         } else if (verifyPlayerHand(gameRow)) {
             // 'wildFour' verify the player's hand accept the play if hand does not meet color req.
             // TODO: Accepting play for now but if varifyPlayerHand is false we should reject the play outside of this.
-            applyAndAcceptPlay(result, gameRow, playerRow, playObject); // accept.... for now.
+            applyAndAcceptPlay(result, gameRow, playerRow, playObject, collectionRowHandByCollectionIndex); // accept.... for now.
         }
     } else if (collectionRowHandByCollectionIndex.color === gameRow.card_color_legal || collectionRowHandByCollectionIndex.content === gameRow.card_content_legal) {
         // Accept Play
-        applyAndAcceptPlay(result, gameRow, playerRow, playObject);
+        applyAndAcceptPlay(result, gameRow, playerRow, playObject, collectionRowHandByCollectionIndex);
     } else {
         // Reject play
         // write onto result notifying error.
