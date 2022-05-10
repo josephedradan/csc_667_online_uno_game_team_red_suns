@@ -4,12 +4,6 @@ const in_game_socket_message_button = document.getElementById(
     'in_game_socket_message_button',
 );
 
-const getGameId = () => {
-    // https://term-project-red-suns.herokuapp.com/games/112451
-    const currURL = window.location.href;
-    const gameId = currURL.split('/');
-    return gameId.at(gameId.length - 1);
-};
 
 in_game_socket_message.addEventListener('keypress', (e) => {
     // behavior explained: shift + enter will make new line in text area
