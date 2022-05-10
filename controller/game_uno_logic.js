@@ -263,15 +263,15 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRow, playerRow, pl
         // - verify the player's hand to see if the has no legal cards left to play
         // 'wild' accept the play
         if (collectionRowHandByCollectionIndex.content === 'wild') {
-            applyAndAcceptPlay(result, gameRow, playerRow, playObject, collectionRowHandByCollectionIndex);
+            await applyAndAcceptPlay(result, gameRow, playerRow, playObject, collectionRowHandByCollectionIndex);
         } else if (verifyPlayerHand(gameRow)) {
             // 'wildFour' verify the player's hand accept the play if hand does not meet color req.
             // TODO: Accepting play for now but if varifyPlayerHand is false we should reject the play outside of this.
-            applyAndAcceptPlay(result, gameRow, playerRow, playObject, collectionRowHandByCollectionIndex); // accept.... for now.
+            await applyAndAcceptPlay(result, gameRow, playerRow, playObject, collectionRowHandByCollectionIndex); // accept.... for now.
         }
     } else if (collectionRowHandByCollectionIndex.color === gameRow.card_color_legal || collectionRowHandByCollectionIndex.content === gameRow.card_content_legal) {
         // Accept Play
-        applyAndAcceptPlay(result, gameRow, playerRow, playObject, collectionRowHandByCollectionIndex);
+        await applyAndAcceptPlay(result, gameRow, playerRow, playObject, collectionRowHandByCollectionIndex);
     } else {
         // Reject play
         // write onto result notifying error.
