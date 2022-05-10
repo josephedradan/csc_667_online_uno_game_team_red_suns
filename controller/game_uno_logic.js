@@ -174,12 +174,11 @@ const applyAndAcceptPlay = async (result, gameRow, playerRow, playObject, playCa
         playObject.collection_index,
     );
 
-    const newGameData = await dbEngineGameUno.updateGameDataRowByGameIdAndGameState(
+    const newGameData = await dbEngineGameUno.dbEngineGameUno.updateGameDataCardLegal(
         gameRow.game_id,
-        {
-            content_legal: playCard.content,
-            color_legal: playCard.color,
-        },
+        playCard.type,
+        playCard.content,
+        playCard.color,
     );
 
     if (!collectionRowHandUpdated) {
@@ -187,6 +186,13 @@ const applyAndAcceptPlay = async (result, gameRow, playerRow, playObject, playCa
         result.status = constants.FAILURE;
         // eslint-disable-next-line no-param-reassign
         result.message = `Failed to update Collection ${gameRow.game_id}`;
+    }
+
+    if (!newGameData) {
+        // eslint-disable-next-line no-param-reassign
+        result.status = constants.FAILURE;
+        // eslint-disable-next-line no-param-reassign
+        result.message = `Failed to update GameData ${gameRow.game_id}`;
     }
 
     /*
