@@ -211,7 +211,7 @@ gameUnoLogic.updateGameData = updateGameData;
 async function doMoveCardHandToPlayByCollectionIndexLogic(gameRow, playerRow, collection_index, color) {
     debugPrinter.printFunction(doMoveCardHandToPlayByCollectionIndexLogic.name);
     debugPrinter.printBackendMagenta(color);
-    debugPrinter.printBackendWhite("FUC");
+    debugPrinter.printBackendWhite('FUC');
 
     const result = {
         status: null,
