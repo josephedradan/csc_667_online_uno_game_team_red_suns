@@ -174,13 +174,12 @@ const applyAndAcceptPlay = async (result, gameRow, playerRow, playObject, playCa
         playObject.collection_index,
     );
 
-    const newGameData = await dbEngineGameUno.updateGameDataRowByGameIdAndGameState(
-        gameRow.game_id,
-        {
-            content_legal: playCard.content,
-            color_legal: playCard.color,
-        },
-    );
+    /*
+            "CardInfo".type,
+            "CardInfo".color,
+            "CardInfo".content
+    */
+    const newGameData = await dbEngineGameUno.updateGameDataCardLegal(gameRow.game_id, playCard.type, playCard.color, playCard.content);
 
     if (!collectionRowHandUpdated) {
         // eslint-disable-next-line no-param-reassign
