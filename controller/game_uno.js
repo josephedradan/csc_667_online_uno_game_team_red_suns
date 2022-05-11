@@ -833,7 +833,7 @@ gameUno.moveCardDrawToPlay = moveCardDrawToPlay;
  * @param playObject
  * @returns {Promise<{player_current_turn_new: null, game: null, collection: null, message: null, status: null, player: null}>}
  */
-async function moveCardHandToPlayByCollectionIndex(game_id, user_id, playObject) {
+async function moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_index, color) {
     debugPrinter.printFunction(moveCardHandToPlayByCollectionIndex.name);
 
     const result = {
@@ -869,7 +869,7 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, playObject)
 
     // TODO FUCK
 
-    const gameLogic = await gameUnoLogic.doMoveCardHandToPlayByCollectionIndexLogic(gameRow, playerRow, playObject);
+    const gameLogic = await gameUnoLogic.doMoveCardHandToPlayByCollectionIndexLogic(gameRow, playerRow, collection_index, color);
 
     if (gameLogic.status === constants.FAILURE) {
         result.status = gameLogic.status;
@@ -881,7 +881,7 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, playObject)
 
     result.status = constants.SUCCESS;
 
-    result.message = `Card (collection_index ${playObject.collection_index}) from player ${playerRow.display_name} (player_id ${playerRow.player_id})'s 
+    result.message = `Card (collection_index ${collection_index}) from player ${playerRow.display_name} (player_id ${playerRow.player_id})'s 
     collection moved to PLAY's collection's top for Game ${game_id}`;
 
     return result;

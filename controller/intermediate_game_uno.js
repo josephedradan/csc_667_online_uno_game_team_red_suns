@@ -170,13 +170,13 @@ async function moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow)
 
 intermediateGameUno.moveCardDrawToHandByGameIDAndPlayerRowWrapped = moveCardDrawToHandByGameIDAndPlayerRowWrapped;
 
-async function playCardHandToPlayDeckWrapped(game_id, user_id, playObject) {
+async function playCardHandToPlayDeckWrapped(game_id, user_id, collection_index, color) {
     debugPrinter.printFunction(playCardHandToPlayDeckWrapped.name);
 
     // TODO HANDLE PLAYING SPECIAL CARDS
     // TODO CHANGE TURN IF NEEDED
 
-    const result = await gameUno.moveCardHandToPlayByCollectionIndex(game_id, user_id, playObject);
+    const result = await gameUno.moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_index, color);
 
     await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 
@@ -223,7 +223,7 @@ async function startGameWrapped(game_id, user_id) {
 
     // FXIME: VERY DANGEROUS LOOP
     while (!gameData || gameData.status === constants.FAILURE) {
-        gameData = await gameUnoLogic.updateGameData(result.game, {});
+        gameData = await gameUnoLogic.updateGameData(result.game, null);
 
         if (gameData.status === constants.FAILURE) {
             await updateCollectionRowPlayToDrawAndRandomizedByGameID(game_id);

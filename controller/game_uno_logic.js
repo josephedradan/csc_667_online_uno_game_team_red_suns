@@ -1,6 +1,15 @@
+const e = require('express');
 const debugPrinter = require('../util/debug_printer');
 const dbEngineGameUno = require('./db_engine_game_uno');
 const constants = require('../server/constants');
+const unoCardConstants = require('../server/uno_card_constants');
+
+const set = new Set(unoCardConstants.LEGAL_COLORS);
+
+function isValidColor(color) {
+    debugPrinter.printBackendMagenta(set.has(color));
+    return set.has(color);
+}
 
 const gameUnoLogic = {};
 
@@ -58,7 +67,7 @@ async function changeTurnAndGetPlayerRowDetailedByGameID(gameRow) {
     });
 
     const indexOfNextPlayerInPlayerRowsActive = ((indexOfCurrentPlayer + 1 + gameRow.skip_amount) % playerRowsActive.length);
-
+    await dbEngineGameUno.updateGameDataSkipAmount(gameRow.game_id, 0);
     result.user_id_turn = playerRowsActive[indexOfNextPlayerInPlayerRowsActive].user_id;
     result.player_id_turn = playerRowsActive[indexOfNextPlayerInPlayerRowsActive].player_id;
 
@@ -82,8 +91,9 @@ gameUnoLogic.changeTurnAndGetPlayerRowDetailedByGameID = changeTurnAndGetPlayerR
  * @param playObject
  * @returns {Promise<{game, message: null, status: null}>}
  */
-async function updateGameData(gameRow, playObject) {
+async function updateGameData(gameRow, color) {
     debugPrinter.printFunction(updateGameData.name);
+    debugPrinter.printBackendCyan(gameRow);
 
     const result = {
         status: null,
@@ -93,9 +103,21 @@ async function updateGameData(gameRow, playObject) {
         card_legal: null,
     };
 
+    if (!color && isValidColor(color)) {
+        result.status = constants.FAILURE;
+        result.message = `Improper color by game_id: ${gameRow.game_id} color: ${color}`;
+        return result;
+    }
+
     const collectionRowPlayTop = await dbEngineGameUno.getCollectionRowTopDetailedByGameIDAndCollectionInfoID(gameRow.game_id, 2);
 
     debugPrinter.printBackendGreen(collectionRowPlayTop);
+
+    if (!collectionRowPlayTop) {
+        result.status = constants.FAILURE;
+        result.message = `Get Collection of the Top Card of the Play Stack failed, it's empty game_id: ${gameRow.game_id}`;
+        return result;
+    }
 
     const temp = {
         collection_index: collectionRowPlayTop.collection_index,
@@ -106,16 +128,20 @@ async function updateGameData(gameRow, playObject) {
     debugPrinter.printBackendBlue(temp);
 
     // Use playObject's color by default if it exists
-    if (playObject.color) {
-        temp.color = playObject.color;
+    if (color && temp.color === unoCardConstants.CARD_COLOR_BLACK) {
+        temp.color = color;
     }
-    debugPrinter.printError(playObject);
-    debugPrinter.printBackendBlue(temp);
+    // debugPrinter.printError(playObject);
+    // debugPrinter.printBackendBlue(temp);
 
     // If temp.color is black
-    if (temp.color === 'black') {
+
+    // wildfour causes a draw of four cards, wild doesnt cause a draw. Both causes a change in color chosen by the player.
+    debugPrinter.printBackendWhite(temp.color);
+    debugPrinter.printBackendWhite(color);
+    if (temp.color === unoCardConstants.CARD_COLOR_BLACK) {
         result.status = constants.FAILURE;
-        result.message = `Top Card of PLAY's collection is black for game ${gameRow.gameid}. No color is selected, suggest a reshuffle`;
+        result.message = `Top Card of PLAY's collection is black for game ${gameRow.game_id}. No color is selected, suggest a reshuffle`;
         return result;
     }
 
@@ -129,6 +155,23 @@ async function updateGameData(gameRow, playObject) {
         return result;
     }
     result.card_legal = cardLegal;
+
+    // TODO: REMEMBER TO IMPLEMENT THE RESETTERS.
+    // Assume db queries will be successful since it lacks user input, guards preffered
+    if (temp.content === unoCardConstants.SPECIALS_CONTENT_WILDFOUR) {
+        // await dbEngineGameUno.updateGameDataDrawAmount(gameRow.game_id, 4);
+        if (gameRow.draw_amount > 1) {
+            await dbEngineGameUno.updateGameDataDrawAmount(gameRow.game_id, gameRow.draw_amount + 4);
+        } else {
+            await dbEngineGameUno.updateGameDataDrawAmount(gameRow.game_id, 4);
+        }
+    } else if (temp.content === unoCardConstants.SPECIALS_CONTENT_DRAWTWO) {
+        await dbEngineGameUno.updateGameDataDrawAmount(gameRow.game_id, 2);
+    } else if (temp.content === unoCardConstants.SPECIALS_CONTENT_REVERSE) {
+        await dbEngineGameUno.updateGameDataIsClockwise(gameRow.game_id, !gameRow.is_clockwise);
+    } else if (temp.content === unoCardConstants.SPECIALS_CONTENT_SKIP) {
+        await dbEngineGameUno.updateGameDataSkipAmount(1);
+    }
 
     const changeTurnObject = await gameUnoLogic.changeTurnAndGetPlayerRowDetailedByGameID(gameRow);
 
@@ -164,64 +207,11 @@ gameUnoLogic.updateGameData = updateGameData;
  */
 
 // Helpers for : doMoveCardHandToPlayByCollectionIndexLogic
-// eslint-disable-next-line no-shadow
-const applyAndAcceptPlay = async (result, gameRow, playerRow, playObject, playCard) => {
-    // Update Player's collection & Update PLAY's collection (May be empty)
-    debugPrinter.printFunction(applyAndAcceptPlay.name);
-    const collectionRowHandUpdated = await dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed(
-        gameRow.game_id,
-        playerRow.player_id,
-        playObject.collection_index,
-    );
 
-    /*
-            "CardInfo".type,
-            "CardInfo".color,
-            "CardInfo".content
-    */
-    const newGameData = await dbEngineGameUno.updateGameDataCardLegal(gameRow.game_id, playCard.type, playCard.color, playCard.content);
-
-    if (!collectionRowHandUpdated) {
-        // eslint-disable-next-line no-param-reassign
-        result.status = constants.FAILURE;
-        // eslint-disable-next-line no-param-reassign
-        result.message = `Failed to update Collection ${gameRow.game_id}`;
-    }
-
-    if (!newGameData) {
-        // eslint-disable-next-line no-param-reassign
-        result.status = constants.FAILURE;
-        // eslint-disable-next-line no-param-reassign
-        result.message = `Failed to update GameData ${gameRow.game_id}`;
-    }
-
-    // eslint-disable-next-line no-param-reassign
-    result.status = constants.SUCCESS;
-    // eslint-disable-next-line no-param-reassign
-    result.collection = collectionRowHandUpdated;
-};
-
-const verifyPlayerHand = async (gameRow) => {
-    debugPrinter.printFunction(verifyPlayerHand.name);
-    // Grab the the current state of the player's hand collection
-    const playerHand = await dbEngineGameUno.getCollectionRowDetailedByPlayerID(gameRow.player_id_turn);
-    if (!playerHand) {
-        debugPrinter.printBackendRed(`${verifyPlayerHand.name} FAILED`);
-        return false;
-    }
-    // Loop through this player's hand collection and find one instance of a card that is the same color as the card in the play stack.
-    // if there is a LEGAL card in the player's hand return false.
-    // eslint-disable-next-line no-plusplus
-    for (let i = 0; i < playerHand.length; i++) {
-        if (playerHand[i].color === gameRow.card_color_legal) {
-            return false;
-        }
-    }
-    return true;
-};
-
-async function doMoveCardHandToPlayByCollectionIndexLogic(gameRow, playerRow, playObject) {
+async function doMoveCardHandToPlayByCollectionIndexLogic(gameRow, playerRow, collection_index, color) {
     debugPrinter.printFunction(doMoveCardHandToPlayByCollectionIndexLogic.name);
+    debugPrinter.printBackendMagenta(color);
+    debugPrinter.printBackendWhite("FUC");
 
     const result = {
         status: null,
@@ -230,14 +220,18 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRow, playerRow, pl
         game_data: null,
     };
 
+    if (!color && isValidColor(color)) {
+        result.status = constants.FAILURE;
+        result.message = `Improper color by player_id: ${gameRow.game_id} color: ${color}`;
+        return result;
+    }
+
     // Check if card collection_index index exists (May be undefined)
-    const collectionRowHandByCollectionIndex = await dbEngineGameUno.getCollectionRowHandDetailedByCollectionIndex(playerRow.player_id, playObject.collection_index);
+    const collectionRowHandByCollectionIndex = await dbEngineGameUno.getCollectionRowHandDetailedByCollectionIndex(playerRow.player_id, collection_index);
 
     if (!collectionRowHandByCollectionIndex) {
         result.status = constants.FAILURE;
-        result.message = `Player ${playerRow.display_name} 
-        (player_id ${playerRow.player_id})'s Card (collection_index 
-        ${playObject.collection_index}) does not exist`;
+        result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id})'s Card (collection_index ${collection_index}) does not exist`;
         // Can be used as a short circuit because the playerRow is based on the game_id (don't need to check if game exists)
         return result;
     }
@@ -256,40 +250,14 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRow, playerRow, pl
      * }
      *
      */
-<<<<<<< HEAD
-=======
-    console.log(`collectionHand: ${collectionRowHandByCollectionIndex.color}:${collectionRowHandByCollectionIndex.content}`);
-    console.log(`gameRow: ${gameRow.card_color_legal}:${gameRow.card_content_legal}`);
->>>>>>> backend
-    if (collectionRowHandByCollectionIndex.color === 'black') {
-        // - verify the player's hand to see if the has no legal cards left to play
-        // 'wild' accept the play
-        if (collectionRowHandByCollectionIndex.content === 'wild') {
-            await applyAndAcceptPlay(result, gameRow, playerRow, playObject, collectionRowHandByCollectionIndex);
-        } else if (verifyPlayerHand(gameRow)) {
-            // 'wildFour' verify the player's hand accept the play if hand does not meet color req.
-            // TODO: Accepting play for now but if varifyPlayerHand is false we should reject the play outside of this.
-            await applyAndAcceptPlay(result, gameRow, playerRow, playObject, collectionRowHandByCollectionIndex); // accept.... for now.
-        }
-    } else if (collectionRowHandByCollectionIndex.color === gameRow.card_color_legal || collectionRowHandByCollectionIndex.content === gameRow.card_content_legal) {
-        // Accept Play
-        await applyAndAcceptPlay(result, gameRow, playerRow, playObject, collectionRowHandByCollectionIndex);
-    } else {
-        // Reject play
-        // write onto result notifying error.
+    const queryResult = await dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed(gameRow.game_id, playerRow.player_id, collection_index);
+    if (!queryResult) {
         result.status = constants.FAILURE;
-        result.message = `Illegal card play;
-        COLOR: ${collectionRowHandByCollectionIndex.color}
-        CONTENT: ${collectionRowHandByCollectionIndex.content}
-        PLAYER_ID:${collectionRowHandByCollectionIndex.player_id}
-        GAME_ID:${collectionRowHandByCollectionIndex.game_id}`;
-        // return result prematurely as to avoid updates.
-        debugPrinter.printBackendRed(result);
-        return result;
+        result.message = `Update to the Collection table by hand to play unsuccessful. player_id: ${playerRow.player_id} at collection_index: ${collection_index}`;
     }
 
+    const gameData = await gameUnoLogic.updateGameData(gameRow, color);
     console.log('-------------------------------------UPDATING GAME_DATA-------------------------------------');
-    const gameData = await gameUnoLogic.updateGameData(gameRow, playObject);
 
     if (gameData.status === constants.FAILURE) {
         result.status = gameData.status;

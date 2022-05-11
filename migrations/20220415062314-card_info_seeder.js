@@ -1,10 +1,23 @@
 const e = require('express');
+const unoCardConstants = require('../server/uno_card_constants');
 
 const values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-const specials = ['skip', 'reverse', 'drawTwo', 'wild', 'wildFour'];
-const colors = ['blue', 'red', 'green', 'yellow', 'black'];
-const NUMBER = 'NUMBER';
-const SPECIAL = 'SPECIAL';
+const specials = [
+    unoCardConstants.SPECIALS_CONTENT_SKIP,
+    unoCardConstants.SPECIALS_CONTENT_REVERSE,
+    unoCardConstants.SPECIALS_CONTENT_DRAWTWO,
+    unoCardConstants.SPECIALS_CONTENT_WILD,
+    unoCardConstants.SPECIALS_CONTENT_WILDFOUR,
+];
+const colors = [
+    unoCardConstants.CARD_COLOR_BLUE,
+    unoCardConstants.CARD_COLOR_RED,
+    unoCardConstants.CARD_COLOR_GREEN,
+    unoCardConstants.CARD_COLOR_YELLOW,
+    unoCardConstants.CARD_COLOR_BLACK,
+];
+const number = unoCardConstants.NUMBER;
+const special = unoCardConstants.SPECIAL;
 
 let index = 0;
 
@@ -21,7 +34,7 @@ function generateCard(content, color, type) {
 }
 
 function generateColoredNumCard(color, _values) {
-    return values.map((content) => generateCard(content, color, NUMBER));
+    return values.map((content) => generateCard(content, color, number));
 }
 
 function generateColoredSpecialCards() {
@@ -31,7 +44,7 @@ function generateColoredSpecialCards() {
     for (let i = 0; i < specials.length - 2; i++) {
         // eslint-disable-next-line no-plusplus
         for (let j = 0; j < colors.length - 1; j++) {
-            retArr.push(generateCard(specials[i], colors[j], SPECIAL));
+            retArr.push(generateCard(specials[i], colors[j], special));
         }
     }
 
@@ -41,14 +54,14 @@ function generateColoredSpecialCards() {
 function generateSpecialCards() {
     return [
         generateCard(
-            'wild',
-            'black',
-            SPECIAL,
+            unoCardConstants.SPECIALS_CONTENT_WILD,
+            unoCardConstants.CARD_COLOR_BLACK,
+            special,
         ),
         generateCard(
-            'wildFour',
-            'black',
-            SPECIAL,
+            unoCardConstants.SPECIALS_CONTENT_WILDFOUR,
+            unoCardConstants.CARD_COLOR_BLACK,
+            special,
         ),
     ];
 }
@@ -73,7 +86,7 @@ function seedAllCards() {
                 // eslint-disable-next-line no-plusplus
                 card_info_id: count++, content: cards[i].content, color: cards[i].color, type: cards[i].type,
             });
-        } else if (cards[i].content === 'wild' || cards[i].content === 'wildFour') {
+        } else if (cards[i].content === unoCardConstants.SPECIALS_CONTENT_WILD || cards[i].content === unoCardConstants.SPECIALS_CONTENT_WILDFOUR) {
             // eslint-disable-next-line no-plusplus
             for (let j = 0; j < 4; j++) {
                 inOrderDeck.push({
