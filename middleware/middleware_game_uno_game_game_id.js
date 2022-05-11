@@ -4,7 +4,7 @@ const gameUno = require('../controller/game_uno');
 const utilCommon = require('../controller/util_common');
 const intermediateSocketIOGameUno = require('../controller/intermediate_socket_io_game_uno');
 const intermediateGameUno = require('../controller/intermediate_game_uno');
-const constants = require('../server/constants');
+const constants = require('../config/constants');
 
 const middlewareGameUnoGameGameID = {};
 

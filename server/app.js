@@ -57,7 +57,7 @@ const dotenv = require('dotenv');
 dotenv.config(); // This must be at the top of all before any imports
 
 // eslint-disable-next-line import/order
-const constants = require('./constants');
+const constants = require('../config/constants');
 
 // eslint-disable-next-line import/order
 const connectionContainer = require('./server');

@@ -18,7 +18,7 @@ const to = require('await-to-js').default;
 const joiSchemas = require('../controller/joi_schemas');
 const debugPrinter = require('../util/debug_printer');
 const utilCommon = require('../controller/util_common');
-const constants = require('../server/constants');
+const constants = require('../config/constants');
 
 async function validateCommon(
     req,

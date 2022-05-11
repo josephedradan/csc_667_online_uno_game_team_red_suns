@@ -19,7 +19,7 @@ const debugPrinter = require('../util/debug_printer');
 const dbEngineMessage = require('./db_engine_message');
 const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');
 const db = require('../db');
-const constants = require('../server/constants');
+const constants = require('../config/constants');
 
 const controllerGameID = {};
 

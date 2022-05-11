@@ -1,7 +1,7 @@
 const e = require('express');
 const debugPrinter = require('../util/debug_printer');
 const dbEngineGameUno = require('./db_engine_game_uno');
-const constants = require('../server/constants');
+const constants = require('../config/constants');
 const unoCardConstants = require('../server/uno_card_constants');
 
 const set = new Set(unoCardConstants.LEGAL_COLORS);

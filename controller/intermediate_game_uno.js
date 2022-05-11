@@ -5,7 +5,7 @@ const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno')
 const dbEngineMessage = require('./db_engine_message');
 const dbEngineGameUno = require('./db_engine_game_uno');
 const { io } = require('../server/server');
-const constants = require('../server/constants');
+const constants = require('../config/constants');
 
 const intermediateGameUno = {};
 

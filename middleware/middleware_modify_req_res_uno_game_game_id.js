@@ -1,7 +1,7 @@
 const debugPrinter = require('../util/debug_printer');
 const dbEngineGameUno = require('../controller/db_engine_game_uno');
 const utilCommon = require('../controller/util_common');
-const constants = require('../server/constants');
+const constants = require('../config/constants');
 
 const middlewareModifyReqResGameUnoGameID = {};
 

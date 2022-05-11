@@ -84,7 +84,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const dbEngine = require('./db_engine');
 const debugPrinter = require('../util/debug_printer');
 const handlerPassword = require('./handler_password');
-const constants = require('../server/constants');
+const constants = require('../config/constants');
 
 // These are the fields that passport will look for in req.body
 const REQ_BODY_FIELD_NAMES_TO_LOOK_FOR = {
