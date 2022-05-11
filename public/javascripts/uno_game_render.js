@@ -332,19 +332,12 @@ class TurnController {
                     this.handContainer.children
                 )) {
                     removeBounceAnimation(reapplyCard);
-                    /*applyBounceAnimation(
-                        reapplyCard,
-                        playCollection,
-                        cardCollection[idx]
-                    );*/
                 }
             });
 
             // restart the animation
             draggable.setDragEndCallback(async (newParent) => {
-                // debugger;
                 if (newParent == this.playContainer) {
-                    // debugger;
                     // if card is a wild card, prompt with modal and request the move
                     // console.log(cardData);
                     if (cardData.color == "black") {
@@ -367,9 +360,12 @@ class TurnController {
                                 collection_index: cardData.collection_index,
                             }
                         );
+
                         // debugger;
                         console.log(result);
+                        applyCurrentColorToGameScreen(cardData.color);
                     }
+                    // update legal color
                 } else {
                     for (const [idx, reapplyCard] of Object.entries(
                         this.handContainer.children
@@ -383,7 +379,6 @@ class TurnController {
                     }
                 }
             });
-
             this.draggables.push(draggable);
             applyBounceAnimation(card, playCollection, cardData);
         });
@@ -469,15 +464,15 @@ async function renderGameState(game_state) {
 
     // this check is to allow for the rendering of the host. since we're rendering
     // TODO: legal_color will be used instead to render the current color being played
-    if (
-        game_state.collection_play.length !== 0 ||
-        !game_state.collection_play
-    ) {
-        applyCurrentColorToGameScreen(
-            game_state.collection_play[game_state.collection_play.length - 1]
-                .color
-        );
-    }
+    // if (
+    //     game_state.collection_play.length !== 0 ||
+    //     !game_state.collection_play
+    // ) {
+    //     // applyCurrentColorToGameScreen(
+    //     //     game_state.collection_play[game_state.collection_play.length - 1]
+    //     //         .color
+    //     // );
+    // }
 
     if (!queueActive) {
         queueActive = true;
@@ -585,6 +580,9 @@ async function renderGameState(game_state) {
                 }
             }
         }
+        if (game_state.game.card_color_legal) {
+            applyCurrentColorToGameScreen(game_state.game.card_color_legal);
+        }
         forceScrollDown();
         queueActive = false;
     }
@@ -600,8 +598,14 @@ const display_current_player = (display_name) => {
     currentPlayerTarget.textContent = `Current Player: ${display_name}`;
 };
 
-const applyCurrentColorToGameScreen = (color) => {
+// not pretty i'm sorry...
+const applyCurrentColorToGameScreen = async (color) => {
     const currentColor = document.getElementById("currentColor");
+    for (let i = 0; i < currentColor.classList.length; i++) {
+        if (currentColor.classList[i].match(/bg-\S+-\d+/)) {
+            currentColor.classList.remove(currentColor.classList[i]);
+        }
+    }
     currentColor.classList.add(`bg-${color}-500`);
 };
 
