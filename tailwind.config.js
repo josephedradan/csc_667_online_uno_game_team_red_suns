@@ -1,8 +1,8 @@
 module.exports = {
-    content: ["./views/**/*.{html,js,hbs}"],
+    content: ['./views/**/*.{html,js,hbs}'],
     theme: {
         maxHeight: {
-            583: "583px",
+            583: '583px',
         },
         extend: {
             // keyframes: {
