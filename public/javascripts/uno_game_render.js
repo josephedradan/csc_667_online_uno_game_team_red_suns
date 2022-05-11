@@ -579,9 +579,9 @@ async function renderGameState(game_state) {
                     );
                 }
             }
-        }
-        if (game_state.game.card_color_legal) {
-            applyCurrentColorToGameScreen(game_state.game.card_color_legal);
+            if (game_state.game.card_color_legal) {
+                applyCurrentColorToGameScreen(game_state.game.card_color_legal);
+            }
         }
         forceScrollDown();
         queueActive = false;
