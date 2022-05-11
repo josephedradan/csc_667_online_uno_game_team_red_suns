@@ -17,7 +17,7 @@ const middlewareModifyReqResGameUnoGameID = {};
 async function attachGameToRequestAndResponseLocalAndGuard(req, res, next) {
     debugPrinter.printMiddleware(attachGameToRequestAndResponseLocalAndGuard.name);
 
-    const gameRow = await dbEngineGameUno.getGameRowByGameIDSimple(req.params.game_id);
+    const gameRow = await dbEngineGameUno.getGameRowSimpleByGameID(req.params.game_id);
 
     if (!gameRow) {
         utilCommon.reqSessionMessageHandler(req, constants.FAILURE, 'Game does not exist');
@@ -39,7 +39,7 @@ middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocalAndGuard 
 async function attachGameToRequestAndResponseLocal(req, res, next) {
     debugPrinter.printMiddleware(attachGameToRequestAndResponseLocal.name);
 
-    const gameRow = await dbEngineGameUno.getGameRowByGameIDSimple(req.params.game_id);
+    const gameRow = await dbEngineGameUno.getGameRowSimpleByGameID(req.params.game_id);
 
     if (gameRow) {
         req.game = gameRow;

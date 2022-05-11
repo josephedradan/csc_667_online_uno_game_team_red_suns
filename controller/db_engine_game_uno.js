@@ -900,8 +900,8 @@ dbEngineGameUno.getGameRowDetailedByGameID = getGameRowDetailedByGameID;
  * @param game_id
  * @returns {Promise<any>}
  */
-async function getGameRowByGameIDSimple(game_id) {
-    debugPrinter.printFunction(getGameRowByGameIDSimple.name);
+async function getGameRowSimpleByGameID(game_id) {
+    debugPrinter.printFunction(getGameRowSimpleByGameID.name);
     const result = await db.any(
         `
         SELECT game_id, is_active, player_id_host
@@ -916,7 +916,7 @@ async function getGameRowByGameIDSimple(game_id) {
     return result[0];
 }
 
-dbEngineGameUno.getGameRowByGameIDSimple = getGameRowByGameIDSimple;
+dbEngineGameUno.getGameRowSimpleByGameID = getGameRowSimpleByGameID;
 
 /**
  * Get all games

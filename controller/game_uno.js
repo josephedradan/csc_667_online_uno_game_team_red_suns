@@ -128,7 +128,7 @@ async function getGame(game_id) {
     };
 
     // May be undefined
-    const gameRow = await dbEngineGameUno.getGameRowByGameIDSimple(game_id);
+    const gameRow = await dbEngineGameUno.getGameRowSimpleByGameID(game_id);
 
     // If Game Row does not exist
     if (!gameRow) {
