@@ -256,6 +256,11 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRow, playerRow, pl
      * }
      *
      */
+<<<<<<< HEAD
+=======
+    console.log(`collectionHand: ${collectionRowHandByCollectionIndex.color}:${collectionRowHandByCollectionIndex.content}`);
+    console.log(`gameRow: ${gameRow.card_color_legal}:${gameRow.card_content_legal}`);
+>>>>>>> backend
     if (collectionRowHandByCollectionIndex.color === 'black') {
         // - verify the player's hand to see if the has no legal cards left to play
         // 'wild' accept the play

@@ -4,7 +4,6 @@ const in_game_socket_message_button = document.getElementById(
     'in_game_socket_message_button',
 );
 
-
 in_game_socket_message.addEventListener('keypress', (e) => {
     // behavior explained: shift + enter will make new line in text area
     // by default a user can hit enter to send message.
