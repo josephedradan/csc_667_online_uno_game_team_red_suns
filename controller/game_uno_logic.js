@@ -1,7 +1,7 @@
 const e = require('express');
 const debugPrinter = require('../util/debug_printer');
 const dbEngineGameUno = require('./db_engine_game_uno');
-const constants = require('../server/constants');
+const constants = require('../config/constants');
 const unoCardConstants = require('../server/uno_card_constants');
 
 const set = new Set(unoCardConstants.LEGAL_COLORS);
@@ -211,7 +211,7 @@ gameUnoLogic.updateGameData = updateGameData;
 async function doMoveCardHandToPlayByCollectionIndexLogic(gameRow, playerRow, collection_index, color) {
     debugPrinter.printFunction(doMoveCardHandToPlayByCollectionIndexLogic.name);
     debugPrinter.printBackendMagenta(color);
-    debugPrinter.printBackendWhite("FUC");
+    debugPrinter.printBackendWhite('FUC');
 
     const result = {
         status: null,

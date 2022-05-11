@@ -10,7 +10,7 @@ const dbEngine = require('./db_engine');
 const dbEngineGameUno = require('./db_engine_game_uno');
 
 const debugPrinter = require('../util/debug_printer');
-const constants = require('../server/constants');
+const constants = require('../config/constants');
 const gameUnoLogic = require('./game_uno_logic');
 
 const gameUno = {};
@@ -128,7 +128,7 @@ async function getGame(game_id) {
     };
 
     // May be undefined
-    const gameRow = await dbEngineGameUno.getGameRowByGameIDSimple(game_id);
+    const gameRow = await dbEngineGameUno.getGameRowSimpleByGameID(game_id);
 
     // If Game Row does not exist
     if (!gameRow) {

@@ -1,6 +1,6 @@
 const connectionContainer = require('../server/server');
 const gameUno = require('./game_uno');
-const constants = require('../server/constants');
+const constants = require('../config/constants');
 const debugPrinter = require('../util/debug_printer');
 
 const intermediateSocketIOGameUno = {};

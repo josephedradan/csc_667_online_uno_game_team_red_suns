@@ -331,19 +331,12 @@ class TurnController {
                     this.handContainer.children,
                 )) {
                     removeBounceAnimation(reapplyCard);
-                    /* applyBounceAnimation(
-                        reapplyCard,
-                        playCollection,
-                        cardCollection[idx]
-                    ); */
                 }
             });
 
             // restart the animation
             draggable.setDragEndCallback(async (newParent) => {
-                // debugger;
                 if (newParent == this.playContainer) {
-                    // debugger;
                     // if card is a wild card, prompt with modal and request the move
                     // console.log(cardData);
                     if (cardData.color == 'black') {
@@ -366,9 +359,12 @@ class TurnController {
                                 collection_index: cardData.collection_index,
                             },
                         );
+
                         // debugger;
                         console.log(result);
+                        applyCurrentColorToGameScreen(cardData.color);
                     }
+                    // update legal color
                 } else {
                     for (const [idx, reapplyCard] of Object.entries(
                         this.handContainer.children,
@@ -382,7 +378,6 @@ class TurnController {
                     }
                 }
             });
-
             this.draggables.push(draggable);
             applyBounceAnimation(card, playCollection, cardData);
         });
@@ -438,21 +433,171 @@ class TurnController {
     }
 }
 
+// This class takes in a function and ensures that calls to that function execute synchronously
+// Used to queue incoming game states
+// Will be useful if we add animations later
+class EventProcessor {
+    constructor(processFunc) {
+        this.processFunc = processFunc;
+        this.queue = [];
+        this.active = false;
+    }
+
+    // Call this function as if it's the function we passed to the constructor
+    process() {
+        this.queue.push(arguments);
+        console.log('Adding to queue');
+        this.#startQueue();
+    }
+
+    #processEvent() {
+        const args = this.queue.shift();
+        this.processFunc.apply(null, args);
+    }
+
+    #startQueue() {
+        if (!this.active) {
+            console.log('Began processing');
+            this.active = true;
+            while (this.queue.length > 0) {
+                this.#processEvent();
+            }
+            this.active = false;
+            console.log('Ended processing');
+        }
+    }
+}
+
 let gameRenderer;
 let turnController;
 
-const gameStateQueue = [];
-let queueActive = false;
 const playerMapping = new Map();
 playerMapping.set(2, [0, 2]);
 playerMapping.set(3, [0, 1, 3]);
 playerMapping.set(4, [0, 1, 2, 3]);
 
-// I'll clean this up, ik it's bad
-async function renderGameState(game_state) {
-    const localPlayer = (await axios.get(`/game/${getGameId()}/getPlayer`)).data
-        .player;
+// This function handles game states coming off of a queue
+const gameStateProcessor = new EventProcessor(async (game_state, playersHand) => {
+    // this check is to allow for the rendering of the host. since we're rendering
+    // TODO: legal_color will be used instead to render the current color being played
+    // if (
+    //     game_state.collection_play.length !== 0 ||
+    //     !game_state.collection_play
+    // ) {
+    //     // applyCurrentColorToGameScreen(
+    //     //     game_state.collection_play[game_state.collection_play.length - 1]
+    //     //         .color
+    //     // );
+    // }
 
+    const localPlayer = (await axios.get(`/game/${getGameId()}/getPlayer`)).data.player;
+
+    const gameWindow = document.getElementById('game_window');
+    const playerList = document.getElementById('list_of_players');
+
+    // Display the proper panel depending on game state
+    gameWindow.classList.toggle(
+        'invisible',
+        !game_state.game.is_active,
+    );
+    gameWindow.classList.toggle('hidden', !game_state.game.is_active);
+    playerList.classList.toggle('invisible', game_state.game.is_active);
+    playerList.classList.toggle('hidden', game_state.game.is_active);
+
+    if (game_state.game.is_active) {
+        if (gameRenderer == null) {
+            const drawContainer = document.getElementById('drawCard');
+            const playContainer = document.getElementById('discard');
+
+            gameRenderer = new UnoGameRenderer(
+                drawContainer,
+                playContainer,
+            );
+
+            turnController = new TurnController(
+                drawContainer,
+                playContainer,
+                document.getElementById('player0'),
+                gameWindow,
+            );
+
+            const { players } = game_state;
+
+            let offset = 0;
+
+            players.forEach((player, index) => {
+                if (player.player_id === localPlayer.player_id) {
+                    offset = index;
+                }
+            });
+
+            // placement of players based on how many
+            const newPos = playerMapping.get(players.length);
+            for (let i = 0; i < newPos.length; i++) {
+                const handContainer = document.getElementById(
+                    `player${newPos[i]}`,
+                );
+                const player = players[(i + offset) % players.length];
+                gameRenderer.addPlayer(player.player_id, handContainer);
+            }
+        }
+
+        game_state.players.forEach((player) => {
+            if (player.player_id == localPlayer.player_id) {
+                gameRenderer.updateHand(
+                    player.player_id,
+                    playersHand.data.collection, // eric added this for all cards
+                );
+            } else {
+                gameRenderer.updateHand(
+                    player.player_id,
+                    player.collection, // eric added this for all cards
+                );
+            }
+        });
+
+        if (game_state.collection_play.length > 0) {
+            gameRenderer.updateTopCard(
+                game_state.collection_play[
+                    game_state.collection_play.length - 1
+                ],
+            );
+        }
+
+        // If its my turn
+        // make my cards draggable loop
+        // draggable for this card, disconnect all others upon callback
+        // callback is if card is black, modal, then request
+        // else request
+        // if (game_state.player_id_turn === localPlayer.player_id) {
+
+        // }
+        // pass also the current player at the start of turn so we can display that current player
+        // console.log(game_state.game.player_id_turn);
+
+        // search game state for current player id, match and return name
+        display_current_player(
+            game_state.players.find(
+                (player) => player.player_id === game_state.game.player_id_turn,
+            ).display_name,
+        );
+        // console.log(game_state.game.player_id_turn);
+        // console.log(localPlayer.player_id);
+        if (game_state.game.player_id_turn == localPlayer.player_id) {
+            turnController.startTurn(
+                playersHand.data.collection,
+                game_state.collection_play, // discard pile
+            );
+        }
+        if (game_state.game.card_color_legal) {
+            applyCurrentColorToGameScreen(game_state.game.card_color_legal);
+        }
+    }
+    forceScrollDown();
+});
+
+// This function takes incoming game_states and shoves them into a queue to be processed synchronously
+async function renderGameState(game_state) {
     console.log(
         '%cserver-game-game-id-game-state',
         'color: black;background-color:lawngreen;font-size: 20px;',
@@ -462,128 +607,7 @@ async function renderGameState(game_state) {
     // Ohhh this is gonna cause problems potentially. Maybe.
     const playersHand = await axios.get(`/game/${getGameId()}/getHand`);
 
-    gameStateQueue.push([game_state, playersHand]);
-
-    // this check is to allow for the rendering of the host. since we're rendering
-    // TODO: legal_color will be used instead to render the current color being played
-    if (
-        game_state.collection_play.length !== 0
-        || !game_state.collection_play
-    ) {
-        applyCurrentColorToGameScreen(
-            game_state.collection_play[game_state.collection_play.length - 1]
-                .color,
-        );
-    }
-
-    if (!queueActive) {
-        queueActive = true;
-
-        while (gameStateQueue.length > 0) {
-            const [game_state, playersHand] = gameStateQueue.shift();
-
-            const gameWindow = document.getElementById('game_window');
-            const playerList = document.getElementById('list_of_players');
-
-            // Display the proper panel depending on game state
-            gameWindow.classList.toggle(
-                'invisible',
-                !game_state.game.is_active,
-            );
-            gameWindow.classList.toggle('hidden', !game_state.game.is_active);
-            playerList.classList.toggle('invisible', game_state.game.is_active);
-            playerList.classList.toggle('hidden', game_state.game.is_active);
-
-            if (game_state.game.is_active) {
-                if (gameRenderer == null) {
-                    const drawContainer = document.getElementById('drawCard');
-                    const playContainer = document.getElementById('discard');
-
-                    gameRenderer = new UnoGameRenderer(
-                        drawContainer,
-                        playContainer,
-                    );
-
-                    turnController = new TurnController(
-                        drawContainer,
-                        playContainer,
-                        document.getElementById('player0'),
-                        gameWindow,
-                    );
-
-                    const { players } = game_state;
-
-                    let offset = 0;
-
-                    players.forEach((player, index) => {
-                        if (player.player_id === localPlayer.player_id) {
-                            offset = index;
-                        }
-                    });
-
-                    // placement of players based on how many
-                    const newPos = playerMapping.get(players.length);
-                    for (let i = 0; i < newPos.length; i++) {
-                        const handContainer = document.getElementById(
-                            `player${newPos[i]}`,
-                        );
-                        const player = players[(i + offset) % players.length];
-                        gameRenderer.addPlayer(player.player_id, handContainer);
-                    }
-                }
-
-                game_state.players.forEach((player) => {
-                    if (player.player_id == localPlayer.player_id) {
-                        gameRenderer.updateHand(
-                            player.player_id,
-                            playersHand.data.collection, // eric added this for all cards
-                        );
-                    } else {
-                        gameRenderer.updateHand(
-                            player.player_id,
-                            player.collection, // eric added this for all cards
-                        );
-                    }
-                });
-
-                if (game_state.collection_play.length > 0) {
-                    gameRenderer.updateTopCard(
-                        game_state.collection_play[
-                            game_state.collection_play.length - 1
-                        ],
-                    );
-                }
-
-                // If its my turn
-                // make my cards draggable loop
-                // draggable for this card, disconnect all others upon callback
-                // callback is if card is black, modal, then request
-                // else request
-                // if (game_state.player_id_turn === localPlayer.player_id) {
-
-                // }
-                // pass also the current player at the start of turn so we can display that current player
-                // console.log(game_state.game.player_id_turn);
-
-                // search game state for current player id, match and return name
-                display_current_player(
-                    game_state.players.find(
-                        (player) => player.player_id === game_state.game.player_id_turn,
-                    ).display_name,
-                );
-                // console.log(game_state.game.player_id_turn);
-                // console.log(localPlayer.player_id);
-                if (game_state.game.player_id_turn == localPlayer.player_id) {
-                    turnController.startTurn(
-                        playersHand.data.collection,
-                        game_state.collection_play, // discard pile
-                    );
-                }
-            }
-        }
-        forceScrollDown();
-        queueActive = false;
-    }
+    gameStateProcessor.process(game_state, playersHand);
 }
 
 const forceScrollDown = () => {
@@ -595,8 +619,14 @@ const display_current_player = (display_name) => {
     currentPlayerTarget.textContent = `Current Player: ${display_name}`;
 };
 
-const applyCurrentColorToGameScreen = (color) => {
+// not pretty i'm sorry...
+const applyCurrentColorToGameScreen = async (color) => {
     const currentColor = document.getElementById('currentColor');
+    for (let i = 0; i < currentColor.classList.length; i++) {
+        if (currentColor.classList[i].match(/bg-\S+-\d+/)) {
+            currentColor.classList.remove(currentColor.classList[i]);
+        }
+    }
     currentColor.classList.add(`bg-${color}-500`);
 };
 

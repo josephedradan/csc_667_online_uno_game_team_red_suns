@@ -8,7 +8,7 @@ const gameUno = require('./game_uno');
 const intermediateGameUno = require('./intermediate_game_uno');
 const utilCommon = require('./util_common');
 const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');
-const constants = require('../server/constants');
+const constants = require('../config/constants');
 
 /* ############################################################################################################# */
 
