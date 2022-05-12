@@ -479,10 +479,8 @@ playerMapping.set(2, [0, 2]);
 playerMapping.set(3, [0, 1, 3]);
 playerMapping.set(4, [0, 1, 2, 3]);
 
-
 // This function handles game states coming off of a queue
 let gameStateProcessor = new EventProcessor(async (game_state, playersHand) => {
-
     // this check is to allow for the rendering of the host. since we're rendering
     // TODO: legal_color will be used instead to render the current color being played
     // if (
@@ -495,16 +493,14 @@ let gameStateProcessor = new EventProcessor(async (game_state, playersHand) => {
     //     // );
     // }
 
-    const localPlayer = (await axios.get(`/game/${getGameId()}/getPlayer`)).data.player;
+    const localPlayer = (await axios.get(`/game/${getGameId()}/getPlayer`)).data
+        .player;
 
     const gameWindow = document.getElementById("game_window");
     const playerList = document.getElementById("list_of_players");
 
     // Display the proper panel depending on game state
-    gameWindow.classList.toggle(
-        "invisible",
-        !game_state.game.is_active
-    );
+    gameWindow.classList.toggle("invisible", !game_state.game.is_active);
     gameWindow.classList.toggle("hidden", !game_state.game.is_active);
     playerList.classList.toggle("invisible", game_state.game.is_active);
     playerList.classList.toggle("hidden", game_state.game.is_active);
@@ -514,10 +510,7 @@ let gameStateProcessor = new EventProcessor(async (game_state, playersHand) => {
             const drawContainer = document.getElementById("drawCard");
             const playContainer = document.getElementById("discard");
 
-            gameRenderer = new UnoGameRenderer(
-                drawContainer,
-                playContainer
-            );
+            gameRenderer = new UnoGameRenderer(drawContainer, playContainer);
 
             turnController = new TurnController(
                 drawContainer,
@@ -583,8 +576,7 @@ let gameStateProcessor = new EventProcessor(async (game_state, playersHand) => {
         // search game state for current player id, match and return name
         display_current_player(
             game_state.players.find(
-                (player) =>
-                    player.player_id === game_state.game.player_id_turn
+                (player) => player.player_id === game_state.game.player_id_turn
             ).display_name
         );
         // console.log(game_state.game.player_id_turn);
@@ -650,6 +642,14 @@ const applyBounceAnimation = (card, playCollection, cardData) => {
     } else {
         card.classList.add("brightness-75");
         card.toggleAttribute("disabled", true); // ERIC, added disabled as well.
+
+        card.addEventListener("click", (e) => {
+            // e.preventDefault();
+            card.classList.add("apply-shake");
+            setTimeout(() => {
+                card.classList.remove("apply-shake");
+            }, 1300);
+        });
     }
 };
 
