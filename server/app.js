@@ -349,8 +349,16 @@ application.use((req, res, next) => {
 
 // error handler
 application.use((err, req, res, next) => {
-    debugPrinter.printError('IN ERROR YO');
     debugPrinter.printError(err);
+
+    debugPrinter.printBackendRed('req.method');
+    debugPrinter.printDebug(req.method);
+    debugPrinter.printBackendRed('req.url');
+    debugPrinter.printDebug(req.url);
+    debugPrinter.printBackendRed('req.body');
+    debugPrinter.printDebug(req.body);
+    debugPrinter.printBackendRed('req.user');
+    debugPrinter.printDebug(req.user);
 
     // set locals, only providing error in development
     res.locals.message = err.message;

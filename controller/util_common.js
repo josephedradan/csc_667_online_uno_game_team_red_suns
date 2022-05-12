@@ -3,33 +3,40 @@ Common utility functions used by controllers
 
  */
 
+const debugPrinter = require('../util/debug_printer');
+
 const utilCommon = {};
 
-function reqSessionMessageHandler(req, status, message) {
+function attachMessageToSessionMessageIfPossible(req, status, message) {
     const body = {
         status,
         message,
     };
 
-    req.session.message = body;
+    if (req.session) {
+        req.session.message = body;
+    }
 
     return body;
 }
 
-utilCommon.reqSessionMessageHandler = reqSessionMessageHandler;
+utilCommon.reqSessionMessageHandler = attachMessageToSessionMessageIfPossible;
 
-function getJsonResponseAndCallReqSessionMessageHandler(req, status, message, url) {
-    const result = reqSessionMessageHandler(req, status, message);
-
+function getJsonResponseCommon(req, status, message, url) {
     const body = {
-        status: result.status,
-        message: result.message,
+        status,
+        message,
         url: url || '/',
     };
-
     return body;
 }
+utilCommon.getJsonResponseCommon = getJsonResponseCommon;
 
-utilCommon.getJsonResponseAndCallReqSessionMessageHandler = getJsonResponseAndCallReqSessionMessageHandler;
+function getJsonResponseAndCallAttachMessageToSessionMessageIfPossible(req, status, message, url) {
+    const result = attachMessageToSessionMessageIfPossible(req, status, message);
+    return getJsonResponseCommon(req, result.status, result.message, url);
+}
+
+utilCommon.getJsonResponseAndCallAttachMsesageToSessionMessageIfPossible = getJsonResponseAndCallAttachMessageToSessionMessageIfPossible;
 
 module.exports = utilCommon;

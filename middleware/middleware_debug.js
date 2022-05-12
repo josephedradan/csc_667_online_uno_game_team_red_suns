@@ -14,12 +14,14 @@ function printDebugger(textHeader) {
 
             debugPrinter.printBackendYellow(`--- (${textHeader}) DEBUGGING MIDDLEWARE START ---`);
 
-            debugPrinter.printBackendGreen('req.url');
-            debugPrinter.printDebug(req.url);
-            debugPrinter.printBackendGreen('req.body');
-            debugPrinter.printDebug(req.body);
-            debugPrinter.printBackendGreen('req.user');
-            debugPrinter.printDebug(req.user);
+            debugPrinter.printDebug('req.method');
+            debugPrinter.printBackendMagenta(req.method);
+            debugPrinter.printDebug('req.url');
+            debugPrinter.printBackendMagenta(req.url);
+            debugPrinter.printDebug('req.body');
+            debugPrinter.printBackendMagenta(req.body);
+            debugPrinter.printDebug('req.user');
+            debugPrinter.printBackendMagenta(req.user);
 
             debugPrinter.printBackendYellow(`--- (${textHeader}) DEBUGGING MIDDLEWARE END ---`);
         }
