@@ -1,5 +1,5 @@
 const e = require('express');
-const unoCardConstants = require('../server/uno_card_constants');
+const unoCardConstants = require('../config/constants_game_uno');
 
 const values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 const specials = [
