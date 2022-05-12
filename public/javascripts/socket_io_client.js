@@ -25,7 +25,7 @@ socket.on('connect', async () => {
     if (containsGame > -1) {
         // game_id will I assume be always the second element when the path is tokenized.
         const game_id = parseInt(getGameId(), 10);
-        socket.emit('client-game-game-id-join-room', game_id); // parsed game_id from URL.
+        socket.emit('client-game-game-id-join-room',game_id); // parsed game_id from URL.
         // load all previous messages in lobby.
         const results = await axios.get(`/game/${game_id}/getMessages`);
         for (const old_msgs of results.data) {

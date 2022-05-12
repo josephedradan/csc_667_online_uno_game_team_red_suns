@@ -637,3 +637,37 @@
         rgba(144, 174, 198, 1) 100%
     );
 }
+
+@keyframes shake {
+    0%,
+    100% {
+        transform: rotate(-15deg);
+    }
+    50% {
+        transform: rotate(15deg);
+    }
+}
+
+@-webkit-keyframes shake {
+    0%,
+    100% {
+        transform: rotate(-15deg);
+    }
+    50% {
+        transform: rotate(15deg);
+    }
+}
+
+@-moz-keyframes shake {
+    0%,
+    100% {
+        transform: rotate(-15deg);
+    }
+    50% {
+        transform: rotate(15deg);
+    }
+}
+
+.apply-shake {
+    animation: shake 1s ease-in-out 0.1s infinite alternate;
+}
