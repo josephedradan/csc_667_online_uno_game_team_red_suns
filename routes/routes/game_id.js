@@ -65,6 +65,11 @@ routerGameID.post(
     controllerGameID.POSTTransferHost,
 );
 
+routerGameID.get(
+    '/getHand',
+    controllerGameID.GETGetHand,
+);
+
 routerGameID.use(middlewareGameUnoGameGameID.checkIfPlayerCanDoAction);
 
 routerGameID.post(
@@ -75,11 +80,6 @@ routerGameID.post(
 routerGameID.get(
     '/drawCard',
     controllerGameID.GETDrawCard, // TODO
-);
-
-routerGameID.get(
-    '/getHand',
-    controllerGameID.GETGetHand,
 );
 
 module.exports = routerGameID;

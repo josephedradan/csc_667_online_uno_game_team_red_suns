@@ -158,7 +158,7 @@ async function GETGetHand(req, res, next) {
 
     const result = await gameUno.getHand(req.game.game_id, req.user.user_id);
 
-    // debugPrinter.printDebug(result);
+    debugPrinter.printError(result);
 
     res.json(result);
 }
