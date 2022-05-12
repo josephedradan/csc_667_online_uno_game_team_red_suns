@@ -33,7 +33,9 @@ async function POSTLogIn(req, res, next) {
         constants.SUCCESS,
         'Log in was successful',
     );
-    res.json(jsonResponse);
+
+    // res.json(jsonResponse);
+    res.redirect(jsonResponse.url);
 }
 
 controllerIndex.POSTLogIn = POSTLogIn;
@@ -112,7 +114,8 @@ async function isRegistrationPossible(req, res, username, display_name) {
             'Username already exists',
         );
 
-        res.json(jsonResponse);
+        // res.json(jsonResponse);
+        res.redirect(jsonResponse.url);
         return false;
     }
 
@@ -126,7 +129,8 @@ async function isRegistrationPossible(req, res, username, display_name) {
             'Display name already exists',
         );
 
-        res.json(jsonResponse);
+        // res.json(jsonResponse);
+        res.redirect(jsonResponse.url);
         return false;
     }
     return true;
@@ -169,7 +173,8 @@ async function POSTRegistration(req, res, next) {
             `User "${user.username}" was created`,
         );
 
-        res.json(jsonResponse);
+        // res.json(jsonResponse);
+        res.redirect(jsonResponse.url);
     }
 }
 
