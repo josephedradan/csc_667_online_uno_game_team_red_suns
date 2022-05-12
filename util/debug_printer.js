@@ -214,6 +214,11 @@ const debugPrinter = {
     printBackendYellow: wrapperPrinter((input) => {
         _print(input, 'backend_yellow');
     }),
+
+
+    printCustom: wrapperPrinter((input, colorTheme) => {
+        _print(input, colorTheme);
+    }),
 };
 
 // Export const printers

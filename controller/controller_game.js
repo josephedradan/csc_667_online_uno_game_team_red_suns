@@ -17,7 +17,7 @@ const controllerGame = {};
 async function GETGame(req, res, next) {
     debugPrinter.printMiddleware(GETGame.name);
 
-    utilCommon.reqSessionMessageHandler(
+    utilCommon.attachMessageToSessionMessageIfPossible(
         req,
         constants.FAILURE,
         'This page does not exist.',

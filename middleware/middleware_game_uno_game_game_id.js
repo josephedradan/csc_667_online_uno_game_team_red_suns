@@ -47,7 +47,7 @@ middlewareGameUnoGameGameID.validateRequestBody = validateRequestBody;
 async function checkIfPlayerCanDoAction(req, res, next) {
     debugPrinter.printMiddleware(checkIfPlayerCanDoAction.name);
 
-    if (req.game.player_id_turn === req.player.player_id_turn) {
+    if (req.game.player_id_turn === req.player.player_id) {
         next();
     } else {
         res.json({
@@ -106,7 +106,7 @@ async function checkIfInGameOrJoinGameIfPossibleNoPlayerInReqAndGuard(req, res, 
 
         // If the user failed to join the game as a player
         if (resultJoinGameObject.status === constants.FAILURE) {
-            utilCommon.reqSessionMessageHandler(
+            utilCommon.attachMessageToSessionMessageIfPossible(
                 req,
                 resultJoinGameObject.status,
                 resultJoinGameObject.message,

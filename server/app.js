@@ -288,7 +288,7 @@ If your application uses persistent login sessions, passport.session() middlewar
 (Serialize and deserialize. Persist the login)
 
 Notes:
-    Basically, it will add req.userr
+    Basically, it will add req.user
 
 Reference:
 
@@ -331,10 +331,10 @@ application.use(middlewareModifyReqRes.attachUserToResponseLocals);
 /* ############################## DEBUGGING ############################## */
 
 // Express debugging
-application.use(middlewareDebug.printDebugger('Express'));
+application.use(middlewareDebug.printDebugger('Express', 'backend_yellow'));
 
 // Socket.io debugging
-handlerSocketIOUseExpress.useExpressMiddleware(middlewareDebug.printDebugger('Socket.io'));
+handlerSocketIOUseExpress.useExpressMiddleware(middlewareDebug.printDebugger('Socket.io', 'backend_cyan'));
 
 /* ############################## routes ############################## */
 

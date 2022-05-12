@@ -16,4 +16,7 @@ constants.socketIDRoomIndex = 'index';
 constants.FAILURE = 'failure';
 constants.SUCCESS = 'success';
 
+constants.POST = 'POST';
+constants.GET = 'GET';
+
 module.exports = constants;

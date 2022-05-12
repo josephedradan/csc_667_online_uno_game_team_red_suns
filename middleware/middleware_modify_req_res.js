@@ -23,9 +23,12 @@ const middlewareModifyReqRes = {};
 /**
  * Add a message (which in this case should be an object) so the frontend can deal with it
  * Notes:
- *      1. Get the message from the session (express-session)
- *      2. Add the message to the current request's response
- *      3. Front end must deal with it...
+ *      Process:
+ *          1. Get the message from the session (express-session)
+ *          2. Add the message to the current request's response
+ *          3. Front end must deal with it...
+ *
+ *      This is basically express-flash
  *
  * @param req
  * @param res

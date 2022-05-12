@@ -62,9 +62,11 @@ async function validateCommon(
 const middlewareValidation = {};
 
 function callbackValidationErrorCommon(req, res, next, error) {
-    utilCommon.reqSessionMessageHandler(req, constants.FAILURE, error);
+    const jsonResponse = utilCommon.attachMessageToSessionMessageIfPossible(req, constants.FAILURE, error);
 
-    res.redirect('back');
+    res.json(jsonResponse);
+
+    // res.redirect('back');
     // next();
 }
 

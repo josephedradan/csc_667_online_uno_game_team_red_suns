@@ -28,7 +28,7 @@ const controllerIndex = {};
 async function POSTLogIn(req, res, next) {
     debugPrinter.printMiddleware(POSTLogIn.name);
 
-    const jsonResponse = utilCommon.getJsonResponseAndCallAttachMsesageToSessionMessageIfPossible(
+    const jsonResponse = utilCommon.getJsonResponseAndAttachMessageToSessionMessageIfPossible(
         req,
         constants.SUCCESS,
         'Log in was successful',
@@ -54,7 +54,7 @@ controllerIndex.POSTLogIn = POSTLogIn;
 async function POSTLogOut(req, res, next) {
     debugPrinter.printMiddleware(POSTLogOut.name);
 
-    const jsonResponse = utilCommon.getJsonResponseAndCallAttachMsesageToSessionMessageIfPossible(
+    const jsonResponse = utilCommon.getJsonResponseAndAttachMessageToSessionMessageIfPossible(
         req,
         constants.SUCCESS,
         'Log out was successful',
@@ -109,7 +109,7 @@ async function isRegistrationPossible(req, res, username, display_name) {
     const userByUsername = await dbEngine.getUserRowByUsername(username);
 
     if (userByUsername) {
-        jsonResponse = utilCommon.getJsonResponseAndCallAttachMsesageToSessionMessageIfPossible(
+        jsonResponse = utilCommon.getJsonResponseAndAttachMessageToSessionMessageIfPossible(
             req,
             constants.FAILURE,
             'Username already exists',
@@ -124,7 +124,7 @@ async function isRegistrationPossible(req, res, username, display_name) {
     const userByDisplayName = await dbEngine.getUserRowByDisplayName(display_name);
 
     if (userByDisplayName) {
-        jsonResponse = utilCommon.getJsonResponseAndCallAttachMsesageToSessionMessageIfPossible(
+        jsonResponse = utilCommon.getJsonResponseAndAttachMessageToSessionMessageIfPossible(
             req,
             constants.FAILURE,
             'Display name already exists',
@@ -168,7 +168,7 @@ async function POSTRegistration(req, res, next) {
 
         debugPrinter.printBackendGreen(user);
 
-        const jsonResponse = utilCommon.getJsonResponseAndCallAttachMsesageToSessionMessageIfPossible(
+        const jsonResponse = utilCommon.getJsonResponseAndAttachMessageToSessionMessageIfPossible(
             req,
             constants.SUCCESS,
             `User "${user.username}" was created`,
@@ -197,14 +197,14 @@ async function POSTCreateGame(req, res, next) { // TODO CLEAN UP THIS
     debugPrinter.printBackendWhite(result);
 
     if (!result) {
-        const jsonResponse = utilCommon.getJsonResponseAndCallAttachMsesageToSessionMessageIfPossible(
+        const jsonResponse = utilCommon.getJsonResponseAndAttachMessageToSessionMessageIfPossible(
             req,
             constants.SUCCESS,
             'Game failed to be created',
         );
         res.json(jsonResponse);
     } else {
-        const jsonResponse = utilCommon.getJsonResponseAndCallAttachMsesageToSessionMessageIfPossible(
+        const jsonResponse = utilCommon.getJsonResponseAndAttachMessageToSessionMessageIfPossible(
             req,
             constants.SUCCESS,
             `Game id ${result.game.game_id} created`,

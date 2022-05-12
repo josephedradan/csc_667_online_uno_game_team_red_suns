@@ -20,7 +20,7 @@ async function attachGameToRequestAndResponseLocalAndGuard(req, res, next) {
     const gameRow = await dbEngineGameUno.getGameRowSimpleByGameID(req.params.game_id);
 
     if (!gameRow) {
-        utilCommon.reqSessionMessageHandler(req, constants.FAILURE, 'Game does not exist');
+        utilCommon.attachMessageToSessionMessageIfPossible(req, constants.FAILURE, 'Game does not exist');
 
         res.redirect('back');
     } else {
@@ -65,9 +65,13 @@ async function attachPlayerToRequestAndResponseLocalsAndGuard(req, res, next) {
     const rowPlayer = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(req.params.game_id, req.user.user_id);
 
     if (!rowPlayer) {
-        utilCommon.reqSessionMessageHandler(req, constants.FAILURE, 'Player does not exist');
+        const jsonResponse = utilCommon.getJsonResponseAndAttachMessageToSessionMessageIfPossible(req, constants.FAILURE, 'Player does not exist');
 
-        res.redirect('back');
+        if (req.method === constants.GET) {
+            res.redirect(jsonResponse.url);
+        } else {
+            res.json(jsonResponse);
+        }
     } else {
         req.player = rowPlayer;
 

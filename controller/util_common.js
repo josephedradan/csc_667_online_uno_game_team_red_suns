@@ -20,7 +20,7 @@ function attachMessageToSessionMessageIfPossible(req, status, message) {
     return body;
 }
 
-utilCommon.reqSessionMessageHandler = attachMessageToSessionMessageIfPossible;
+utilCommon.attachMessageToSessionMessageIfPossible = attachMessageToSessionMessageIfPossible;
 
 function getJsonResponseCommon(req, status, message, url) {
     const body = {
@@ -32,11 +32,13 @@ function getJsonResponseCommon(req, status, message, url) {
 }
 utilCommon.getJsonResponseCommon = getJsonResponseCommon;
 
-function getJsonResponseAndCallAttachMessageToSessionMessageIfPossible(req, status, message, url) {
+function getJsonResponseAndAttachMessageToSessionMessageIfPossible(req, status, message, url) {
     const result = attachMessageToSessionMessageIfPossible(req, status, message);
     return getJsonResponseCommon(req, result.status, result.message, url);
 }
 
-utilCommon.getJsonResponseAndCallAttachMsesageToSessionMessageIfPossible = getJsonResponseAndCallAttachMessageToSessionMessageIfPossible;
+utilCommon.getJsonResponseAndAttachMessageToSessionMessageIfPossible = getJsonResponseAndAttachMessageToSessionMessageIfPossible;
+
+
 
 module.exports = utilCommon;

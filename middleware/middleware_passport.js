@@ -39,14 +39,17 @@ middlewarePassport.checkAuthenticated = async (req, res, next) => {
     if (req.isAuthenticated()) {
         next();
     } else {
-        utilCommon.reqSessionMessageHandler(
+        const jsonResponse = utilCommon.getJsonResponseAndAttachMessageToSessionMessageIfPossible(
             req,
             constants.FAILURE,
             'User must be logged in to use this feature',
         );
 
-        res.redirect('back');
-        // next();
+        if (req.method === constants.GET) {
+            res.redirect(jsonResponse.url);
+        } else {
+            res.json(jsonResponse);
+        }
     }
 };
 
@@ -64,10 +67,17 @@ middlewarePassport.checkUnauthenticated = async (req, res, next) => {
     if (req.isUnauthenticated()) {
         next();
     } else {
-        utilCommon.reqSessionMessageHandler(req, constants.FAILURE, `${req.user.username} you are logged in, you must not be logged in to use this feature`);
+        const jsonResponse = utilCommon.getJsonResponseAndAttachMessageToSessionMessageIfPossible(
+            req,
+            constants.FAILURE,
+            `${req.user.username} you are logged in, you must not be logged in to use this feature`,
+        );
 
-        res.redirect('back');
-        // next();
+        if (req.method === constants.GET) {
+            res.redirect(jsonResponse.url);
+        } else {
+            res.json(jsonResponse);
+        }
     }
 };
 
@@ -119,14 +129,16 @@ function callbackCustomWrapper(req, res, next) {
     function callbackCustom(err, attributesAddedToReqUser, info) {
         debugPrinter.printFunction(callbackCustom.name);
 
-        // Standard error checking (error should have come from the custom verifyCallback call most likely in handler_passport)
-        if (err) {
-            return next(err);
-        }
         debugPrinter.printBackendGreen('attributesAddedToReqUser');
         debugPrinter.printBackendBlue(attributesAddedToReqUser);
         debugPrinter.printBackendGreen('info');
         debugPrinter.printBackendBlue(info);
+
+        // Standard error checking (error should have come from the custom verifyCallback call most likely in handler_passport)
+        if (err) {
+            next(err);
+            // eslint-disable-next-line brace-style
+        }
         /*
         If attributesAddedToReqUser was not given by the passport strategy.
         The strategy should have returned information that should be added to req.user
@@ -134,12 +146,14 @@ function callbackCustomWrapper(req, res, next) {
         Notes:
             It's a very bad idea to tell the user what they failed on when they log in, it is a security risk
          */
-        if (!attributesAddedToReqUser) {
+        else if (!attributesAddedToReqUser) {
             // Unsuccessful login response
 
-            utilCommon.reqSessionMessageHandler(req, constants.FAILURE, 'Password/Username is invalid'); // If you care about security
+            const jsonResponse = utilCommon.getJsonResponseAndAttachMessageToSessionMessageIfPossible(req, constants.FAILURE, 'Password/Username is invalid'); // If you care about security
 
-            res.redirect('back');
+            res.json(jsonResponse);
+
+            // res.redirect('back');
             // next();
         } else {
             /*
@@ -181,7 +195,7 @@ function callbackCustomWrapper(req, res, next) {
                     // };
 
                     // Successful login response
-                    utilCommon.reqSessionMessageHandler(req, constants.SUCCESS, `${req.user.username} has logged in`);
+                    utilCommon.attachMessageToSessionMessageIfPossible(req, constants.SUCCESS, `${req.user.username} has logged in`);
 
                     next();
                 }

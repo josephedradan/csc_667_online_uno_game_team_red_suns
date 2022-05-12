@@ -860,12 +860,18 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_
     // If player is exists for the user for the game
     if (!playerRow) {
         result.status = constants.FAILURE;
-        result.message = `Player ${playerRow.display_name} 
-                        (player_id ${playerRow.player_id}) does not exist for game ${game_id}`;
+        result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id}) does not exist for game ${game_id}`;
         // Can be used as a short circuit because the playerRow is based on the game_id (don't need to check if game exists)
         return result;
     }
     result.player = playerRow;
+
+    // Check if it's the player's turn
+    if (gameRow.player_id_turn !== playerRow.player_id){
+        result.status = constants.FAILURE;
+        result.message = `It is not Player ${playerRow.display_name} (player_id ${playerRow.player_id}) turn for game ${game_id}`;
+        return result;
+    }
 
     // TODO FUCK
 
@@ -881,8 +887,8 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_
 
     result.status = constants.SUCCESS;
 
-    result.message = `Card (collection_index ${collection_index}) from player ${playerRow.display_name} (player_id ${playerRow.player_id})'s 
-    collection moved to PLAY's collection's top for Game ${game_id}`;
+    result.message = `Card (collection_index ${collection_index}) from player ${playerRow.display_name} \
+    (player_id ${playerRow.player_id})'s collection moved to PLAY's collection's top for Game ${game_id}`;
 
     return result;
 }
@@ -1029,55 +1035,6 @@ async function setGamePlayerIDHost(game_id, user_id) {
 }
 
 gameUno.setGamePlayerIDHost = setGamePlayerIDHost;
-
-// TODO: DON'T USE THE BELOW FUNCTION BECAUSE IT IS NOT NECESSARY
-// async function setGamePlayerIDTurn(game_id, user_id) {
-//     debugPrinter.printFunction(setGamePlayerIDTurn.name);
-//
-//     const result = {
-//         status: null,
-//         message: null,
-//         game: null,
-//         player: null,
-//     };
-//
-//     const gameRow = await dbEngineGameUno.getGameRowByGameIDDetailed(game_id);
-//
-//     // Check if game exists
-//     if (!gameRow) {
-//         result.status = constants.FAILURE;
-//         result.message = `Game ${game_id} does not exist`;
-//         return result;
-//     }
-//     result.game = gameRow;
-//
-//     // Get player given game_id and user_id (May be undefined)
-//     const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(game_id, user_id);
-//
-//     // If player is exists for the user for the game
-//     if (!playerRow) {
-//         result.status = constants.FAILURE;
-//         result.message = `Player does not exist for game ${game_id}`;
-//         return result;
-//     }
-//     result.player = playerRow;
-//
-//     const gameRowNew = await dbEngineGameUno.updateGamePlayerIDTurnByGameID(game_id, playerRow.player_id);
-//
-//     if (!gameRowNew) {
-//         result.status = constants.FAILURE;
-//         result.message = `Could not update game ${game_id}'s player turn`;
-//         return result;
-//     }
-//     result.game = gameRowNew;
-//
-//     result.status = constants.SUCCESS;
-//     result.message = `Player ${playerRow.player_id}'s has the turn for game ${game_id}`;
-//
-//     return result;
-// }
-//
-// gameUno.setGamePlayerIDTurn = setGamePlayerIDTurn;
 
 module.exports = gameUno;
 
