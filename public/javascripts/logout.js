@@ -4,7 +4,7 @@ logout.addEventListener('click', async () => {
     //     (response) => (window.location = response.url),
     // );
 
-    axios.post('/logout', {})
+    await axios.post('/logout', {})
         .then((response) => {
             window.location = response.data.url;
         });
