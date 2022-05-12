@@ -34,8 +34,8 @@ async function POSTLogIn(req, res, next) {
         'Log in was successful',
     );
 
-    // res.json(jsonResponse);
-    res.redirect(jsonResponse.url);
+    res.json(jsonResponse);
+    // res.redirect(jsonResponse.url);
 }
 
 controllerIndex.POSTLogIn = POSTLogIn;
@@ -61,6 +61,7 @@ async function POSTLogOut(req, res, next) {
     );
 
     res.json(jsonResponse);
+    // res.redirect(jsonResponse.url);
 }
 
 controllerIndex.POSTLogOut = POSTLogOut;
@@ -173,8 +174,8 @@ async function POSTRegistration(req, res, next) {
             `User "${user.username}" was created`,
         );
 
-        // res.json(jsonResponse);
-        res.redirect(jsonResponse.url);
+        res.json(jsonResponse);
+        // res.redirect(jsonResponse.url);
     }
 }
 

@@ -98,8 +98,15 @@ registration_form.addEventListener('change', (e) => {
 });
 
 // extra safe guard to prevent users from removing disabled tag
-registration_submit.addEventListener('click', (e) => {
-    if (!toggle_enable_button.every((e) => e === true)) e.preventDefault();
+registration_submit.addEventListener('click', async (e) => {
+    e.preventDefault();
+    // if (!toggle_enable_button.every((e) => e === true)) e.preventDefault();
+
+    const formData = new FormData(registration_form);
+    const response = await axios.post('/registration', Object.fromEntries(formData)); // TODO: GUARD AND CLEANUP
+
+    // console.log(response.data)
+    window.location = response.data.url;
 });
 
 // display error
