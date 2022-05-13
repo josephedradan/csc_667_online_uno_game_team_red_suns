@@ -92,7 +92,6 @@ class Draggable {
     }
 
     dragMouseUp(event) {
-
         console.log("Drag ended!!!");
         // If not left click, do nothing
         if (event.which != 1) {
@@ -536,7 +535,9 @@ class EventProcessor {
     // Call this function as if it's the function we passed to the constructor
     process() {
         this.queue.push(arguments);
-        console.log("Adding to queue, " + this.queue.length + " items in queue");
+        console.log(
+            "Adding to queue, " + this.queue.length + " items in queue"
+        );
         this.#startQueue();
     }
 
@@ -670,6 +671,14 @@ const gameStateProcessor = new EventProcessor(
                         player.player_id === game_state.game.player_id_turn
                 ).display_name
             );
+            // console.log(game_state.game.is_clockwise);
+            console.log(game_state.game.draw_amount);
+            document.getElementById("is_reverse").innerHTML = `Direction: ${
+                game_state.game.is_clockwise ? "Clockwise" : "Counter Clockwise"
+            }`;
+            document.getElementById(
+                "draw_amount"
+            ).innerHTML = `Draw amount: ${game_state.game.draw_amount}`;
             // console.log(game_state.game.player_id_turn);
             // console.log(localPlayer.player_id);
             // console.log(game_state);
