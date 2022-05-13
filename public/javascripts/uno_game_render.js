@@ -384,13 +384,11 @@ class TurnController {
                             }
                         );
 
-                        // debugger;
                         console.log(result);
                         applyCurrentColorToGameScreen(cardData.color);
                     }
 
                     this.endTurn();
-                    // update legal color
                 } else {
                     for (const [idx, reapplyCard] of Object.entries(
                         this.handContainer.children
@@ -403,6 +401,10 @@ class TurnController {
                         );
                     }
                 }
+                this.playContainer.classList.add("animate-ping");
+                setTimeout(() => {
+                    this.playContainer.classList.remove("animate-ping");
+                }, 810);
             });
             this.draggables.push(draggable);
             applyBounceAnimation(card, game_state.game, cardData);
@@ -664,22 +666,12 @@ const gameStateProcessor = new EventProcessor(
             // pass also the current player at the start of turn so we can display that current player
             // console.log(game_state.game.player_id_turn);
 
-            // search game state for current player id, match and return name
-
-            // weird bug where display_name is undefined during first couple renders
-            if (
-                game_state.players.some(
-                    (player) => player.display_name !== undefined
-                )
-            ) {
-                display_current_player(
-                    game_state.players.find(
-                        (player) =>
-                            player.player_id === game_state.game.player_id_turn
-                    ).display_name
-                );
+            const findPlayer = game_state.players.find((player) => {
+                player.player_id === game_state.game.player_id_turn;
+            });
+            if (findPlayer !== undefined) {
+                display_current_player(findPlayer.display_name);
             }
-
             document.getElementById("is_reverse").innerHTML = `Direction: ${
                 game_state.game.is_clockwise ? "Clockwise" : "Counter Clockwise"
             }`;
