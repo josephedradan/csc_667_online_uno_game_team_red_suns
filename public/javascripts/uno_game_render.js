@@ -448,29 +448,41 @@ class EventProcessor {
         this.processFunc = processFunc;
         this.queue = [];
         this.active = false;
+        this.delay = 0;
     }
 
     // Call this function as if it's the function we passed to the constructor
     process() {
         this.queue.push(arguments);
-        console.log("Adding to queue");
+        console.log("Adding to queue, " + this.queue.length + " items in queue");
         this.#startQueue();
     }
 
+    // Set delay in seconds
+    setDelay(delay) {
+        this.delay = delay * 1000;
+    }
+
     #processEvent() {
+        console.log(this.queue.length + " events in queue");
         const args = this.queue.shift();
         this.processFunc.apply(null, args);
+        setTimeout(() => {
+            if (this.queue.length > 0) {
+                console.log(this.delay);
+                this.#processEvent();
+            } else {
+                console.log("Inactive!");
+                this.active = false;
+            }
+        }, this.delay);
     }
 
     #startQueue() {
         if (!this.active) {
-            console.log("Began processing");
+            console.log("Active!");
             this.active = true;
-            while (this.queue.length > 0) {
-                this.#processEvent();
-            }
-            this.active = false;
-            console.log("Ended processing");
+            this.#processEvent();
         }
     }
 }
@@ -592,6 +604,8 @@ const gameStateProcessor = new EventProcessor(
         forceScrollDown();
     }
 );
+
+gameStateProcessor.setDelay(0.25);
 
 // This function takes incoming game_states and shoves them into a queue to be processed synchronously
 async function renderGameState(game_state) {
