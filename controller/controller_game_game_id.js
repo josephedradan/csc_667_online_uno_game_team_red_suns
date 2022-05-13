@@ -45,7 +45,7 @@ async function POSTPlayCard(req, res, next) {
         color,
     );
 
-    debugPrinter.printError(result);
+    debugPrinter.printBackendWhite(result);
 
     // debugPrinter.printDebug(result);
 
@@ -61,7 +61,7 @@ async function GETDrawCard(req, res, next) {
 
     // const result = await dbEngineGameUno.getCollectionRowDetailedByPlayerID(req.player.player_id);
 
-    // debugPrinter.printDebug(result);
+    // debugPrinter.printBackendWhite(result);
 
     res.json(result);
 }
@@ -73,7 +73,7 @@ async function POSTStartGame(req, res, next) {
 
     const result = await intermediateGameUno.startGameWrapped(req.game.game_id, req.user.user_id);
 
-    debugPrinter.printDebug(result);
+    // debugPrinter.printBackendWhite(result);
 
     res.json(result);
 }
@@ -85,7 +85,7 @@ async function POSTLeaveGame(req, res, next) {
 
     const result = await intermediateGameUno.leaveGameWrapped(req.game.game_id, req.user.user_id);
 
-    debugPrinter.printDebug(result);
+    // debugPrinter.printBackendWhite(result);
 
     res.json(result);
 }
@@ -130,7 +130,7 @@ async function GETGetGameState(req, res, next) {
 
     const result = await gameUno.getGameState(req.game.game_id);
 
-    debugPrinter.printDebug(result);
+    // debugPrinter.printBackendWhite(result);
 
     res.json(result);
 }
@@ -158,7 +158,7 @@ async function GETGetHand(req, res, next) {
 
     const result = await gameUno.getHand(req.game.game_id, req.user.user_id);
 
-    debugPrinter.printError(result);
+    // debugPrinter.printBackendWhite(result);
 
     res.json(result);
 }
@@ -170,7 +170,7 @@ async function GETGetGameAndTheirPlayers(req, res, next) {
 
     const result = await gameUno.getGameAndTheirPlayersByGameIDDetailed(req.game.game_id);
 
-    debugPrinter.printDebug(result);
+    // debugPrinter.printBackendWhite(result);
 
     res.json(result);
 }
@@ -182,7 +182,7 @@ async function GETGetPlayer(req, res, next) {
 
     const result = await gameUno.getPlayerDetailedByGameIDAndUserID(req.game.game_id, req.user.user_id);
 
-    debugPrinter.printDebug(result);
+    // debugPrinter.printBackendWhite(result);
 
     res.json(result);
 }
