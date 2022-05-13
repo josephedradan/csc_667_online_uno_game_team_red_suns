@@ -4,7 +4,7 @@ const dbEngine = require('./db_engine');
 const passwordHandler = require('./handler_password');
 
 const debugPrinter = require('../util/debug_printer');
-const gameUno = require('./game_uno');
+const gameUno = require('./game_uno_logic');
 const intermediateGameUno = require('./intermediate_game_uno');
 const utilCommon = require('./util_common');
 const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');

@@ -1,5 +1,5 @@
 const connectionContainer = require('../server/server');
-const gameUno = require('./game_uno');
+const gameUno = require('./game_uno_logic');
 const constants = require('../config/constants');
 const debugPrinter = require('../util/debug_printer');
 

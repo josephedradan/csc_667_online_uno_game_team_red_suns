@@ -1,5 +1,5 @@
-const gameUno = require('./game_uno');
-const gameUnoLogic = require('./game_uno_logic');
+const gameUno = require('./game_uno_logic');
+const gameUnoLogicHelper = require('./game_uno_logic_helper');
 const debugPrinter = require('../util/debug_printer');
 const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');
 const dbEngineMessage = require('./db_engine_message');
@@ -197,7 +197,13 @@ async function startGameWrapped(game_id, user_id) {
     debugPrinter.printFunction(startGameWrapped.name);
 
     // WARNING: DO NOT RETURN THE RESULT OF THIS FUNCTION TO USERS BECAUSE IT RETURNS EVERYTHING ABOUT THE CARDS
-    const result = await gameUno.startGame(game_id, user_id, 1);
+    const result = await gameUno.startGame(
+        game_id,
+        user_id,
+        1,
+        7,
+        intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState,
+    );
 
     if (result.status === constants.FAILURE) {
         debugPrinter.printError(result);

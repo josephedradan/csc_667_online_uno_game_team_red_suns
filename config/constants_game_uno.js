@@ -6,15 +6,17 @@ constants_game_uno.CARD_COLOR_GREEN = 'green';
 constants_game_uno.CARD_COLOR_YELLOW = 'yellow';
 constants_game_uno.CARD_COLOR_RED = 'red';
 constants_game_uno.CARD_COLOR_BLUE = 'blue';
-constants_game_uno.NUMBER = 'NUMBER';
-constants_game_uno.SPECIAL = 'SPECIAL';
-constants_game_uno.SPECIALS_CONTENT_SKIP = 'skip';
-constants_game_uno.SPECIALS_CONTENT_REVERSE = 'reverse';
-constants_game_uno.SPECIALS_CONTENT_DRAWTWO = 'drawTwo';
-constants_game_uno.SPECIALS_CONTENT_WILD = 'wild';
-constants_game_uno.SPECIALS_CONTENT_WILDFOUR = 'wildFour';
 
-constants_game_uno.LEGAL_SELECTABLE_COLORS = [
+constants_game_uno.CARD_TYPE_NUMBER = 'NUMBER';
+constants_game_uno.CARD_TYPE_SPECIAL = 'SPECIAL';
+
+constants_game_uno.CARD_CONTENT_SKIP = 'skip';
+constants_game_uno.CARD_CONTENT_REVERSE = 'reverse';
+constants_game_uno.CARD_CONTENT_DRAWTWO = 'drawTwo';
+constants_game_uno.CARD_CONTENT_WILD = 'wild';
+constants_game_uno.CARD_CONTENT_WILDFOUR = 'wildFour';
+
+constants_game_uno.CARD_COLORS_SELECETABLE_LEGEAL = [
     constants_game_uno.CARD_COLOR_BLUE,
     constants_game_uno.CARD_COLOR_RED,
     constants_game_uno.CARD_COLOR_GREEN,

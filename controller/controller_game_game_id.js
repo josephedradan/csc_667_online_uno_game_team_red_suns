@@ -2,7 +2,7 @@
 Handle all the game api calls
 
  */
-const gameUno = require('./game_uno');
+const gameUno = require('./game_uno_logic');
 
 const intermediateGameUno = require('./intermediate_game_uno');
 
@@ -158,7 +158,7 @@ async function GETGetHand(req, res, next) {
 
     const result = await gameUno.getHand(req.game.game_id, req.user.user_id);
 
-    // debugPrinter.printBackendWhite(result);
+    debugPrinter.printBackendWhite(result);
 
     res.json(result);
 }

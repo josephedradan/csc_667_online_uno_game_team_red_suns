@@ -215,7 +215,6 @@ const debugPrinter = {
         _print(input, 'backend_yellow');
     }),
 
-
     printCustom: wrapperPrinter((input, colorTheme) => {
         _print(input, colorTheme);
     }),

@@ -39,6 +39,4 @@ function getJsonResponseAndAttachMessageToSessionMessageIfPossible(req, status, 
 
 utilCommon.getJsonResponseAndAttachMessageToSessionMessageIfPossible = getJsonResponseAndAttachMessageToSessionMessageIfPossible;
 
-
-
 module.exports = utilCommon;

@@ -1,23 +1,23 @@
 const e = require('express');
-const unoCardConstants = require('../config/constants_game_uno');
+const constantsGameUno = require('../config/constants_game_uno');
 
 const values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 const specials = [
-    unoCardConstants.SPECIALS_CONTENT_SKIP,
-    unoCardConstants.SPECIALS_CONTENT_REVERSE,
-    unoCardConstants.SPECIALS_CONTENT_DRAWTWO,
-    unoCardConstants.SPECIALS_CONTENT_WILD,
-    unoCardConstants.SPECIALS_CONTENT_WILDFOUR,
+    constantsGameUno.CARD_CONTENT_SKIP,
+    constantsGameUno.CARD_CONTENT_REVERSE,
+    constantsGameUno.CARD_CONTENT_DRAWTWO,
+    constantsGameUno.CARD_CONTENT_WILD,
+    constantsGameUno.CARD_CONTENT_WILDFOUR,
 ];
 const colors = [
-    unoCardConstants.CARD_COLOR_BLUE,
-    unoCardConstants.CARD_COLOR_RED,
-    unoCardConstants.CARD_COLOR_GREEN,
-    unoCardConstants.CARD_COLOR_YELLOW,
-    unoCardConstants.CARD_COLOR_BLACK,
+    constantsGameUno.CARD_COLOR_BLUE,
+    constantsGameUno.CARD_COLOR_RED,
+    constantsGameUno.CARD_COLOR_GREEN,
+    constantsGameUno.CARD_COLOR_YELLOW,
+    constantsGameUno.CARD_COLOR_BLACK,
 ];
-const number = unoCardConstants.NUMBER;
-const special = unoCardConstants.SPECIAL;
+const number = constantsGameUno.CARD_TYPE_NUMBER;
+const special = constantsGameUno.CARD_TYPE_SPECIAL;
 
 let index = 0;
 
@@ -54,13 +54,13 @@ function generateColoredSpecialCards() {
 function generateSpecialCards() {
     return [
         generateCard(
-            unoCardConstants.SPECIALS_CONTENT_WILD,
-            unoCardConstants.CARD_COLOR_BLACK,
+            constantsGameUno.CARD_CONTENT_WILD,
+            constantsGameUno.CARD_COLOR_BLACK,
             special,
         ),
         generateCard(
-            unoCardConstants.SPECIALS_CONTENT_WILDFOUR,
-            unoCardConstants.CARD_COLOR_BLACK,
+            constantsGameUno.CARD_CONTENT_WILDFOUR,
+            constantsGameUno.CARD_COLOR_BLACK,
             special,
         ),
     ];
@@ -86,7 +86,7 @@ function seedAllCards() {
                 // eslint-disable-next-line no-plusplus
                 card_info_id: count++, content: cards[i].content, color: cards[i].color, type: cards[i].type,
             });
-        } else if (cards[i].content === unoCardConstants.SPECIALS_CONTENT_WILD || cards[i].content === unoCardConstants.SPECIALS_CONTENT_WILDFOUR) {
+        } else if (cards[i].content === constantsGameUno.CARD_CONTENT_WILD || cards[i].content === constantsGameUno.CARD_CONTENT_WILDFOUR) {
             // eslint-disable-next-line no-plusplus
             for (let j = 0; j < 4; j++) {
                 inOrderDeck.push({

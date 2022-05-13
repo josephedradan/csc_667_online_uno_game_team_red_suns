@@ -10,7 +10,7 @@ const debugPrinter = require('../util/debug_printer');
 const dbEngineMessage = require('./db_engine_message');
 const dbEngineGameUno = require('./db_engine_game_uno');
 const intermediateSocketIOGameUno = require('./intermediate_socket_io_game_uno');
-const gameUno = require('./game_uno');
+const gameUno = require('./game_uno_logic');
 const constants = require('../config/constants');
 const intermediateGameUno = require('./intermediate_game_uno');
 
