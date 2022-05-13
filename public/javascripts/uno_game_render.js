@@ -312,7 +312,7 @@ class TurnController {
     }
 
     // note for callbacks that you want to use arrow functions for any form of callbacks if you're using this keyword
-    startTurn(cardCollection, playCollection) {
+    startTurn(cardCollection, game_state) {
         this.endTurn();
         cardCollection.forEach((cardData) => {
             // console.log(cardData); // card data last element has the discard card
@@ -338,15 +338,16 @@ class TurnController {
 
             // restart the animation
             draggable.setDragEndCallback(async (newParent) => {
+                // console.log(cardData.collection_index);
+                // console.log(game_state);
+                // console.log(cardCollection);
                 if (newParent == this.playContainer) {
                     // if card is a wild card, prompt with modal and request the move
                     // console.log(cardData);
                     if (cardData.color == "black") {
                         // Modal!
+                        // this.handleBlackCardAction(cardData);
                         this.handleBlackCardAction(cardData);
-                        // TODO: add animation before based on the legal color selected
-                        // reupdate the hand when you select a color have handleBlack return a color to note which is the legal cards now.
-                        applyBounceAnimation(card, playCollection, cardData);
                     } else {
                         // Make move request
                         // const moveResult = await axios.post(`/game/${getGameId()}/move`, {cardData.collection_index}); //or however the heck it's named
@@ -377,14 +378,14 @@ class TurnController {
                         // removeBounceAnimation(reapplyCard);
                         applyBounceAnimation(
                             reapplyCard,
-                            playCollection,
+                            game_state.game,
                             cardCollection[idx]
                         );
                     }
                 }
             });
             this.draggables.push(draggable);
-            applyBounceAnimation(card, playCollection, cardData);
+            applyBounceAnimation(card, game_state.game, cardData);
         });
 
         const drawCard = document.getElementById("drawCard");
@@ -428,7 +429,6 @@ class TurnController {
         for (const colorSelectedByID of colorSelectionChildren) {
             colorSelectedByID.addEventListener("click", async (e) => {
                 const selectedColor = e.target.getAttribute("id");
-                console.log(selectedColor);
                 await axios.post(`/game/${getGameId()}/playCard`, {
                     collection_index: cardData.collection_index,
                     color: selectedColor, // selected color
@@ -497,7 +497,6 @@ const gameStateProcessor = new EventProcessor(
         //     //         .color
         //     // );
         // }
-
         const localPlayer = (await axios.get(`/game/${getGameId()}/getPlayer`))
             .data.player;
 
@@ -590,10 +589,11 @@ const gameStateProcessor = new EventProcessor(
             );
             // console.log(game_state.game.player_id_turn);
             // console.log(localPlayer.player_id);
+            // console.log(game_state);
             if (game_state.game.player_id_turn == localPlayer.player_id) {
                 turnController.startTurn(
                     playersHand.data.collection,
-                    game_state.collection_play // discard pile
+                    game_state // discard pile
                 );
             }
             if (game_state.game.card_color_legal) {
@@ -639,13 +639,11 @@ const applyCurrentColorToGameScreen = async (color) => {
     currentColor.classList.add(`bg-${color}-500`);
 };
 
-const applyBounceAnimation = (card, playCollection, cardData) => {
-    if (!playCollection[playCollection.length - 1]) return;
-    if (cardData.color === playCollection[playCollection.length - 1].color) {
+const applyBounceAnimation = (card, game, cardData) => {
+    // if (!playCollection[playCollection.length - 1]) return;
+    if (cardData.color === game.card_color_legal) {
         card.classList.add("animate-bounce");
-    } else if (
-        cardData.content === playCollection[playCollection.length - 1].content
-    ) {
+    } else if (cardData.content === game.card_content_legal) {
         card.classList.add("animate-bounce");
     } else if (cardData.color === "black") {
         card.classList.add("animate-bounce");
