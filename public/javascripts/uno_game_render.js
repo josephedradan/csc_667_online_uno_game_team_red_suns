@@ -495,7 +495,7 @@ class TurnController {
                     color: selectedColor, // selected color
                 });
                 applyCurrentColorToGameScreen(selectedColor);
-                document.getElementById("wildFourUserEvent").innerHTML = "";
+                wildFourUserEvent.innerHTML = "";
                 wildFourUserEvent.classList.remove(
                     ...wildFourUserEvent.classList
                 );
