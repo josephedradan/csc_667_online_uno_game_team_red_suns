@@ -41,9 +41,11 @@ async function changeTurnAndGetPlayerRowDetailedByGameID(gameRow) {
         return result;
     }
 
+    debugPrinter.printBackendWhite(playerRowsActive);
+
     // If there is no player_id for the game
     if (gameRow.player_id_turn === null) { // TODO: Maybe use "Players".player_index in the future
-        await dbEngineGameUno.updateGameDataPlayerIDTurn(gameRow.game_id, playerRowsActive[0].player_id);
+        await dbEngineGameUno.updateGameDatRowPlayerIDTurn(gameRow.game_id, playerRowsActive[0].player_id);
         result.status = constants.SUCCESS;
         result.message = `Game ${gameRow.game_id}'s player_id_turn was null, player ${playerRowsActive[0].player_id} will have the turn`;
         result.player_id_turn = playerRowsActive[0].player_id;
@@ -66,12 +68,12 @@ async function changeTurnAndGetPlayerRowDetailedByGameID(gameRow) {
     });
 
     const indexOfNextPlayerInPlayerRowsActive = ((indexOfCurrentPlayer + 1 + gameRow.skip_amount) % playerRowsActive.length);
-    await dbEngineGameUno.updateGameDataSkipAmount(gameRow.game_id, 0);
+    await dbEngineGameUno.updateGameDataRowSkipAmount(gameRow.game_id, 0);
 
     result.user_id_turn = playerRowsActive[indexOfNextPlayerInPlayerRowsActive].user_id;
     result.player_id_turn = playerRowsActive[indexOfNextPlayerInPlayerRowsActive].player_id;
 
-    const gameData = await dbEngineGameUno.updateGameDataPlayerIDTurn(gameRow.game_id, result.player_id_turn);
+    const gameData = await dbEngineGameUno.updateGameDatRowPlayerIDTurn(gameRow.game_id, result.player_id_turn);
 
     if (!gameData) {
         result.status = constants.FAILURE;
@@ -152,7 +154,7 @@ async function updateGameData(gameRow, color) {
     }
 
     // May be undefined
-    const cardLegal = await dbEngineGameUno.updateGameDataCardLegal(gameRow.game_id, temp.type, temp.content, temp.color);
+    const cardLegal = await dbEngineGameUno.updateGameDataRowCardLegal(gameRow.game_id, temp.type, temp.content, temp.color);
 
     debugPrinter.printError(cardLegal);
     if (!cardLegal) {
@@ -168,16 +170,16 @@ async function updateGameData(gameRow, color) {
     if (temp.content === unoCardConstants.SPECIALS_CONTENT_WILDFOUR) {
         // await dbEngineGameUno.updateGameDataDrawAmount(gameRow.game_id, 4);
         if (gameRow.draw_amount > 1) {
-            await dbEngineGameUno.updateGameDataDrawAmount(gameRow.game_id, gameRow.draw_amount + 4);
+            await dbEngineGameUno.updateGameDataRowDrawAmount(gameRow.game_id, gameRow.draw_amount + 4);
         } else {
-            await dbEngineGameUno.updateGameDataDrawAmount(gameRow.game_id, 4);
+            await dbEngineGameUno.updateGameDataRowDrawAmount(gameRow.game_id, 4);
         }
     } else if (temp.content === unoCardConstants.SPECIALS_CONTENT_DRAWTWO) {
-        await dbEngineGameUno.updateGameDataDrawAmount(gameRow.game_id, 2);
+        await dbEngineGameUno.updateGameDataRowDrawAmount(gameRow.game_id, 2);
     } else if (temp.content === unoCardConstants.SPECIALS_CONTENT_REVERSE) {
-        await dbEngineGameUno.updateGameDataIsClockwise(gameRow.game_id, !gameRow.is_clockwise);
+        await dbEngineGameUno.updateGameDataRowIsClockwise(gameRow.game_id, !gameRow.is_clockwise);
     } else if (temp.content === unoCardConstants.SPECIALS_CONTENT_SKIP) {
-        await dbEngineGameUno.updateGameDataSkipAmount(1);
+        await dbEngineGameUno.updateGameDataRowSkipAmount(1);
     }
 
     const changeTurnObject = await gameUnoLogic.changeTurnAndGetPlayerRowDetailedByGameID(gameRow);
@@ -243,6 +245,7 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRow, playerRow, co
         return result;
     }
 
+    // ?????????????????
     /**
      * grab the card at the top of the play stack
      * grab the card that the player wants to play

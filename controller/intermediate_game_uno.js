@@ -166,7 +166,7 @@ async function moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow)
         return result;
     }
 
-    // await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
+    await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 
     return result;
 }
@@ -175,9 +175,6 @@ intermediateGameUno.moveCardDrawToHandByGameIDAndPlayerRowWrapped = moveCardDraw
 
 async function playCardHandToPlayDeckWrapped(game_id, user_id, collection_index, color) {
     debugPrinter.printFunction(playCardHandToPlayDeckWrapped.name);
-
-    // TODO HANDLE PLAYING SPECIAL CARDS
-    // TODO CHANGE TURN IF NEEDED
 
     const result = await gameUno.moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_index, color);
 
@@ -207,37 +204,6 @@ async function startGameWrapped(game_id, user_id) {
 
         return gameUno.getGameState(game_id);
     }
-
-    // Emit the gameState to room and get gameState
-    // await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
-
-    // const playersRow = await dbEngineGameUno.getPlayerRowsDetailedByGameID(game_id);
-    //
-    // // eslint-disable-next-line no-restricted-syntax
-    // for (const playerRow of playersRow) {
-    //     // eslint-disable-next-line no-plusplus
-    //     for (let i = 0; i < 7; i++) {
-    //         // eslint-disable-next-line no-await-in-loop
-    //         await moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow);
-    //     }
-    // }
-
-    // await gameUno.moveCardDrawToPlay(game_id);
-
-    // let gameData = null;
-    //
-    // // FXIME: VERY DANGEROUS LOOP
-    // while (!gameData || gameData.status === constants.FAILURE) {
-    //     // eslint-disable-next-line no-await-in-loop
-    //     gameData = await gameUnoLogic.updateGameData(result.game, null);
-    //
-    //     if (gameData.status === constants.FAILURE) {
-    //         // eslint-disable-next-line no-await-in-loop
-    //         await dbEngineGameUno.updateCollectionRowsPlayToDrawAndRandomizeDrawByGameID(game_id);
-    //         // eslint-disable-next-line no-await-in-loop
-    //         await gameUno.moveCardDrawToPlay(game_id);
-    //     }
-    // }
 
     const resultNew = intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 

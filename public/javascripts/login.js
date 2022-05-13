@@ -1,13 +1,13 @@
-const login = document.getElementById("login_form_button");
+const login = document.getElementById('login_form_button');
 if (login) {
-    login.addEventListener("click", async (event) => {
+    login.addEventListener('click', async (event) => {
         event.preventDefault();
 
-        const formLogin = document.getElementById("login_form");
+        const formLogin = document.getElementById('login_form');
         const formData = new FormData(formLogin);
 
         await axios
-            .post("/login", Object.fromEntries(formData))
+            .post('/login', Object.fromEntries(formData))
             .then((response) => {
                 window.location = response.data.url;
             })

@@ -476,7 +476,7 @@ async function createGameV2(user_id) {
 
 gameUno.createGameV2 = createGameV2;
 
-async function reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid(game_id) {
+async function reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid(gameRow) {
     debugPrinter.printFunction(reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid.name);
 
     const result = {
@@ -485,29 +485,33 @@ async function reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayI
         game_data: null,
     };
 
-    let gameDataRow = null;
+    let resultGameData = null;
 
     // FIXME: VERY DANGEROUS LOOP
-    while (!gameDataRow || gameDataRow.status === constants.FAILURE) {
+    while (!resultGameData || resultGameData.status === constants.FAILURE) {
         // eslint-disable-next-line no-await-in-loop
-        gameDataRow = await gameUnoLogic.updateGameData(game_id, null);
+        resultGameData = await gameUnoLogic.updateGameData(gameRow, null);
 
-        if (gameDataRow.status === constants.FAILURE) {
+        debugPrinter.printDebug(gameRow);
+        debugPrinter.printDebug(resultGameData);
+
+        if (resultGameData.status === constants.FAILURE) {
             // eslint-disable-next-line no-await-in-loop
-            await dbEngineGameUno.updateCollectionRowsPlayToDrawAndRandomizeDrawByGameID(gameDataRow.game_id);
+            await dbEngineGameUno.updateCollectionRowsPlayToDrawAndRandomizeDrawByGameID(gameRow.game_id);
             // eslint-disable-next-line no-await-in-loop
-            await gameUno.moveCardDrawToPlay(gameDataRow.game_id);
+            await gameUno.moveCardDrawToPlay(gameRow.game_id);
         }
+        debugPrinter.printError('111111111111111111111111111111111111111');
     }
 
-    result.game_data = gameDataRow;
+    result.game_data = resultGameData;
     result.status = constants.SUCCESS;
-    result.message = `GameData (game_id ${gameDataRow.game_id}) was updated`;
+    result.message = `GameData (game_id ${resultGameData.game_id}) was updated`;
 
     return result;
 }
 
-gameUno.reshuffleCollectionDrawAndPlayIfPlayHasBlackCardOnTop = reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid;
+gameUno.reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid = reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid;
 
 /*
 {
@@ -551,7 +555,6 @@ async function startGame(game_id, user_id, deckMultiplier, drawAmount, callback_
         player: null,
         cards: null,
         players: null,
-        change_turn: null,
     };
 
     let gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
@@ -616,16 +619,6 @@ async function startGame(game_id, user_id, deckMultiplier, drawAmount, callback_
     }
     result.players = playerRows;
 
-    const changeTurnObject = await gameUnoLogic.changeTurnAndGetPlayerRowDetailedByGameID(gameRow);
-
-    if (changeTurnObject.status === constants.FAILURE) {
-        result.status = changeTurnObject.status;
-        result.message = changeTurnObject.message;
-        return result;
-    }
-
-    result.change_turn = changeTurnObject;
-
     // New Game Row
     gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
     result.game = gameRow;
@@ -636,7 +629,7 @@ async function startGame(game_id, user_id, deckMultiplier, drawAmount, callback_
     for (const playerRow of playerRows) {
         // eslint-disable-next-line no-plusplus
         for (let i = 0; i < 7; i++) {
-            // eslint-disable-next-line no-await-in-loop
+            // eslint-disable-next-line no-await-in-loop,no-use-before-define
             await moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, callback_game_id);
         }
     }
@@ -644,7 +637,8 @@ async function startGame(game_id, user_id, deckMultiplier, drawAmount, callback_
     // TODO GUARD AND CHECK
     await gameUno.moveCardDrawToPlay(game_id);
 
-    await reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid;
+    // TODO GUARD AND CHECK
+    await reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid(gameRow);
 
     result.status = constants.SUCCESS;
     result.message = `Game ${game_id} started`;
@@ -811,6 +805,8 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, cal
     }
     result.player = playerRow;
 
+    // TODO FUUUUUUUUUUUCK
+
     let collectionRowHand = null;
 
     let cardsDrew = 0;
@@ -819,12 +815,20 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, cal
     while (cardsDrew < gameRow.draw_amount) {
         // If the server crashes, the player still needs to draw the appropriate amount of cards (May be undefined)
         // eslint-disable-next-line no-await-in-loop
-        const gameData = await dbEngineGameUno.updateGameDataDrawAmount(game_id, cardsDrew);
+        const gameData = await dbEngineGameUno.updateGameDataRowDrawAmount(game_id, cardsDrew);
 
         if (!gameData) {
-            result.status = constants.FAILURE;
-            result.message = `Game ${gameRow.game_id}'s GameData failed to update draw_amount`;
-            return result;
+            // result.status = constants.FAILURE;
+            // result.message = `Game ${gameRow.game_id}'s GameData failed to update draw_amount`;
+            // return result;
+
+            debugPrinter.printError(`Error when Drawing cards for Game game_id ${game_id}`)
+            /*
+            If this break is hit, then something went wrong updating the db. This break should probably never be hit, but
+            if it does then something went wrong
+
+             */
+            break;
         }
 
         // eslint-disable-next-line no-await-in-loop
@@ -833,7 +837,7 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, cal
         // If there are no cards in the Collection DRAW, reshuffle Collection PLAY to Collection DRAW
         if (collectionCountDraw === 0) {
             // eslint-disable-next-line no-await-in-loop
-            const gameDataNew = await reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid(game_id);
+            const gameDataRowNew = await reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid(gameRow);
 
             // Get the new Collection DRAW (May be empty)
             // eslint-disable-next-line no-await-in-loop
@@ -883,7 +887,10 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, cal
     }
 
     // Reset draw amount
-    await dbEngineGameUno.updateGameDataDrawAmount(game_id, 1);
+    await dbEngineGameUno.updateGameDataRowDrawAmount(game_id, 1);
+
+
+    // TODO FUUUUUUUUUUUCK
 
     result.collection = collectionRowHand;
 

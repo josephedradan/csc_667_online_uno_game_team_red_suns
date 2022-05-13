@@ -1618,8 +1618,8 @@ GameData Related
 ##############################################################################################################
 */
 
-async function updateGameDataIsClockwise(game_id, boolean) {
-    debugPrinter.printFunction(updateGameDataIsClockwise.name);
+async function updateGameDataRowIsClockwise(game_id, boolean) {
+    debugPrinter.printFunction(updateGameDataRowIsClockwise.name);
 
     const result = await db.any(
         `
@@ -1638,7 +1638,7 @@ async function updateGameDataIsClockwise(game_id, boolean) {
     return result[0];
 }
 
-dbEngineGameUno.updateGameDataIsClockwise = updateGameDataIsClockwise;
+dbEngineGameUno.updateGameDataRowIsClockwise = updateGameDataRowIsClockwise;
 
 async function updateGameDataPlayerIDTurn(game_id, player_id) {
     debugPrinter.printFunction(updateGameDataPlayerIDTurn.name);
@@ -1660,10 +1660,10 @@ async function updateGameDataPlayerIDTurn(game_id, player_id) {
     return result[0];
 }
 
-dbEngineGameUno.updateGameDataPlayerIDTurn = updateGameDataPlayerIDTurn;
+dbEngineGameUno.updateGameDatRowPlayerIDTurn = updateGameDataPlayerIDTurn;
 
-async function updateGameDataCardLegal(game_id, card_type_legal, card_content_legal, card_color_legal) {
-    debugPrinter.printFunction(updateGameDataCardLegal.name);
+async function updateGameDataRowCardLegal(game_id, card_type_legal, card_content_legal, card_color_legal) {
+    debugPrinter.printFunction(updateGameDataRowCardLegal.name);
 
     const result = await db.any(
         `
@@ -1686,10 +1686,10 @@ async function updateGameDataCardLegal(game_id, card_type_legal, card_content_le
     return result[0];
 }
 
-dbEngineGameUno.updateGameDataCardLegal = updateGameDataCardLegal;
+dbEngineGameUno.updateGameDataRowCardLegal = updateGameDataRowCardLegal;
 
-async function updateGameDataSkipAmount(game_id, skipAmount) {
-    debugPrinter.printFunction(updateGameDataSkipAmount.name);
+async function updateGameDataRowSkipAmount(game_id, skipAmount) {
+    debugPrinter.printFunction(updateGameDataRowSkipAmount.name);
 
     const result = await db.any(
         `
@@ -1708,10 +1708,10 @@ async function updateGameDataSkipAmount(game_id, skipAmount) {
     return result[0];
 }
 
-dbEngineGameUno.updateGameDataSkipAmount = updateGameDataSkipAmount;
+dbEngineGameUno.updateGameDataRowSkipAmount = updateGameDataRowSkipAmount;
 
-async function updateGameDataDrawAmount(game_id, drawAmount) {
-    debugPrinter.printFunction(updateGameDataDrawAmount.name);
+async function updateGameDataRowDrawAmount(game_id, drawAmount) {
+    debugPrinter.printFunction(updateGameDataRowDrawAmount.name);
 
     const result = await db.any(
         `
@@ -1730,6 +1730,6 @@ async function updateGameDataDrawAmount(game_id, drawAmount) {
     return result[0];
 }
 
-dbEngineGameUno.updateGameDataDrawAmount = updateGameDataDrawAmount;
+dbEngineGameUno.updateGameDataRowDrawAmount = updateGameDataRowDrawAmount;
 
 module.exports = dbEngineGameUno;
