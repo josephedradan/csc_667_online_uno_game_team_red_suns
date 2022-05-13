@@ -486,17 +486,6 @@ playerMapping.set(4, [0, 1, 2, 3]);
 // This function handles game states coming off of a queue
 const gameStateProcessor = new EventProcessor(
     async (game_state, playersHand) => {
-        // this check is to allow for the rendering of the host. since we're rendering
-        // TODO: legal_color will be used instead to render the current color being played
-        // if (
-        //     game_state.collection_play.length !== 0 ||
-        //     !game_state.collection_play
-        // ) {
-        //     // applyCurrentColorToGameScreen(
-        //     //     game_state.collection_play[game_state.collection_play.length - 1]
-        //     //         .color
-        //     // );
-        // }
         const localPlayer = (await axios.get(`/game/${getGameId()}/getPlayer`))
             .data.player;
 
