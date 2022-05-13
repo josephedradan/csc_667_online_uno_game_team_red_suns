@@ -221,17 +221,12 @@ async function updateGameData(gameRowDetailed, color) {
             );
         }
     } else if (temp.content === constantsGameUno.CARD_CONTENT_DRAWTWO) {
-        if (gameRowDetailed.draw_amount > 1) {
-            await dbEngineGameUno.updateGameDataRowDrawAmount(
-                gameRowDetailed.game_id,
-                gameRowDetailed.draw_amount + 2
-            );
-        } else {
-            await dbEngineGameUno.updateGameDataRowDrawAmount(
-                gameRowDetailed.game_id,
-                2
-            );
-        }
+        await dbEngineGameUno.updateGameDataRowDrawAmount(
+            gameRowDetailed.game_id,
+            gameRowDetailed.draw_amount > 1
+                ? gameRowDetailed.draw_amount + 2
+                : 2
+        );
     } else if (temp.content === constantsGameUno.CARD_CONTENT_REVERSE) {
         await dbEngineGameUno.updateGameDataRowIsClockwise(
             gameRowDetailed.game_id,

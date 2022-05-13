@@ -665,23 +665,29 @@ const gameStateProcessor = new EventProcessor(
             // console.log(game_state.game.player_id_turn);
 
             // search game state for current player id, match and return name
-            display_current_player(
-                game_state.players.find(
-                    (player) =>
-                        player.player_id === game_state.game.player_id_turn
-                ).display_name
-            );
-            // console.log(game_state.game.is_clockwise);
-            console.log(game_state.game.draw_amount);
+
+            // weird bug where display_name is undefined during first couple renders
+            if (
+                game_state.players.some(
+                    (player) => player.display_name !== undefined
+                )
+            ) {
+                display_current_player(
+                    game_state.players.find(
+                        (player) =>
+                            player.player_id === game_state.game.player_id_turn
+                    ).display_name
+                );
+            }
+
             document.getElementById("is_reverse").innerHTML = `Direction: ${
                 game_state.game.is_clockwise ? "Clockwise" : "Counter Clockwise"
             }`;
-            document.getElementById(
-                "draw_amount"
-            ).innerHTML = `Draw amount: ${game_state.game.draw_amount}`;
-            // console.log(game_state.game.player_id_turn);
-            // console.log(localPlayer.player_id);
-            // console.log(game_state);
+            if (game_state.game.draw_amount !== 0) {
+                document.getElementById(
+                    "draw_amount"
+                ).innerHTML = `Draw amount: ${game_state.game.draw_amount}`;
+            }
             if (game_state.game.player_id_turn == localPlayer.player_id) {
                 turnController.startTurn(
                     playersHand.data.collection,
