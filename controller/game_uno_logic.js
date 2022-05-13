@@ -907,7 +907,6 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, cal
     // Change turn if player draws when there is a WILDFOUR or DRAWTWO and the draw_amount is > 0 (Note that gameRowDetailed should be outdated by this point which is why this logic works)
     if (((gameRowDetailed.card_content_legal === constantsGameUno.CARD_CONTENT_WILDFOUR) || (gameRowDetailed.card_content_legal === constantsGameUno.CARD_CONTENT_DRAWTWO))
         && (gameRowDetailed.draw_amount > 1)) {
-        debugPrinter.printError('DREW DURING A +4 OR +2 SWITCH TURN');
         const changeTurn = await gameUnoLogicHelper.changeTurnAndGetPlayerRowDetailedByGameID(gameRowDetailed);
 
         if (changeTurn.status === constants.FAILURE) {

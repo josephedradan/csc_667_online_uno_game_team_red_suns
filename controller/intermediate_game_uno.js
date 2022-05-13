@@ -37,20 +37,21 @@ Return format
 async function createGameWrapped(user_id) {
     debugPrinter.printFunction(createGameWrapped.name);
 
-    const gameObject = await gameUno.createGameV2(user_id); // TODO: Possibly redesign because card generation should happen when you start the game, not create a game
-    debugPrinter.printBackendBlue(gameObject);
+    const game = await gameUno.createGameV2(user_id); // TODO: Possibly redesign because card generation should happen when you start the game, not create a game
+    debugPrinter.printBackendBlue(game);
 
-    if (gameObject.status === constants.FAILURE) {
-        return gameObject;
+    if (result.status === constants.FAILURE) {
+        debugPrinter.printError(game);
+        return game;
     }
 
-    const game_url = await intermediateGameUno.getRelativeGameURL(gameObject.game.game_id);
+    const game_url = await intermediateGameUno.getRelativeGameURL(game.game.game_id);
 
-    gameObject.game_url = game_url;
+    game.game_url = game_url;
 
     await intermediateSocketIOGameUno.emitInRoom_ServerIndex_Games();
 
-    return gameObject;
+    return game;
 }
 
 intermediateGameUno.createGameWrapped = createGameWrapped;
@@ -68,7 +69,9 @@ async function joinGameIfPossibleWrapped(game_id, user_id) {
 
     const result = await gameUno.joinGameIfPossible(game_id, user_id);
 
-    debugPrinter.printDebug(result);
+    if (result.status === constants.FAILURE) {
+        debugPrinter.printError(result);
+    }
 
     await intermediateSocketIOGameUno.emitInRoom_ServerIndex_Games();
 
@@ -92,6 +95,10 @@ async function leaveGameWrapped(game_id, user_id) {
     const result = await gameUno.leaveGame(game_id, user_id);
 
     const arrayPromises = [intermediateSocketIOGameUno.emitInRoom_ServerIndex_Games()];
+
+    if (result.status === constants.FAILURE) {
+        debugPrinter.printError(result);
+    }
 
     if (result.game) {
         const message = 'The host left, the game is dead, go back to the homepage.';
@@ -160,10 +167,8 @@ async function moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow)
         intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState, // Emit the gameState to room and get gameState
     );
 
-    debugPrinter.printDebug(result);
-
     if (result.status === constants.FAILURE) {
-        return result;
+        debugPrinter.printError(result);
     }
 
     await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
@@ -177,6 +182,10 @@ async function playCardHandToPlayDeckWrapped(game_id, user_id, collection_index,
     debugPrinter.printFunction(playCardHandToPlayDeckWrapped.name);
 
     const result = await gameUno.moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_index, color);
+
+    if (result.status === constants.FAILURE) {
+        debugPrinter.printError(result);
+    }
 
     await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 
@@ -207,8 +216,6 @@ async function startGameWrapped(game_id, user_id) {
 
     if (result.status === constants.FAILURE) {
         debugPrinter.printError(result);
-
-        return gameUno.getGameState(game_id);
     }
 
     const resultNew = intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);

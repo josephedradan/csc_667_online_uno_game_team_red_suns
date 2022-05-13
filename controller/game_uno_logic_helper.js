@@ -119,8 +119,6 @@ async function updateGameData(gameRowDetailed, color) {
 
     const collectionRowPlayTop = await dbEngineGameUno.getCollectionRowTopDetailedByGameIDAndCollectionInfoID(gameRowDetailed.game_id, 2);
 
-    debugPrinter.printBackendGreen(collectionRowPlayTop);
-
     if (!collectionRowPlayTop) {
         result.status = constants.FAILURE;
         result.message = `Get Collection of the Top Card of the Play Stack failed, it's empty game_id: ${gameRowDetailed.game_id}`;
@@ -133,7 +131,6 @@ async function updateGameData(gameRowDetailed, color) {
         content: collectionRowPlayTop.content,
         type: collectionRowPlayTop.type,
     };
-    debugPrinter.printBackendBlue(temp);
 
     // Use playObject's color by default if it exists
     if (color && temp.color === constantsGameUno.CARD_COLOR_BLACK) {
@@ -154,7 +151,6 @@ async function updateGameData(gameRowDetailed, color) {
     // May be undefined
     const gameDataRow = await dbEngineGameUno.updateGameDataRowCardLegal(gameRowDetailed.game_id, temp.type, temp.content, temp.color);
 
-    debugPrinter.printError(gameDataRow);
     if (!gameDataRow) {
         result.status = constants.FAILURE;
         result.message = `Failed to update gameDate ${gameRowDetailed.game_id} legal card`;
