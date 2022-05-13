@@ -14,18 +14,17 @@ const gameUnoLogicHelper = {};
 
 /**
  * IMPORTANT NOTES:
- *      USE THIS FUNCTION IN THIS FILE ONLY
+ *      YOU USE THIS FUNCTION IN THIS FILE ONLY, IT ALSO ASSUMES gameRowDetailed IS UP TO DATE OR ELSE LOGIC WILL FAIL
  *
  * @param game_id
  * @returns {Promise<void>}
  */
-async function changeTurnAndGetPlayerRowDetailedByGameID(gameRow) {
-    debugPrinter.printFunction(changeTurnAndGetPlayerRowDetailedByGameID.name);
+async function changeTurnByGameRow(gameRowDetailed) {
+    debugPrinter.printFunction(changeTurnByGameRow.name);
 
     const result = {
         status: null,
         message: null,
-        game: gameRow,
         game_data: null,
         players_active: null,
         player_id_turn: null,
@@ -33,27 +32,27 @@ async function changeTurnAndGetPlayerRowDetailedByGameID(gameRow) {
     };
 
     // May be empty
-    let playerRowsActive = await dbEngineGameUno.getPlayerRowsGameIsActive(gameRow.game_id);
+    let playerRowsActive = await dbEngineGameUno.getPlayerRowsGameIsActive(gameRowDetailed.game_id);
 
     if (!playerRowsActive.length) {
         result.status = constants.FAILURE;
-        result.message = `No active players in game ${gameRow.game_id}`;
+        result.message = `No active players in game ${gameRowDetailed.game_id}`;
         return result;
     }
 
     // debugPrinter.printBackendWhite(playerRowsActive);
 
     // If there is no player_id for the game
-    if (gameRow.player_id_turn === null) { // TODO: Maybe use "Players".player_index in the future
-        await dbEngineGameUno.updateGameDatRowPlayerIDTurn(gameRow.game_id, playerRowsActive[0].player_id);
+    if (gameRowDetailed.player_id_turn === null) { // TODO: Maybe use "Players".player_index in the future
+        await dbEngineGameUno.updateGameDatRowPlayerIDTurn(gameRowDetailed.game_id, playerRowsActive[0].player_id);
         result.status = constants.SUCCESS;
-        result.message = `Game ${gameRow.game_id}'s player_id_turn was null, player ${playerRowsActive[0].player_id} will have the turn`;
+        result.message = `Game ${gameRowDetailed.game_id}'s player_id_turn was null, player ${playerRowsActive[0].player_id} will have the turn`;
         result.player_id_turn = playerRowsActive[0].player_id;
         result.user_id_turn = playerRowsActive[0].user_id;
         return result;
     }
 
-    if (gameRow.is_clockwise !== false) {
+    if (gameRowDetailed.is_clockwise === false) {
         playerRowsActive = playerRowsActive.reverse();
     }
 
@@ -62,34 +61,54 @@ async function changeTurnAndGetPlayerRowDetailedByGameID(gameRow) {
     let indexOfCurrentPlayer = null; // FIXME ME, MIGHT BE DANGEROUS
 
     playerRowsActive.forEach((playerRow, index) => {
-        if (gameRow.player_id_turn === playerRow.player_id) {
+        if (gameRowDetailed.player_id_turn === playerRow.player_id) {
             indexOfCurrentPlayer = index;
         }
     });
 
-    const indexOfNextPlayerInPlayerRowsActive = ((indexOfCurrentPlayer + 1 + gameRow.skip_amount) % playerRowsActive.length);
-    await dbEngineGameUno.updateGameDataRowSkipAmount(gameRow.game_id, 0);
+    const indexOfNextPlayerInPlayerRowsActive = ((indexOfCurrentPlayer + 1 + gameRowDetailed.skip_amount) % playerRowsActive.length);
+    await dbEngineGameUno.updateGameDataRowSkipAmount(gameRowDetailed.game_id, 0);
 
     result.user_id_turn = playerRowsActive[indexOfNextPlayerInPlayerRowsActive].user_id;
     result.player_id_turn = playerRowsActive[indexOfNextPlayerInPlayerRowsActive].player_id;
 
-    const gameData = await dbEngineGameUno.updateGameDatRowPlayerIDTurn(gameRow.game_id, result.player_id_turn);
+    const gameData = await dbEngineGameUno.updateGameDatRowPlayerIDTurn(gameRowDetailed.game_id, result.player_id_turn);
 
     if (!gameData) {
         result.status = constants.FAILURE;
-        result.message = `Game ${gameRow.game_id}'s GameData failed to update`;
+        result.message = `Game ${gameRowDetailed.game_id}'s GameData failed to update`;
         return result;
     }
 
     result.game_data = gameData;
 
     result.status = constants.SUCCESS;
-    result.message = `Game ${gameRow.game_id}, player (player_id ${result.player_id}) has the turn`;
+    result.message = `Game ${gameRowDetailed.game_id}, player (player_id ${result.player_id}) has the turn`;
 
     return result;
 }
 
-gameUnoLogicHelper.changeTurnAndGetPlayerRowDetailedByGameID = changeTurnAndGetPlayerRowDetailedByGameID;
+gameUnoLogicHelper.changeTurnByGameRow = changeTurnByGameRow;
+
+async function changeTurnByGameID(game_id) {
+    debugPrinter.printFunction(changeTurnByGameID.name)
+    const gameRowDetailed = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
+
+    const result = {
+        status: null,
+        message: null,
+    };
+
+    if (!gameRowDetailed) {
+        result.status = constants.FAILURE;
+        result.message = `Game ${game_id} does not exist`;
+        return result;
+    }
+
+    return changeTurnByGameRow(gameRowDetailed);
+}
+
+gameUnoLogicHelper.changeTurnByGameID = changeTurnByGameID;
 
 /**
  * Notes:
@@ -108,7 +127,7 @@ async function updateGameData(gameRowDetailed, color) {
     const result = {
         status: null,
         message: null,
-        game_data: null,
+        game: null,
     };
 
     if (!color && isValidSlectableColor(color)) {
@@ -156,40 +175,51 @@ async function updateGameData(gameRowDetailed, color) {
         result.message = `Failed to update gameDate ${gameRowDetailed.game_id} legal card`;
         return result;
     }
-    result.game_data = gameDataRow;
 
     // TODO: REMEMBER TO IMPLEMENT THE RESETTERS. JOSEPH FIX IT
+    // TODO: CHECK AND GUARD THE BELOW
 
     // Assume db queries will be successful since it lacks user input, guards preffered
     if (temp.content === constantsGameUno.CARD_CONTENT_WILDFOUR) {
         // await dbEngineGameUno.updateGameDataDrawAmount(gameRowDetailed.game_id, 4);
         if (gameRowDetailed.draw_amount > 1) {
-            result.game_data = await dbEngineGameUno.updateGameDataRowDrawAmount(
+            await dbEngineGameUno.updateGameDataRowDrawAmount(
                 gameRowDetailed.game_id,
                 gameRowDetailed.draw_amount + 4,
             );
         } else {
-            result.game_data = await dbEngineGameUno.updateGameDataRowDrawAmount(
+            await dbEngineGameUno.updateGameDataRowDrawAmount(
                 gameRowDetailed.game_id,
                 4,
             );
         }
     } else if (temp.content === constantsGameUno.CARD_CONTENT_DRAWTWO) {
-        result.game_data = await dbEngineGameUno.updateGameDataRowDrawAmount(
+        await dbEngineGameUno.updateGameDataRowDrawAmount(
             gameRowDetailed.game_id,
             2,
         );
     } else if (temp.content === constantsGameUno.CARD_CONTENT_REVERSE) {
-        result.game_data = await dbEngineGameUno.updateGameDataRowIsClockwise(
+        await dbEngineGameUno.updateGameDataRowIsClockwise(
             gameRowDetailed.game_id,
             !gameRowDetailed.is_clockwise,
         );
     } else if (temp.content === constantsGameUno.CARD_CONTENT_SKIP) {
-        result.game_data = await dbEngineGameUno.updateGameDataRowSkipAmount(
-            1,
+        await dbEngineGameUno.updateGameDataRowSkipAmount(
+            gameRowDetailed.game_id,
             1,
         );
     }
+
+    // May be Undefined
+    const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(gameDataRow.game_id);
+
+    if (!gameRow) {
+        result.status = constants.FAILURE;
+        result.message = `Game ${gameDataRow.game_id} does not exist`;
+        return result;
+    }
+
+    result.game = gameRow;
 
     result.status = constants.SUCCESS;
     result.message = `Game ${gameRowDetailed.game_id}'s GameData was successfully updated`;
@@ -224,7 +254,7 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRowDetailed, playe
         status: null,
         message: null,
         collection: null,
-        game_data: null,
+        game: null,
         change_turn: null,
     };
 
@@ -307,7 +337,7 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRowDetailed, playe
         return result;
     }
 
-    const changeTurn = await gameUnoLogicHelper.changeTurnAndGetPlayerRowDetailedByGameID(gameRowDetailed);
+    const changeTurn = await gameUnoLogicHelper.changeTurnByGameRow(gameData.game);
 
     if (changeTurn.status === constants.FAILURE) {
         result.status = changeTurn.status;
@@ -318,7 +348,7 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRowDetailed, playe
     result.change_turn = changeTurn;
 
     result.message = `Game ${gameRowDetailed.game_id}, player ${playerRow.display_name} (player_id ${playerRow.player_id}) has successfully played their Card (collection_index ${collection_index})'`;
-    result.game_data = gameData;
+    result.game = gameData;
 
     return result;
 }

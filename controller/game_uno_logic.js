@@ -288,7 +288,7 @@ async function leaveGame(game_id, user_id) {
     } else {
         // WARNING, MUST CHANGE TURN BEFORE LEAVING OR ELSE THE GAME WILL CRASH
         if (gameRow.player_id_turn === playerRow.player_id) {
-            const changeTurn = await gameUnoLogicHelper.changeTurnAndGetPlayerRowDetailedByGameID(gameRow);
+            const changeTurn = await gameUnoLogicHelper.changeTurnByGameRow(gameRow);
 
             if (changeTurn.status === constants.FAILURE) {
                 result.status = changeTurn.status;
@@ -642,7 +642,7 @@ async function startGame(game_id, user_id, deckMultiplier, drawAmountPerPlayer, 
     // TODO GUARD AND CHECK
     await reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid(gameRowDetailed);
 
-    const changeTurn = await gameUnoLogicHelper.changeTurnAndGetPlayerRowDetailedByGameID(gameRowDetailed);
+    const changeTurn = await gameUnoLogicHelper.changeTurnByGameID(gameRowDetailed);
 
     if (changeTurn.status === constants.FAILURE) {
         result.status = changeTurn.status;
@@ -907,7 +907,7 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, cal
     // Change turn if player draws when there is a WILDFOUR or DRAWTWO and the draw_amount is > 0 (Note that gameRowDetailed should be outdated by this point which is why this logic works)
     if (((gameRowDetailed.card_content_legal === constantsGameUno.CARD_CONTENT_WILDFOUR) || (gameRowDetailed.card_content_legal === constantsGameUno.CARD_CONTENT_DRAWTWO))
         && (gameRowDetailed.draw_amount > 1)) {
-        const changeTurn = await gameUnoLogicHelper.changeTurnAndGetPlayerRowDetailedByGameID(gameRowDetailed);
+        const changeTurn = await gameUnoLogicHelper.changeTurnByGameID(gameRowDetailed.game_id);
 
         if (changeTurn.status === constants.FAILURE) {
             result.status = changeTurn.status;
