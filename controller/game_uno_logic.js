@@ -642,7 +642,7 @@ async function startGame(game_id, user_id, deckMultiplier, drawAmountPerPlayer, 
     // TODO GUARD AND CHECK
     await reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid(gameRowDetailed);
 
-    const changeTurn = await gameUnoLogicHelper.changeTurnByGameID(gameRowDetailed);
+    const changeTurn = await gameUnoLogicHelper.changeTurnByGameID(gameRowDetailed.game_id);
 
     if (changeTurn.status === constants.FAILURE) {
         result.status = changeTurn.status;

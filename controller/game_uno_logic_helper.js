@@ -91,7 +91,7 @@ async function changeTurnByGameRow(gameRowDetailed) {
 gameUnoLogicHelper.changeTurnByGameRow = changeTurnByGameRow;
 
 async function changeTurnByGameID(game_id) {
-    debugPrinter.printFunction(changeTurnByGameID.name)
+    debugPrinter.printFunction(changeTurnByGameID.name);
     const gameRowDetailed = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
 
     const result = {
