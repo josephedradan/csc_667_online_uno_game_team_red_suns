@@ -476,6 +476,39 @@ async function createGameV2(user_id) {
 
 gameUno.createGameV2 = createGameV2;
 
+async function reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid(game_id) {
+    debugPrinter.printFunction(reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid.name);
+
+    const result = {
+        status: null,
+        message: null,
+        game_data: null,
+    };
+
+    let gameDataRow = null;
+
+    // FIXME: VERY DANGEROUS LOOP
+    while (!gameDataRow || gameDataRow.status === constants.FAILURE) {
+        // eslint-disable-next-line no-await-in-loop
+        gameDataRow = await gameUnoLogic.updateGameData(game_id, null);
+
+        if (gameDataRow.status === constants.FAILURE) {
+            // eslint-disable-next-line no-await-in-loop
+            await dbEngineGameUno.updateCollectionRowsPlayToDrawAndRandomizeDrawByGameID(gameDataRow.game_id);
+            // eslint-disable-next-line no-await-in-loop
+            await gameUno.moveCardDrawToPlay(gameDataRow.game_id);
+        }
+    }
+
+    result.game_data = gameDataRow;
+    result.status = constants.SUCCESS;
+    result.message = `GameData (game_id ${gameDataRow.game_id}) was updated`;
+
+    return result;
+}
+
+gameUno.reshuffleCollectionDrawAndPlayIfPlayHasBlackCardOnTop = reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid;
+
 /*
 {
     status,
@@ -506,7 +539,7 @@ gameUno.createGameV2 = createGameV2;
  * @param player_id
  * @returns {Promise<null|{game: null, message: null, status: null}>}
  */
-async function startGame(game_id, user_id, deckMultiplier) {
+async function startGame(game_id, user_id, deckMultiplier, drawAmount, callback_game_id) {
     debugPrinter.printFunction(startGame.name);
 
     // TODO: Assign player_index to players so you know the turn order. Maybe do this because we can use the player_id instead
@@ -532,15 +565,15 @@ async function startGame(game_id, user_id, deckMultiplier) {
     result.game = gameRow;
 
     // Get player given game_id and user_id (May be undefined)
-    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(game_id, user_id);
+    const playerRowHost = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(game_id, user_id);
 
     // If player is exists for the user for the game
-    if (!playerRow) {
+    if (!playerRowHost) {
         result.status = constants.FAILURE;
         result.message = `Player does not exist for game ${game_id}`;
         return result;
     }
-    result.player = playerRow;
+    result.player = playerRowHost;
 
     // If player_id is host and if game is not active, make it active
     if (gameRow.is_active === true) {
@@ -549,7 +582,7 @@ async function startGame(game_id, user_id, deckMultiplier) {
         return result;
     }
 
-    await dbEngineGameUno.updateGameIsActiveByGameID(game_id, true);
+    await dbEngineGameUno.updateGameRowIsActiveByGameID(game_id, true);
 
     // May be empty
     const cardRows = await dbEngineGameUno.createCardRowsAndCardsRowsAndCollectionRowsWithCollectionRandomized(gameRow.game_id, deckMultiplier);
@@ -568,7 +601,7 @@ async function startGame(game_id, user_id, deckMultiplier) {
     result.cards = cardRows; // In this case, cardsRows is not cards, but cardRows is cards
 
     // May be empty
-    await dbEngineGameUno.updatePlayersInGameRows(game_id, true);
+    await dbEngineGameUno.updatePlayersRowsInGameRows(game_id, true);
 
     const playerRows = await dbEngineGameUno.getPlayerRowsDetailedByGameID(gameRow.game_id);
 
@@ -596,6 +629,22 @@ async function startGame(game_id, user_id, deckMultiplier) {
     // New Game Row
     gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
     result.game = gameRow;
+
+    /* ----- Distribute Cards ----- */
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const playerRow of playerRows) {
+        // eslint-disable-next-line no-plusplus
+        for (let i = 0; i < 7; i++) {
+            // eslint-disable-next-line no-await-in-loop
+            await moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, callback_game_id);
+        }
+    }
+
+    // TODO GUARD AND CHECK
+    await gameUno.moveCardDrawToPlay(game_id);
+
+    await reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid;
 
     result.status = constants.SUCCESS;
     result.message = `Game ${game_id} started`;
@@ -715,7 +764,7 @@ async function getGameState(game_id) {
     // eslint-disable-next-line no-restricted-syntax
     for (const playerRow of playerRows) {
         // eslint-disable-next-line no-await-in-loop
-        playerRow.collection = await dbEngineGameUno.getCollectionCollectionIndexRowsByPlayerID(playerRow.player_id);
+        playerRow.collection = await dbEngineGameUno.getCollectionRowsCollectionIndexByPlayerID(playerRow.player_id);
     }
 
     // May be empty
@@ -733,15 +782,26 @@ async function getGameState(game_id) {
 
 gameUno.getGameState = getGameState;
 
-async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow) {
+async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, callback_game_id) {
     debugPrinter.printFunction(moveCardDrawToHandTopByGameIDAndPlayerRow.name);
 
     const result = {
         status: null,
         message: null,
+        game: null,
         player: null,
         collection: null,
     };
+
+    // May be undefined
+    const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
+
+    // If Game Row does not exist
+    if (!gameRow) {
+        result.status = constants.FAILURE;
+        result.message = `Game ${game_id} does not exist`;
+        return result;
+    }
 
     // If player is exists for the user for the game
     if (!playerRow) {
@@ -751,15 +811,81 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow) {
     }
     result.player = playerRow;
 
-    // My be undefined
-    const collectionRow = await dbEngineGameUno.updateCollectionRowDrawToHandTop(game_id, playerRow.player_id);
+    let collectionRowHand = null;
 
-    if (!collectionRow) {
-        result.status = constants.FAILURE;
-        result.message = `Error in updating player ${playerRow.display_name} (player_id ${playerRow.player_id})'s collection`;
-        return result;
+    let cardsDrew = 0;
+
+    // Draw the appropriate amount of cards for the player
+    while (cardsDrew < gameRow.draw_amount) {
+        // If the server crashes, the player still needs to draw the appropriate amount of cards (May be undefined)
+        // eslint-disable-next-line no-await-in-loop
+        const gameData = await dbEngineGameUno.updateGameDataDrawAmount(game_id, cardsDrew);
+
+        if (!gameData) {
+            result.status = constants.FAILURE;
+            result.message = `Game ${gameRow.game_id}'s GameData failed to update draw_amount`;
+            return result;
+        }
+
+        // eslint-disable-next-line no-await-in-loop
+        const collectionCountDraw = await dbEngineGameUno.getCollectionCountByGameIDAndCollectionInfoID(game_id, 1);
+
+        // If there are no cards in the Collection DRAW, reshuffle Collection PLAY to Collection DRAW
+        if (collectionCountDraw === 0) {
+            // eslint-disable-next-line no-await-in-loop
+            const gameDataNew = await reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid(game_id);
+
+            // Get the new Collection DRAW (May be empty)
+            // eslint-disable-next-line no-await-in-loop
+            const collectionCountDrawNew = await dbEngineGameUno.getCollectionCountByGameIDAndCollectionInfoID(game_id, 1);
+
+            if (collectionCountDrawNew.length === 0) {
+                // result.status = constants.FAILURE;
+                // result.message = `Collection DRAW is still empty, ${playerRow.player_id} Should play cards`;
+                // return result;
+
+                /*
+                If this break is hit, the game is in a complicated state where there no cards in the DRAW collection even after
+                moving all the cards from the PLAY collection into the DRAW collection and playing 1 card from the DRAW to the PLAY.
+
+                If the player can't play a card after all this drawing, the game will probably be in a soft lock state...
+
+                TODO: Add code to prevent this soft lock by skipping the player if they can't play a legal card
+
+                 */
+                break;
+            }
+
+            // Execute the callback if necessary
+            if (callback_game_id) {
+                // eslint-disable-next-line no-await-in-loop
+                await callback_game_id(game_id);
+            }
+        }
+
+        // My be undefined
+        // eslint-disable-next-line no-await-in-loop
+        collectionRowHand = await dbEngineGameUno.updateCollectionRowDrawToHandTop(game_id, playerRow.player_id);
+
+        if (!collectionRowHand) {
+            result.status = constants.FAILURE;
+            result.message = `Error in updating player ${playerRow.display_name} (player_id ${playerRow.player_id})'s collection`;
+            return result;
+        }
+
+        // Execute the callback if necessary
+        if (callback_game_id) {
+            // eslint-disable-next-line no-await-in-loop
+            await callback_game_id(game_id);
+        }
+
+        cardsDrew += 1;
     }
-    result.collection = collectionRow;
+
+    // Reset draw amount
+    await dbEngineGameUno.updateGameDataDrawAmount(game_id, 1);
+
+    result.collection = collectionRowHand;
 
     result.status = constants.SUCCESS;
     result.message = `A card from DRAW's collection moved to player ${playerRow.display_name} (player_id ${playerRow.player_id})'s collection's top for Game ${game_id}`;
@@ -867,7 +993,7 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_
     result.player = playerRow;
 
     // Check if it's the player's turn
-    if (gameRow.player_id_turn !== playerRow.player_id){
+    if (gameRow.player_id_turn !== playerRow.player_id) {
         result.status = constants.FAILURE;
         result.message = `It is not Player ${playerRow.display_name} (player_id ${playerRow.player_id}) turn for game ${game_id}`;
         return result;
@@ -1019,7 +1145,7 @@ async function setGamePlayerIDHost(game_id, user_id) {
     }
     result.player = playerRow;
 
-    const gameRowNew = await dbEngineGameUno.updateGamePlayerIDHostByGameID(game_id, playerRow.player_id);
+    const gameRowNew = await dbEngineGameUno.updateGameRowPlayerIDHostByGameID(game_id, playerRow.player_id);
 
     if (!gameRowNew) {
         result.status = constants.FAILURE;

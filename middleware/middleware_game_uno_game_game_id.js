@@ -52,7 +52,7 @@ async function checkIfPlayerCanDoAction(req, res, next) {
     } else {
         res.json({
             status: constants.FAILURE,
-            message: 'It is not your turn',
+            message: `It is not your turn player_if ${req.player.player_id}`,
         });
     }
 }

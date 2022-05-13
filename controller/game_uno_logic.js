@@ -4,10 +4,9 @@ const dbEngineGameUno = require('./db_engine_game_uno');
 const constants = require('../config/constants');
 const unoCardConstants = require('../config/constants_game_uno');
 
-const set = new Set(unoCardConstants.LEGAL_COLORS);
+const set = new Set(unoCardConstants.LEGAL_SELECTABLE_COLORS);
 
-function isValidColor(color) {
-    debugPrinter.printBackendMagenta(set.has(color));
+function isValidSlectableColor(color) {
     return set.has(color);
 }
 
@@ -112,7 +111,7 @@ async function updateGameData(gameRow, color) {
         card_legal: null,
     };
 
-    if (!color && isValidColor(color)) {
+    if (!color && isValidSlectableColor(color)) {
         result.status = constants.FAILURE;
         result.message = `Improper color by game_id: ${gameRow.game_id} color: ${color}`;
         return result;
@@ -145,7 +144,7 @@ async function updateGameData(gameRow, color) {
 
     // If temp.color is black
 
-    // wildfour causes a draw of four cards, wild does'nt cause a draw. Both causes a change in color chosen by the player.
+    // wildfour causes a draw of four cards, wild doesn't cause a draw. Both causes a change in color chosen by the player.
     if (temp.color === unoCardConstants.CARD_COLOR_BLACK) {
         result.status = constants.FAILURE;
         result.message = `Top Card of PLAY's collection is black for game ${gameRow.game_id}. No color is selected, suggest a reshuffle`;
@@ -227,7 +226,7 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRow, playerRow, co
         game_data: null,
     };
 
-    if (!color && isValidColor(color)) {
+    if (!color && isValidSlectableColor(color)) {
         result.status = constants.FAILURE;
         result.message = `Game ${gameRow.game_id}, player ${playerRow.display_name} (player_id ${playerRow.player_id}) played an invalid color ${color}`;
         return result;

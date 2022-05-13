@@ -742,8 +742,8 @@ dbEngineGameUno.randomizeCollectionRowsByGameIDAndCollectionInfoID = randomizeCo
 //
 // dbEngineGameUno.randomizeCollectionRowsByGameID = randomizeCollectionRowsByGameID;
 
-async function updateCollectionRowPlayToDrawAndRandomizedByGameID(game_id) {
-    debugPrinter.printFunction(updateCollectionRowPlayToDrawAndRandomizedByGameID.name);
+async function updateCollectionRowsPlayToDrawAndRandomizeDrawByGameID(game_id) {
+    debugPrinter.printFunction(updateCollectionRowsPlayToDrawAndRandomizeDrawByGameID.name);
     const result = await db.any(
         `
             UPDATE "Collection"
@@ -801,7 +801,7 @@ async function updateCollectionRowPlayToDrawAndRandomizedByGameID(game_id) {
     return result;
 }
 
-dbEngineGameUno.updateCollectionRowPlayToDrawAndRandomizedByGameID = updateCollectionRowPlayToDrawAndRandomizedByGameID;
+dbEngineGameUno.updateCollectionRowsPlayToDrawAndRandomizeDrawByGameID = updateCollectionRowsPlayToDrawAndRandomizeDrawByGameID;
 
 async function deletePlayersRowByUserID(user_id) {
     debugPrinter.printFunction(deletePlayersRowByUserID.name);
@@ -1069,6 +1069,29 @@ async function getCollectionRowDetailedByGameIDAndCollectionInfoID(game_id, coll
 
 dbEngineGameUno.getCollectionRowDetailedByGameIDAndCollectionInfoID = getCollectionRowDetailedByGameIDAndCollectionInfoID;
 
+async function getCollectionCountByGameIDAndCollectionInfoID(game_id, collection_info_id) {
+    debugPrinter.printFunction(getCollectionCountByGameIDAndCollectionInfoID.name);
+    const result = await db.any(
+        `
+        SELECT 
+            COUNT(*)
+        FROM "Collection"
+        JOIN "Cards" ON "Collection".card_id = "Cards".card_id
+        JOIN "Card" ON "Collection".card_id = "Card".card_id
+        WHERE "Cards".game_id = $1
+        AND "Collection".collection_info_id = $2
+        `,
+        [
+            game_id,
+            collection_info_id,
+        ],
+    );
+
+    return result[0];
+}
+
+dbEngineGameUno.getCollectionCountByGameIDAndCollectionInfoID = getCollectionCountByGameIDAndCollectionInfoID;
+
 async function getCollectionRowCollectionIndexByGameIDAndCollectionInfoID(game_id, collection_info_id) {
     debugPrinter.printFunction(getCollectionRowCollectionIndexByGameIDAndCollectionInfoID.name);
     const result = await db.any(
@@ -1255,8 +1278,8 @@ async function getPlayerRowsGameIsActive(game_id) {
 
 dbEngineGameUno.getPlayerRowsGameIsActive = getPlayerRowsGameIsActive;
 
-async function updatePlayersInGameRows(game_id, boolean) {
-    debugPrinter.printFunction(updatePlayersInGameRows.name);
+async function updatePlayersRowsInGameRows(game_id, boolean) {
+    debugPrinter.printFunction(updatePlayersRowsInGameRows.name);
     const result = await db.any(
         `
         UPDATE "Players"
@@ -1274,11 +1297,11 @@ async function updatePlayersInGameRows(game_id, boolean) {
     return result;
 }
 
-dbEngineGameUno.updatePlayersInGameRows = updatePlayersInGameRows;
+dbEngineGameUno.updatePlayersRowsInGameRows = updatePlayersRowsInGameRows;
 
 // TODO CALL THIS WHEN A PLAYER WINS
-async function updatePlayersInGameRowByPlayerID(game_id, player_id, boolean) {
-    debugPrinter.printFunction(updatePlayersInGameRowByPlayerID.name);
+async function updatePlayersRowInGameRowByPlayerID(game_id, player_id, boolean) {
+    debugPrinter.printFunction(updatePlayersRowInGameRowByPlayerID.name);
     const result = await db.any(
         `
         UPDATE "Players"
@@ -1298,10 +1321,10 @@ async function updatePlayersInGameRowByPlayerID(game_id, player_id, boolean) {
     return result;
 }
 
-dbEngineGameUno.updatePlayersInGameRowByPlayerID = updatePlayersInGameRowByPlayerID;
+dbEngineGameUno.updatePlayersRowInGameRowByPlayerID = updatePlayersRowInGameRowByPlayerID;
 
-async function getNumberOfPlayersRowsByGameID(game_id) {
-    debugPrinter.printFunction(getNumberOfPlayersRowsByGameID.name);
+async function getPlayersCountByGameID(game_id) {
+    debugPrinter.printFunction(getPlayersCountByGameID.name);
 
     const result = await db.any(
         `
@@ -1315,10 +1338,10 @@ async function getNumberOfPlayersRowsByGameID(game_id) {
     return result[0];
 }
 
-dbEngineGameUno.getNumberOfPlayersRowsByGameID = getNumberOfPlayersRowsByGameID;
+dbEngineGameUno.getPlayersCountByGameID = getPlayersCountByGameID;
 
-async function getCollectionCollectionIndexRowsByPlayerID(player_id) {
-    debugPrinter.printFunction(getCollectionCollectionIndexRowsByPlayerID.name);
+async function getCollectionRowsCollectionIndexByPlayerID(player_id) {
+    debugPrinter.printFunction(getCollectionRowsCollectionIndexByPlayerID.name);
 
     const result = await db.any(
         `
@@ -1333,10 +1356,10 @@ async function getCollectionCollectionIndexRowsByPlayerID(player_id) {
     return result;
 }
 
-dbEngineGameUno.getCollectionCollectionIndexRowsByPlayerID = getCollectionCollectionIndexRowsByPlayerID;
+dbEngineGameUno.getCollectionRowsCollectionIndexByPlayerID = getCollectionRowsCollectionIndexByPlayerID;
 
-async function getCollectionCollectionIndexRowsDrawByGameID(game_id) {
-    debugPrinter.printFunction(getCollectionCollectionIndexRowsDrawByGameID.name);
+async function getCollectionRowsCollectionIndexDrawByGameID(game_id) {
+    debugPrinter.printFunction(getCollectionRowsCollectionIndexDrawByGameID.name);
 
     const result = await db.any(
         `
@@ -1352,10 +1375,10 @@ async function getCollectionCollectionIndexRowsDrawByGameID(game_id) {
     return result;
 }
 
-dbEngineGameUno.getCollectionCollectionIndexRowsDrawByGameID = getCollectionCollectionIndexRowsDrawByGameID;
+dbEngineGameUno.getCollectionRowsCollectionIndexDrawByGameID = getCollectionRowsCollectionIndexDrawByGameID;
 
-async function updateGameIsActiveByGameID(game_id, boolean) {
-    debugPrinter.printFunction(updateGameIsActiveByGameID.name);
+async function updateGameRowIsActiveByGameID(game_id, boolean) {
+    debugPrinter.printFunction(updateGameRowIsActiveByGameID.name);
 
     const result = await db.any(
         `
@@ -1373,10 +1396,10 @@ async function updateGameIsActiveByGameID(game_id, boolean) {
     return result;
 }
 
-dbEngineGameUno.updateGameIsActiveByGameID = updateGameIsActiveByGameID;
+dbEngineGameUno.updateGameRowIsActiveByGameID = updateGameRowIsActiveByGameID;
 
-async function updateGamePlayerIDHostByGameID(game_id, player_id) {
-    debugPrinter.printFunction(updateGamePlayerIDHostByGameID.name);
+async function updateGameRowPlayerIDHostByGameID(game_id, player_id) {
+    debugPrinter.printFunction(updateGameRowPlayerIDHostByGameID.name);
 
     const result = await db.any(
         `
@@ -1394,7 +1417,7 @@ async function updateGamePlayerIDHostByGameID(game_id, player_id) {
     return result;
 }
 
-dbEngineGameUno.updateGamePlayerIDHostByGameID = updateGamePlayerIDHostByGameID;
+dbEngineGameUno.updateGameRowPlayerIDHostByGameID = updateGameRowPlayerIDHostByGameID;
 
 async function updateCollectionRowDrawToHandTop(game_id, player_id) {
     debugPrinter.printFunction(updateCollectionRowDrawToHandTop.name);

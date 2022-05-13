@@ -14,12 +14,11 @@ constants_game_uno.SPECIALS_CONTENT_DRAWTWO = 'drawTwo';
 constants_game_uno.SPECIALS_CONTENT_WILD = 'wild';
 constants_game_uno.SPECIALS_CONTENT_WILDFOUR = 'wildFour';
 
-constants_game_uno.LEGAL_COLORS = [
+constants_game_uno.LEGAL_SELECTABLE_COLORS = [
     constants_game_uno.CARD_COLOR_BLUE,
     constants_game_uno.CARD_COLOR_RED,
     constants_game_uno.CARD_COLOR_GREEN,
     constants_game_uno.CARD_COLOR_YELLOW,
-    constants_game_uno.CARD_COLOR_BLACK,
 ];
 
 module.exports = constants_game_uno;

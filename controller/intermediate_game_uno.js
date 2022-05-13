@@ -154,7 +154,11 @@ intermediateGameUno.sendMessageWrapped = sendMessageWrapped;
 async function moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow) {
     debugPrinter.printFunction(moveCardDrawToHandByGameIDAndPlayerRowWrapped.name);
 
-    const result = await gameUno.moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow);
+    const result = await gameUno.moveCardDrawToHandTopByGameIDAndPlayerRow(
+        game_id,
+        playerRow,
+        intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState, // Emit the gameState to room and get gameState
+    );
 
     debugPrinter.printDebug(result);
 
@@ -162,8 +166,7 @@ async function moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow)
         return result;
     }
 
-    // Emit the gameState to room and get gameState
-    await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
+    // await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 
     return result;
 }
@@ -200,36 +203,41 @@ async function startGameWrapped(game_id, user_id) {
     const result = await gameUno.startGame(game_id, user_id, 1);
 
     if (result.status === constants.FAILURE) {
+        debugPrinter.printError(result);
+
         return gameUno.getGameState(game_id);
     }
 
     // Emit the gameState to room and get gameState
-    await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
+    // await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 
-    const playersRow = await dbEngineGameUno.getPlayerRowsDetailedByGameID(game_id);
+    // const playersRow = await dbEngineGameUno.getPlayerRowsDetailedByGameID(game_id);
+    //
+    // // eslint-disable-next-line no-restricted-syntax
+    // for (const playerRow of playersRow) {
+    //     // eslint-disable-next-line no-plusplus
+    //     for (let i = 0; i < 7; i++) {
+    //         // eslint-disable-next-line no-await-in-loop
+    //         await moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow);
+    //     }
+    // }
 
-    // eslint-disable-next-line no-restricted-syntax
-    for (const playerRow of playersRow) {
-        // eslint-disable-next-line no-plusplus
-        for (let i = 0; i < 7; i++) {
-            // eslint-disable-next-line no-await-in-loop
-            await moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow);
-        }
-    }
+    // await gameUno.moveCardDrawToPlay(game_id);
 
-    await gameUno.moveCardDrawToPlay(game_id);
-
-    let gameData = null;
-
-    // FXIME: VERY DANGEROUS LOOP
-    while (!gameData || gameData.status === constants.FAILURE) {
-        gameData = await gameUnoLogic.updateGameData(result.game, null);
-
-        if (gameData.status === constants.FAILURE) {
-            await updateCollectionRowPlayToDrawAndRandomizedByGameID(game_id);
-            await gameUno.moveCardDrawToPlay(game_id);
-        }
-    }
+    // let gameData = null;
+    //
+    // // FXIME: VERY DANGEROUS LOOP
+    // while (!gameData || gameData.status === constants.FAILURE) {
+    //     // eslint-disable-next-line no-await-in-loop
+    //     gameData = await gameUnoLogic.updateGameData(result.game, null);
+    //
+    //     if (gameData.status === constants.FAILURE) {
+    //         // eslint-disable-next-line no-await-in-loop
+    //         await dbEngineGameUno.updateCollectionRowsPlayToDrawAndRandomizeDrawByGameID(game_id);
+    //         // eslint-disable-next-line no-await-in-loop
+    //         await gameUno.moveCardDrawToPlay(game_id);
+    //     }
+    // }
 
     const resultNew = intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 
