@@ -191,6 +191,7 @@ async function updateGameData(gameRowDetailed, color) {
     } else if (temp.content === constantsGameUno.CARD_CONTENT_SKIP) {
         result.game_data = await dbEngineGameUno.updateGameDataRowSkipAmount(
             1,
+            1,
         );
     }
 
