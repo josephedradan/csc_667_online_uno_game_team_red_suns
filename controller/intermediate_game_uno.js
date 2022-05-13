@@ -40,7 +40,7 @@ async function createGameWrapped(user_id) {
     const game = await gameUno.createGameV2(user_id); // TODO: Possibly redesign because card generation should happen when you start the game, not create a game
     debugPrinter.printBackendBlue(game);
 
-    if (result.status === constants.FAILURE) {
+    if (game.status === constants.FAILURE) {
         debugPrinter.printError(game);
         return game;
     }
