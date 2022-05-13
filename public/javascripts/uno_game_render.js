@@ -92,6 +92,8 @@ class Draggable {
     }
 
     dragMouseUp(event) {
+
+        console.log("Drag ended!!!");
         // If not left click, do nothing
         if (event.which != 1) {
             return;
@@ -128,6 +130,7 @@ class Draggable {
                 mouseY < parseInt(rect.bottom, 10)
             ) {
                 container.appendChild(this.element);
+                console.log("Appended!!");
                 this.parent = this.element.parentElement;
                 parented = true;
                 if (this.dragEndCallback) {
@@ -137,13 +140,22 @@ class Draggable {
             }
         }
         if (!parented) {
-            this.parent.insertBefore(
-                this.element,
-                this.parent.children[this.childIndex]
-            );
-            if (this.dragEndCallback) {
-                this.dragEndCallback(this.parent);
-            }
+            this.cancelDrag();
+        }
+    }
+
+    cancelDrag() {
+        this.dragging = false;
+        this.element.style.top = null;
+        this.element.style.left = null;
+        this.element.style.position = null;
+        this.element.style.transform = null;
+        this.parent.insertBefore(
+            this.element,
+            this.parent.children[this.childIndex]
+        );
+        if (this.dragEndCallback) {
+            this.dragEndCallback(this.parent);
         }
     }
 
@@ -159,6 +171,9 @@ class Draggable {
         this.element.removeEventListener("mousedown", this.dragMouseDown);
         document.removeEventListener("mouseup", this.dragMouseUp);
         document.removeEventListener("mousemove", this.dragMouseMove);
+        if (this.dragging) {
+            this.cancelDrag();
+        }
     }
 }
 
@@ -374,6 +389,8 @@ class TurnController {
                         console.log(result);
                         applyCurrentColorToGameScreen(cardData.color);
                     }
+
+                    this.endTurn();
                     // update legal color
                 } else {
                     for (const [idx, reapplyCard] of Object.entries(
