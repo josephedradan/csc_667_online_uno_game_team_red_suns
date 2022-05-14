@@ -332,6 +332,7 @@ class TurnController {
     // note for callbacks that you want to use arrow functions for any form of callbacks if you're using this keyword
     startTurn(cardCollection, game_state) {
         this.endTurn();
+
         cardCollection.forEach((cardData) => {
             // console.log(cardData); // card data last element has the discard card
             // console.log(cardData.collection_index);
@@ -362,6 +363,21 @@ class TurnController {
                 if (newParent == this.playContainer) {
                     // if card is a wild card, prompt with modal and request the move
                     // console.log(cardData);
+                    setTimeout(() => {
+                        const cloneOfParent =
+                            newParent.childNodes[
+                                newParent.childNodes.length - 1
+                            ].cloneNode(true);
+                        this.playContainer.append(cloneOfParent);
+                        cloneOfParent.classList.add("animate-ping");
+                        // console.log("in here");
+                        setTimeout(() => {
+                            console.log("in here");
+                            // cloneOfParent.classList.remove("animate-ping");
+                            cloneOfParent.remove();
+                        }, 710);
+                    }, 100);
+
                     if (cardData.color == "black") {
                         // Modal!
                         // this.handleBlackCardAction(cardData);
@@ -387,7 +403,33 @@ class TurnController {
                         console.log(result);
                         applyCurrentColorToGameScreen(cardData.color);
                     }
+                    // const cloneOfParent =
+                    //     newParent.childNodes[
+                    //         newParent.childNodes.length - 1
+                    //     ].cloneNode(true); // true in params mean deep copy
+                    // console.log(cloneOfParent);
+                    // // console.log(this.playContainer);
+                    // cloneOfParent.id = "dummyDiv";
+                    // this.playContainer.append(cloneOfParent);
+                    // console.log(this.playContainer);
 
+                    // const getClone = document.getElementById("dummyDiv");
+                    // console.log(getClone);
+                    // getClone.classList.add("animate-ping");
+                    // // document
+                    // //     .getElementById("discard")
+                    // //     .appendChild(cloneOfParent);
+                    // setTimeout(() => {
+                    //     getClone.classList.remove("animate-ping");
+                    //     // }, 2000);
+                    // }, 810);
+                    // cloneOfParent.remove();
+
+                    // working one but only animates the card need dummy.
+                    // this.playContainer.classList.add("animate-ping");
+                    // setTimeout(() => {
+                    //     this.playContainer.classList.remove("animate-ping");
+                    // }, 710);
                     this.endTurn();
                 } else {
                     for (const [idx, reapplyCard] of Object.entries(
@@ -401,10 +443,6 @@ class TurnController {
                         );
                     }
                 }
-                this.playContainer.classList.add("animate-ping");
-                setTimeout(() => {
-                    this.playContainer.classList.remove("animate-ping");
-                }, 810);
             });
             this.draggables.push(draggable);
             applyBounceAnimation(card, game_state.game, cardData);
