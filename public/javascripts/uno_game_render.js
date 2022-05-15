@@ -363,25 +363,14 @@ class TurnController {
                 if (newParent == this.playContainer) {
                     // if card is a wild card, prompt with modal and request the move
                     // console.log(cardData);
-                    setTimeout(() => {
-                        const cloneOfParent =
-                            newParent.childNodes[
-                                newParent.childNodes.length - 1
-                            ].cloneNode(true);
-                        this.playContainer.append(cloneOfParent);
-                        cloneOfParent.classList.add("animate-ping");
-                        // console.log("in here");
-                        setTimeout(() => {
-                            console.log("in here");
-                            // cloneOfParent.classList.remove("animate-ping");
-                            cloneOfParent.remove();
-                        }, 710);
-                    }, 100);
 
+                    // this.#animateCardPing(this.playContainer);
                     if (cardData.color == "black") {
                         // Modal!
                         // this.handleBlackCardAction(cardData);
-                        this.#handleBlackCardAction(cardData);
+                        this.#handleBlackCardAction(cardData).then((res) => {
+                            this.#animateCardPing(this.playContainer);
+                        });
                     } else {
                         // Make move request
                         // const moveResult = await axios.post(`/game/${getGameId()}/move`, {cardData.collection_index}); //or however the heck it's named
@@ -400,36 +389,11 @@ class TurnController {
                             }
                         );
 
-                        console.log(result);
+                        // console.log(result);
+                        this.#animateCardPing(this.playContainer);
                         applyCurrentColorToGameScreen(cardData.color);
                     }
-                    // const cloneOfParent =
-                    //     newParent.childNodes[
-                    //         newParent.childNodes.length - 1
-                    //     ].cloneNode(true); // true in params mean deep copy
-                    // console.log(cloneOfParent);
-                    // // console.log(this.playContainer);
-                    // cloneOfParent.id = "dummyDiv";
-                    // this.playContainer.append(cloneOfParent);
-                    // console.log(this.playContainer);
 
-                    // const getClone = document.getElementById("dummyDiv");
-                    // console.log(getClone);
-                    // getClone.classList.add("animate-ping");
-                    // // document
-                    // //     .getElementById("discard")
-                    // //     .appendChild(cloneOfParent);
-                    // setTimeout(() => {
-                    //     getClone.classList.remove("animate-ping");
-                    //     // }, 2000);
-                    // }, 810);
-                    // cloneOfParent.remove();
-
-                    // working one but only animates the card need dummy.
-                    // this.playContainer.classList.add("animate-ping");
-                    // setTimeout(() => {
-                    //     this.playContainer.classList.remove("animate-ping");
-                    // }, 710);
                     this.endTurn();
                 } else {
                     for (const [idx, reapplyCard] of Object.entries(
@@ -481,83 +445,105 @@ class TurnController {
         // document.getElementById("wildFourUserEvent").innerHTML = "";
     }
 
+    #animateCardPing(playContainer) {
+        setTimeout(() => {
+            const cloneOfParent =
+                playContainer.childNodes[
+                    playContainer.childNodes.length - 1
+                ].cloneNode(true);
+            playContainer.append(cloneOfParent);
+            cloneOfParent.classList.add("animate-ping");
+            setTimeout(() => {
+                // cloneOfParent.classList.remove("animate-ping");
+                cloneOfParent.remove();
+            }, 710);
+        }, 100);
+    }
+
     #handleBlackCardAction(cardData) {
-        const wildFourUserEvent = document.getElementById("wildFourUserEvent");
-        const yellow = document.createElement("div");
-        const green = document.createElement("div");
-        const blue = document.createElement("div");
-        const red = document.createElement("div");
+        return new Promise((resolve, reject) => {
+            const wildFourUserEvent =
+                document.getElementById("wildFourUserEvent");
+            const yellow = document.createElement("div");
+            const green = document.createElement("div");
+            const blue = document.createElement("div");
+            const red = document.createElement("div");
 
-        wildFourUserEvent.classList.add(
-            "fixed",
-            "z-10",
-            "grid",
-            "w-64",
-            "h-64",
-            "grid-cols-2",
-            "gap-1",
-            "bg-black",
-            "rounded-lg",
-            "custom-inset"
-        );
-        yellow.classList.add(
-            "col-span-1",
-            "mt-1",
-            "ml-1",
-            "bg-yellow-500",
-            "hover:bg-yellow-700"
-        );
-        green.classList.add(
-            "col-span-1",
-            "mt-1",
-            "mr-1",
-            "bg-green-500",
-            "hover:bg-green-700"
-        );
-        blue.classList.add(
-            "col-span-1",
-            "mb-1",
-            "ml-1",
-            "bg-blue-500",
-            "hover:bg-blue-700"
-        );
-        red.classList.add(
-            "col-span-1",
-            "mb-1",
-            "mr-1",
-            "bg-red-500",
-            "hover:bg-red-700"
-        );
+            wildFourUserEvent.classList.add(
+                "fixed",
+                "z-10",
+                "grid",
+                "w-64",
+                "h-64",
+                "grid-cols-2",
+                "gap-1",
+                "bg-black",
+                "rounded-lg",
+                "custom-inset"
+            );
+            yellow.classList.add(
+                "col-span-1",
+                "mt-1",
+                "ml-1",
+                "bg-yellow-500",
+                "hover:bg-yellow-700"
+            );
+            green.classList.add(
+                "col-span-1",
+                "mt-1",
+                "mr-1",
+                "bg-green-500",
+                "hover:bg-green-700"
+            );
+            blue.classList.add(
+                "col-span-1",
+                "mb-1",
+                "ml-1",
+                "bg-blue-500",
+                "hover:bg-blue-700"
+            );
+            red.classList.add(
+                "col-span-1",
+                "mb-1",
+                "mr-1",
+                "bg-red-500",
+                "hover:bg-red-700"
+            );
 
-        yellow.id = "yellow";
-        green.id = "green";
-        blue.id = "blue";
-        red.id = "red";
+            yellow.id = "yellow";
+            green.id = "green";
+            blue.id = "blue";
+            red.id = "red";
 
-        wildFourUserEvent.append(yellow);
-        wildFourUserEvent.append(green);
-        wildFourUserEvent.append(blue);
-        wildFourUserEvent.append(red);
+            wildFourUserEvent.append(yellow);
+            wildFourUserEvent.append(green);
+            wildFourUserEvent.append(blue);
+            wildFourUserEvent.append(red);
 
-        // wildFourUserEvent.classList.toggle("hidden", false);
-        const colorSelectionChildren = document.querySelectorAll(
-            "#wildFourUserEvent div"
-        );
-        for (const colorSelectedByID of colorSelectionChildren) {
-            colorSelectedByID.addEventListener("click", async (e) => {
-                const selectedColor = e.target.getAttribute("id");
-                await axios.post(`/game/${getGameId()}/playCard`, {
-                    collection_index: cardData.collection_index,
-                    color: selectedColor, // selected color
+            // wildFourUserEvent.classList.toggle("hidden", false);
+            const colorSelectionChildren = document.querySelectorAll(
+                "#wildFourUserEvent div"
+            );
+            for (const colorSelectedByID of colorSelectionChildren) {
+                colorSelectedByID.addEventListener("click", async (e) => {
+                    const selectedColor = e.target.getAttribute("id");
+                    await axios
+                        .post(`/game/${getGameId()}/playCard`, {
+                            collection_index: cardData.collection_index,
+                            color: selectedColor, // selected color
+                        })
+                        .then((res) => {
+                            applyCurrentColorToGameScreen(selectedColor);
+                            wildFourUserEvent.innerHTML = "";
+                            wildFourUserEvent.classList.remove(
+                                ...wildFourUserEvent.classList
+                            );
+                            resolve();
+                        });
+                    // wildFourUserEvent.classList.toggle("hidden", true);
                 });
-                applyCurrentColorToGameScreen(selectedColor);
-                wildFourUserEvent.innerHTML = "";
-                wildFourUserEvent.classList.remove(
-                    ...wildFourUserEvent.classList
-                );
-                // wildFourUserEvent.classList.toggle("hidden", true);
-            });
-        }
+            }
+        });
     }
 }
 
@@ -758,7 +744,6 @@ const display_current_player = (display_name) => {
     currentPlayerTarget.textContent = `Current Player: ${display_name}`;
 };
 
-// not pretty i'm sorry...
 const applyCurrentColorToGameScreen = async (color) => {
     const currentColor = document.getElementById("currentColor");
     for (let i = 0; i < currentColor.classList.length; i++) {
