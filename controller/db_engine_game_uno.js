@@ -160,7 +160,9 @@ async function createPlayerRowAndCreatePlayersRow(user_id, game_id) {
             playersRow.game_id,
             "User".display_name,
             "UserStatistic".num_wins,
-            "UserStatistic".num_loss
+            "UserStatistic".num_loss,
+            playersRow.in_game,
+            playersRow.uno_check
         FROM playerRow
         JOIN playersRow ON playerRow.player_id = playersRow.player_id
         JOIN "Game" ON playersRow.game_id = "Game".game_id
@@ -1168,7 +1170,8 @@ async function getPlayerRowDetailedByGameIDAndUserID(user_id, game_id) {
             "User".display_name,
             "UserStatistic".num_wins,
             "UserStatistic".num_loss,
-            "Players".in_game
+            "Players".in_game,
+            "Players".uno_check
         FROM "Player"
         JOIN "Players" ON "Player".player_id = "Players".player_id
         JOIN "Game" ON "Players".game_id = "Game".game_id
@@ -1198,7 +1201,9 @@ async function getPlayerRowDetailedByPlayerID(player_id) {
             "Players".game_id,
             "User".display_name,
             "UserStatistic".num_wins,
-            "UserStatistic".num_loss
+            "UserStatistic".num_loss,
+            "Players".in_game,
+            "Players".uno_check
         FROM "Player"
         JOIN "Players" ON "Player".player_id = "Players".player_id
         JOIN "Game" ON "Players".game_id = "Game".game_id
@@ -1233,7 +1238,9 @@ async function getPlayerRowsDetailedByGameID(game_id) {
             "Players".game_id,
             "User".display_name,
             "UserStatistic".num_wins,
-            "UserStatistic".num_loss
+            "UserStatistic".num_loss,
+            "Players".in_game,
+            "Players".uno_check
         FROM "Player"
         JOIN "Players" ON "Player".player_id = "Players".player_id
         JOIN "Game" ON "Players".game_id = "Game".game_id
@@ -1251,8 +1258,8 @@ async function getPlayerRowsDetailedByGameID(game_id) {
 
 dbEngineGameUno.getPlayerRowsDetailedByGameID = getPlayerRowsDetailedByGameID;
 
-async function getPlayerRowsInGame(game_id) {
-    debugPrinter.printFunction(getPlayerRowsInGame.name);
+async function getPlayerRowsSimpleInGame(game_id) {
+    debugPrinter.printFunction(getPlayerRowsSimpleInGame.name);
     const result = await db.any(
         `
         SELECT
@@ -1277,7 +1284,7 @@ async function getPlayerRowsInGame(game_id) {
     return result;
 }
 
-dbEngineGameUno.getPlayerRowsInGame = getPlayerRowsInGame;
+dbEngineGameUno.getPlayerRowsSimpleInGame = getPlayerRowsSimpleInGame;
 
 async function updatePlayersRowsInGameRows(game_id, boolean) {
     debugPrinter.printFunction(updatePlayersRowsInGameRows.name);

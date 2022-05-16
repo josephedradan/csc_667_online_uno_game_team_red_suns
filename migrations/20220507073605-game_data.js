@@ -69,6 +69,14 @@ module.exports = {
                 allowNull: false,
                 unique: false,
             },
+
+            uno_available: {
+                type: Sequelize.DataTypes.BOOLEAN,
+                defaultValue: false,
+                allowNull: false,
+                unique: false,
+            },
+
         });
     },
 
