@@ -180,10 +180,7 @@ controllerGameID.GETGetGameAndTheirPlayers = GETGetGameAndTheirPlayers;
 async function GETGetPlayer(req, res, next) {
     debugPrinter.printMiddleware(GETGetPlayer.name);
 
-    
-    const result = await gameUno.getPlayerDetailedByGameIDAndUserID(req.user.user_id);
-
-    // debugPrinter.printBackendWhite(result);
+    const result = await gameUno.getPlayerDetailedByGameIDAndUserID(req.user.user_id, req.game.game_id);
 
     res.json(result);
 }
@@ -193,10 +190,10 @@ controllerGameID.GETGetPlayer = GETGetPlayer;
 async function POSTUno(req, res, next) {
     debugPrinter.printMiddleware(POSTUno.name);
 
-    //TODO: emit to the socket with a wrapper????
-    const result = await intermediateGameUno.getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUno(req.user.user_id, req.game.game_id); 
+    // TODO: emit to the socket with a wrapper????
+    const result = await intermediateGameUno.getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUno(req.user.user_id, req.game.game_id);
 
-    res.json(result); 
+    res.json(result);
 }
 
 controllerGameID.POSTUno = POSTUno;

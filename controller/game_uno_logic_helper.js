@@ -1,8 +1,8 @@
-const e = require("express");
-const debugPrinter = require("../util/debug_printer");
-const dbEngineGameUno = require("./db_engine_game_uno");
-const constants = require("../config/constants");
-const constantsGameUno = require("../config/constants_game_uno");
+const e = require('express');
+const debugPrinter = require('../util/debug_printer');
+const dbEngineGameUno = require('./db_engine_game_uno');
+const constants = require('../config/constants');
+const constantsGameUno = require('../config/constants_game_uno');
 
 const set = new Set(constantsGameUno.CARD_COLORS_SELECETABLE_LEGEAL);
 
@@ -120,22 +120,19 @@ async function changeTurnByGameRow(gameRowDetailed) {
         }
     });
 
-    const indexOfNextPlayerInPlayerRowsActive =
-        (indexOfCurrentPlayer + 1 + gameRowDetailed.skip_amount) %
-        playerRowsActive.length;
+    const indexOfNextPlayerInPlayerRowsActive = (indexOfCurrentPlayer + 1 + gameRowDetailed.skip_amount)
+        % playerRowsActive.length;
     await dbEngineGameUno.updateGameDataRowSkipAmount(
         gameRowDetailed.game_id,
-        0
+        0,
     );
 
-    result.user_id_turn =
-        playerRowsActive[indexOfNextPlayerInPlayerRowsActive].user_id;
-    result.player_id_turn =
-        playerRowsActive[indexOfNextPlayerInPlayerRowsActive].player_id;
+    result.user_id_turn = playerRowsActive[indexOfNextPlayerInPlayerRowsActive].user_id;
+    result.player_id_turn = playerRowsActive[indexOfNextPlayerInPlayerRowsActive].player_id;
 
     const gameData = await dbEngineGameUno.updateGameDatRowPlayerIDTurn(
         gameRowDetailed.game_id,
-        result.player_id_turn
+        result.player_id_turn,
     );
 
     if (!gameData) {
@@ -157,7 +154,7 @@ gameUnoLogicHelper.changeTurnByGameRow = changeTurnByGameRow;
 async function changeTurnByGameID(game_id) {
     debugPrinter.printFunction(changeTurnByGameID.name);
     const gameRowDetailed = await dbEngineGameUno.getGameRowDetailedByGameID(
-        game_id
+        game_id,
     );
 
     const result = {
@@ -251,12 +248,12 @@ async function updateGameData(gameRowDetailed, color) {
         if (gameRowDetailed.draw_amount > 1) {
             await dbEngineGameUno.updateGameDataRowDrawAmount(
                 gameRowDetailed.game_id,
-                gameRowDetailed.draw_amount + 4
+                gameRowDetailed.draw_amount + 4,
             );
         } else {
             await dbEngineGameUno.updateGameDataRowDrawAmount(
                 gameRowDetailed.game_id,
-                4
+                4,
             );
         }
     } else if (temp.content === constantsGameUno.CARD_CONTENT_DRAWTWO) {
@@ -264,17 +261,17 @@ async function updateGameData(gameRowDetailed, color) {
             gameRowDetailed.game_id,
             gameRowDetailed.draw_amount > 1
                 ? gameRowDetailed.draw_amount + 2
-                : 2
+                : 2,
         );
     } else if (temp.content === constantsGameUno.CARD_CONTENT_REVERSE) {
         await dbEngineGameUno.updateGameDataRowIsClockwise(
             gameRowDetailed.game_id,
-            !gameRowDetailed.is_clockwise
+            !gameRowDetailed.is_clockwise,
         );
     } else if (temp.content === constantsGameUno.CARD_CONTENT_SKIP) {
         await dbEngineGameUno.updateGameDataRowSkipAmount(
             gameRowDetailed.game_id,
-            1
+            1,
         );
     }
 
@@ -319,7 +316,7 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(
     gameRowDetailed,
     playerRow,
     collection_index,
-    color
+    color,
 ) {
     debugPrinter.printFunction(doMoveCardHandToPlayByCollectionIndexLogic.name);
 
@@ -393,7 +390,7 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(
 
     const gameData = await gameUnoLogicHelper.updateGameData(
         gameRowDetailed,
-        color
+        color,
     );
 
     if (gameData.status_game_uno === constants.FAILURE) {
@@ -403,7 +400,7 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(
     }
 
     const changeTurn = await gameUnoLogicHelper.changeTurnByGameRow(
-        gameData.game
+        gameData.game,
     );
 
     if (changeTurn.status_game_uno === constants.FAILURE) {
@@ -411,6 +408,14 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(
         result.message = changeTurn.message;
         return result;
     }
+
+    // // If player has no cards
+    // if (){
+    //
+    // }
+
+
+
 
     result.change_turn = changeTurn;
 
@@ -420,8 +425,7 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(
     return result;
 }
 
-gameUnoLogicHelper.doMoveCardHandToPlayByCollectionIndexLogic =
-    doMoveCardHandToPlayByCollectionIndexLogic;
+gameUnoLogicHelper.doMoveCardHandToPlayByCollectionIndexLogic = doMoveCardHandToPlayByCollectionIndexLogic;
 
 async function isWildFourPlayLegal(gameRowDetailed, collectionRowsChallenged) {
     debugPrinter.printFunction(isWildFourPlayLegal.name);
@@ -444,14 +448,14 @@ async function isWildFourPlayLegal(gameRowDetailed, collectionRowsChallenged) {
     }
     // eslint-disable-next-line no-restricted-syntax
     for (const collectionRow of collectionRowsChallenged) {
-        debugPrinter.printBackendWhite(`${collectionRow.color} ${collectionRowPrevious.color} FUCK YA`)
+        debugPrinter.printBackendWhite(`${collectionRow.color} ${collectionRowPrevious.color} FUCK YA`);
 
         if (collectionRow.color === collectionRowPrevious.color) {
-            debugPrinter.printGreen(`${collectionRow.color} ${collectionRowPrevious.color} FUCK YA`)
+            debugPrinter.printGreen(`${collectionRow.color} ${collectionRowPrevious.color} FUCK YA`);
             return false;
         }
     }
-    debugPrinter.printGreen(`FUCK NO`)
+    debugPrinter.printGreen('FUCK NO');
     return true;
 }
 

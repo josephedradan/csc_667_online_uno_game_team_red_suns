@@ -25,7 +25,7 @@ routerGame.get(
 
 routerGame.use('/:game_id', middlewareGameUnoGameGameID.checkIfRouteExists);
 routerGame.use('/:game_id', middlewareModifyReqResGameUnoGameID.attachGameToRequestAndResponseLocalAndGuard);
-routerGame.use('/', middlewareUnoGameSettings.checkIfPlayerLimitIsReached);
+// routerGame.use('/', middlewareUnoGameSettings.checkIfPlayerLimitIsReached);
 routerGame.use('/', middlewareGameUnoGameGameID.checkIfInGameOrJoinGameIfPossibleNoPlayerInReqAndGuard);
 routerGame.use('/:game_id', middlewareModifyReqResGameUnoGameID.attachPlayerToRequestAndResponseLocalsAndGuard);
 
