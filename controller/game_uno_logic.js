@@ -893,13 +893,18 @@ async function moveCardDrawTopToHandHelper(gameRowDetailed, playerRowDetailed, d
         cardsDrew += 1;
     }
 
-    // FIXME DO NOT DO THIS HERE DO THIS IS updateGameData
-    // const collectionCountHand = await dbEngineGameUno.getCollectionCountByPlayerID(playerRowDetailed.player_id);
-    // if (collectionCountHand === 1) {
-    //     await dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId(gameRowDetailed.game_id, playerRowDetailed.player_id, true);
-    // } else {
-    //     await dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId(gameRowDetailed.game_id, playerRowDetailed.player_id, false);
-    // }
+    const arrayPromises = [];
+
+    // IGNORE THIS: FIXME DO NOT DO THIS HERE DO THIS IS updateGameData
+    const collectionCountHand = await dbEngineGameUno.getCollectionCountByPlayerID(playerRowDetailed.player_id);
+    if (collectionCountHand === 1) {
+        arrayPromises.push(dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId(gameRowDetailed.game_id, playerRowDetailed.player_id, true));
+        arrayPromises.push(dbEngineGameUno.updateGameDataRowIsUnoAvailable(gameRowDetailed.game_id, true));
+    } else {
+        arrayPromises.push(dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId(gameRowDetailed.game_id, playerRowDetailed.player_id, false));
+    }
+
+    await Promise.all(arrayPromises);
 
     return collectionRowHand;
 }
@@ -1408,7 +1413,10 @@ async function callUnoLogic(user_id, game_id, callback_game_id, callback_game_id
         return result;
     }
 
+    // TODO CAN OPTIMIZE AWAIT
     for (const playerRowDetailed of playerRowsInGame) {
+
+        // Draw for player who have one card except for the caller of this function
         if (playerRowDetailed.uno_check === true && playerRowDetailedCaller.player_id !== playerRowDetailed.player_id) {
             // eslint-disable-next-line no-await-in-loop
             await moveCardDrawTopToHandHelper(
@@ -1418,10 +1426,11 @@ async function callUnoLogic(user_id, game_id, callback_game_id, callback_game_id
                 callback_game_id,
                 callback_game_id_message,
             );
-
-            await dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId(game_id, playerRowDetailed.player_id, false);
         }
+        // eslint-disable-next-line no-await-in-loop
+        await dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId(game_id, playerRowDetailed.player_id, false);
     }
+    await dbEngineGameUno.updateGameDataRowIsUnoAvailable(gameRowDetailed.game_id, false);
 
     // // Finding players who are marked with unoChecked = true; // FIXME: THIS IS NOT ACTIVE PLAYERS, CHANGE IT TO ACTIVE PLAYERS WHEN THE CODE SUPPORTS IT
     // for (let i = 0; i < playerRowsInGame.length; i++) {
@@ -1440,8 +1449,11 @@ async function callUnoLogic(user_id, game_id, callback_game_id, callback_game_id
 
     // Update gameData
     await gameUnoLogicHelper.updateGameDataByGameRow(gameRowDetailed, null);
+
+    const first = dbEngineGameUno.updateGameDataRowIsUnoAvailable(gameRowDetailed.game_id, true);
+
     result.status_game_uno = constants.SUCCESS;
-    result.message = `uno_check successfully flagged for player_id: ${playerRowDetailed.player_id} in game ${game_id}`;
+    result.message = `uno_check successfully flagged for player_id: ${playerRowDetailedCaller.player_id} in game ${game_id}`;
 
     return result;
 }
