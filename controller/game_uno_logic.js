@@ -774,10 +774,10 @@ async function getGameState(game_id) {
     }
 
     // May be empty
-    result.collection_draw = await dbEngineGameUno.getCollectionRowCollectionIndexByGameIDAndCollectionInfoID(game_id, 1);
+    result.collection_draw = await dbEngineGameUno.getCollectionRowsCollectionIndexByGameIDAndCollectionInfoID(game_id, 1);
 
     // May be empty
-    result.collection_play = await dbEngineGameUno.getCollectionRowDetailedByGameIDAndCollectionInfoID(game_id, 2);
+    result.collection_play = await dbEngineGameUno.getCollectionRowsDetailedByGameIDAndCollectionInfoID(game_id, 2);
 
     result.status_game_uno = constants.SUCCESS;
     result.message = 'Game state returned';
@@ -1085,7 +1085,7 @@ async function getHand(game_id, user_id) {
     result.player = playerRow;
 
     // May be undefined
-    const collectionRow = await dbEngineGameUno.getCollectionRowDetailedByPlayerID(playerRow.player_id);
+    const collectionRow = await dbEngineGameUno.getCollectionRowsDetailedByPlayerID(playerRow.player_id);
 
     // If player is exists for the user for the game
     if (!collectionRow) {

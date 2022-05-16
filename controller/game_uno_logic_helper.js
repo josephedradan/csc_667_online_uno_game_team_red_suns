@@ -32,7 +32,7 @@ async function changeTurnByGameRow(gameRowDetailed) {
     };
 
     // May be empty
-    let playerRowsActive = await dbEngineGameUno.getPlayerRowsGameIsActive(gameRowDetailed.game_id);
+    let playerRowsActive = await dbEngineGameUno.getPlayerRowsInGame(gameRowDetailed.game_id);
 
     if (!playerRowsActive.length) {
         result.status_game_uno = constants.FAILURE;
@@ -265,7 +265,7 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRowDetailed, playe
     }
 
     // Check if card collection_index index exists (May be undefined)
-    const collectionRowHandByCollectionIndex = await dbEngineGameUno.getCollectionRowHandDetailedByCollectionIndex(playerRow.player_id, collection_index);
+    const collectionRowHandByCollectionIndex = await dbEngineGameUno.checkCollectionRowHandDetailedByCollectionIndex(playerRow.player_id, collection_index);
 
     if (!collectionRowHandByCollectionIndex) {
         result.status_game_uno = constants.FAILURE;
@@ -317,7 +317,7 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRowDetailed, playe
      * }
      *
      */
-    const collectionRowNew = await dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowDetailed(
+    const collectionRowNew = await dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowsDetailed(
         gameRowDetailed.game_id,
         playerRow.player_id,
         collection_index,
