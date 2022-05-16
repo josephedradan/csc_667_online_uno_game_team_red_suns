@@ -33,8 +33,8 @@ async function POSTPlayCard(req, res, next) {
     */
     const {
         collection_index, // TODO DO VALIDATION
-        type,
-        content,
+        // type,
+        // content,
         color,
     } = req.body;
 
@@ -196,9 +196,22 @@ async function POSTUno(req, res, next) {
     //TODO: emit to the socket with a wrapper????
     const result = await gameUno.getGameStateByGameIDAndUserIDAndAttachWinnerToResult(req.user.user_id, req.game.game_id);
 
-    res.json(result);
+    return result;
 }
 
 controllerGameID.POSTUno = POSTUno;
+
+async function POSTChallenge(req, res, next) {
+    debugPrinter.printMiddleware(POSTChallenge.name);
+
+    const result = await intermediateGameUno.challengePlayer(
+        req.game.game_id,
+        req.player,
+    );
+
+    res.json(result);
+}
+
+controllerGameID.POSTChallenge = POSTChallenge;
 
 module.exports = controllerGameID;

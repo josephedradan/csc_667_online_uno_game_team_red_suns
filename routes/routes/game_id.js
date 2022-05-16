@@ -87,4 +87,9 @@ routerGameID.post(
     controllerGameID.POSTUno,
 )
 
+routerGameID.post(
+    '/challenge',
+    controllerGameID.POSTChallenge,
+);
+
 module.exports = routerGameID;
