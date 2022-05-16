@@ -407,7 +407,8 @@ async function isWildFourPlayLegal(gameRowDetailed, collectionRowsChallenged) {
     //     boolean: null,
     // };
 
-    const collectionRowPrevious = dbEngineGameUno.getCollectionRowPlayPrevious(gameRowDetailed.game_id);
+    // Get Previous card to check its color
+    const collectionRowPrevious = await dbEngineGameUno.getCollectionRowPlayPrevious(gameRowDetailed.game_id);
 
     // TODO GUARD
     if (!collectionRowPrevious) {
@@ -416,14 +417,16 @@ async function isWildFourPlayLegal(gameRowDetailed, collectionRowsChallenged) {
         // return result
         return false;
     }
-
     // eslint-disable-next-line no-restricted-syntax
     for (const collectionRow of collectionRowsChallenged) {
+        debugPrinter.printBackendWhite(`${collectionRow.color} ${collectionRowPrevious.color} FUCK YA`)
+
         if (collectionRow.color === collectionRowPrevious.color) {
+            debugPrinter.printGreen(`${collectionRow.color} ${collectionRowPrevious.color} FUCK YA`)
             return false;
         }
     }
-    debugPrinter.printGreen("FUCK YOU DUDE")
+    debugPrinter.printGreen(`FUCK NO`)
     return true;
 }
 
