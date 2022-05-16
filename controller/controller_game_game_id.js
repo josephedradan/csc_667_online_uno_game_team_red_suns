@@ -33,8 +33,8 @@ async function POSTPlayCard(req, res, next) {
     */
     const {
         collection_index, // TODO DO VALIDATION
-        type,
-        content,
+        // type,
+        // content,
         color,
     } = req.body;
 
@@ -188,5 +188,15 @@ async function GETGetPlayer(req, res, next) {
 }
 
 controllerGameID.GETGetPlayer = GETGetPlayer;
+
+async function POSTChallenge(req, res, next) {
+    debugPrinter.printMiddleware(POSTChallenge.name);
+
+    const result = await gameUno.challengePlayer(req.user.user_id, req.player.player_id) // INTERMEDIATE
+
+    res.json(result);
+}
+
+controllerGameID.POSTChallenge = POSTChallenge;
 
 module.exports = controllerGameID;
