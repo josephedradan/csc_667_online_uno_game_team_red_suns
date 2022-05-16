@@ -1458,6 +1458,45 @@ async function updateCollectionRowDrawToHandTop(game_id, player_id) {
 
 dbEngineGameUno.updateCollectionRowDrawToHandTop = updateCollectionRowDrawToHandTop;
 
+async function updateCollectionRowPlayToHandTop(game_id, player_id) {
+    debugPrinter.printFunction(updateCollectionRowDrawToHandTop.name);
+
+    const result = await db.any(
+        `
+        WITH collectionRowDrawTop AS (
+            SELECT "Collection".card_id
+            FROM "Collection" 
+            JOIN "Cards" ON "Collection".card_id = "Cards".card_id
+            WHERE "Cards".game_id = $1
+            AND "Collection".collection_info_id = 2
+            ORDER BY collection_index DESC LIMIT 1
+        ), collectionRowHandNumberOfRows AS (
+            SELECT COUNT(*) as amount
+            FROM "Collection" 
+            JOIN "Cards" ON "Collection".card_id = "Cards".card_id
+            WHERE "Cards".game_id = $1
+            AND "Collection".player_id = $2
+        )
+        UPDATE "Collection" 
+        SET    
+            player_id = $2,
+            collection_info_id = 3,
+            collection_index = (SELECT amount FROM collectionRowHandNumberOfRows)
+        FROM collectionRowDrawTop 
+        WHERE "Collection".card_id = collectionRowDrawTop.card_id
+        RETURNING *;
+        `,
+        [
+            game_id,
+            player_id,
+        ],
+    );
+
+    return result[0];
+}
+
+dbEngineGameUno.updateCollectionRowPlayToHandTop = updateCollectionRowPlayToHandTop;
+
 async function updateCollectionRowDrawToPlayTop(game_id) {
     debugPrinter.printFunction(updateCollectionRowDrawToPlayTop.name);
 
@@ -1589,6 +1628,49 @@ async function updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRow
 }
 
 dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowsDetailed = updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowsDetailed;
+
+async function getCollectionRowPlayPrevious(game_id) {
+    debugPrinter.printFunction(updateGameDataRowIsClockwise.name);
+
+    const result = await db.any(
+        `
+            WITH collectionCountPlay AS (
+                SELECT COUNT(*) AS amount
+                FROM "Collection"
+                JOIN "Cards" ON "Collection".card_id = "Cards".card_id
+                JOIN "Card" ON "Collection".card_id = "Card".card_id
+                WHERE "Cards".game_id = $1
+                AND "Collection".collection_info_id = 2
+            )
+            SELECT 
+                "Cards".game_id,
+                "CardInfo".type,
+                "CardInfo".color,
+                "CardInfo".content,
+                "Collection".player_id,
+                "Collection".collection_index,
+                "Collection".card_id,
+                "Collection".collection_info_id,
+                "Card".card_info_id,
+                "CollectionInfo".type AS collection_info_type
+            FROM "Collection"
+            JOIN "Cards" ON "Collection".card_id = "Cards".card_id
+            JOIN "Card" ON "Collection".card_id = "Card".card_id
+            JOIN "CardInfo" ON "CardInfo".card_info_id = "Card".card_info_id
+            JOIN "CollectionInfo" ON "CollectionInfo".collection_info_id = "Collection".collection_info_id
+            WHERE "Cards".game_id = $1
+            AND "Collection".collection_info_id = 2
+            AND "Collection".collection_index = (SELECT amount FROM collectionCountPlay) - 2 
+        `,
+        [
+            game_id,
+        ],
+    );
+
+    return result[0];
+}
+
+dbEngineGameUno.getCollectionRowPlayPrevious = getCollectionRowPlayPrevious;
 
 /*
 ##############################################################################################################

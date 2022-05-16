@@ -171,7 +171,8 @@ async function moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow)
         debugPrinter.printError(result);
     }
 
-    await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
+    // Unnecessary
+    // await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 
     return result;
 }
