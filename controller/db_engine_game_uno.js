@@ -1631,7 +1631,7 @@ async function updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRow
 dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowsDetailed = updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowsDetailed;
 
 async function getCollectionRowPlayPrevious(game_id) {
-    debugPrinter.printFunction(updateGameDataRowIsClockwise.name);
+    debugPrinter.printFunction(getCollectionRowPlayPrevious.name);
 
     const result = await db.any(
         `

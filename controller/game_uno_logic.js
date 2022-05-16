@@ -1196,9 +1196,11 @@ async function challengePlayerHandler(gameRowDetailed, playerRowChallenger, play
         boolean: null,
     };
 
-    const isWildFourLegal = gameUnoLogicHelper.isWildFourPlayLegal(gameRowDetailed, collectionRowsChallenged);
+    const isWildFourLegal = await gameUnoLogicHelper.isWildFourPlayLegal(gameRowDetailed, collectionRowsChallenged);
 
     result.boolean = isWildFourLegal;
+
+    debugPrinter.printError(`LOOK HERE ${isWildFourLegal}`);
 
     // If Wild +4 is legal
     if (isWildFourLegal) {
@@ -1216,8 +1218,11 @@ async function challengePlayerHandler(gameRowDetailed, playerRowChallenger, play
 
         result.message = `Player ${playerRowChallenger.display_name} (player_id ${playerRowChallenger.player_id})'s challenge against Player ${playerRowChallenged.display_name} (player_id ${playerRowChallenged.player_id}) failed`;
 
-
-
+        // Execute the callback if necessary
+        if (callback_game_id) {
+            // eslint-disable-next-line no-await-in-loop
+            await callback_game_id(gameRowDetailed.game_id);
+        }
     } else {
         // eslint-disable-next-line no-plusplus
         for (let i = 0; i < 6; i++) {
