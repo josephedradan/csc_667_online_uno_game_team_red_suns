@@ -880,7 +880,8 @@ async function getGameRowDetailedByGameID(game_id) {
             "GameData".card_content_legal,
             "GameData".card_color_legal,
             "GameData".skip_amount,
-            "GameData".draw_amount
+            "GameData".draw_amount,
+            "GameData".uno_available
         FROM "Game"
         JOIN "GameData" ON "Game".game_id = "GameData".game_id
         WHERE "Game".game_id = $1
@@ -1089,7 +1090,7 @@ async function getCollectionCountByGameIDAndCollectionInfoID(game_id, collection
         ],
     );
 
-    return result[0];
+    return result[0].count;
 }
 
 dbEngineGameUno.getCollectionCountByGameIDAndCollectionInfoID = getCollectionCountByGameIDAndCollectionInfoID;
@@ -1343,7 +1344,7 @@ async function getPlayersCountByGameID(game_id) {
         [game_id],
     );
 
-    return result[0];
+    return result[0].count;
 }
 
 dbEngineGameUno.getPlayersCountByGameID = getPlayersCountByGameID;
