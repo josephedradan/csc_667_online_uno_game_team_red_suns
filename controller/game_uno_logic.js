@@ -956,8 +956,15 @@ async function moveCardDrawTopToHandFullByGameIDAndPlayerRow(game_id, playerRowD
         callback_game_id_message,
     );
 
+    const arrayPromise = [];
+
     // Reset draw amount
-    await dbEngineGameUno.updateGameDataRowDrawAmount(game_id, 1);
+    arrayPromise.push(dbEngineGameUno.updateGameDataRowDrawAmount(game_id, 1));
+
+    // Reset Challenge if there was a challenge
+    arrayPromise.push(dbEngineGameUno.updateGameDataRowIsChallengeAvailable(gameRowDetailed.game_id, false));
+
+    await Promise.all(arrayPromise);
 
     // TODO THE BELOW IS DRAWING WHEN WILD +4 or +2 iS ON TOP
 
@@ -1368,7 +1375,9 @@ async function challengePlayer(game_id, playerRow, callback_game_id) {
 
     // Update gameData
     // await gameUnoLogicHelper.updateGameDataByGameRow(gameRowDetailed, null);
-    await gameUnoLogicHelper.updateGameDataFull(gameRowDetailed.game_id, null);
+    // await gameUnoLogicHelper.updateGameDataFull(gameRowDetailed.game_id, null); // TODO DO NOT CALL THIS HERE
+
+    await dbEngineGameUno.updateGameDataRowIsChallengeAvailable(gameRowDetailed.game_id, false);
 
     result.status_game_uno = resultChallengePlayerHandlerObject.status_game_uno;
     result.message = resultChallengePlayerHandlerObject.message;
@@ -1452,7 +1461,7 @@ async function callUnoLogic(user_id, game_id, callback_game_id, callback_game_id
     // }
 
     // Update gameData
-    // await gameUnoLogicHelper.updateGameDataByGameRow(gameRowDetailed, null);
+    // await gameUnoLogicHelper.updateGameDataByGameRow(gameRowDetailed, null); // TODO DO NOT CALL THIS HERE
     await gameUnoLogicHelper.updateGameDataFull(gameRowDetailed.game_id, null);
 
     result.status_game_uno = constants.SUCCESS;

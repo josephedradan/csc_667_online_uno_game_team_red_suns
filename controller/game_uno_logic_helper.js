@@ -243,53 +243,56 @@ async function updateGameDataFullByGameRow(gameRowDetailed, color) {
 
     // TODO: CHECK AND GUARD THE BELOW
 
-    // Assume that the db queries will be successful since the player does not have a input
-    if (temp.content === constantsGameUno.CARD_CONTENT_WILDFOUR && gameRowDetailed.draw_amount > 1) {
-        await dbEngineGameUno.updateGameDataRowIsChallengeAvailable(gameDataRow.game_id, true);
-    } else {
-        // Automatically set is_challenge_available back to false
-        await dbEngineGameUno.updateGameDataRowIsChallengeAvailable(gameDataRow.game_id, false);
-    }
+    // TODO: NOT A NICE WAY TO DO IT, BUT IT'S OK
+    let gameDataNew = gameRowDetailed;
 
     // Assume that the db queries will be successful since the player does not have a input
     if (temp.content === constantsGameUno.CARD_CONTENT_WILDFOUR) {
         if (gameRowDetailed.draw_amount > 1) {
-            await dbEngineGameUno.updateGameDataRowDrawAmount(
+            gameDataNew = await dbEngineGameUno.updateGameDataRowDrawAmount(
                 gameRowDetailed.game_id,
                 gameRowDetailed.draw_amount + 4,
             );
         } else {
-            await dbEngineGameUno.updateGameDataRowDrawAmount(
+            gameDataNew = await dbEngineGameUno.updateGameDataRowDrawAmount(
                 gameRowDetailed.game_id,
                 4,
             );
         }
     } else if (temp.content === constantsGameUno.CARD_CONTENT_DRAWTWO) {
         if (gameRowDetailed.draw_amount > 1) {
-            await dbEngineGameUno.updateGameDataRowDrawAmount(
+            gameDataNew = await dbEngineGameUno.updateGameDataRowDrawAmount(
                 gameRowDetailed.game_id,
                 gameRowDetailed.draw_amount + 2,
             );
         } else {
-            await dbEngineGameUno.updateGameDataRowDrawAmount(
+            gameDataNew = await dbEngineGameUno.updateGameDataRowDrawAmount(
                 gameRowDetailed.game_id,
                 2,
             );
         }
     } else if (temp.content === constantsGameUno.CARD_CONTENT_REVERSE) {
-        await dbEngineGameUno.updateGameDataRowIsClockwise(
+        gameDataNew = await dbEngineGameUno.updateGameDataRowIsClockwise(
             gameRowDetailed.game_id,
             !gameRowDetailed.is_clockwise,
         );
     } else if (temp.content === constantsGameUno.CARD_CONTENT_SKIP) {
-        await dbEngineGameUno.updateGameDataRowSkipAmount(
+        gameDataNew = await dbEngineGameUno.updateGameDataRowSkipAmount(
             gameRowDetailed.game_id,
             1,
         );
     }
 
-    debugPrinter.printError("JOSEPH LOOK 3")
-    debugPrinter.printError(gameRowDetailed)
+    // TODO NOT CORRECT PLACE TO PUT THIS
+    // Assume that the db queries will be successful since the player does not have a input
+    // if (temp.content === constantsGameUno.CARD_CONTENT_WILDFOUR && gameDataNew.draw_amount > 1) {
+    //     await dbEngineGameUno.updateGameDataRowIsChallengeAvailable(gameDataRow.game_id, true);
+    // } else {
+    //     // Automatically set is_challenge_available back to false
+    //     await dbEngineGameUno.updateGameDataRowIsChallengeAvailable(gameDataRow.game_id, false);
+    // }
+
+    // debugPrinter.printError(gameRowDetailed)
     /* ----- Check for Uno and check to see if the game can end ----- */
 
     let player_id_winner = null;
@@ -369,9 +372,9 @@ gameUnoLogicHelper.updateGameDataFullByGameRow = updateGameDataFullByGameRow;
 async function updateGameDataFull(game_id, color) {
     debugPrinter.printFunction(updateGameDataFull.name);
 
-    debugPrinter.printError("JOSEPH LOOK 2")
+    debugPrinter.printError('JOSEPH LOOK 2');
     const gameRowDetailed = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
-    debugPrinter.printError(gameRowDetailed)
+    debugPrinter.printError(gameRowDetailed);
 
     return updateGameDataFullByGameRow(gameRowDetailed, color);
 }
@@ -474,6 +477,11 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(
         result.message = `Game ${gameRowDetailed.game_id}, player ${playerRowDetailed.display_name} (player_id ${playerRowDetailed.player_id}), Update to the player's collection failed`;
     }
     result.collection = collectionRowsNew;
+
+    // ALLOW CHALLENGE, THIS MUST BE PLACED HERE
+    if (collectionRowHandByCollectionIndex.content === constantsGameUno.CARD_CONTENT_WILDFOUR) {
+        await dbEngineGameUno.updateGameDataRowIsChallengeAvailable(gameRowDetailed.game_id, true);
+    }
 
     const gameData = await gameUnoLogicHelper.updateGameDataFullByGameRow(
         gameRowDetailed,

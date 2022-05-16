@@ -277,6 +277,7 @@ async function challengePlayerWrapped(game_id, playerRow) {
         debugPrinter.printError(result);
     }
 
+    // NECESSARY
     await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 
     return result;
