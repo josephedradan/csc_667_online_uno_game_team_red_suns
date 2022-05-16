@@ -1,16 +1,44 @@
-const configGameUno = require('../config/config_game_uno.json');
 const dbEngineGameUno = require('../controller/db_engine_game_uno');
+const gameUnoSettings = require('../config/game_uno_settings');
+const utilCommon = require('../controller/util_common');
+const constants = require('../config/constants');
 
 const middlewareUnoGameSettings = {};
 
-async function checkIfPlayerLimitIsReached(req, res, next) {
+async function checkIfPlayersMaxIsReached(req, res, next) {
     const result = dbEngineGameUno.getPlayersCountByGameID(req.game.game_id); // TODO WARNING, DANGEROUS NEED TO CHECK IF RESULT IS UNDEFINED
 
-    if (result <= configGameUno.players_max) {
+    if (result >= gameUnoSettings.PLAYERS_MAX) {
+        const jsonResponse = utilCommon.getJsonResponseAndAttachMessageToSessionMessageIfPossible(
+            req,
+            constants.FAILURE,
+            `Max players reached for game ${req.game.game_id}`,
+        );
+
+        res.redirect(jsonResponse.url);
+    } else {
         next();
     }
 }
 
-middlewareUnoGameSettings.checkIfPlayerLimitIsReached = checkIfPlayerLimitIsReached;
+middlewareUnoGameSettings.checkIfPlayerLimitIsReached = checkIfPlayersMaxIsReached;
+
+async function checkIfPlayersMinIsReached(req, res, next) {
+    const result = dbEngineGameUno.getPlayersCountByGameID(req.game.game_id); // TODO WARNING, DANGEROUS NEED TO CHECK IF RESULT IS UNDEFINED
+
+    if (result < gameUnoSettings.PLAYERS_MIN) {
+        const jsonResponse = utilCommon.getJsonResponseCommon(
+            constants.FAILURE,
+            'At least 2 players must be in the game to start',
+            null,
+        );
+
+        res.json(jsonResponse);
+    } else {
+        next();
+    }
+}
+
+middlewareUnoGameSettings.checkIfPlayersMinIsReached = checkIfPlayersMinIsReached;
 
 module.exports = middlewareUnoGameSettings;

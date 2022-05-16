@@ -1045,7 +1045,8 @@ async function moveCardHandToPlayByCollectionIndex(user_id, game_id, collection_
 
     result.status_game_uno = constants.SUCCESS;
 
-    result.message = `Card (collection_index ${collection_index}) from player ${playerRowDetailed.display_name} (player_id ${playerRowDetailed.player_id})'s collection moved to PLAY's collection's top for Game ${game_id}`;
+    result.message = `Card (collection_index ${collection_index}) from player ${playerRowDetailed.display_name} `
+        + `(player_id ${playerRowDetailed.player_id})'s collection moved to PLAY's collection's top for Game ${game_id}`;
 
     return result;
 }
@@ -1276,21 +1277,23 @@ async function challengePlayerHandler(gameRowDetailed, playerRowChallenger, play
         // TODO GUARD
         const collectionRowHand = await moveCardDrawTopToHandHelper(gameRowDetailed, playerRowChallenger, 2, callback_game_id);
 
-        result.message = `Player ${playerRowChallenger.display_name} (player_id ${playerRowChallenger.player_id})'s challenge against Player ${playerRowChallenged.display_name} (player_id ${playerRowChallenged.player_id}) failed`;
+        result.message = `Player ${playerRowChallenger.display_name} (player_id ${playerRowChallenger.player_id})'s `
+            + `challenge against Player ${playerRowChallenged.display_name} (player_id ${playerRowChallenged.player_id}) failed`;
     } else {
         const collectionRowHand = await moveCardDrawTopToHandHelper(gameRowDetailed, playerRowChallenged, 6, callback_game_id);
 
         // TODO GUARD
-        // Put the top card back in the original player's hand
-        const collectionRow = await dbEngineGameUno.updateCollectionRowPlayToHandTop(gameRowDetailed.game_id, playerRowChallenged.player_id);
+        // Put the top card back in the original player's hand (Wild +4 back to original player's hand)
+        // const collectionRow = await dbEngineGameUno.updateCollectionRowPlayToHandTop(gameRowDetailed.game_id, playerRowChallenged.player_id);
+        //
+        // // Execute the callback if necessary
+        // if (callback_game_id) {
+        //     // eslint-disable-next-line no-await-in-loop
+        //     await callback_game_id(gameRowDetailed.game_id);
+        // }
 
-        // Execute the callback if necessary
-        if (callback_game_id) {
-            // eslint-disable-next-line no-await-in-loop
-            await callback_game_id(gameRowDetailed.game_id);
-        }
-
-        result.message = `Player ${playerRowChallenger.display_name} (player_id ${playerRowChallenger.player_id})'s challenge against Player ${playerRowChallenged.display_name} (player_id ${playerRowChallenged.player_id}) was successful`;
+        result.message = `Player ${playerRowChallenger.display_name} (player_id ${playerRowChallenger.player_id})'s `
+            + `challenge against Player ${playerRowChallenged.display_name} (player_id ${playerRowChallenged.player_id}) was successful`;
     }
     result.status_game_uno = constants.SUCCESS;
 
