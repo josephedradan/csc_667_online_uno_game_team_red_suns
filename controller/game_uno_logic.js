@@ -1238,6 +1238,8 @@ async function challengePlayerHandler(gameRowDetailed, playerRowChallenger, play
 }
 
 async function challengePlayer(game_id, playerRow, callback_game_id) {
+    debugPrinter.printFunction(challengePlayer.name);
+
     const result = {
         status_game_uno: null,
         message: null,
@@ -1255,13 +1257,13 @@ async function challengePlayer(game_id, playerRow, callback_game_id) {
     }
     result.game = gameRowDetailed;
 
-    if (await gameUnoLogicHelper.canPlayerChallenge(gameRowDetailed, playerRow)) {
+    if (!(await gameUnoLogicHelper.canPlayerChallenge(gameRowDetailed, playerRow))) {
         result.status_game_uno = constants.FAILURE;
-        result.message = `game_id ${game_id}, player_id ${playerRow.player_id} cannot challenge`;
+        result.message = `game_id ${game_id}, Player ${playerRow.display_name}, player_id ${playerRow.player_id} cannot challenge`;
         return result;
     }
 
-    const resultPlayerPreviousObject = await gameUnoLogicHelper.getPlayerIDPrevious(game_id);
+    const resultPlayerPreviousObject = await gameUnoLogicHelper.getUserIDAndPlayerIDPreviousByGameRow(gameRowDetailed);
 
     if (resultPlayerPreviousObject.status_game_uno === constants.FAILURE) {
         result.status_game_uno = resultPlayerPreviousObject.status_game_uno;

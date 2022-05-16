@@ -263,4 +263,24 @@ intermediateGameUno.setGamePlayerIDHostWrapped = setGamePlayerIDHostWrapped;
 //
 // intermediateGameUno.setGamePlayerIDTurnWrapped = setGamePlayerIDTurnWrapped;
 
+async function challengePlayer(game_id, playerRow) {
+    debugPrinter.printFunction(challengePlayer.name);
+
+    const result = await gameUno.challengePlayer(
+        game_id,
+        playerRow,
+        intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState,
+    );
+
+    if (result.status_game_uno === constants.FAILURE) {
+        debugPrinter.printError(result);
+    }
+
+    // await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
+
+    return result;
+}
+
+intermediateGameUno.challengePlayer = challengePlayer;
+
 module.exports = intermediateGameUno;
