@@ -9,7 +9,7 @@ window.addEventListener("DOMContentLoaded", () => {
         window.addEventListener(
             "keydown",
             (e) => {
-                console.log(e.key);
+                // console.log(e.key);
                 if (e.key === "Escape") {
                     overlay.classList.add("hidden");
                 }
