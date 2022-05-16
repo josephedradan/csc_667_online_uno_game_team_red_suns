@@ -95,6 +95,7 @@ const middlewareModifyReqRes = require('../middleware/middleware_modify_req_res'
 const middlewareDebug = require('../middleware/middleware_debug');
 
 const routes = require('../routes/routes');
+const routesEnd = require('./app_end');
 
 const debugPrinter = require('../util/debug_printer');
 const middlewareExpressToSocketIO = require('../ignore/middleware_express_to_socket_io');
@@ -340,33 +341,8 @@ handlerSocketIOUseExpress.useExpressMiddleware(middlewareDebug.printDebugger('So
 
 application.use('/', routes);
 
-/* ############################## Error handling ############################## */
+/* ############################## Error handling and Special throws ############################## */
 
-// catch 404 and forward to error handler
-application.use((req, res, next) => {
-    next(createError(404));
-});
-
-// error handler
-application.use((err, req, res, next) => {
-    debugPrinter.printError(err);
-
-    debugPrinter.printBackendRed('req.method');
-    debugPrinter.printDebug(req.method);
-    debugPrinter.printBackendRed('req.url');
-    debugPrinter.printDebug(req.url);
-    debugPrinter.printBackendRed('req.body');
-    debugPrinter.printDebug(req.body);
-    debugPrinter.printBackendRed('req.user');
-    debugPrinter.printDebug(req.user);
-
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-    // render the error page
-    res.status(err.status || 500);
-    res.render('error');
-});
+application.use(routesEnd);
 
 module.exports = application;

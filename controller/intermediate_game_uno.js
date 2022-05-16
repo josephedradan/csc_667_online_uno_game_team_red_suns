@@ -212,7 +212,7 @@ async function startGameWrapped(user_id, game_id) {
         user_id,
         game_id,
         1,
-        7,
+        1,
         intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState,
     );
 
@@ -277,7 +277,7 @@ async function challengePlayerWrapped(game_id, playerRow) {
         debugPrinter.printError(result);
     }
 
-    // await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
+    await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 
     return result;
 }

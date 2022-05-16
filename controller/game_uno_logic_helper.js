@@ -4,6 +4,7 @@ const dbEngineGameUno = require('./db_engine_game_uno');
 const constants = require('../config/constants');
 const constantsGameUno = require('../config/constants_game_uno');
 const dbEngine = require('./db_engine');
+const gameUnoSpecial = require('./game_uno_special');
 
 const set = new Set(constantsGameUno.CARD_COLORS_SELECETABLE_LEGEAL);
 
@@ -295,6 +296,7 @@ async function updateGameDataByGameRow(gameRowDetailed, color) {
 
     // eslint-disable-next-line no-restricted-syntax
     for (const playerRow of playerRowsActive) {
+        // eslint-disable-next-line no-await-in-loop
         const collectionCountHand = await dbEngineGameUno.getCollectionCountByPlayerID(playerRow.player_id);
         if (collectionCountHand === 1) {
             // eslint-disable-next-line no-await-in-loop
@@ -306,6 +308,7 @@ async function updateGameDataByGameRow(gameRowDetailed, color) {
         }
     }
 
+    // If there is a winner in the game
     if (player_id_winner) {
         // eslint-disable-next-line no-restricted-syntax
         await Promise.all(playerRowsActive.map(async (playerRow) => {
@@ -313,14 +316,10 @@ async function updateGameDataByGameRow(gameRowDetailed, color) {
                 return dbEngine.incrementUserStatisticRowNumWins(playerRow.user_id);
             }
             return dbEngine.incrementUserStatisticRowNumLoss(playerRow.user_id);
-
         }));
-
-        result.status_game_uno = constants.SUCCESS;
-        result.message = `Game ${gameRowDetailed.game_id}'s has a winner`;
-        return result;
     }
 
+    // Reset is_uno_available back to false if there is no Uno Available
     if (!isUnoAvailable) {
         await dbEngineGameUno.updateGameDataRowIsUnoAvailable(gameRowDetailed.game_id, false);
     }
@@ -332,6 +331,16 @@ async function updateGameDataByGameRow(gameRowDetailed, color) {
         result.status_game_uno = constants.FAILURE;
         result.message = `Game ${gameDataRow.game_id} does not exist`;
         return result;
+    }
+
+    // Do a special throw to end the game
+    if (player_id_winner) {
+        const playerRowDetailedWinner = await dbEngineGameUno.getPlayerRowDetailedByPlayerID(player_id_winner);
+
+        const message = `The winner is ${playerRowDetailedWinner.display_name} (player_id :${playerRowDetailedWinner.player_id}) `
+            + `of game_id ${gameRowDetailed.game_id}`;
+
+        throw new gameUnoSpecial.GameUnoWinner(message, gameRowDetailedMostUpToDate, playerRowDetailedWinner);
     }
 
     result.game = gameRowDetailedMostUpToDate;
