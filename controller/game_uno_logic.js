@@ -893,11 +893,13 @@ async function moveCardDrawTopToHandHelper(gameRowDetailed, playerRowDetailed, d
         cardsDrew += 1;
     }
 
-    const collectionCountHand = await dbEngineGameUno.getCollectionCountByPlayerID(playerRowDetailed.player_id);
-
-    if (collectionCountHand === 1) {
-        await dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId(gameRowDetailed.game_id, playerRowDetailed.player_id, true);
-    }
+    // FIXME DO NOT DO THIS HERE DO THIS IS updateGameData
+    // const collectionCountHand = await dbEngineGameUno.getCollectionCountByPlayerID(playerRowDetailed.player_id);
+    // if (collectionCountHand === 1) {
+    //     await dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId(gameRowDetailed.game_id, playerRowDetailed.player_id, true);
+    // } else {
+    //     await dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId(gameRowDetailed.game_id, playerRowDetailed.player_id, false);
+    // }
 
     return collectionRowHand;
 }
@@ -1387,6 +1389,17 @@ async function callUnoLogic(user_id, game_id, callback_game_id, callback_game_id
         return result;
     }
 
+    // Get player given game_id and user_id (May be undefined)
+    const playerRowDetailedCaller = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
+
+    // If player is exists for the user for the game
+    if (!playerRowDetailedCaller) {
+        result.status_game_uno = constants.FAILURE;
+        result.message = `Player does not exist for game ${game_id}`;
+
+        return result;
+    }
+
     // Get players in the game (TODO CHANGE IT TO ACTIVE PLAYERS)
     const playerRowsInGame = await dbEngineGameUno.getPlayerRowsDetailedByGameID(game_id);
     if (!playerRowsInGame) {
@@ -1396,7 +1409,7 @@ async function callUnoLogic(user_id, game_id, callback_game_id, callback_game_id
     }
 
     for (const playerRowDetailed of playerRowsInGame) {
-        if (playerRowDetailed.uno_check === true) {
+        if (playerRowDetailed.uno_check === true && playerRowDetailedCaller.player_id !== playerRowDetailed.player_id) {
             // eslint-disable-next-line no-await-in-loop
             await moveCardDrawTopToHandHelper(
                 gameRowDetailed,
@@ -1405,6 +1418,8 @@ async function callUnoLogic(user_id, game_id, callback_game_id, callback_game_id
                 callback_game_id,
                 callback_game_id_message,
             );
+
+            await dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId(game_id, playerRowDetailed.player_id, false);
         }
     }
 

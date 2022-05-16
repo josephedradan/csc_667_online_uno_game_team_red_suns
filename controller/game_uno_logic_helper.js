@@ -300,11 +300,17 @@ async function updateGameDataByGameRow(gameRowDetailed, color) {
         const collectionCountHand = await dbEngineGameUno.getCollectionCountByPlayerID(playerRow.player_id);
         if (collectionCountHand === 1) {
             // eslint-disable-next-line no-await-in-loop
-            await dbEngineGameUno.updateGameDataRowIsUnoAvailable(gameRowDetailed.game_id, true);
+            const first = dbEngineGameUno.updateGameDataRowIsUnoAvailable(gameRowDetailed.game_id, true);
+            const second = dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId(gameRowDetailed.game_id, playerRow.player_id, true);
+
+            await Promise.all([first, second]);
+
             isUnoAvailable = true;
-        } else if (collectionCountHand === 0) {
+        } else if (collectionCountHand === 0) { // Required
             player_id_winner = playerRow.player_id;
             break;
+        } else {
+            await dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId(gameRowDetailed.game_id, playerRow.player_id, false);
         }
     }
 

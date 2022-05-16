@@ -432,7 +432,7 @@ class TurnController {
             applyBounceAnimation(card, game_state.game, cardData);
         });
 
-        document.getElementById("challenge").toggleAttribute('disabled', !game_state.game.is_challenge_available);
+        document.getElementById('challenge').toggleAttribute('disabled', !game_state.game.is_challenge_available);
 
         // const drawCard = document.getElementById('drawCard');
         // const drawParent = drawCard.parentElement;
@@ -656,12 +656,12 @@ const gameStateProcessor = new EventProcessor(
                     document.getElementById('player0'),
                     gameWindow,
                 );
-            
-                document.getElementById("callUno").addEventListener("click", async () => {
+
+                document.getElementById('callUno').addEventListener('click', async () => {
                     await axios.post(`/game/${getGameId()}/uno`, {});
                 });
 
-                document.getElementById("challenge").addEventListener("click", async () => {
+                document.getElementById('challenge').addEventListener('click', async () => {
                     await axios.post(`/game/${getGameId()}/challenge`, {});
                 });
 
@@ -707,9 +707,9 @@ const gameStateProcessor = new EventProcessor(
                     ],
                 );
             }
-            
-            document.getElementById("callUno").toggleAttribute('disabled', !game_state.game.is_uno_available);
-            document.getElementById("challenge").toggleAttribute('disabled', true);
+
+            document.getElementById('callUno').toggleAttribute('disabled', !game_state.game.is_uno_available);
+            document.getElementById('challenge').toggleAttribute('disabled', true);
 
             // If its my turn
             // make my cards draggable loop
@@ -797,7 +797,7 @@ const applyBounceAnimation = (card, game, cardData) => {
             card.classList.add('brightness-75');
             card.toggleAttribute('disabled', true); // ERIC, added disabled as well.
 
-            card.addEventListener("mousedown", (e) => {
+            card.addEventListener('mousedown', (e) => {
                 shakeCard(card);
             });
         }
@@ -811,16 +811,16 @@ const applyBounceAnimation = (card, game, cardData) => {
         card.classList.add('brightness-75');
         card.toggleAttribute('disabled', true); // ERIC, added disabled as well.
 
-        card.addEventListener("mousedown", (e) => {
+        card.addEventListener('mousedown', (e) => {
             shakeCard(card);
         });
     }
 };
 
 const shakeCard = (card) => {
-    card.classList.add("apply-shake");
+    card.classList.add('apply-shake');
     setTimeout(() => {
-        card.classList.remove("apply-shake");
+        card.classList.remove('apply-shake');
     }, 300);
 };
 

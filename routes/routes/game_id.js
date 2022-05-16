@@ -72,6 +72,11 @@ routerGameID.get(
     controllerGameID.GETGetHand,
 );
 
+routerGameID.post(
+    '/uno',
+    controllerGameID.POSTUno,
+);
+
 routerGameID.use(middlewareGameUnoGameGameID.checkIfPlayerCanDoAction);
 
 routerGameID.post(
@@ -84,10 +89,6 @@ routerGameID.get(
     controllerGameID.GETDrawCard,
 );
 
-routerGameID.post(
-    '/uno',
-    controllerGameID.POSTUno,
-);
 
 routerGameID.post(
     '/challenge',

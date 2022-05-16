@@ -50,7 +50,7 @@ async function checkIfPlayerCanDoAction(req, res, next) {
     if (req.game.player_id_turn === req.player.player_id) {
         next();
     } else {
-        debugPrinter.printRed("ITS NOT YOUR TURN")
+        debugPrinter.printRed('ITS NOT YOUR TURN');
         res.json({
             status: constants.FAILURE,
             message: `It is not your turn player_id ${req.player.player_id}`,

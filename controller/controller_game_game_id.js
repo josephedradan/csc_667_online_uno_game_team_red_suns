@@ -193,6 +193,8 @@ async function POSTUno(req, res, next) {
     // TODO: emit to the socket with a wrapper????
     const result = await intermediateGameUno.callUnoWrapped(req.user.user_id, req.game.game_id);
 
+    debugPrinter.printError(result);
+
     res.json(result);
 }
 

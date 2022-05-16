@@ -288,8 +288,8 @@ async function callUnoWrapped(user_id, game_id) {
     debugPrinter.printFunction(challengePlayerWrapped.name);
 
     const result = await gameUno.callUnoLogic(
-        game_id,
         user_id,
+        game_id,
         intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState,
         intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_MessageServer_Wrapped,
     );
