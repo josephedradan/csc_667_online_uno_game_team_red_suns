@@ -161,7 +161,7 @@ intermediateGameUno.sendMessageWrapped = sendMessageWrapped;
 async function moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow) {
     debugPrinter.printFunction(moveCardDrawToHandByGameIDAndPlayerRowWrapped.name);
 
-    const result = await gameUno.moveCardDrawToHandTopByGameIDAndPlayerRow(
+    const result = await gameUno.moveCardDrawTopToHandFullByGameIDAndPlayerRow(
         game_id,
         playerRow,
         intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState, // Emit the gameState to room and get gameState
@@ -282,5 +282,23 @@ async function challengePlayer(game_id, playerRow) {
 }
 
 intermediateGameUno.challengePlayer = challengePlayer;
+
+async function getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUnoSocketWrapper(user_id, game_id) {
+    
+    const result = await gameUno.getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUno(
+        user_id,
+        game_id,
+    );
+
+    if (result.status_game_uno === constants.FAILURE) {
+        debugPrinter.printError(result);
+    }
+    
+    await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
+
+    return result;
+}
+
+intermediateGameUno.getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUnoWrapper = getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUnoSocketWrapper;
 
 module.exports = intermediateGameUno;

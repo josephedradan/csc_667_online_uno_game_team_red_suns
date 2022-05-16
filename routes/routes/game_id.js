@@ -6,6 +6,7 @@ Notes:
 const express = require('express');
 const middlewareGameUnoGameGameID = require('../../middleware/middleware_game_uno_game_game_id');
 const controllerGameID = require('../../controller/controller_game_game_id');
+const middlewareUnoGameSettings = require('../../middleware/middleware_game_uno_settings');
 
 const routerGameID = express.Router();
 
@@ -56,6 +57,7 @@ routerGameID.post(
 routerGameID.post(
     '/startGame',
     middlewareGameUnoGameGameID.checkIfPlayerIDIsHost,
+    middlewareUnoGameSettings.checkIfPlayersMinIsReached,
     controllerGameID.POSTStartGame,
 );
 
@@ -79,8 +81,13 @@ routerGameID.post(
 
 routerGameID.get(
     '/drawCard',
-    controllerGameID.GETDrawCard, // TODO
+    controllerGameID.GETDrawCard,
 );
+
+routerGameID.post(
+    '/uno', 
+    controllerGameID.POSTUno,
+)
 
 routerGameID.post(
     '/challenge',

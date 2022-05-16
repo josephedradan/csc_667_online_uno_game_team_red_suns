@@ -180,7 +180,8 @@ controllerGameID.GETGetGameAndTheirPlayers = GETGetGameAndTheirPlayers;
 async function GETGetPlayer(req, res, next) {
     debugPrinter.printMiddleware(GETGetPlayer.name);
 
-    const result = await gameUno.getPlayerDetailedByGameIDAndUserID(req.user.user_id, req.game.game_id);
+    
+    const result = await gameUno.getPlayerDetailedByGameIDAndUserID(req.user.user_id);
 
     // debugPrinter.printBackendWhite(result);
 
@@ -188,6 +189,17 @@ async function GETGetPlayer(req, res, next) {
 }
 
 controllerGameID.GETGetPlayer = GETGetPlayer;
+
+async function POSTUno(req, res, next) {
+    debugPrinter.printMiddleware(POSTUno.name);
+
+    //TODO: emit to the socket with a wrapper????
+    const result = await intermediateGameUno.getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUno(req.user.user_id, req.game.game_id); 
+
+    res.json(result); 
+}
+
+controllerGameID.POSTUno = POSTUno;
 
 async function POSTChallenge(req, res, next) {
     debugPrinter.printMiddleware(POSTChallenge.name);

@@ -15,6 +15,7 @@ const constants = require('../config/constants');
 const constantsGameUno = require('../config/constants_game_uno');
 
 const debugPrinter = require('../util/debug_printer');
+const { result } = require('../db');
 
 const gameUnoLogic = {};
 
@@ -627,7 +628,7 @@ async function startGame(user_id, game_id, deckMultiplier, drawAmountPerPlayer, 
         // eslint-disable-next-line no-plusplus
         for (let i = 0; i < drawAmountPerPlayer; i++) {
             // eslint-disable-next-line no-await-in-loop,no-use-before-define
-            await moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRowDetailed, callback_game_id);
+            await moveCardDrawTopToHandFullByGameIDAndPlayerRow(game_id, playerRowDetailed, callback_game_id);
         }
     }
 
@@ -783,8 +784,90 @@ async function getGameState(game_id) {
 
 gameUnoLogic.getGameState = getGameState;
 
-async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRowDetailed, callback_game_id) {
-    debugPrinter.printFunction(moveCardDrawToHandTopByGameIDAndPlayerRow.name);
+async function moveCardDrawTopToHandHelper(gameRowDetailed, playerRowDetailed, draw_amount, callback_game_id) {
+    let collectionRowHand = null;
+
+    let cardsDrew = 0;
+
+    // Draw the appropriate amount of cards for the player
+    while (cardsDrew < draw_amount) {
+        // If the server crashes, the player still needs to draw the appropriate amount of cards (May be undefined)
+        // eslint-disable-next-line no-await-in-loop
+        const gameDataRow = await dbEngineGameUno.updateGameDataRowDrawAmount(gameRowDetailed.game_id, cardsDrew);
+
+        if (!gameDataRow) {
+            // result.status_game_uno = constants.FAILURE;
+            // result.message = `Game ${gameRowDetailed.game_id}'s GameData failed to update draw_amount`;
+            // return result;
+
+            debugPrinter.printError(`Error when Drawing cards for Game game_id ${gameRowDetailed.game_id}`);
+            /*
+            If this break is hit, then something went wrong updating the db. This break should probably never be hit, but
+            if it does then something went wrong
+
+             */
+            break;
+        }
+
+        // eslint-disable-next-line no-await-in-loop
+        const collectionCountDraw = await dbEngineGameUno.getCollectionCountByGameIDAndCollectionInfoID(gameRowDetailed.game_id, 1);
+
+        // If there are no cards in the Collection DRAW, reshuffle Collection PLAY to Collection DRAW
+        if (collectionCountDraw === 0) {
+            // eslint-disable-next-line no-await-in-loop
+            const gameDataRowNew = await reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid(gameRowDetailed);
+
+            // Get the new Collection DRAW (May be empty)
+            // eslint-disable-next-line no-await-in-loop
+            const collectionCountDrawNew = await dbEngineGameUno.getCollectionCountByGameIDAndCollectionInfoID(gameRowDetailed.game_id, 1);
+
+            if (collectionCountDrawNew.length === 0) {
+                // result.status_game_uno = constants.FAILURE;
+                // result.message = `Collection DRAW is still empty, ${playerRow.player_id} Should play cards`;
+                // return result;
+
+                /*
+                If this break is hit, the game is in a complicated state where there no cards in the DRAW collection even after
+                moving all the cards from the PLAY collection into the DRAW collection and playing 1 card from the DRAW to the PLAY.
+
+                If the player can't play a card after all this drawing, the game will probably be in a soft lock state...
+
+                TODO: Add code to prevent this soft lock by skipping the player if they can't play a legal card
+
+                 */
+                break;
+            }
+
+            // Execute the callback if necessary
+            if (callback_game_id) {
+                // eslint-disable-next-line no-await-in-loop
+                await callback_game_id(gameRowDetailed.game_id);
+            }
+        }
+
+        // My be undefined
+        // eslint-disable-next-line no-await-in-loop
+        collectionRowHand = await dbEngineGameUno.updateCollectionRowDrawToHandTop(gameRowDetailed.game_id, playerRowDetailed.player_id);
+
+        // TODO GUARD
+        // if (!collectionRowHand) {
+        //     result.status_game_uno = constants.FAILURE;
+        //     result.message = `Error in updating player ${playerRowDetailed.display_name} (player_id ${playerRowDetailed.player_id})'s collection`;
+        //     return result;
+        // }
+
+        // Execute the callback if necessary
+        if (callback_game_id) {
+            // eslint-disable-next-line no-await-in-loop
+            await callback_game_id(gameRowDetailed.game_id);
+        }
+
+        cardsDrew += 1;
+    }
+}
+
+async function moveCardDrawTopToHandFullByGameIDAndPlayerRow(game_id, playerRowDetailed, callback_game_id) {
+    debugPrinter.printFunction(moveCardDrawTopToHandFullByGameIDAndPlayerRow.name);
 
     const result = {
         status_game_uno: null,
@@ -813,91 +896,14 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRowDetai
     }
     result.player = playerRowDetailed;
 
-    // TODO FUUUUUUUUUUUCK
+    // TODO THE MAIN BODY IS BELOW THIS
 
-    let collectionRowHand = null;
-
-    let cardsDrew = 0;
-
-    // Draw the appropriate amount of cards for the player
-    while (cardsDrew < gameRowDetailed.draw_amount) {
-        // If the server crashes, the player still needs to draw the appropriate amount of cards (May be undefined)
-        // eslint-disable-next-line no-await-in-loop
-        const gameDataRow = await dbEngineGameUno.updateGameDataRowDrawAmount(game_id, cardsDrew);
-
-        if (!gameDataRow) {
-            // result.status_game_uno = constants.FAILURE;
-            // result.message = `Game ${gameRowDetailed.game_id}'s GameData failed to update draw_amount`;
-            // return result;
-
-            debugPrinter.printError(`Error when Drawing cards for Game game_id ${game_id}`);
-            /*
-            If this break is hit, then something went wrong updating the db. This break should probably never be hit, but
-            if it does then something went wrong
-
-             */
-            break;
-        }
-
-        // eslint-disable-next-line no-await-in-loop
-        const collectionCountDraw = await dbEngineGameUno.getCollectionCountByGameIDAndCollectionInfoID(game_id, 1);
-
-        // If there are no cards in the Collection DRAW, reshuffle Collection PLAY to Collection DRAW
-        if (collectionCountDraw === 0) {
-            // eslint-disable-next-line no-await-in-loop
-            const gameDataRowNew = await reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid(gameRowDetailed);
-
-            // Get the new Collection DRAW (May be empty)
-            // eslint-disable-next-line no-await-in-loop
-            const collectionCountDrawNew = await dbEngineGameUno.getCollectionCountByGameIDAndCollectionInfoID(game_id, 1);
-
-            if (collectionCountDrawNew.length === 0) {
-                // result.status_game_uno = constants.FAILURE;
-                // result.message = `Collection DRAW is still empty, ${playerRow.player_id} Should play cards`;
-                // return result;
-
-                /*
-                If this break is hit, the game is in a complicated state where there no cards in the DRAW collection even after
-                moving all the cards from the PLAY collection into the DRAW collection and playing 1 card from the DRAW to the PLAY.
-
-                If the player can't play a card after all this drawing, the game will probably be in a soft lock state...
-
-                TODO: Add code to prevent this soft lock by skipping the player if they can't play a legal card
-
-                 */
-                break;
-            }
-
-            // Execute the callback if necessary
-            if (callback_game_id) {
-                // eslint-disable-next-line no-await-in-loop
-                await callback_game_id(game_id);
-            }
-        }
-
-        // My be undefined
-        // eslint-disable-next-line no-await-in-loop
-        collectionRowHand = await dbEngineGameUno.updateCollectionRowDrawToHandTop(game_id, playerRowDetailed.player_id);
-
-        if (!collectionRowHand) {
-            result.status_game_uno = constants.FAILURE;
-            result.message = `Error in updating player ${playerRowDetailed.display_name} (player_id ${playerRowDetailed.player_id})'s collection`;
-            return result;
-        }
-
-        // Execute the callback if necessary
-        if (callback_game_id) {
-            // eslint-disable-next-line no-await-in-loop
-            await callback_game_id(game_id);
-        }
-
-        cardsDrew += 1;
-    }
+    const collectionRowHand = await moveCardDrawTopToHandHelper(gameRowDetailed, playerRowDetailed, gameRowDetailed.draw_amount, callback_game_id);
 
     // Reset draw amount
     await dbEngineGameUno.updateGameDataRowDrawAmount(game_id, 1);
 
-    // TODO FUUUUUUUUUUUCK
+    // TODO THE BELOW IS DRAWING WHEN WILD +4 or +2 iS ON TOP
 
     // Change turn if player draws when there is a WILDFOUR or DRAWTWO and the draw_amount is > 0 (Note that gameRowDetailed should be outdated by this point which is why this logic works)
     if (((gameRowDetailed.card_content_legal === constantsGameUno.CARD_CONTENT_WILDFOUR) || (gameRowDetailed.card_content_legal === constantsGameUno.CARD_CONTENT_DRAWTWO))
@@ -919,7 +925,7 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRowDetai
     return result;
 }
 
-gameUnoLogic.moveCardDrawToHandTopByGameIDAndPlayerRow = moveCardDrawToHandTopByGameIDAndPlayerRow;
+gameUnoLogic.moveCardDrawTopToHandFullByGameIDAndPlayerRow = moveCardDrawTopToHandFullByGameIDAndPlayerRow;
 
 /*
 {
@@ -935,7 +941,7 @@ async function moveCardDrawToHandTopByGameIdAndUseID(user_id, game_id) {
     // Get player given game_id and user_id (May be undefined)
     const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
 
-    return moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow);
+    return moveCardDrawTopToHandFullByGameIDAndPlayerRow(game_id, playerRow);
 }
 
 gameUnoLogic.moveCardDrawToHandTopByGameIdAndUseID = moveCardDrawToHandTopByGameIdAndUseID;
@@ -1039,7 +1045,8 @@ async function moveCardHandToPlayByCollectionIndex(user_id, game_id, collection_
 
     result.status_game_uno = constants.SUCCESS;
 
-    result.message = `Card (collection_index ${collection_index}) from player ${playerRowDetailed.display_name} (player_id ${playerRowDetailed.player_id})'s collection moved to PLAY's collection's top for Game ${game_id}`;
+    result.message = `Card (collection_index ${collection_index}) from player ${playerRowDetailed.display_name} `
+        + `(player_id ${playerRowDetailed.player_id})'s collection moved to PLAY's collection's top for Game ${game_id}`;
 
     return result;
 }
@@ -1187,6 +1194,67 @@ async function setGamePlayerIDHost(user_id, game_id) {
 
 gameUnoLogic.setGamePlayerIDHost = setGamePlayerIDHost;
 
+async function getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUno(user_id, game_id) {
+    debugPrinter.printFunction(getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUno.name);
+    const result = {
+        status_game_uno: null,
+        message: null,
+        game: null,
+        player: null,
+    }
+
+    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
+    if(!playerRow) {
+        result.status_game_uno = constants.FAILURE;
+        result.message = `Could not retrieve the player information for user_id: ${user_id} for game: ${game_id}`;
+        return result;
+    }
+
+    const playerCollectionHand = await dbEngineGameUno.getCollectionRowsDetailedByPlayerID(playerRow.player_id); 
+
+    if(!playerCollectionHand) {
+        result.status_game_uno = constants.FAILURE;
+        result.message = `Player's hand could not be retrieved for player_id: ${playerRow.player_id}, in game: ${game_id}`;
+        return result;
+    }
+
+    if(playerRow.is_active && playerCollectionHand.length === 0) {
+        //check the hand
+        // if a single player's hand is of length zero
+        //      we set all players and the game to inActive, signifying end of the game.
+        const updateResultPlayer = await dbEngineGameUno.updatePlayersRowsInGameRows(game_id, false);
+        if(!updateResultPlayer) {
+            result.status_game_uno = constants.FAILURE;
+            result.message = `Could not set all player's inactive when someone 'wins' for player_id: ${playerRow.player_id} in game: ${game_id}`;
+            return result;
+        }
+
+        const updateResultGame = await dbEngineGameUno.updateGameRowIsActiveByGameID(game_id, false); 
+        if(!updateResultGame) {
+            result.status_game_uno = constants.FAILURE;
+            result.message = `Could not set game to be inactive for game: ${game_id}`;
+            return result;
+        }
+        
+        result.status_game_uno = constants.SUCCESS;
+        result.message = `Successfully made all players in game: ${game_id} inactive, congratulations player ${playerRow.player_id}, you've won.`
+        result.player = playerRow;
+    }
+
+    const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
+    if(!gameRow) {
+        result.status_game_uno = constants.FAILURE;
+        result.message = `Could not retrieve the game_state for game: ${game_id}`;
+        return result;
+    }
+
+    result.game = gameRow; 
+    return result;
+}
+
+gameUnoLogic.getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUno = getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUno;
+
+
 async function challengePlayerHandler(gameRowDetailed, playerRowChallenger, playerRowChallenged, collectionRowsChallenged, callback_game_id) {
     debugPrinter.printFunction(challengePlayerHandler.name);
 
@@ -1196,45 +1264,36 @@ async function challengePlayerHandler(gameRowDetailed, playerRowChallenger, play
         boolean: null,
     };
 
-    const isWildFourLegal = gameUnoLogicHelper.isWildFourPlayLegal(gameRowDetailed, collectionRowsChallenged);
+    const isWildFourLegal = await gameUnoLogicHelper.isWildFourPlayLegal(gameRowDetailed, collectionRowsChallenged);
 
     result.boolean = isWildFourLegal;
+
+    debugPrinter.printError(`LOOK HERE ${isWildFourLegal}`);
 
     // If Wild +4 is legal
     if (isWildFourLegal) {
         // eslint-disable-next-line no-plusplus
-        for (let i = 0; i < 2; i++) {
-            // eslint-disable-next-line no-await-in-loop,no-use-before-define
-            await moveCardDrawToHandTopByGameIDAndPlayerRow(gameRowDetailed.game_id, playerRowChallenger, callback_game_id); // TODO GUARDS
-
-            // Execute the callback if necessary
-            if (callback_game_id) {
-                // eslint-disable-next-line no-await-in-loop
-                await callback_game_id(gameRowDetailed.game_id);
-            }
-        }
-
-        result.message = `Player ${playerRowChallenger.display_name} (player_id ${playerRowChallenger.player_id})'s challenge against Player ${playerRowChallenged.display_name} (player_id ${playerRowChallenged.player_id}) failed`;
-
-
-
-    } else {
-        // eslint-disable-next-line no-plusplus
-        for (let i = 0; i < 6; i++) {
-            // eslint-disable-next-line no-await-in-loop,no-use-before-define
-            await moveCardDrawToHandTopByGameIDAndPlayerRow(gameRowDetailed.game_id, playerRowChallenged, callback_game_id); // TODO GUARDS
-
-            // Execute the callback if necessary
-            if (callback_game_id) {
-                // eslint-disable-next-line no-await-in-loop
-                await callback_game_id(gameRowDetailed.game_id);
-            }
-        }
 
         // TODO GUARD
-        const collectionRow = await dbEngineGameUno.updateCollectionRowPlayToHandTop(gameRowDetailed.game_id, playerRowChallenged.player_id);
+        const collectionRowHand = await moveCardDrawTopToHandHelper(gameRowDetailed, playerRowChallenger, 2, callback_game_id);
 
-        result.message = `Player ${playerRowChallenger.display_name} (player_id ${playerRowChallenger.player_id})'s challenge against Player ${playerRowChallenged.display_name} (player_id ${playerRowChallenged.player_id}) was successful`;
+        result.message = `Player ${playerRowChallenger.display_name} (player_id ${playerRowChallenger.player_id})'s `
+            + `challenge against Player ${playerRowChallenged.display_name} (player_id ${playerRowChallenged.player_id}) failed`;
+    } else {
+        const collectionRowHand = await moveCardDrawTopToHandHelper(gameRowDetailed, playerRowChallenged, 6, callback_game_id);
+
+        // TODO GUARD
+        // Put the top card back in the original player's hand (Wild +4 back to original player's hand)
+        // const collectionRow = await dbEngineGameUno.updateCollectionRowPlayToHandTop(gameRowDetailed.game_id, playerRowChallenged.player_id);
+        //
+        // // Execute the callback if necessary
+        // if (callback_game_id) {
+        //     // eslint-disable-next-line no-await-in-loop
+        //     await callback_game_id(gameRowDetailed.game_id);
+        // }
+
+        result.message = `Player ${playerRowChallenger.display_name} (player_id ${playerRowChallenger.player_id})'s `
+            + `challenge against Player ${playerRowChallenged.display_name} (player_id ${playerRowChallenged.player_id}) was successful`;
     }
     result.status_game_uno = constants.SUCCESS;
 
