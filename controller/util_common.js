@@ -7,9 +7,9 @@ const debugPrinter = require('../util/debug_printer');
 
 const utilCommon = {};
 
-function attachMessageToSessionMessageIfPossible(req, status, message) {
+function attachMessageToSessionMessageIfPossible(req, status_game_uno, message) {
     const body = {
-        status,
+        status_game_uno,
         message,
     };
 
@@ -22,9 +22,9 @@ function attachMessageToSessionMessageIfPossible(req, status, message) {
 
 utilCommon.attachMessageToSessionMessageIfPossible = attachMessageToSessionMessageIfPossible;
 
-function getJsonResponseCommon(req, status, message, url) {
+function getJsonResponseCommon(req, status_game_uno, message, url) {
     const body = {
-        status,
+        status_game_uno,
         message,
         url: url || '/',
     };
@@ -32,8 +32,8 @@ function getJsonResponseCommon(req, status, message, url) {
 }
 utilCommon.getJsonResponseCommon = getJsonResponseCommon;
 
-function getJsonResponseAndAttachMessageToSessionMessageIfPossible(req, status, message, url) {
-    const result = attachMessageToSessionMessageIfPossible(req, status, message);
+function getJsonResponseAndAttachMessageToSessionMessageIfPossible(req, status_game_uno, message, url) {
+    const result = attachMessageToSessionMessageIfPossible(req, status_game_uno, message);
     return getJsonResponseCommon(req, result.status, result.message, url);
 }
 
