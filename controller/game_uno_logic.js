@@ -565,15 +565,15 @@ async function startGame(user_id, game_id, deckMultiplier, drawAmountPerPlayer, 
     result.game = gameRowDetailed;
 
     // Get player given game_id and user_id (May be undefined)
-    const playerRowHost = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
+    const playerRowDetailedHost = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
 
     // If player is exists for the user for the game
-    if (!playerRowHost) {
+    if (!playerRowDetailedHost) {
         result.status_game_uno = constants.FAILURE;
         result.message = `Player does not exist for game ${game_id}`;
         return result;
     }
-    result.player = playerRowHost;
+    result.player = playerRowDetailedHost;
 
     // If player_id is host and if game is not active, make it active
     if (gameRowDetailed.is_active === true) {
@@ -603,9 +603,9 @@ async function startGame(user_id, game_id, deckMultiplier, drawAmountPerPlayer, 
     // May be empty
     await dbEngineGameUno.updatePlayersRowsInGameRows(game_id, true);
 
-    const playerRows = await dbEngineGameUno.getPlayerRowsDetailedByGameID(gameRowDetailed.game_id);
+    const playerRowsDetailed = await dbEngineGameUno.getPlayerRowsDetailedByGameID(gameRowDetailed.game_id);
 
-    if (!playerRows.length) {
+    if (!playerRowsDetailed.length) {
         result.status_game_uno = constants.FAILURE;
         // result.message = `Error no players for game ${game_id}, game ${game_id} will be deleted`;
         result.message = `Error no players for game ${game_id}`;
@@ -614,7 +614,7 @@ async function startGame(user_id, game_id, deckMultiplier, drawAmountPerPlayer, 
 
         return result;
     }
-    result.players = playerRows;
+    result.players = playerRowsDetailed;
 
     // New Game Row
     gameRowDetailed = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
@@ -623,11 +623,11 @@ async function startGame(user_id, game_id, deckMultiplier, drawAmountPerPlayer, 
     /* ----- Distribute Cards ----- */
 
     // eslint-disable-next-line no-restricted-syntax
-    for (const playerRow of playerRows) {
+    for (const playerRowDetailed of playerRowsDetailed) {
         // eslint-disable-next-line no-plusplus
         for (let i = 0; i < drawAmountPerPlayer; i++) {
             // eslint-disable-next-line no-await-in-loop,no-use-before-define
-            await moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, callback_game_id);
+            await moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRowDetailed, callback_game_id);
         }
     }
 
@@ -746,24 +746,24 @@ async function getGameState(game_id) {
     };
 
     // May be undefined
-    const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
+    const gameRowDetailed = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
 
     // If Game Row does not exist
-    if (!gameRow) {
+    if (!gameRowDetailed) {
         result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} does not exist`;
         return result;
     }
 
-    result.game = gameRow;
+    result.game = gameRowDetailed;
 
     // May be empty
-    const playerRows = await dbEngineGameUno.getPlayerRowsDetailedByGameID(gameRow.game_id);
+    const playerRowsDetailed = await dbEngineGameUno.getPlayerRowsDetailedByGameID(gameRowDetailed.game_id);
 
-    result.players = playerRows;
+    result.players = playerRowsDetailed;
 
     // eslint-disable-next-line no-restricted-syntax
-    for (const playerRow of playerRows) {
+    for (const playerRow of playerRowsDetailed) {
         // eslint-disable-next-line no-await-in-loop
         playerRow.collection = await dbEngineGameUno.getCollectionRowsCollectionIndexByPlayerID(playerRow.player_id);
     }
@@ -783,7 +783,7 @@ async function getGameState(game_id) {
 
 gameUnoLogic.getGameState = getGameState;
 
-async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, callback_game_id) {
+async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRowDetailed, callback_game_id) {
     debugPrinter.printFunction(moveCardDrawToHandTopByGameIDAndPlayerRow.name);
 
     const result = {
@@ -806,12 +806,12 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, cal
     }
 
     // If player is exists for the user for the game
-    if (!playerRow) {
+    if (!playerRowDetailed) {
         result.status_game_uno = constants.FAILURE;
         result.message = `Player does not exist for game ${game_id}`; // Short circuit because the playerRow is based on the game_id (don't need to check if game exists)
         return result;
     }
-    result.player = playerRow;
+    result.player = playerRowDetailed;
 
     // TODO FUUUUUUUUUUUCK
 
@@ -823,9 +823,9 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, cal
     while (cardsDrew < gameRowDetailed.draw_amount) {
         // If the server crashes, the player still needs to draw the appropriate amount of cards (May be undefined)
         // eslint-disable-next-line no-await-in-loop
-        const gameData = await dbEngineGameUno.updateGameDataRowDrawAmount(game_id, cardsDrew);
+        const gameDataRow = await dbEngineGameUno.updateGameDataRowDrawAmount(game_id, cardsDrew);
 
-        if (!gameData) {
+        if (!gameDataRow) {
             // result.status_game_uno = constants.FAILURE;
             // result.message = `Game ${gameRowDetailed.game_id}'s GameData failed to update draw_amount`;
             // return result;
@@ -877,11 +877,11 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, cal
 
         // My be undefined
         // eslint-disable-next-line no-await-in-loop
-        collectionRowHand = await dbEngineGameUno.updateCollectionRowDrawToHandTop(game_id, playerRow.player_id);
+        collectionRowHand = await dbEngineGameUno.updateCollectionRowDrawToHandTop(game_id, playerRowDetailed.player_id);
 
         if (!collectionRowHand) {
             result.status_game_uno = constants.FAILURE;
-            result.message = `Error in updating player ${playerRow.display_name} (player_id ${playerRow.player_id})'s collection`;
+            result.message = `Error in updating player ${playerRowDetailed.display_name} (player_id ${playerRowDetailed.player_id})'s collection`;
             return result;
         }
 
@@ -914,7 +914,7 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, cal
     result.collection = collectionRowHand;
 
     result.status_game_uno = constants.SUCCESS;
-    result.message = `A card from DRAW's collection moved to player ${playerRow.display_name} (player_id ${playerRow.player_id})'s collection's top for Game ${game_id}`;
+    result.message = `A card from DRAW's collection moved to player ${playerRowDetailed.display_name} (player_id ${playerRowDetailed.player_id})'s collection's top for Game ${game_id}`;
 
     return result;
 }
@@ -951,10 +951,10 @@ async function moveCardDrawToPlay(game_id) { // TODO ADD MORE GUARDING AND ERROR
     };
 
     // May be undefined
-    const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
+    const gameRowDetailed = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
 
     // If Game Row does not exist
-    if (!gameRow) {
+    if (!gameRowDetailed) {
         result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} does not exist`;
         return result;
@@ -997,37 +997,37 @@ async function moveCardHandToPlayByCollectionIndex(user_id, game_id, collection_
     };
 
     // May be undefined
-    const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
+    const gameRowDetailed = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
 
     // If Game Row does not exist
-    if (!gameRow) {
+    if (!gameRowDetailed) {
         result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} does not exist`;
         return result;
     }
 
     // Get player given game_id and user_id (May be undefined)
-    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
+    const playerRowDetailed = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
 
     // If player is exists for the user for the game
-    if (!playerRow) {
+    if (!playerRowDetailed) {
         result.status_game_uno = constants.FAILURE;
-        result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id}) does not exist for game ${game_id}`;
-        // Can be used as a short circuit because the playerRow is based on the game_id (don't need to check if game exists)
+        result.message = `Player ${playerRowDetailed.display_name} (player_id ${playerRowDetailed.player_id}) does not exist for game ${game_id}`;
+        // Can be used as a short circuit because the playerRowDetailed is based on the game_id (don't need to check if game exists)
         return result;
     }
-    result.player = playerRow;
+    result.player = playerRowDetailed;
 
     // Check if it's the player's turn
-    if (gameRow.player_id_turn !== playerRow.player_id) {
+    if (gameRowDetailed.player_id_turn !== playerRowDetailed.player_id) {
         result.status_game_uno = constants.FAILURE;
-        result.message = `It is not Player ${playerRow.display_name} (player_id ${playerRow.player_id}) turn for game ${game_id}`;
+        result.message = `It is not Player ${playerRowDetailed.display_name} (player_id ${playerRowDetailed.player_id}) turn for game ${game_id}`;
         return result;
     }
 
-    // TODO FUCK
+    // TODO STUFF BELOW
 
-    const gameLogic = await gameUnoLogicHelper.doMoveCardHandToPlayByCollectionIndexLogic(gameRow, playerRow, collection_index, color);
+    const gameLogic = await gameUnoLogicHelper.doMoveCardHandToPlayByCollectionIndexLogic(gameRowDetailed, playerRowDetailed, collection_index, color);
 
     if (gameLogic.status_game_uno === constants.FAILURE) {
         result.status_game_uno = gameLogic.status_game_uno;
@@ -1039,7 +1039,7 @@ async function moveCardHandToPlayByCollectionIndex(user_id, game_id, collection_
 
     result.status_game_uno = constants.SUCCESS;
 
-    result.message = `Card (collection_index ${collection_index}) from player ${playerRow.display_name} (player_id ${playerRow.player_id})'s collection moved to PLAY's collection's top for Game ${game_id}`;
+    result.message = `Card (collection_index ${collection_index}) from player ${playerRowDetailed.display_name} (player_id ${playerRowDetailed.player_id})'s collection moved to PLAY's collection's top for Game ${game_id}`;
 
     return result;
 }
@@ -1056,42 +1056,42 @@ async function getHand(user_id, game_id) {
         collection: null,
     };
 
-    const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
+    const gameRowDetailed = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
 
     // Check if game exists
-    if (!gameRow) {
+    if (!gameRowDetailed) {
         result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} does not exist`;
         return result;
     }
 
-    result.game = gameRow;
+    result.game = gameRowDetailed;
 
     // Get player given game_id and user_id (May be undefined)
-    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
+    const playerRowDetailed = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
 
     // If player is exists for the user for the game
-    if (!playerRow) {
+    if (!playerRowDetailed) {
         result.status_game_uno = constants.FAILURE;
-        result.message = `Player does not exist for game ${game_id}`; // Short circuit because the playerRow is based on the game_id (don't need to check if game exists)
+        result.message = `Player does not exist for game ${game_id}`; // Short circuit because the playerRowDetailed is based on the game_id (don't need to check if game exists)
         return result;
     }
-    result.player = playerRow;
+    result.player = playerRowDetailed;
 
-    // May be undefined
-    const collectionRow = await dbEngineGameUno.getCollectionRowsDetailedByPlayerID(playerRow.player_id);
+    // May be empty
+    const collectionRows = await dbEngineGameUno.getCollectionRowsDetailedByPlayerID(playerRowDetailed.player_id);
 
-    // If player is exists for the user for the game
-    if (!collectionRow) {
-        result.status_game_uno = constants.FAILURE;
-        result.message = `Collection does not exist for player ${playerRow.display_name} (player_id ${playerRow.player_id})`;
-        return result;
-    }
+    // // If player is exists for the user for the game
+    // if (!collectionRows.length) {
+    //     result.status_game_uno = constants.FAILURE;
+    //     result.message = `Collection is empty for player ${playerRowDetailed.display_name} (player_id ${playerRowDetailed.player_id})`;
+    //     return result;
+    // }
 
     result.status_game_uno = constants.SUCCESS;
-    result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id})'s hand returned`;
+    result.message = `Player ${playerRowDetailed.display_name} (player_id ${playerRowDetailed.player_id})'s hand returned`;
 
-    result.collection = collectionRow;
+    result.collection = collectionRows;
 
     return result;
 }
@@ -1108,30 +1108,30 @@ async function getPlayerDetailedByGameIDAndUserID(user_id, game_id) {
         player: null,
     };
 
-    const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
+    const gameRowDetailed = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
 
     // Check if game exists
-    if (!gameRow) {
+    if (!gameRowDetailed) {
         result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} does not exist`;
         return result;
     }
 
-    result.game = gameRow;
+    result.game = gameRowDetailed;
 
     // Get player given game_id and user_id (May be undefined)
-    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
+    const playerRowDetailed = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
 
     // If player is exists for the user for the game
-    if (!playerRow) {
+    if (!playerRowDetailed) {
         result.status_game_uno = constants.FAILURE;
-        result.message = `Player does not exist for game ${game_id}`; // Short circuit because the playerRow is based on the game_id (don't need to check if game exists)
+        result.message = `Player does not exist for game ${game_id}`; // Short circuit because the playerRowDetailed is based on the game_id (don't need to check if game exists)
         return result;
     }
-    result.player = playerRow;
+    result.player = playerRowDetailed;
 
     result.status_game_uno = constants.SUCCESS;
-    result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id}) returned`;
+    result.message = `Player ${playerRowDetailed.display_name} (player_id ${playerRowDetailed.player_id}) returned`;
 
     return result;
 }
@@ -1148,29 +1148,29 @@ async function setGamePlayerIDHost(user_id, game_id) {
         player: null,
     };
 
-    const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
+    const gameRowDetailed = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
 
     // Check if game exists
-    if (!gameRow) {
+    if (!gameRowDetailed) {
         result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} does not exist`;
         return result;
     }
-    result.game = gameRow;
+    result.game = gameRowDetailed;
 
     // Get player given game_id and user_id (May be undefined)
-    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
+    const playerRowDetailed = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
 
     // If player is exists for the user for the game
-    if (!playerRow) {
+    if (!playerRowDetailed) {
         result.status_game_uno = constants.FAILURE;
         result.message = `Player does not exist for game ${game_id}`;
 
         return result;
     }
-    result.player = playerRow;
+    result.player = playerRowDetailed;
 
-    const gameRowNew = await dbEngineGameUno.updateGameRowPlayerIDHostByGameID(game_id, playerRow.player_id);
+    const gameRowNew = await dbEngineGameUno.updateGameRowPlayerIDHostByGameID(game_id, playerRowDetailed.player_id);
 
     if (!gameRowNew) {
         result.status_game_uno = constants.FAILURE;
@@ -1180,14 +1180,124 @@ async function setGamePlayerIDHost(user_id, game_id) {
     result.game = gameRowNew;
 
     result.status_game_uno = constants.SUCCESS;
-    result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id}) is not the host of game ${game_id}`;
+    result.message = `Player ${playerRowDetailed.display_name} (player_id ${playerRowDetailed.player_id}) is not the host of game ${game_id}`;
 
     return result;
 }
 
 gameUnoLogic.setGamePlayerIDHost = setGamePlayerIDHost;
 
+async function challengePlayerHandler(gameRowDetailed, playerRowChallenger, playerRowChallenged, collectionRowsChallenged, callback_game_id) {
+    debugPrinter.printFunction(challengePlayerHandler.name);
 
+    const result = {
+        status_game_uno: null,
+        message: null,
+        boolean: null,
+    };
+
+    const isPlayLegal = gameUnoLogicHelper.isWildFourPlayLegal(gameRowDetailed, collectionRowsChallenged);
+
+    result.boolean = isPlayLegal;
+
+    if (isPlayLegal) {
+        // eslint-disable-next-line no-plusplus
+        for (let i = 0; i < 2; i++) {
+            // eslint-disable-next-line no-await-in-loop,no-use-before-define
+            await moveCardDrawToHandTopByGameIDAndPlayerRow(gameRowDetailed.game_id, playerRowChallenger, callback_game_id); // TODO GUARDS
+
+            // Execute the callback if necessary
+            if (callback_game_id) {
+                // eslint-disable-next-line no-await-in-loop
+                await callback_game_id(gameRowDetailed.game_id);
+            }
+        }
+
+        result.message = `Player ${playerRowChallenger.display_name} (player_id ${playerRowChallenger.player_id})'s challenge against Player ${playerRowChallenged.display_name} (player_id ${playerRowChallenged.player_id}) failed`;
+    } else {
+        // eslint-disable-next-line no-plusplus
+        for (let i = 0; i < 4; i++) {
+            // eslint-disable-next-line no-await-in-loop,no-use-before-define
+            await moveCardDrawToHandTopByGameIDAndPlayerRow(gameRowDetailed.game_id, playerRowChallenged, callback_game_id); // TODO GUARDS
+
+            // Execute the callback if necessary
+            if (callback_game_id) {
+                // eslint-disable-next-line no-await-in-loop
+                await callback_game_id(gameRowDetailed.game_id);
+            }
+        }
+
+        // TODO GUARD
+        const collectionRow = await dbEngineGameUno.updateCollectionRowPlayToHandTop(gameRowDetailed.game_id, playerRowChallenged.player_id);
+
+        result.message = `Player ${playerRowChallenger.display_name} (player_id ${playerRowChallenger.player_id})'s challenge against Player ${playerRowChallenged.display_name} (player_id ${playerRowChallenged.player_id}) was successful`;
+    }
+    result.status_game_uno = constants.SUCCESS;
+
+    return result;
+}
+
+async function challengePlayer(game_id, playerRow, callback_game_id) {
+    const result = {
+        status_game_uno: null,
+        message: null,
+        game: null,
+        collection: null,
+    };
+
+    const gameRowDetailed = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
+
+    // Check if game exists
+    if (!gameRowDetailed) {
+        result.status_game_uno = constants.FAILURE;
+        result.message = `Game ${game_id} does not exist`;
+        return result;
+    }
+    result.game = gameRowDetailed;
+
+    if (await gameUnoLogicHelper.canPlayerChallenge(gameRowDetailed, playerRow)) {
+        result.status_game_uno = constants.FAILURE;
+        result.message = `game_id ${game_id}, player_id ${playerRow.player_id} cannot challenge`;
+        return result;
+    }
+
+    const resultPlayerPreviousObject = await gameUnoLogicHelper.getPlayerIDPrevious(game_id);
+
+    if (resultPlayerPreviousObject.status_game_uno === constants.FAILURE) {
+        result.status_game_uno = resultPlayerPreviousObject.status_game_uno;
+        result.message = resultPlayerPreviousObject.message;
+        return result;
+    }
+
+    const { user_id_previous } = resultPlayerPreviousObject;
+
+    const resultHandObject = await getHand(user_id_previous, game_id);
+
+    if (resultHandObject.status_game_uno === constants.FAILURE) {
+        result.status_game_uno = resultHandObject.status_game_uno;
+        result.message = resultHandObject.message;
+        return result;
+    }
+    result.collection = resultHandObject.collection;
+
+    // TODO THE CHALLENGE STUFF HERE
+
+    // TODO GUARD
+    const resultChallengePlayerHandlerObject = await challengePlayerHandler(
+        gameRowDetailed,
+        playerRow,
+        resultHandObject.player,
+        resultHandObject.collection,
+        callback_game_id,
+    );
+
+    result.status_game_uno = resultChallengePlayerHandlerObject.status_game_uno;
+    result.message = resultChallengePlayerHandlerObject.message;
+
+    return result;
+}
+
+gameUnoLogic.challengePlayer = challengePlayer;
 module.exports = gameUnoLogic;
 
 // TODO REASSIGN player_index WHEN A PLAYER IS OUT. BASCIALLY WHEN THEY CALLED UNO AND THEY ARE NOT A PLAYER IN THE ACTUAL PLAYING OF THE GAME
