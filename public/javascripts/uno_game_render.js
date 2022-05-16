@@ -860,10 +860,14 @@ const endGameDisplayer = (object) => {
                 ">The Winner is <span class="font-bold">${object.player.display_name}</span>!!!</h2>
             </div>`;
         endGameFlashMessage.style.visibility = "visible";
+        setTimeout(() => {
+            window.location.pathname = object.url;
+        }, 3000);
+    } else {
+        setTimeout(() => {
+            window.location.pathname = object.url;
+        }, 500);
     }
-    setTimeout(() => {
-        window.location.pathname = object.url;
-    }, 3000);
 };
 
 async function setup() {
