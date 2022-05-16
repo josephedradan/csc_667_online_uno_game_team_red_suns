@@ -970,6 +970,8 @@ async function moveCardDrawTopToHandFullByGameIDAndPlayerRow(game_id, playerRowD
 
     result.collection = collectionRowHand;
 
+    await gameUnoLogicHelper.updateGameDataByGameRow(gameRowDetailed, null);
+
     result.status_game_uno = constants.SUCCESS;
     result.message = `A card from DRAW's collection moved to player ${playerRowDetailed.display_name} (player_id ${playerRowDetailed.player_id})'s collection's top for Game ${game_id}`;
 
@@ -1348,7 +1350,7 @@ async function challengePlayer(game_id, playerRow, callback_game_id) {
     );
 
     // Update gameData
-    await gameUnoLogicHelper.updateGameDataByGameRow(gameRowDetailed);
+    await gameUnoLogicHelper.updateGameDataByGameRow(gameRowDetailed, null);
 
     result.status_game_uno = resultChallengePlayerHandlerObject.status_game_uno;
     result.message = resultChallengePlayerHandlerObject.message;
@@ -1401,7 +1403,7 @@ async function callUnoLogic(user_id, game_id, callback_game_id, callback_game_id
         return result;
     }
 
-    // finding players who are marked with unoChecked = true;
+    // Finding players who are marked with unoChecked = true; // FIXME: THIS IS NOT ACTIVE PLAYERS, CHANGE IT TO ACTIVE PLAYERS WHEN THE CODE SUPPORTS IT
     for (let i = 0; i < playerRowsInGame.length; i++) {
         const currentPlayerHand = await dbEngineGameUno.getCollectionRowsDetailedByPlayerID(playerRowsInGame[i].player_id);
         if (!currentPlayerHand) {
@@ -1410,6 +1412,7 @@ async function callUnoLogic(user_id, game_id, callback_game_id, callback_game_id
             return result;
         }
         if (playerRowsInGame[i].uno_check === false && currentPlayerHand.length === 1) {
+            // eslint-disable-next-line no-await-in-loop
             await moveCardDrawTopToHandHelper(gameRowDetailed, playerRowsInGame[i], 2, callback_game_id, callback_game_id_message);
         }
     }

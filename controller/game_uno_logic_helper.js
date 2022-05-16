@@ -246,7 +246,7 @@ async function updateGameDataByGameRow(gameRowDetailed, color) {
     // TODO: CHECK AND GUARD THE BELOW
 
     // Assume that the db queries will be successful since the player does not have a input
-    if (temp.content === constantsGameUno.CARD_CONTENT_WILDFOUR) {
+    if (temp.content === constantsGameUno.CARD_CONTENT_WILDFOUR && gameRowDetailed.draw_amount > 1) {
         await dbEngineGameUno.updateGameDataRowIsChallengeAvailable(gameDataRow.game_id, true);
     } else {
         // Automatically set is_challenge_available back to false
