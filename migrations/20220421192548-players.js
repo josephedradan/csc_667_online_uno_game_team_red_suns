@@ -52,6 +52,13 @@ module.exports = {
                 allowNull: true,
                 unique: false, // False because this table holds all the player indices
             },
+
+            uno_check: {
+                type: Sequelize.DataTypes.BOOLEAN,
+                defaultValue: false,
+                unique: false,
+            },
+
         });
     },
 

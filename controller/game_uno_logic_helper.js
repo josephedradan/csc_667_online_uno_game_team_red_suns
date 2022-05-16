@@ -31,7 +31,7 @@ async function getUserIDAndPlayerIDPreviousByGameRow(gameRowDetailed) {
     };
 
     // May be empty
-    let playerRowsActive = await dbEngineGameUno.getPlayerRowsInGame(gameRowDetailed.game_id);
+    let playerRowsActive = await dbEngineGameUno.getPlayerRowsSimpleInGame(gameRowDetailed.game_id);
 
     if (!playerRowsActive.length) {
         result.status_game_uno = constants.FAILURE;
@@ -86,7 +86,7 @@ async function changeTurnByGameRow(gameRowDetailed) {
     };
 
     // May be empty
-    let playerRowsActive = await dbEngineGameUno.getPlayerRowsInGame(gameRowDetailed.game_id);
+    let playerRowsActive = await dbEngineGameUno.getPlayerRowsSimpleInGame(gameRowDetailed.game_id);
 
     if (!playerRowsActive.length) {
         result.status_game_uno = constants.FAILURE;
