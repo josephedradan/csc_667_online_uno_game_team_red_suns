@@ -881,7 +881,8 @@ async function getGameRowDetailedByGameID(game_id) {
             "GameData".card_color_legal,
             "GameData".skip_amount,
             "GameData".draw_amount,
-            "GameData".uno_available
+            "GameData".is_uno_available,
+            "GameData".is_challenge_available
         FROM "Game"
         JOIN "GameData" ON "Game".game_id = "GameData".game_id
         WHERE "Game".game_id = $1
@@ -1709,8 +1710,8 @@ async function updateGameDataRowIsClockwise(game_id, boolean) {
 
 dbEngineGameUno.updateGameDataRowIsClockwise = updateGameDataRowIsClockwise;
 
-async function updateGameDataPlayerIDTurn(game_id, player_id) {
-    debugPrinter.printFunction(updateGameDataPlayerIDTurn.name);
+async function updateGameDataRowPlayerIDTurn(game_id, player_id) {
+    debugPrinter.printFunction(updateGameDataRowPlayerIDTurn.name);
 
     const result = await db.any(
         `
@@ -1729,7 +1730,7 @@ async function updateGameDataPlayerIDTurn(game_id, player_id) {
     return result[0];
 }
 
-dbEngineGameUno.updateGameDatRowPlayerIDTurn = updateGameDataPlayerIDTurn;
+dbEngineGameUno.updateGameDataRowPlayerIDTurn = updateGameDataRowPlayerIDTurn;
 
 async function updateGameDataRowCardLegal(game_id, card_type_legal, card_content_legal, card_color_legal) {
     debugPrinter.printFunction(updateGameDataRowCardLegal.name);
@@ -1800,5 +1801,49 @@ async function updateGameDataRowDrawAmount(game_id, drawAmount) {
 }
 
 dbEngineGameUno.updateGameDataRowDrawAmount = updateGameDataRowDrawAmount;
+
+async function updateGameDataRowIsUnoAvailable(game_id, boolean) {
+    debugPrinter.printFunction(updateGameDataRowIsUnoAvailable.name);
+
+    const result = await db.any(
+        `
+        UPDATE "GameData"
+        SET 
+            is_uno_available = $2
+        WHERE "GameData".game_id = $1
+        RETURNING *;
+        `,
+        [
+            game_id,
+            boolean,
+        ],
+    );
+
+    return result[0];
+}
+
+dbEngineGameUno.updateGameDataRowIsUnoAvailable = updateGameDataRowIsUnoAvailable;
+
+async function updateGameDataRowIsChallengeAvailable(game_id, boolean) {
+    debugPrinter.printFunction(updateGameDataRowIsChallengeAvailable.name);
+
+    const result = await db.any(
+        `
+        UPDATE "GameData"
+        SET 
+            is_challenge_available = $2
+        WHERE "GameData".game_id = $1
+        RETURNING *;
+        `,
+        [
+            game_id,
+            boolean,
+        ],
+    );
+
+    return result[0];
+}
+
+dbEngineGameUno.updateGameDataRowIsChallengeAvailable = updateGameDataRowIsChallengeAvailable;
 
 module.exports = dbEngineGameUno;
