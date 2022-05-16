@@ -98,8 +98,8 @@ async function initialSocketJoin(socket) {
                 socket.request.game_id = game_id_client;
 
                 const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(
-                    socket.request.game_id,
                     socket.request.user.user_id,
+                    socket.request.game_id,
                 );
 
                 // If Player Row exists
@@ -110,7 +110,7 @@ async function initialSocketJoin(socket) {
                     // eslint-disable-next-line no-param-reassign
                     socket.request.player_id = playerRow.player_id;
 
-                    const user_recent = await dbEngineGameUno.getUserByPlayerID(playerRow.player_id);
+                    const user_recent = await dbEngineGameUno.getUserRowByPlayerID(playerRow.player_id);
 
                     await Promise.all(
                         [
@@ -134,7 +134,7 @@ async function initialSocketJoin(socket) {
             // If socket has the game_id and socket has the player_id
             if (socket.request.game_id && socket.request.player_id) {
                 // get user
-                const user_recent = await dbEngineGameUno.getUserByPlayerID(socket.request.player_id);
+                const user_recent = await dbEngineGameUno.getUserRowByPlayerID(socket.request.player_id);
 
                 // get game
                 const game_current = await dbEngineGameUno.getGameRowDetailedByGameID(socket.request.game_id);
@@ -152,7 +152,10 @@ async function initialSocketJoin(socket) {
                         );
                     } else {
                         // Make the player leave the game
-                        await intermediateGameUno.leaveGameWrapped(socket.request.game_id, socket.request.user.user_id);
+                        await intermediateGameUno.leaveGameWrapped(
+                            socket.request.user.user_id,
+                            socket.request.game_id,
+                        );
 
                         emitInRoomServerMessage = intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_MessageServer_Wrapped(
                             socket.request.game_id,
