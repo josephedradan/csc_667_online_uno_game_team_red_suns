@@ -486,7 +486,7 @@ async function reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayI
     // FIXME: VERY DANGEROUS LOOP
     while (!gameDataResult || gameDataResult.status_game_uno === constants.FAILURE) {
         // eslint-disable-next-line no-await-in-loop
-        gameDataResult = await gameUnoLogicHelper.updateGameDataByGameRow(gameRow, null);
+        gameDataResult = await gameUnoLogicHelper.updateGameDataFull(gameRow.game_id, null);
 
         // eslint-disable-next-line no-await-in-loop
         drawCount = await dbEngineGameUno.getCollectionCountByGameIDAndCollectionInfoID(gameRow.game_id, 1);
@@ -983,7 +983,11 @@ async function moveCardDrawTopToHandFullByGameIDAndPlayerRow(game_id, playerRowD
 
     result.collection = collectionRowHand;
 
-    await gameUnoLogicHelper.updateGameData(gameRowDetailed.game_id, null);
+    // debugPrinter.printError("JOSEPH LOOK 1")
+    // debugPrinter.printDebug(gameRowDetailed)
+
+    // FIXME: DO NOT CALL THIS WHAT SO EVER
+    // await gameUnoLogicHelper.updateGameDataFull(gameRowDetailed.game_id, null); // DO NOT CALL THIS
 
     result.status_game_uno = constants.SUCCESS;
     result.message = `A card from DRAW's collection moved to player ${playerRowDetailed.display_name} (player_id ${playerRowDetailed.player_id})'s collection's top for Game ${game_id}`;
@@ -1364,7 +1368,7 @@ async function challengePlayer(game_id, playerRow, callback_game_id) {
 
     // Update gameData
     // await gameUnoLogicHelper.updateGameDataByGameRow(gameRowDetailed, null);
-    await gameUnoLogicHelper.updateGameData(gameRowDetailed.game_id, null);
+    await gameUnoLogicHelper.updateGameDataFull(gameRowDetailed.game_id, null);
 
     result.status_game_uno = resultChallengePlayerHandlerObject.status_game_uno;
     result.message = resultChallengePlayerHandlerObject.message;
@@ -1449,7 +1453,7 @@ async function callUnoLogic(user_id, game_id, callback_game_id, callback_game_id
 
     // Update gameData
     // await gameUnoLogicHelper.updateGameDataByGameRow(gameRowDetailed, null);
-    await gameUnoLogicHelper.updateGameData(gameRowDetailed.game_id, null);
+    await gameUnoLogicHelper.updateGameDataFull(gameRowDetailed.game_id, null);
 
     result.status_game_uno = constants.SUCCESS;
     result.message = `uno_check successfully flagged for player_id: ${playerRowDetailedCaller.player_id} in game ${game_id}`;

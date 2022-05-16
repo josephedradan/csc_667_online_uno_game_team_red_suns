@@ -187,9 +187,8 @@ gameUnoLogicHelper.changeTurnByGameID = changeTurnByGameID;
  * @param color
  * @returns {Promise<{game, message: null, status: null}>}
  */
-async function updateGameDataByGameRow(gameRowDetailed, color) {
-    debugPrinter.printFunction(updateGameDataByGameRow.name);
-    debugPrinter.printBackendCyan(gameRowDetailed);
+async function updateGameDataFullByGameRow(gameRowDetailed, color) {
+    debugPrinter.printFunction(updateGameDataFullByGameRow.name);
 
     const result = {
         status_game_uno: null,
@@ -233,7 +232,6 @@ async function updateGameDataByGameRow(gameRowDetailed, color) {
         result.message = `Top Card of PLAY's collection is black for game ${gameRowDetailed.game_id}. No color is selected, suggest a reshuffle`;
         return result;
     }
-
     // Get GameData (May be undefined)
     const gameDataRow = await dbEngineGameUno.updateGameDataRowCardLegal(gameRowDetailed.game_id, temp.type, temp.content, temp.color);
 
@@ -256,7 +254,7 @@ async function updateGameDataByGameRow(gameRowDetailed, color) {
     // Assume that the db queries will be successful since the player does not have a input
     if (temp.content === constantsGameUno.CARD_CONTENT_WILDFOUR) {
         if (gameRowDetailed.draw_amount > 1) {
-            await dbEngineGameUno.updateGameDataRowDrawAmount( // FIXME SOMETHING AOBUT +4
+            await dbEngineGameUno.updateGameDataRowDrawAmount(
                 gameRowDetailed.game_id,
                 gameRowDetailed.draw_amount + 4,
             );
@@ -267,12 +265,17 @@ async function updateGameDataByGameRow(gameRowDetailed, color) {
             );
         }
     } else if (temp.content === constantsGameUno.CARD_CONTENT_DRAWTWO) {
-        await dbEngineGameUno.updateGameDataRowDrawAmount(
-            gameRowDetailed.game_id,
-            gameRowDetailed.draw_amount > 1
-                ? gameRowDetailed.draw_amount + 2
-                : 2,
-        );
+        if (gameRowDetailed.draw_amount > 1) {
+            await dbEngineGameUno.updateGameDataRowDrawAmount(
+                gameRowDetailed.game_id,
+                gameRowDetailed.draw_amount + 2,
+            );
+        } else {
+            await dbEngineGameUno.updateGameDataRowDrawAmount(
+                gameRowDetailed.game_id,
+                2,
+            );
+        }
     } else if (temp.content === constantsGameUno.CARD_CONTENT_REVERSE) {
         await dbEngineGameUno.updateGameDataRowIsClockwise(
             gameRowDetailed.game_id,
@@ -285,6 +288,8 @@ async function updateGameDataByGameRow(gameRowDetailed, color) {
         );
     }
 
+    debugPrinter.printError("JOSEPH LOOK 3")
+    debugPrinter.printError(gameRowDetailed)
     /* ----- Check for Uno and check to see if the game can end ----- */
 
     let player_id_winner = null;
@@ -359,17 +364,19 @@ async function updateGameDataByGameRow(gameRowDetailed, color) {
     return result;
 }
 
-gameUnoLogicHelper.updateGameDataByGameRow = updateGameDataByGameRow;
+gameUnoLogicHelper.updateGameDataFullByGameRow = updateGameDataFullByGameRow;
 
-async function updateGameData(game_id, color) {
-    debugPrinter.printFunction(updateGameData.name);
+async function updateGameDataFull(game_id, color) {
+    debugPrinter.printFunction(updateGameDataFull.name);
 
+    debugPrinter.printError("JOSEPH LOOK 2")
     const gameRowDetailed = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
+    debugPrinter.printError(gameRowDetailed)
 
-    return updateGameDataByGameRow(gameRowDetailed, color);
+    return updateGameDataFullByGameRow(gameRowDetailed, color);
 }
 
-gameUnoLogicHelper.updateGameData = updateGameData;
+gameUnoLogicHelper.updateGameDataFull = updateGameDataFull;
 
 /**
  * Notes:
@@ -440,6 +447,8 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(
         return result;
     }
 
+    debugPrinter.printError('YO YO YO');
+    debugPrinter.printError(gameRowDetailed);
     // If the game's card_content_legal (top card) is a Draw +2
     if ((gameRowDetailed.card_content_legal === constantsGameUno.CARD_CONTENT_DRAWTWO)
         && (gameRowDetailed.card_content_legal !== collectionRowHandByCollectionIndex.content)
@@ -466,7 +475,7 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(
     }
     result.collection = collectionRowsNew;
 
-    const gameData = await gameUnoLogicHelper.updateGameDataByGameRow(
+    const gameData = await gameUnoLogicHelper.updateGameDataFullByGameRow(
         gameRowDetailed,
         color,
     );
