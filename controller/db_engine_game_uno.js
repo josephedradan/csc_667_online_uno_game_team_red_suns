@@ -1167,7 +1167,8 @@ async function getPlayerRowDetailedByGameIDAndUserID(user_id, game_id) {
             "Players".game_id,
             "User".display_name,
             "UserStatistic".num_wins,
-            "UserStatistic".num_loss
+            "UserStatistic".num_loss,
+            "Players".in_game
         FROM "Player"
         JOIN "Players" ON "Player".player_id = "Players".player_id
         JOIN "Game" ON "Players".game_id = "Game".game_id
