@@ -1044,8 +1044,7 @@ async function moveCardHandToPlayByCollectionIndex(user_id, game_id, collection_
 
     result.status_game_uno = constants.SUCCESS;
 
-    result.message = `Card (collection_index ${collection_index}) from player ${playerRow.display_name} \
-    (player_id ${playerRow.player_id})'s collection moved to PLAY's collection's top for Game ${game_id}`;
+    result.message = `Card (collection_index ${collection_index}) from player ${playerRow.display_name} (player_id ${playerRow.player_id})'s collection moved to PLAY's collection's top for Game ${game_id}`;
 
     return result;
 }
