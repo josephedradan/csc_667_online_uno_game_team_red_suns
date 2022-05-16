@@ -1216,21 +1216,29 @@ async function getGameStateByGameIDAndUserIDAndAttachWinnerToResult(player_id, g
         //check the hand
         // if a single player's hand is of length zero
         //      we set all players in the lobby to inActive, signifying end of the game.
+        let updateResult; 
         if(playerCollectionHand.length === 0) {
-            await dbEngineGameUno.updatePlayersRowsInGameRows(game_id, false);
+            updateResult = await dbEngineGameUno.updatePlayersRowsInGameRows(game_id, false);
+        }
+
+        if(!updateResult) {
+            result.status_game_uno = constants.FAILURE;
+            result.message = `Could not set all player's inactive when someone 'wins' for player_id: ${player_id} in game: ${game_id}`;
+            return result;
         }
     }
 
     const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
-
     if(!gameRow) {
         result.status_game_uno = constants.FAILURE;
         result.message = `Could not retrieve the game_state for game: ${game_id}`;
         return result;
     }
 
-    //result.game = gameRow; 
-    //result.player = playerRow;
+    result.status_game_uno = constants.SUCCESS;
+    result.message = `Successfully made all players in game: ${game_id} inactive, congratulations player ${player_id}, you've won.`
+    result.game = gameRow; 
+    result.player = playerRow;
 
 
     return result;
