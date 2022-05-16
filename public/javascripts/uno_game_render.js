@@ -332,7 +332,7 @@ class TurnController {
             if (newParent == this.handContainer) {
                 this.drawContainer.appendChild(drawCard);
 
-                console.log("Drawing a card!!!");
+                console.log('Drawing a card!!!');
                 const result = await axios.get(`/game/${getGameId()}/drawCard`);
 
                 console.log(result);
@@ -341,7 +341,7 @@ class TurnController {
             }
         });
         this.drawCard.toggleAttribute('disabled', true);
-        //this.draggables.push(draggable);
+        // this.draggables.push(draggable);
         // another hacky way to add/remove event listeners
         // this.handleBlackCardAction = this.#handleBlackCardAction.bind(this);
         // this.removeBlackCardEvent = this.#removeBlackCardEvent.bind(this);
@@ -432,8 +432,8 @@ class TurnController {
             applyBounceAnimation(card, game_state.game, cardData);
         });
 
-        //const drawCard = document.getElementById('drawCard');
-        //const drawParent = drawCard.parentElement;
+        // const drawCard = document.getElementById('drawCard');
+        // const drawParent = drawCard.parentElement;
         /*
         const draggable = new Draggable(
             drawCard,
@@ -710,11 +710,11 @@ const gameStateProcessor = new EventProcessor(
             // console.log(game_state.game.player_id_turn);
 
             const findPlayer = game_state.players.find((player) => {
-                console.log(player + " " + player.player_id + " " + game_state.game.player_id_turn);
+                console.log(`${player} ${player.player_id} ${game_state.game.player_id_turn}`);
                 return player.player_id === game_state.game.player_id_turn;
             });
 
-            console.log("Found player: " + findPlayer);
+            console.log(`Found player: ${findPlayer}`);
 
             if (findPlayer !== undefined) {
                 display_current_player(findPlayer.display_name);

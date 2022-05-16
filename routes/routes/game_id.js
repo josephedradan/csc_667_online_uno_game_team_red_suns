@@ -57,7 +57,7 @@ routerGameID.post(
 routerGameID.post(
     '/startGame',
     middlewareGameUnoGameGameID.checkIfPlayerIDIsHost,
-    middlewareUnoGameSettings.checkIfPlayersMinIsReached,
+    // middlewareUnoGameSettings.checkIfPlayersMinIsReached,
     controllerGameID.POSTStartGame,
 );
 
@@ -85,9 +85,9 @@ routerGameID.get(
 );
 
 routerGameID.post(
-    '/uno', 
+    '/uno',
     controllerGameID.POSTUno,
-)
+);
 
 routerGameID.post(
     '/challenge',
