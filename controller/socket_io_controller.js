@@ -152,7 +152,7 @@ async function initialSocketJoin(socket) {
                         );
                     } else {
                         // Make the player leave the game
-                        await intermediateGameUno.leaveGameWrapped(socket.request.game_id, socket.request.user.user_id);
+                        await intermediateGameUno.leaveGameWrapped(socket.request.user.user_id, socket.request.game_id);
 
                         emitInRoomServerMessage = intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_MessageServer_Wrapped(
                             socket.request.game_id,

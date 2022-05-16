@@ -71,7 +71,7 @@ controllerGameID.GETDrawCard = GETDrawCard;
 async function POSTStartGame(req, res, next) {
     debugPrinter.printMiddleware(POSTStartGame.name);
 
-    const result = await intermediateGameUno.startGameWrapped(req.game.game_id, req.user.user_id);
+    const result = await intermediateGameUno.startGameWrapped(req.user.user_id, req.game.game_id);
 
     // debugPrinter.printBackendWhite(result);
 
@@ -83,7 +83,7 @@ controllerGameID.POSTStartGame = POSTStartGame;
 async function POSTLeaveGame(req, res, next) {
     debugPrinter.printMiddleware(POSTLeaveGame.name);
 
-    const result = await intermediateGameUno.leaveGameWrapped(req.game.game_id, req.user.user_id);
+    const result = await intermediateGameUno.leaveGameWrapped(req.user.user_id, req.game.game_id);
 
     // debugPrinter.printBackendWhite(result);
 
@@ -98,7 +98,7 @@ async function POSTTransferHost(req, res, next) { // TODO THIS
     // Give user_id to transfer host
     const { user_id } = req.body;
 
-    const result = await intermediateGameUno.setGamePlayerIDHostWrapped(req.game.game_id, user_id);
+    const result = await intermediateGameUno.setGamePlayerIDHostWrapped(user_id, req.game.game_id);
 
     debugPrinter.printDebug(result);
 
@@ -156,7 +156,7 @@ controllerGameID.POSTSendMessage = POSTSendMessage;
 async function GETGetHand(req, res, next) {
     debugPrinter.printMiddleware(GETGetHand.name);
 
-    const result = await gameUno.getHand(req.game.game_id, req.user.user_id);
+    const result = await gameUno.getHand(req.user.user_id, req.game.game_id);
 
     debugPrinter.printBackendWhite(result);
 
@@ -180,7 +180,7 @@ controllerGameID.GETGetGameAndTheirPlayers = GETGetGameAndTheirPlayers;
 async function GETGetPlayer(req, res, next) {
     debugPrinter.printMiddleware(GETGetPlayer.name);
 
-    const result = await gameUno.getPlayerDetailedByGameIDAndUserID(req.game.game_id, req.user.user_id);
+    const result = await gameUno.getPlayerDetailedByGameIDAndUserID(req.user.user_id, req.game.game_id);
 
     // debugPrinter.printBackendWhite(result);
 

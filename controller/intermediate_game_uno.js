@@ -64,7 +64,7 @@ Return format
     player
 {
  */
-async function joinGameIfPossibleWrapped(user_id,game_id ) {
+async function joinGameIfPossibleWrapped(user_id, game_id) {
     debugPrinter.printFunction(joinGameIfPossibleWrapped.name);
 
     const result = await gameUno.joinGameIfPossible(user_id, game_id);
@@ -89,10 +89,10 @@ Return format
     game
 {
  */
-async function leaveGameWrapped(game_id, user_id) {
+async function leaveGameWrapped(user_id, game_id) {
     debugPrinter.printFunction(leaveGameWrapped.name);
 
-    const result = await gameUno.leaveGame(game_id, user_id);
+    const result = await gameUno.leaveGame(user_id, game_id);
 
     const arrayPromises = [intermediateSocketIOGameUno.emitInRoom_ServerIndex_Games()];
 
@@ -178,10 +178,10 @@ async function moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow)
 
 intermediateGameUno.moveCardDrawToHandByGameIDAndPlayerRowWrapped = moveCardDrawToHandByGameIDAndPlayerRowWrapped;
 
-async function playCardHandToPlayDeckWrapped(game_id, user_id, collection_index, color) {
+async function playCardHandToPlayDeckWrapped(user_id, game_id, collection_index, color) {
     debugPrinter.printFunction(playCardHandToPlayDeckWrapped.name);
 
-    const result = await gameUno.moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_index, color);
+    const result = await gameUno.moveCardHandToPlayByCollectionIndex(user_id, game_id, collection_index, color);
 
     if (result.status_game_uno === constants.FAILURE) {
         debugPrinter.printError(result);
@@ -202,13 +202,13 @@ Return format
     game
 }
  */
-async function startGameWrapped(game_id, user_id) {
+async function startGameWrapped(user_id, game_id) {
     debugPrinter.printFunction(startGameWrapped.name);
 
     // WARNING: DO NOT RETURN THE RESULT OF THIS FUNCTION TO USERS BECAUSE IT RETURNS EVERYTHING ABOUT THE CARDS
     const result = await gameUno.startGame(
-        game_id,
         user_id,
+        game_id,
         1,
         7,
         intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState,
@@ -225,10 +225,10 @@ async function startGameWrapped(game_id, user_id) {
 
 intermediateGameUno.startGameWrapped = startGameWrapped;
 
-async function setGamePlayerIDHostWrapped(game_id, user_id) {
+async function setGamePlayerIDHostWrapped(user_id, game_id) {
     debugPrinter.printFunction(setGamePlayerIDHostWrapped.name);
 
-    const result = await gameUno.setGamePlayerIDHost(game_id, user_id);
+    const result = await gameUno.setGamePlayerIDHost(user_id, game_id);
 
     if (result.status_game_uno === constants.FAILURE) {
         return result;
@@ -244,10 +244,10 @@ async function setGamePlayerIDHostWrapped(game_id, user_id) {
 intermediateGameUno.setGamePlayerIDHostWrapped = setGamePlayerIDHostWrapped;
 
 // TODO: DON'T USE THE BELOW FUNCTION BECAUSE IT IS NOT NECESSARY
-// async function setGamePlayerIDTurnWrapped(game_id, user_id) {
+// async function setGamePlayerIDTurnWrapped(user_id, game_id) {
 //     debugPrinter.printFunction(setGamePlayerIDTurnWrapped.name);
 //
-//     const result = await gameUno.setGamePlayerIDTurn(game_id, user_id);
+//     const result = await gameUno.setGamePlayerIDTurn(user_id, game_id);
 //
 //     if (result.status_game_uno === constants.FAILURE) {
 //         return result;

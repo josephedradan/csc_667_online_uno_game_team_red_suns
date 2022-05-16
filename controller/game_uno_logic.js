@@ -169,7 +169,7 @@ Return format
  * @param user_id
  * @returns {Promise<*>}
  */
-async function joinGameIfPossible(game_id, user_id) {
+async function joinGameIfPossible(user_id, game_id) {
     debugPrinter.printFunction(joinGameIfPossible.name);
 
     // debugPrinter.printDebug(`game_id: ${game_id} user_id: ${user_id}`);
@@ -250,7 +250,7 @@ Return format
  * @param user_id
  * @returns {Promise<*>}
  */
-async function leaveGame(game_id, user_id) {
+async function leaveGame(user_id, game_id) {
     debugPrinter.printFunction(leaveGame.name);
 
     const result = {
@@ -544,7 +544,7 @@ gameUnoLogic.reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsI
  * @param callback_game_id
  * @returns {Promise<null|{game: null, message: null, status: null}>}
  */
-async function startGame(game_id, user_id, deckMultiplier, drawAmountPerPlayer, callback_game_id) {
+async function startGame(user_id, game_id, deckMultiplier, drawAmountPerPlayer, callback_game_id) {
     debugPrinter.printFunction(startGame.name);
 
     // TODO: Assign player_index to players so you know the turn order. Maybe do this because we can use the player_id instead
@@ -934,7 +934,7 @@ gameUnoLogic.moveCardDrawToHandTopByGameIDAndPlayerRow = moveCardDrawToHandTopBy
     collection,
 }
  */
-async function moveCardDrawToHandTopByGameIdAndUseID(game_id, user_id) {
+async function moveCardDrawToHandTopByGameIdAndUseID(user_id, game_id) {
     debugPrinter.printFunction(moveCardDrawToHandTopByGameIdAndUseID.name);
 
     // Get player given game_id and user_id (May be undefined)
@@ -990,7 +990,7 @@ gameUnoLogic.moveCardDrawToPlay = moveCardDrawToPlay;
  * @param playObject
  * @returns {Promise<{player_current_turn_new: null, game: null, collection: null, message: null, status: null, player: null}>}
  */
-async function moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_index, color) {
+async function moveCardHandToPlayByCollectionIndex(user_id, game_id, collection_index, color) {
     debugPrinter.printFunction(moveCardHandToPlayByCollectionIndex.name);
 
     const result = {
@@ -1035,7 +1035,7 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_
     const gameLogic = await gameUnoLogicHelper.doMoveCardHandToPlayByCollectionIndexLogic(gameRow, playerRow, collection_index, color);
 
     if (gameLogic.status_game_uno === constants.FAILURE) {
-        result.status_game_uno = gameLogic.status;
+        result.status_game_uno = gameLogic.status_game_uno;
         result.message = gameLogic.message;
         return result;
     }
@@ -1052,7 +1052,7 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_
 
 gameUnoLogic.moveCardHandToPlayByCollectionIndex = moveCardHandToPlayByCollectionIndex;
 
-async function getHand(game_id, user_id) {
+async function getHand(user_id, game_id) {
     debugPrinter.printFunction(getHand.name);
 
     const result = {
@@ -1104,7 +1104,7 @@ async function getHand(game_id, user_id) {
 
 gameUnoLogic.getHand = getHand;
 
-async function getPlayerDetailedByGameIDAndUserID(game_id, user_id) {
+async function getPlayerDetailedByGameIDAndUserID(user_id, game_id) {
     debugPrinter.printFunction(getPlayerDetailedByGameIDAndUserID.name);
 
     const result = {
@@ -1144,7 +1144,7 @@ async function getPlayerDetailedByGameIDAndUserID(game_id, user_id) {
 
 gameUnoLogic.getPlayerDetailedByGameIDAndUserID = getPlayerDetailedByGameIDAndUserID;
 
-async function setGamePlayerIDHost(game_id, user_id) {
+async function setGamePlayerIDHost(user_id, game_id) {
     debugPrinter.printFunction(setGamePlayerIDHost.name);
 
     const result = {

@@ -98,7 +98,7 @@ middlewareGameUnoGameGameID.checkIfAllowedToUseAPI = checkIfAllowedToUseAPI;
 async function checkIfInGameOrJoinGameIfPossibleNoPlayerInReqAndGuard(req, res, next) {
     debugPrinter.printMiddleware(checkIfInGameOrJoinGameIfPossibleNoPlayerInReqAndGuard.name);
 
-    const resultPlayerObject = await gameUno.getPlayerDetailedByGameIDAndUserID(req.game.game_id, req.user.user_id);
+    const resultPlayerObject = await gameUno.getPlayerDetailedByGameIDAndUserID(req.user.user_id, req.game.game_id);
 
     // If the user is not a player in the game
     if (resultPlayerObject.status_game_uno === constants.FAILURE) {
