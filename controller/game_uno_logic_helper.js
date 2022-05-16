@@ -423,7 +423,7 @@ async function isWildFourPlayLegal(gameRowDetailed, collectionRowsChallenged) {
             return false;
         }
     }
-
+    debugPrinter.printGreen("FUCK YOU DUDE")
     return true;
 }
 

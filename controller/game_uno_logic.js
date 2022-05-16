@@ -1196,11 +1196,12 @@ async function challengePlayerHandler(gameRowDetailed, playerRowChallenger, play
         boolean: null,
     };
 
-    const isPlayLegal = gameUnoLogicHelper.isWildFourPlayLegal(gameRowDetailed, collectionRowsChallenged);
+    const isWildFourLegal = gameUnoLogicHelper.isWildFourPlayLegal(gameRowDetailed, collectionRowsChallenged);
 
-    result.boolean = isPlayLegal;
+    result.boolean = isWildFourLegal;
 
-    if (isPlayLegal) {
+    // If Wild +4 is legal
+    if (isWildFourLegal) {
         // eslint-disable-next-line no-plusplus
         for (let i = 0; i < 2; i++) {
             // eslint-disable-next-line no-await-in-loop,no-use-before-define
@@ -1214,9 +1215,12 @@ async function challengePlayerHandler(gameRowDetailed, playerRowChallenger, play
         }
 
         result.message = `Player ${playerRowChallenger.display_name} (player_id ${playerRowChallenger.player_id})'s challenge against Player ${playerRowChallenged.display_name} (player_id ${playerRowChallenged.player_id}) failed`;
+
+
+
     } else {
         // eslint-disable-next-line no-plusplus
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 6; i++) {
             // eslint-disable-next-line no-await-in-loop,no-use-before-define
             await moveCardDrawToHandTopByGameIDAndPlayerRow(gameRowDetailed.game_id, playerRowChallenged, callback_game_id); // TODO GUARDS
 
