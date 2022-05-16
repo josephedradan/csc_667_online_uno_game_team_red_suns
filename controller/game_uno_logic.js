@@ -15,6 +15,7 @@ const constants = require('../config/constants');
 const constantsGameUno = require('../config/constants_game_uno');
 
 const debugPrinter = require('../util/debug_printer');
+const { result } = require('../db');
 
 const gameUnoLogic = {};
 
@@ -1187,6 +1188,50 @@ async function setGamePlayerIDHost(user_id, game_id) {
 
 gameUnoLogic.setGamePlayerIDHost = setGamePlayerIDHost;
 
+async function getGameStateByGameIDAndUserIDAndAttachWinnerToResult(user_id, game_id) {
+    debugPrinter.printFunction(getGameStateByGameIDAndUserIDAndAttachWinnerToResult.name);
+    const result = {
+        status_game_uno: null,
+        message: null,
+        game: null,
+        player: null,
+        single_card_holders: []
+    }
+
+    const playerHand = await dbEngineGameUno.getCollectionRowsDetailedByPlayerID(user_id); 
+
+    if(!playerHand) {
+        result.status_game_uno = constants.FAILURE;
+        result.message = `Player's hand could not be retrieved for player_id: ${user_id}, in game: ${game_id}`;
+        return result;
+    }
+
+    const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
+
+    if(!gameRow) {
+        result.status_game_uno = constants.FAILURE;
+        result.message = `Could not retrieve the game_state for game: ${game_id}`;
+        return result;
+    }
+    
+    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
+    if(!playerRow) {
+        result.status_game_uno = constants.FAILURE;
+        result.message = `Could not retrieve the player information for player_id: ${user_id} for game: ${game_id}`;
+        return result;
+    }
+
+    if(playerHand.length === 1) {
+        result.single_card_holders.push(user_id)
+    }
+    result.game = gameRow; 
+    result.player = playerRow;
+
+
+    return result;
+}
+
+gameUnoLogic.getGameStateByGameIDAndUserIDAndAttachWinnerToResult = getGameStateByGameIDAndUserIDAndAttachWinnerToResult;
 
 module.exports = gameUnoLogic;
 

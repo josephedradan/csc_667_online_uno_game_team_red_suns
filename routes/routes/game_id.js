@@ -82,4 +82,9 @@ routerGameID.get(
     controllerGameID.GETDrawCard, // TODO
 );
 
+routerGameID.post(
+    '/uno', 
+    controllerGameID.POSTUno,
+)
+
 module.exports = routerGameID;
