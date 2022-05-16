@@ -513,10 +513,7 @@ async function isWildFourPlayLegal(gameRowDetailed, collectionRowsChallenged) {
     }
     // eslint-disable-next-line no-restricted-syntax
     for (const collectionRow of collectionRowsChallenged) {
-        debugPrinter.printBackendWhite(`${collectionRow.color} ${collectionRowPrevious.color} FUCK YA`);
-
         if (collectionRow.color === collectionRowPrevious.color) {
-            debugPrinter.printGreen(`${collectionRow.color} ${collectionRowPrevious.color} FUCK YA`);
             return false;
         }
     }
