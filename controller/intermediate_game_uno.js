@@ -298,7 +298,7 @@ async function callUnoWrapped(user_id, game_id) {
         debugPrinter.printError(result);
     }
 
-    // await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
+    await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
 
     return result;
 }

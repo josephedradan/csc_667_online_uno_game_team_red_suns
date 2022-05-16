@@ -325,6 +325,7 @@ handlerSocketIOUseExpress.useExpressMiddleware(passport.session());
 
 // Setup more socket io middleware
 require('./socket_io');
+const dbEngineGameUno = require('../controller/db_engine_game_uno');
 
 /* ############################## Middleware Message (Custom middlewares) ############################## */
 
@@ -351,20 +352,29 @@ application.use((req, res, next) => {
 
 // error handler
 application.use((err, req, res, next) => {
+    // If the game throw a win
     if (err instanceof gameUnoSpecial.GameUnoWinner) {
-        debugPrinter.printGreen('WINNER FUCK YOU');
-
-        debugPrinter.printGreen(err);
-
+        debugPrinter.printGreen(`game_id: ${err.game.game_id} has a winner`);
         intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_MessageServer_Wrapped(err.game.game_id, err.message)
-            .then((x) => {})
+            .then((result) => {
+            })
             .catch((error) => {
                 debugPrinter.printError('Special Error');
                 debugPrinter.printError(error);
             });
 
         intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_Object(err.game.game_id, err.getJsonResponse())
-            .then((temp) => {})
+            .then((result) => {
+            })
+            .catch((error) => {
+                debugPrinter.printError('Special Error');
+                debugPrinter.printError(error);
+            });
+
+        // TODO GUARD
+        dbEngineGameUno.deleteGameRow(err.game.game_id)
+            .then((result) => {
+            })
             .catch((error) => {
                 debugPrinter.printError('Special Error');
                 debugPrinter.printError(error);

@@ -2,11 +2,10 @@ const constants = require('../config/constants');
 
 const gameUnoSpecial = {};
 
-class GameUnoWinner extends Error {
+class GameUnoWinner {
     constructor(message, gameRowDetailed, playerRowDetailedWinner) {
-        super(message);
         this.status = 200;
-        // this.message = message;
+        this.message = message;
         this.status_game_uno = constants.SUCCESS;
         this.game = gameRowDetailed;
         this.player = playerRowDetailedWinner;

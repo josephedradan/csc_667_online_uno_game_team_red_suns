@@ -905,7 +905,7 @@ async function moveCardDrawTopToHandFullByGameIDAndPlayerRow(game_id, playerRowD
         game: null,
         player: null,
         collection: null,
-        change_turn: null,
+        // change_turn: null, // May or may not exist
     };
 
     // May be undefined
@@ -958,6 +958,8 @@ async function moveCardDrawTopToHandFullByGameIDAndPlayerRow(game_id, playerRowD
             result.message = changeTurn.message;
             return result;
         }
+
+        result.change_turn = changeTurn;
 
         // Execute the callback if necessary
         if (callback_game_id) {
@@ -1082,9 +1084,7 @@ async function moveCardHandToPlayByCollectionIndex(user_id, game_id, collection_
     }
 
     // TODO STUFF BELOW
-    debugPrinter.printRed('FUCK 1');
     const gameLogic = await gameUnoLogicHelper.doMoveCardHandToPlayByCollectionIndexLogic(gameRowDetailed, playerRowDetailed, collection_index, color);
-    debugPrinter.printRed('FUCK 2');
 
     if (gameLogic.status_game_uno === constants.FAILURE) {
         result.status_game_uno = gameLogic.status_game_uno;
@@ -1415,7 +1415,7 @@ async function callUnoLogic(user_id, game_id, callback_game_id, callback_game_id
     }
 
     // Update gameData
-    await gameUnoLogicHelper.updateGameDataByGameRow(gameRowDetailed);
+    await gameUnoLogicHelper.updateGameDataByGameRow(gameRowDetailed, null);
     result.status_game_uno = constants.SUCCESS;
     result.message = `uno_check successfully flagged for player_id: ${playerRowDetailed.player_id} in game ${game_id}`;
 
