@@ -654,6 +654,14 @@ const gameStateProcessor = new EventProcessor(
                     document.getElementById('player0'),
                     gameWindow,
                 );
+            
+                document.getElementById("callUno").addEventListener("click", async () => {
+                    await axios.post(`/game/${getGameId()}/uno`, {});
+                });
+
+                document.getElementById("challenge").addEventListener("click", async () => {
+                    await axios.post(`/game/${getGameId()}/challenge`, {});
+                });
 
                 const { players } = game_state;
 
@@ -697,6 +705,9 @@ const gameStateProcessor = new EventProcessor(
                     ],
                 );
             }
+            
+            document.getElementById("callUno").toggleAttribute('disabled', !game_state.game.is_uno_available);
+            document.getElementById("challenge").toggleAttribute('disabled', !game_state.game.is_challenge_available);
 
             // If its my turn
             // make my cards draggable loop
