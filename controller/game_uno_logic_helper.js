@@ -130,17 +130,19 @@ async function updateGameData(gameRowDetailed, color) {
         game: null,
     };
 
+    // Check if color is real color that is selectable by a player, if there was a player
     if (!color && isValidSlectableColor(color)) {
         result.status_game_uno = constants.FAILURE;
         result.message = `Improper color by game_id: ${gameRowDetailed.game_id} color: ${color}`;
         return result;
     }
 
+    // Get the top card of the PLAY collection
     const collectionRowPlayTop = await dbEngineGameUno.getCollectionRowTopDetailedByGameIDAndCollectionInfoID(gameRowDetailed.game_id, 2);
 
     if (!collectionRowPlayTop) {
         result.status_game_uno = constants.FAILURE;
-        result.message = `Get Collection of the Top Card of the Play Stack failed, it's empty game_id: ${gameRowDetailed.game_id}`;
+        result.message = `game_id: ${gameRowDetailed.game_id}, getting the top card from the PLAY Collection failed`;
         return result;
     }
 
@@ -158,16 +160,14 @@ async function updateGameData(gameRowDetailed, color) {
     // debugPrinter.printError(playObject);
     // debugPrinter.printBackendBlue(temp);
 
-    // If temp.color is black
-
-    // wildfour causes a draw of four cards, wild doesn't cause a draw. Both causes a change in color chosen by the player.
+    // If temp.color is black (Wild +4 causes a draw of four cards, wild doesn't cause a draw. Both causes a change in color chosen by the player.)
     if (temp.color === constantsGameUno.CARD_COLOR_BLACK) {
         result.status_game_uno = constants.FAILURE;
         result.message = `Top Card of PLAY's collection is black for game ${gameRowDetailed.game_id}. No color is selected, suggest a reshuffle`;
         return result;
     }
 
-    // May be undefined
+    // Get GameData (May be undefined)
     const gameDataRow = await dbEngineGameUno.updateGameDataRowCardLegal(gameRowDetailed.game_id, temp.type, temp.content, temp.color);
 
     if (!gameDataRow) {
@@ -179,7 +179,7 @@ async function updateGameData(gameRowDetailed, color) {
     // TODO: REMEMBER TO IMPLEMENT THE RESETTERS. JOSEPH FIX IT
     // TODO: CHECK AND GUARD THE BELOW
 
-    // Assume db queries will be successful since it lacks user input, guards preffered
+    // Assume that the db queries will be successful since the player does not have a input
     if (temp.content === constantsGameUno.CARD_CONTENT_WILDFOUR) {
         // await dbEngineGameUno.updateGameDataDrawAmount(gameRowDetailed.game_id, 4);
         if (gameRowDetailed.draw_amount > 1) {
@@ -210,16 +210,16 @@ async function updateGameData(gameRowDetailed, color) {
         );
     }
 
-    // May be Undefined
-    const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(gameDataRow.game_id);
+    // Get the most up to date game (May be Undefined)
+    const gameRowDetailedMostUpToDate = await dbEngineGameUno.getGameRowDetailedByGameID(gameDataRow.game_id);
 
-    if (!gameRow) {
+    if (!gameRowDetailedMostUpToDate) {
         result.status_game_uno = constants.FAILURE;
         result.message = `Game ${gameDataRow.game_id} does not exist`;
         return result;
     }
 
-    result.game = gameRow;
+    result.game = gameRowDetailedMostUpToDate;
 
     result.status_game_uno = constants.SUCCESS;
     result.message = `Game ${gameRowDetailed.game_id}'s GameData was successfully updated`;
@@ -258,6 +258,7 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRowDetailed, playe
         change_turn: null,
     };
 
+    // Check if color is real color that is selectable by a player, if there was a player
     if (!color && isValidSlectableColor(color)) {
         result.status_game_uno = constants.FAILURE;
         result.message = `Game ${gameRowDetailed.game_id}, player ${playerRow.display_name} (player_id ${playerRow.player_id}) played an invalid color ${color}`;
@@ -279,6 +280,7 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRowDetailed, playe
     debugPrinter.printBackendWhite(collectionRowHandByCollectionIndex);
     debugPrinter.printGreen(gameRowDetailed);
 
+    // If the game's card_content_legal (top card) is a Wild +4
     if ((gameRowDetailed.card_content_legal === constantsGameUno.CARD_CONTENT_WILDFOUR)
         && (gameRowDetailed.card_content_legal !== collectionRowHandByCollectionIndex.content)
         && gameRowDetailed.draw_amount > 1) {
@@ -290,6 +292,7 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRowDetailed, playe
         return result;
     }
 
+    // If the game's card_content_legal (top card) is a Draw +2
     if ((gameRowDetailed.card_content_legal === constantsGameUno.CARD_CONTENT_DRAWTWO)
         && (gameRowDetailed.card_content_legal !== collectionRowHandByCollectionIndex.content)
         && gameRowDetailed.draw_amount > 1) {
@@ -302,32 +305,18 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRowDetailed, playe
 
     // TODO STUFF IN HERE END
 
-    // ?????????????????
-    /**
-     * grab the card at the top of the play stack
-     * grab the card that the player wants to play
-     *
-     * if (the card is a black card {wildFour or wild}) {
-     *   - verify the player's hand to see if the has no legal cards left to play // Leaves them open to 'challenge' in the future functionality
-     *   - Accept the play.
-     * } else if (the card's color is the same OR the card's content is the same) {
-     *   - Accept the play.
-     * } else {
-     *   - Reject the play.
-     * }
-     *
-     */
-    const collectionRowNew = await dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowsDetailed(
+    // Play the card by its collection_index from the player's Collection (HAND) to the PLAY Collection ()
+    const collectionRowsNew = await dbEngineGameUno.updateCollectionRowHandToPlayByCollectionIndexAndGetCollectionRowsDetailed(
         gameRowDetailed.game_id,
         playerRow.player_id,
         collection_index,
     );
 
-    if (!collectionRowNew) {
+    if (!collectionRowsNew) {
         result.status_game_uno = constants.FAILURE;
         result.message = `Game ${gameRowDetailed.game_id}, player ${playerRow.display_name} (player_id ${playerRow.player_id}), Update to the player's collection failed`;
     }
-    result.collection = collectionRowNew;
+    result.collection = collectionRowsNew;
 
     const gameData = await gameUnoLogicHelper.updateGameData(gameRowDetailed, color);
 

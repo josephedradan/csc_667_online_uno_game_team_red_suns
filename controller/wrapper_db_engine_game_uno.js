@@ -7,11 +7,11 @@ const constants = require('../config/constants');
 const wrapperDBEngineGameUno = {};
 
 async function getGameRowDetailedByGameIDWrapped(game_id) {
-    // May be undefined
-    const [errorGameRowDetailed, gameRowDetailed] = await to(dbEngineGameUno.getGameRowDetailedByGameID(game_id));
+    // Get game (May be undefined)
+    const gameRowDetailed = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
 
     // If undefined
-    if (errorGameRowDetailed) {
+    if (!gameRowDetailed) {
         throw new gameUnoError.GameUnoGetGameError(game_id);
     }
 
@@ -21,10 +21,10 @@ wrapperDBEngineGameUno.getGameRowDetailedByGameIDWrapped = getGameRowDetailedByG
 
 async function getPlayerRowsDetailedByGameIDWrapped(user_id, game_id) {
     // Get player (May be undefined)
-    const [errorPlayerRowDetailed, playerRowDetailed] = await to(dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id));
+    const playerRowDetailed= await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
 
     // If undefined
-    if (errorPlayerRowDetailed) {
+    if (!playerRowDetailed) {
         throw new gameUnoError.GameUnoGetPlayerError(user_id, game_id);
     }
 
