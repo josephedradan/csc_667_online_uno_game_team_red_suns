@@ -200,7 +200,7 @@ async function joinGameIfPossible(game_id, user_id) {
     }
 
     // Get player given game_id and user_id (May be undefined)
-    const playerRowExists = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(game_id, user_id);
+    const playerRowExists = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
 
     // debugPrinter.printDebug(playerRowExists);
 
@@ -271,7 +271,7 @@ async function leaveGame(game_id, user_id) {
     result.game = gameRow;
 
     // May be undefined
-    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(game_id, user_id);
+    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
 
     // If playerRow does not exist
     if (!playerRow) {
@@ -570,7 +570,7 @@ async function startGame(game_id, user_id, deckMultiplier, drawAmountPerPlayer, 
     result.game = gameRowDetailed;
 
     // Get player given game_id and user_id (May be undefined)
-    const playerRowHost = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(game_id, user_id);
+    const playerRowHost = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
 
     // If player is exists for the user for the game
     if (!playerRowHost) {
@@ -938,7 +938,7 @@ async function moveCardDrawToHandTopByGameIdAndUseID(game_id, user_id) {
     debugPrinter.printFunction(moveCardDrawToHandTopByGameIdAndUseID.name);
 
     // Get player given game_id and user_id (May be undefined)
-    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(game_id, user_id);
+    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
 
     return moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow);
 }
@@ -1012,7 +1012,7 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_
     }
 
     // Get player given game_id and user_id (May be undefined)
-    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(game_id, user_id);
+    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
 
     // If player is exists for the user for the game
     if (!playerRow) {
@@ -1074,7 +1074,7 @@ async function getHand(game_id, user_id) {
     result.game = gameRow;
 
     // Get player given game_id and user_id (May be undefined)
-    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(game_id, user_id);
+    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
 
     // If player is exists for the user for the game
     if (!playerRow) {
@@ -1126,7 +1126,7 @@ async function getPlayerDetailedByGameIDAndUserID(game_id, user_id) {
     result.game = gameRow;
 
     // Get player given game_id and user_id (May be undefined)
-    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(game_id, user_id);
+    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
 
     // If player is exists for the user for the game
     if (!playerRow) {
@@ -1165,7 +1165,7 @@ async function setGamePlayerIDHost(game_id, user_id) {
     result.game = gameRow;
 
     // Get player given game_id and user_id (May be undefined)
-    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(game_id, user_id);
+    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
 
     // If player is exists for the user for the game
     if (!playerRow) {

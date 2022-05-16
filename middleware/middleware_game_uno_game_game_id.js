@@ -102,7 +102,7 @@ async function checkIfInGameOrJoinGameIfPossibleNoPlayerInReqAndGuard(req, res, 
 
     // If the user is not a player in the game
     if (resultPlayerObject.status_game_uno === constants.FAILURE) {
-        const resultJoinGameObject = await intermediateGameUno.joinGameIfPossibleWrapped(req.game.game_id, req.user.user_id);
+        const resultJoinGameObject = await intermediateGameUno.joinGameIfPossibleWrapped(req.user.user_id, req.game.game_id);
 
         // If the user failed to join the game as a player
         if (resultJoinGameObject.status_game_uno === constants.FAILURE) {

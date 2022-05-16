@@ -64,10 +64,10 @@ Return format
     player
 {
  */
-async function joinGameIfPossibleWrapped(game_id, user_id) {
+async function joinGameIfPossibleWrapped(user_id,game_id ) {
     debugPrinter.printFunction(joinGameIfPossibleWrapped.name);
 
-    const result = await gameUno.joinGameIfPossible(game_id, user_id);
+    const result = await gameUno.joinGameIfPossible(user_id, game_id);
 
     if (result.status_game_uno === constants.FAILURE) {
         debugPrinter.printError(result);

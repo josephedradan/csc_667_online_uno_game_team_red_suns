@@ -98,8 +98,8 @@ async function initialSocketJoin(socket) {
                 socket.request.game_id = game_id_client;
 
                 const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(
-                    socket.request.game_id,
                     socket.request.user.user_id,
+                    socket.request.game_id,
                 );
 
                 // If Player Row exists

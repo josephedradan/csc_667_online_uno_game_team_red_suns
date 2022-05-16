@@ -1157,7 +1157,7 @@ dbEngineGameUno.getCollectionRowTopDetailedByGameIDAndCollectionInfoID = getColl
  * @param user_id
  * @returns {Promise<any>}
  */
-async function getPlayerRowDetailedByGameIDAndUserID(game_id, user_id) {
+async function getPlayerRowDetailedByGameIDAndUserID(user_id, game_id) {
     debugPrinter.printFunction(getPlayerRowDetailedByGameIDAndUserID.name);
     const result = await db.any(
         `
