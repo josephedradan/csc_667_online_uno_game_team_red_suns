@@ -21,7 +21,7 @@ wrapperDBEngineGameUno.getGameRowDetailedByGameIDWrapped = getGameRowDetailedByG
 
 async function getPlayerRowsDetailedByGameIDWrapped(user_id, game_id) {
     // Get player (May be undefined)
-    const playerRowDetailed= await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
+    const playerRowDetailed = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
 
     // If undefined
     if (!playerRowDetailed) {
