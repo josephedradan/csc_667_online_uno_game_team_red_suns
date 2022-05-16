@@ -34,7 +34,7 @@ utilCommon.getJsonResponseCommon = getJsonResponseCommon;
 
 function getJsonResponseAndAttachMessageToSessionMessageIfPossible(req, status_game_uno, message, url) {
     const result = attachMessageToSessionMessageIfPossible(req, status_game_uno, message);
-    return getJsonResponseCommon(req, result.status, result.message, url);
+    return getJsonResponseCommon(req, result.status_game_uno, result.message, url);
 }
 
 utilCommon.getJsonResponseAndAttachMessageToSessionMessageIfPossible = getJsonResponseAndAttachMessageToSessionMessageIfPossible;

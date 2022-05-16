@@ -40,7 +40,7 @@ async function createGameWrapped(user_id) {
     const game = await gameUno.createGameV2(user_id); // TODO: Possibly redesign because card generation should happen when you start the game, not create a game
     debugPrinter.printBackendBlue(game);
 
-    if (game.status === constants.FAILURE) {
+    if (game.status_game_uno === constants.FAILURE) {
         debugPrinter.printError(game);
         return game;
     }
@@ -69,7 +69,7 @@ async function joinGameIfPossibleWrapped(game_id, user_id) {
 
     const result = await gameUno.joinGameIfPossible(game_id, user_id);
 
-    if (result.status === constants.FAILURE) {
+    if (result.status_game_uno === constants.FAILURE) {
         debugPrinter.printError(result);
     }
 
@@ -96,7 +96,7 @@ async function leaveGameWrapped(game_id, user_id) {
 
     const arrayPromises = [intermediateSocketIOGameUno.emitInRoom_ServerIndex_Games()];
 
-    if (result.status === constants.FAILURE) {
+    if (result.status_game_uno === constants.FAILURE) {
         debugPrinter.printError(result);
     }
 
@@ -167,7 +167,7 @@ async function moveCardDrawToHandByGameIDAndPlayerRowWrapped(game_id, playerRow)
         intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState, // Emit the gameState to room and get gameState
     );
 
-    if (result.status === constants.FAILURE) {
+    if (result.status_game_uno === constants.FAILURE) {
         debugPrinter.printError(result);
     }
 
@@ -183,7 +183,7 @@ async function playCardHandToPlayDeckWrapped(game_id, user_id, collection_index,
 
     const result = await gameUno.moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_index, color);
 
-    if (result.status === constants.FAILURE) {
+    if (result.status_game_uno === constants.FAILURE) {
         debugPrinter.printError(result);
     }
 
@@ -214,7 +214,7 @@ async function startGameWrapped(game_id, user_id) {
         intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState,
     );
 
-    if (result.status === constants.FAILURE) {
+    if (result.status_game_uno === constants.FAILURE) {
         debugPrinter.printError(result);
     }
 
@@ -230,7 +230,7 @@ async function setGamePlayerIDHostWrapped(game_id, user_id) {
 
     const result = await gameUno.setGamePlayerIDHost(game_id, user_id);
 
-    if (result.status === constants.FAILURE) {
+    if (result.status_game_uno === constants.FAILURE) {
         return result;
     }
 
@@ -249,7 +249,7 @@ intermediateGameUno.setGamePlayerIDHostWrapped = setGamePlayerIDHostWrapped;
 //
 //     const result = await gameUno.setGamePlayerIDTurn(game_id, user_id);
 //
-//     if (result.status === constants.FAILURE) {
+//     if (result.status_game_uno === constants.FAILURE) {
 //         return result;
 //     }
 //

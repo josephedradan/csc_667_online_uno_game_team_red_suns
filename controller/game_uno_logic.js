@@ -38,7 +38,7 @@ async function getGamesWithTheirPlayersSimple() {
     debugPrinter.printFunction(getGamesWithTheirPlayersSimple.name);
 
     const result = {
-        status: null,
+        status_game_uno: null,
         message: null,
         games: null,
     };
@@ -54,7 +54,7 @@ async function getGamesWithTheirPlayersSimple() {
         players: playerRows[index],
     }));
 
-    result.status = constants.SUCCESS;
+    result.status_game_uno = constants.SUCCESS;
     result.message = 'Games with their players returned';
     result.games = gamesWithPlayersRows;
 
@@ -85,7 +85,7 @@ async function getGameAndTheirPlayersByGameIDDetailed(game_id) {
     debugPrinter.printFunction(getGameAndTheirPlayersByGameIDDetailed.name);
 
     const result = {
-        status: null,
+        status_game_uno: null,
         message: null,
         game: null,
         players: null,
@@ -96,7 +96,7 @@ async function getGameAndTheirPlayersByGameIDDetailed(game_id) {
 
     // If Game Row does not exist
     if (!gameRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} does not exist`;
         return result;
     }
@@ -107,13 +107,13 @@ async function getGameAndTheirPlayersByGameIDDetailed(game_id) {
     const playerRows = await dbEngineGameUno.getPlayerRowsDetailedByGameID(gameRow.game_id);
 
     if (!playerRows.length) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Error no players for game ${game_id}`;
         return result;
     }
     result.players = playerRows;
 
-    result.status = constants.SUCCESS;
+    result.status_game_uno = constants.SUCCESS;
     result.message = `Game ${game_id} and its players returned`;
 
     return result;
@@ -125,7 +125,7 @@ async function getGame(game_id) {
     debugPrinter.printFunction(getGame.name);
 
     const result = {
-        status: null,
+        status_game_uno: null,
         message: null,
         game: null,
     };
@@ -135,14 +135,14 @@ async function getGame(game_id) {
 
     // If Game Row does not exist
     if (!gameRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} does not exist`;
         return result;
     }
 
     result.game = gameRow;
 
-    result.status = constants.SUCCESS;
+    result.status_game_uno = constants.SUCCESS;
     result.message = `Game ${game_id} returned`;
 
     return result;
@@ -175,7 +175,7 @@ async function joinGameIfPossible(game_id, user_id) {
     // debugPrinter.printDebug(`game_id: ${game_id} user_id: ${user_id}`);
 
     const result = {
-        status: null,
+        status_game_uno: null,
         message: null,
         game: null,
         player: null,
@@ -185,7 +185,7 @@ async function joinGameIfPossible(game_id, user_id) {
 
     // Check if game exists
     if (!gameRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} does not exist`;
         return result;
     }
@@ -194,7 +194,7 @@ async function joinGameIfPossible(game_id, user_id) {
 
     // If game is active
     if (gameRow.is_active) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} is active`;
         return result;
     }
@@ -206,7 +206,7 @@ async function joinGameIfPossible(game_id, user_id) {
 
     // If player is exists for the user for the game
     if (playerRowExists) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Player ${playerRowExists.player_id} already exists for game ${game_id}`;
         result.player = playerRowExists;
         return result;
@@ -217,12 +217,12 @@ async function joinGameIfPossible(game_id, user_id) {
 
     // If player row was not made
     if (!playerRowNew) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Player ${playerRowNew.player_id} could not join game ${game_id}`;
         return result;
     }
 
-    result.status = constants.SUCCESS;
+    result.status_game_uno = constants.SUCCESS;
     result.message = `Player ${playerRowNew.player_id} was created and joined game ${game_id}`;
     result.player = playerRowNew;
 
@@ -254,7 +254,7 @@ async function leaveGame(game_id, user_id) {
     debugPrinter.printFunction(leaveGame.name);
 
     const result = {
-        status: null,
+        status_game_uno: null,
         message: null,
         game: null,
         player: null,
@@ -264,7 +264,7 @@ async function leaveGame(game_id, user_id) {
     const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
 
     if (!gameRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} does not exist`;
         return result;
     }
@@ -275,7 +275,7 @@ async function leaveGame(game_id, user_id) {
 
     // If playerRow does not exist
     if (!playerRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id}) does not exist for game ${game_id}`;
         return result;
     }
@@ -290,8 +290,8 @@ async function leaveGame(game_id, user_id) {
         if (gameRow.player_id_turn === playerRow.player_id) {
             const changeTurn = await gameUnoLogicHelper.changeTurnByGameRow(gameRow);
 
-            if (changeTurn.status === constants.FAILURE) {
-                result.status = changeTurn.status;
+            if (changeTurn.status_game_uno === constants.FAILURE) {
+                result.status_game_uno = changeTurn.status;
                 result.message = changeTurn.message;
                 // return result; // Do not return here because there is more stuff that needs to be returned
             }
@@ -304,7 +304,7 @@ async function leaveGame(game_id, user_id) {
         result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id}) is removed from game ${game_id}`;
     }
 
-    result.status = constants.SUCCESS;
+    result.status_game_uno = constants.SUCCESS;
 
     return result;
 }
@@ -415,7 +415,7 @@ async function createGameV2(user_id) {
     debugPrinter.printFunction(createGameV2.name);
 
     const result = {
-        status: null,
+        status_game_uno: null,
         message: null,
         player: null,
         game: null,
@@ -430,7 +430,7 @@ async function createGameV2(user_id) {
     // debugPrinter.printDebug(playerRow);
 
     if (!playerRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = 'Could not create player row when creating game';
         return result;
     }
@@ -441,7 +441,7 @@ async function createGameV2(user_id) {
     // debugPrinter.printDebug(gameRow);
 
     if (!gameRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = 'Could not create game row when creating game';
         return result;
     }
@@ -450,7 +450,7 @@ async function createGameV2(user_id) {
     const gameData = await dbEngineGameUno.createGameDataRow(gameRow.game_id);
 
     if (!gameData) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = 'Could not create game row when creating game';
         return result;
     }
@@ -461,7 +461,7 @@ async function createGameV2(user_id) {
     // debugPrinter.printDebug(playersRow);
 
     if (!playersRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = 'Could not create players row when creating game, game will be deleted';
 
         await dbEngineGameUno.deleteGameRow(gameRow); // For safety, remove the game
@@ -471,7 +471,7 @@ async function createGameV2(user_id) {
 
     result.players = playersRow;
 
-    result.status = constants.SUCCESS;
+    result.status_game_uno = constants.SUCCESS;
     result.message = `Game ${gameRow.game_id}, player ${playersRow.player_id}, game's players were created`;
 
     return result;
@@ -483,7 +483,7 @@ async function reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayI
     debugPrinter.printFunction(reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayIsInvalid.name);
 
     const result = {
-        status: null,
+        status_game_uno: null,
         message: null,
         game_data: null,
     };
@@ -491,11 +491,11 @@ async function reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayI
     let gameDataResult = null;
 
     // FIXME: VERY DANGEROUS LOOP
-    while (!gameDataResult || gameDataResult.status === constants.FAILURE) {
+    while (!gameDataResult || gameDataResult.status_game_uno === constants.FAILURE) {
         // eslint-disable-next-line no-await-in-loop
         gameDataResult = await gameUnoLogicHelper.updateGameData(gameRow, null);
 
-        if (gameDataResult.status === constants.FAILURE) {
+        if (gameDataResult.status_game_uno === constants.FAILURE) {
             // eslint-disable-next-line no-await-in-loop
             await dbEngineGameUno.updateCollectionRowsPlayToDrawAndRandomizeDrawByGameID(gameRow.game_id);
             // eslint-disable-next-line no-await-in-loop
@@ -504,7 +504,7 @@ async function reshuffleCollectionPlayBackToDrawAndMoveCardDrawToPlayIfCardPlayI
     }
 
     result.game_data = gameDataResult;
-    result.status = constants.SUCCESS;
+    result.status_game_uno = constants.SUCCESS;
     result.message = `GameData (game_id ${gameDataResult.game_id}) was updated`;
 
     return result;
@@ -550,7 +550,7 @@ async function startGame(game_id, user_id, deckMultiplier, drawAmountPerPlayer, 
     // TODO: Assign player_index to players so you know the turn order. Maybe do this because we can use the player_id instead
 
     const result = {
-        status: null,
+        status_game_uno: null,
         message: null,
         game: null,
         player: null,
@@ -562,7 +562,7 @@ async function startGame(game_id, user_id, deckMultiplier, drawAmountPerPlayer, 
     let gameRowDetailed = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
 
     if (!gameRowDetailed) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} does not exist`;
         return result;
     }
@@ -574,7 +574,7 @@ async function startGame(game_id, user_id, deckMultiplier, drawAmountPerPlayer, 
 
     // If player is exists for the user for the game
     if (!playerRowHost) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Player does not exist for game ${game_id}`;
         return result;
     }
@@ -582,7 +582,7 @@ async function startGame(game_id, user_id, deckMultiplier, drawAmountPerPlayer, 
 
     // If player_id is host and if game is not active, make it active
     if (gameRowDetailed.is_active === true) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} is already active`;
         return result;
     }
@@ -595,7 +595,7 @@ async function startGame(game_id, user_id, deckMultiplier, drawAmountPerPlayer, 
 
     // Basically if cards not created
     if (!cardRows.length) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Cards could not be made for game ${game_id}, game ${game_id} will be deleted`;
 
         await dbEngineGameUno.deleteGameRow(gameRowDetailed); // For safety, remove the game
@@ -611,7 +611,7 @@ async function startGame(game_id, user_id, deckMultiplier, drawAmountPerPlayer, 
     const playerRows = await dbEngineGameUno.getPlayerRowsDetailedByGameID(gameRowDetailed.game_id);
 
     if (!playerRows.length) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         // result.message = `Error no players for game ${game_id}, game ${game_id} will be deleted`;
         result.message = `Error no players for game ${game_id}`;
 
@@ -644,15 +644,15 @@ async function startGame(game_id, user_id, deckMultiplier, drawAmountPerPlayer, 
 
     const changeTurn = await gameUnoLogicHelper.changeTurnByGameID(gameRowDetailed.game_id);
 
-    if (changeTurn.status === constants.FAILURE) {
-        result.status = changeTurn.status;
+    if (changeTurn.status_game_uno === constants.FAILURE) {
+        result.status_game_uno = changeTurn.status;
         result.message = changeTurn.message;
         return result;
     }
 
     result.change_turn = changeTurn;
 
-    result.status = constants.SUCCESS;
+    result.status_game_uno = constants.SUCCESS;
     result.message = `Game ${game_id} started`;
 
     return result;
@@ -742,7 +742,7 @@ async function getGameState(game_id) {
     debugPrinter.printFunction(getGameState.name);
 
     const result = {
-        status: null,
+        status_game_uno: null,
         message: null,
         game: null,
         players: null,
@@ -755,7 +755,7 @@ async function getGameState(game_id) {
 
     // If Game Row does not exist
     if (!gameRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} does not exist`;
         return result;
     }
@@ -779,7 +779,7 @@ async function getGameState(game_id) {
     // May be empty
     result.collection_play = await dbEngineGameUno.getCollectionRowDetailedByGameIDAndCollectionInfoID(game_id, 2);
 
-    result.status = constants.SUCCESS;
+    result.status_game_uno = constants.SUCCESS;
     result.message = 'Game state returned';
 
     // Game state
@@ -792,7 +792,7 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, cal
     debugPrinter.printFunction(moveCardDrawToHandTopByGameIDAndPlayerRow.name);
 
     const result = {
-        status: null,
+        status_game_uno: null,
         message: null,
         game: null,
         player: null,
@@ -805,14 +805,14 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, cal
 
     // If Game Row does not exist
     if (!gameRowDetailed) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} does not exist`;
         return result;
     }
 
     // If player is exists for the user for the game
     if (!playerRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Player does not exist for game ${game_id}`; // Short circuit because the playerRow is based on the game_id (don't need to check if game exists)
         return result;
     }
@@ -831,7 +831,7 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, cal
         const gameData = await dbEngineGameUno.updateGameDataRowDrawAmount(game_id, cardsDrew);
 
         if (!gameData) {
-            // result.status = constants.FAILURE;
+            // result.status_game_uno = constants.FAILURE;
             // result.message = `Game ${gameRowDetailed.game_id}'s GameData failed to update draw_amount`;
             // return result;
 
@@ -857,7 +857,7 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, cal
             const collectionCountDrawNew = await dbEngineGameUno.getCollectionCountByGameIDAndCollectionInfoID(game_id, 1);
 
             if (collectionCountDrawNew.length === 0) {
-                // result.status = constants.FAILURE;
+                // result.status_game_uno = constants.FAILURE;
                 // result.message = `Collection DRAW is still empty, ${playerRow.player_id} Should play cards`;
                 // return result;
 
@@ -885,7 +885,7 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, cal
         collectionRowHand = await dbEngineGameUno.updateCollectionRowDrawToHandTop(game_id, playerRow.player_id);
 
         if (!collectionRowHand) {
-            result.status = constants.FAILURE;
+            result.status_game_uno = constants.FAILURE;
             result.message = `Error in updating player ${playerRow.display_name} (player_id ${playerRow.player_id})'s collection`;
             return result;
         }
@@ -909,8 +909,8 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, cal
         && (gameRowDetailed.draw_amount > 1)) {
         const changeTurn = await gameUnoLogicHelper.changeTurnByGameID(gameRowDetailed.game_id);
 
-        if (changeTurn.status === constants.FAILURE) {
-            result.status = changeTurn.status;
+        if (changeTurn.status_game_uno === constants.FAILURE) {
+            result.status_game_uno = changeTurn.status;
             result.message = changeTurn.message;
             return result;
         }
@@ -918,7 +918,7 @@ async function moveCardDrawToHandTopByGameIDAndPlayerRow(game_id, playerRow, cal
 
     result.collection = collectionRowHand;
 
-    result.status = constants.SUCCESS;
+    result.status_game_uno = constants.SUCCESS;
     result.message = `A card from DRAW's collection moved to player ${playerRow.display_name} (player_id ${playerRow.player_id})'s collection's top for Game ${game_id}`;
 
     return result;
@@ -949,7 +949,7 @@ async function moveCardDrawToPlay(game_id) { // TODO ADD MORE GUARDING AND ERROR
     debugPrinter.printFunction(moveCardDrawToPlay.name);
 
     const result = {
-        status: null,
+        status_game_uno: null,
         message: null,
         game: null,
         collection: null,
@@ -960,7 +960,7 @@ async function moveCardDrawToPlay(game_id) { // TODO ADD MORE GUARDING AND ERROR
 
     // If Game Row does not exist
     if (!gameRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} does not exist`;
         return result;
     }
@@ -968,13 +968,13 @@ async function moveCardDrawToPlay(game_id) { // TODO ADD MORE GUARDING AND ERROR
     const collectionRow = await dbEngineGameUno.updateCollectionRowDrawToPlayTop(game_id);
 
     if (!collectionRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Error when updating PLAY's collection for Game ${game_id}`; // TODO FIX THEN
         return result;
     }
     result.collection = collectionRow;
 
-    result.status = constants.SUCCESS;
+    result.status_game_uno = constants.SUCCESS;
     result.message = `A card from DRAW's collection moved to PLAY's collection's top for Game ${game_id}`; // TODO FIX THEN
 
     return result;
@@ -994,7 +994,7 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_
     debugPrinter.printFunction(moveCardHandToPlayByCollectionIndex.name);
 
     const result = {
-        status: null,
+        status_game_uno: null,
         message: null,
         player: null,
         game: null,
@@ -1006,7 +1006,7 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_
 
     // If Game Row does not exist
     if (!gameRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} does not exist`;
         return result;
     }
@@ -1016,7 +1016,7 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_
 
     // If player is exists for the user for the game
     if (!playerRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id}) does not exist for game ${game_id}`;
         // Can be used as a short circuit because the playerRow is based on the game_id (don't need to check if game exists)
         return result;
@@ -1025,7 +1025,7 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_
 
     // Check if it's the player's turn
     if (gameRow.player_id_turn !== playerRow.player_id) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `It is not Player ${playerRow.display_name} (player_id ${playerRow.player_id}) turn for game ${game_id}`;
         return result;
     }
@@ -1034,15 +1034,15 @@ async function moveCardHandToPlayByCollectionIndex(game_id, user_id, collection_
 
     const gameLogic = await gameUnoLogicHelper.doMoveCardHandToPlayByCollectionIndexLogic(gameRow, playerRow, collection_index, color);
 
-    if (gameLogic.status === constants.FAILURE) {
-        result.status = gameLogic.status;
+    if (gameLogic.status_game_uno === constants.FAILURE) {
+        result.status_game_uno = gameLogic.status;
         result.message = gameLogic.message;
         return result;
     }
 
     result.game_logic = gameLogic;
 
-    result.status = constants.SUCCESS;
+    result.status_game_uno = constants.SUCCESS;
 
     result.message = `Card (collection_index ${collection_index}) from player ${playerRow.display_name} \
     (player_id ${playerRow.player_id})'s collection moved to PLAY's collection's top for Game ${game_id}`;
@@ -1056,7 +1056,7 @@ async function getHand(game_id, user_id) {
     debugPrinter.printFunction(getHand.name);
 
     const result = {
-        status: null,
+        status_game_uno: null,
         message: null,
         player: null,
         collection: null,
@@ -1066,7 +1066,7 @@ async function getHand(game_id, user_id) {
 
     // Check if game exists
     if (!gameRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} does not exist`;
         return result;
     }
@@ -1078,7 +1078,7 @@ async function getHand(game_id, user_id) {
 
     // If player is exists for the user for the game
     if (!playerRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Player does not exist for game ${game_id}`; // Short circuit because the playerRow is based on the game_id (don't need to check if game exists)
         return result;
     }
@@ -1089,12 +1089,12 @@ async function getHand(game_id, user_id) {
 
     // If player is exists for the user for the game
     if (!collectionRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Collection does not exist for player ${playerRow.display_name} (player_id ${playerRow.player_id})`;
         return result;
     }
 
-    result.status = constants.SUCCESS;
+    result.status_game_uno = constants.SUCCESS;
     result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id})'s hand returned`;
 
     result.collection = collectionRow;
@@ -1108,7 +1108,7 @@ async function getPlayerDetailedByGameIDAndUserID(game_id, user_id) {
     debugPrinter.printFunction(getPlayerDetailedByGameIDAndUserID.name);
 
     const result = {
-        status: null,
+        status_game_uno: null,
         message: null,
         game: null,
         player: null,
@@ -1118,7 +1118,7 @@ async function getPlayerDetailedByGameIDAndUserID(game_id, user_id) {
 
     // Check if game exists
     if (!gameRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} does not exist`;
         return result;
     }
@@ -1130,13 +1130,13 @@ async function getPlayerDetailedByGameIDAndUserID(game_id, user_id) {
 
     // If player is exists for the user for the game
     if (!playerRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Player does not exist for game ${game_id}`; // Short circuit because the playerRow is based on the game_id (don't need to check if game exists)
         return result;
     }
     result.player = playerRow;
 
-    result.status = constants.SUCCESS;
+    result.status_game_uno = constants.SUCCESS;
     result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id}) returned`;
 
     return result;
@@ -1148,7 +1148,7 @@ async function setGamePlayerIDHost(game_id, user_id) {
     debugPrinter.printFunction(setGamePlayerIDHost.name);
 
     const result = {
-        status: null,
+        status_game_uno: null,
         message: null,
         game: null,
         player: null,
@@ -1158,7 +1158,7 @@ async function setGamePlayerIDHost(game_id, user_id) {
 
     // Check if game exists
     if (!gameRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Game ${game_id} does not exist`;
         return result;
     }
@@ -1169,7 +1169,7 @@ async function setGamePlayerIDHost(game_id, user_id) {
 
     // If player is exists for the user for the game
     if (!playerRow) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Player does not exist for game ${game_id}`;
 
         return result;
@@ -1179,13 +1179,13 @@ async function setGamePlayerIDHost(game_id, user_id) {
     const gameRowNew = await dbEngineGameUno.updateGameRowPlayerIDHostByGameID(game_id, playerRow.player_id);
 
     if (!gameRowNew) {
-        result.status = constants.FAILURE;
+        result.status_game_uno = constants.FAILURE;
         result.message = `Could not update game ${game_id}'s player turn`;
         return result;
     }
     result.game = gameRowNew;
 
-    result.status = constants.SUCCESS;
+    result.status_game_uno = constants.SUCCESS;
     result.message = `Player ${playerRow.display_name} (player_id ${playerRow.player_id}) is not the host of game ${game_id}`;
 
     return result;
