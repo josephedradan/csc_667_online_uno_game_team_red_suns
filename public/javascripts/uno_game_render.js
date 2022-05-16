@@ -13,18 +13,16 @@ class Draggable {
         this.dragMouseMove = this.dragMouseMove.bind(this);
         this.dragMouseUp = this.dragMouseUp.bind(this);
 
-        this.element.addEventListener("mousedown", this.dragMouseDown);
+        this.element.addEventListener('mousedown', this.dragMouseDown);
         // this.element.onmousedown = this.dragMouseDown;
     }
 
     moveToPosition(x, y) {
         const computedStyle = window.getComputedStyle(this.element);
-        const offsetX =
-            -parseInt(computedStyle.width, 10) / 2 -
-            parseInt(computedStyle.marginLeft, 10);
-        const offsetY =
-            -parseInt(computedStyle.height, 10) / 2 -
-            parseInt(computedStyle.marginTop, 10);
+        const offsetX = -parseInt(computedStyle.width, 10) / 2
+            - parseInt(computedStyle.marginLeft, 10);
+        const offsetY = -parseInt(computedStyle.height, 10) / 2
+            - parseInt(computedStyle.marginTop, 10);
 
         let posX = x + offsetX;
         let posY = y + offsetY;
@@ -55,7 +53,7 @@ class Draggable {
         if (this.dragging) {
             return;
         }
-        if (this.element.getAttribute("disabled") !== null) {
+        if (this.element.getAttribute('disabled') !== null) {
             return;
         }
 
@@ -63,15 +61,15 @@ class Draggable {
 
         event.preventDefault();
 
-        document.addEventListener("mouseup", this.dragMouseUp);
-        document.addEventListener("mousemove", this.dragMouseMove);
+        document.addEventListener('mouseup', this.dragMouseUp);
+        document.addEventListener('mousemove', this.dragMouseMove);
 
         this.parent = this.element.parentElement;
         this.childIndex = Array.from(this.parent.children).indexOf(
-            this.element
+            this.element,
         );
-        this.element.style.position = "absolute";
-        this.element.style.transform = "none";
+        this.element.style.position = 'absolute';
+        this.element.style.transform = 'none';
         document.body.appendChild(this.element);
 
         this.moveToPosition(event.clientX, event.clientY);
@@ -92,7 +90,7 @@ class Draggable {
     }
 
     dragMouseUp(event) {
-        console.log("Drag ended!!!");
+        console.log('Drag ended!!!');
         // If not left click, do nothing
         if (event.which != 1) {
             return;
@@ -102,8 +100,8 @@ class Draggable {
 
         event.preventDefault();
 
-        document.removeEventListener("mouseup", this.dragMouseUp);
-        document.removeEventListener("mousemove", this.dragMouseMove);
+        document.removeEventListener('mouseup', this.dragMouseUp);
+        document.removeEventListener('mousemove', this.dragMouseMove);
         this.element.style.top = null;
         this.element.style.left = null;
         this.element.style.position = null;
@@ -123,13 +121,13 @@ class Draggable {
             // console.log(mouseY < parseInt(rect.bottom, 10));
 
             if (
-                mouseX > parseInt(rect.left, 10) &&
-                mouseX < parseInt(rect.right, 10) &&
-                mouseY > parseInt(rect.top, 10) &&
-                mouseY < parseInt(rect.bottom, 10)
+                mouseX > parseInt(rect.left, 10)
+                && mouseX < parseInt(rect.right, 10)
+                && mouseY > parseInt(rect.top, 10)
+                && mouseY < parseInt(rect.bottom, 10)
             ) {
                 container.appendChild(this.element);
-                console.log("Appended!!");
+                console.log('Appended!!');
                 this.parent = this.element.parentElement;
                 parented = true;
                 if (this.dragEndCallback) {
@@ -151,7 +149,7 @@ class Draggable {
         this.element.style.transform = null;
         this.parent.insertBefore(
             this.element,
-            this.parent.children[this.childIndex]
+            this.parent.children[this.childIndex],
         );
         if (this.dragEndCallback) {
             this.dragEndCallback(this.parent);
@@ -167,9 +165,9 @@ class Draggable {
     }
 
     destroy() {
-        this.element.removeEventListener("mousedown", this.dragMouseDown);
-        document.removeEventListener("mouseup", this.dragMouseUp);
-        document.removeEventListener("mousemove", this.dragMouseMove);
+        this.element.removeEventListener('mousedown', this.dragMouseDown);
+        document.removeEventListener('mouseup', this.dragMouseUp);
+        document.removeEventListener('mousemove', this.dragMouseMove);
         if (this.dragging) {
             this.cancelDrag();
         }
@@ -194,7 +192,7 @@ class UnoGameRenderer {
         }
 
         // Empty the container
-        this.handContainers[playerId].innerHTML = "";
+        this.handContainers[playerId].innerHTML = '';
 
         // Loop through cards and render
         cardCollection.forEach((cardData, index) => {
@@ -214,7 +212,7 @@ class UnoGameRenderer {
             return;
         }
         // Destroy all but the top card
-        this.playContainer.innerHTML = "";
+        this.playContainer.innerHTML = '';
         const newCard = this.#generate_card(cardData); // Generate card with card info
         this.playContainer.appendChild(newCard);
     }
@@ -226,12 +224,12 @@ class UnoGameRenderer {
         // Figure out what kind of card and render
         if (cardData.type === undefined) {
             card = this.#generate_flipped_card();
-        } else if (cardData.color === "black") {
-            card = this.#generate_wild_black(cardData.content === "wild");
-        } else if (cardData.type == "NUMBER") {
+        } else if (cardData.color === 'black') {
+            card = this.#generate_wild_black(cardData.content === 'wild');
+        } else if (cardData.type == 'NUMBER') {
             card = this.#generate_color_card(
                 `num-${cardData.content}`,
-                cardData.color
+                cardData.color,
             );
         } else {
             card = this.#generate_color_card(cardData.content, cardData.color);
@@ -240,16 +238,16 @@ class UnoGameRenderer {
     }
 
     #generate_flipped_card = () => {
-        const cardWrapper = document.createElement("div");
-        cardWrapper.classList.add("cardWrapper");
-        const unoCard = document.createElement("div");
-        unoCard.classList.add("unoCard", "flipped");
-        const shadow = document.createElement("div");
-        shadow.classList.add("cardShadow");
-        const inner = document.createElement("span");
-        inner.classList.add("inner");
-        const mark = document.createElement("span");
-        mark.classList.add("mark");
+        const cardWrapper = document.createElement('div');
+        cardWrapper.classList.add('cardWrapper');
+        const unoCard = document.createElement('div');
+        unoCard.classList.add('unoCard', 'flipped');
+        const shadow = document.createElement('div');
+        shadow.classList.add('cardShadow');
+        const inner = document.createElement('span');
+        inner.classList.add('inner');
+        const mark = document.createElement('span');
+        mark.classList.add('mark');
         inner.append(mark);
         unoCard.append(inner);
         unoCard.append(shadow);
@@ -258,16 +256,16 @@ class UnoGameRenderer {
     };
 
     #generate_color_card = (value, color) => {
-        const cardWrapper = document.createElement("div");
-        cardWrapper.classList.add("cardWrapper");
-        const unoCard = document.createElement("div");
-        unoCard.classList.add("unoCard", value, color);
-        const shadow = document.createElement("div");
-        shadow.classList.add("cardShadow");
-        const inner = document.createElement("span");
-        inner.classList.add("inner");
-        const mark = document.createElement("span");
-        mark.classList.add("mark");
+        const cardWrapper = document.createElement('div');
+        cardWrapper.classList.add('cardWrapper');
+        const unoCard = document.createElement('div');
+        unoCard.classList.add('unoCard', value, color);
+        const shadow = document.createElement('div');
+        shadow.classList.add('cardShadow');
+        const inner = document.createElement('span');
+        inner.classList.add('inner');
+        const mark = document.createElement('span');
+        mark.classList.add('mark');
         inner.append(mark);
         unoCard.append(inner);
         unoCard.append(shadow);
@@ -276,30 +274,30 @@ class UnoGameRenderer {
     };
 
     #generate_wild_black = (is_wild /* or is_wildFour */) => {
-        const cardWrapper = document.createElement("div");
-        cardWrapper.classList.add("cardWrapper");
-        const unoCard = document.createElement("div");
+        const cardWrapper = document.createElement('div');
+        cardWrapper.classList.add('cardWrapper');
+        const unoCard = document.createElement('div');
         unoCard.classList.add(
-            "unoCard",
-            is_wild ? "wild" : "wildFour",
-            "black"
+            'unoCard',
+            is_wild ? 'wild' : 'wildFour',
+            'black',
         );
-        const shadow = document.createElement("div");
-        shadow.classList.add("cardShadow");
-        const inner = document.createElement("span");
-        inner.classList.add("inner");
-        const wildMark = document.createElement("span");
-        wildMark.classList.add(is_wild ? "wildMark" : "wildFourMark");
+        const shadow = document.createElement('div');
+        shadow.classList.add('cardShadow');
+        const inner = document.createElement('span');
+        inner.classList.add('inner');
+        const wildMark = document.createElement('span');
+        wildMark.classList.add(is_wild ? 'wildMark' : 'wildFourMark');
 
         // 4 colors
-        const wildRed = document.createElement("div");
-        wildRed.classList.add("wildRed", "wildCard");
-        const wildBlue = document.createElement("div");
-        wildBlue.classList.add("wildBlue", "wildCard");
-        const wildYellow = document.createElement("div");
-        wildYellow.classList.add("wildYellow", "wildCard");
-        const wildGreen = document.createElement("div");
-        wildGreen.classList.add("wildGreen", "wildCard");
+        const wildRed = document.createElement('div');
+        wildRed.classList.add('wildRed', 'wildCard');
+        const wildBlue = document.createElement('div');
+        wildBlue.classList.add('wildBlue', 'wildCard');
+        const wildYellow = document.createElement('div');
+        wildYellow.classList.add('wildYellow', 'wildCard');
+        const wildGreen = document.createElement('div');
+        wildGreen.classList.add('wildGreen', 'wildCard');
 
         wildMark.append(wildRed);
         wildMark.append(wildBlue);
@@ -323,7 +321,27 @@ class TurnController {
         this.handContainer = handContainer;
         this.gameWindow = gameWindow;
         this.draggables = [];
+        this.drawCard = document.getElementById('drawCard');
 
+        const draggable = new Draggable(
+            drawCard,
+            [this.handContainer],
+            this.gameWindow,
+        );
+        draggable.setDragEndCallback(async (newParent) => {
+            if (newParent == this.handContainer) {
+                this.drawContainer.appendChild(drawCard);
+
+                console.log("Drawing a card!!!");
+                const result = await axios.get(`/game/${getGameId()}/drawCard`);
+
+                console.log(result);
+
+                this.endTurn();
+            }
+        });
+        this.drawCard.toggleAttribute('disabled', true);
+        //this.draggables.push(draggable);
         // another hacky way to add/remove event listeners
         // this.handleBlackCardAction = this.#handleBlackCardAction.bind(this);
         // this.removeBlackCardEvent = this.#removeBlackCardEvent.bind(this);
@@ -333,23 +351,25 @@ class TurnController {
     startTurn(cardCollection, game_state) {
         this.endTurn();
 
+        this.drawCard.toggleAttribute('disabled', false);
+
         cardCollection.forEach((cardData) => {
             // console.log(cardData); // card data last element has the discard card
             // console.log(cardData.collection_index);
             const card = this.handContainer.children.item(
-                cardData.collection_index
+                cardData.collection_index,
             );
             const draggable = new Draggable(
                 card,
                 [this.playContainer],
-                this.gameWindow
+                this.gameWindow,
             );
             // kill the animation
             draggable.setDragBeginCallback(async () => {
                 // kill card bounce
                 removeBounceAnimation(card);
                 for (const [idx, reapplyCard] of Object.entries(
-                    this.handContainer.children
+                    this.handContainer.children,
                 )) {
                     removeBounceAnimation(reapplyCard);
                 }
@@ -365,7 +385,7 @@ class TurnController {
                     // console.log(cardData);
 
                     // this.#animateCardPing(this.playContainer);
-                    if (cardData.color == "black") {
+                    if (cardData.color == 'black') {
                         // Modal!
                         // this.handleBlackCardAction(cardData);
                         this.#handleBlackCardAction(cardData).then((res) => {
@@ -374,10 +394,10 @@ class TurnController {
                     } else {
                         // Make move request
                         // const moveResult = await axios.post(`/game/${getGameId()}/move`, {cardData.collection_index}); //or however the heck it's named
-                        console.log("Playing a card!");
+                        console.log('Playing a card!');
 
                         console.log(
-                            `collection_index: ${cardData.collection_index}`
+                            `collection_index: ${cardData.collection_index}`,
                         );
 
                         // console.log(cardData.color);
@@ -386,7 +406,7 @@ class TurnController {
                             `/game/${getGameId()}/playCard`,
                             {
                                 collection_index: cardData.collection_index,
-                            }
+                            },
                         );
 
                         // console.log(result);
@@ -397,13 +417,13 @@ class TurnController {
                     this.endTurn();
                 } else {
                     for (const [idx, reapplyCard] of Object.entries(
-                        this.handContainer.children
+                        this.handContainer.children,
                     )) {
                         // removeBounceAnimation(reapplyCard);
                         applyBounceAnimation(
                             reapplyCard,
                             game_state.game,
-                            cardCollection[idx]
+                            cardCollection[idx],
                         );
                     }
                 }
@@ -412,12 +432,13 @@ class TurnController {
             applyBounceAnimation(card, game_state.game, cardData);
         });
 
-        const drawCard = document.getElementById("drawCard");
-        const drawParent = drawCard.parentElement;
+        //const drawCard = document.getElementById('drawCard');
+        //const drawParent = drawCard.parentElement;
+        /*
         const draggable = new Draggable(
             drawCard,
             [this.handContainer],
-            this.gameWindow
+            this.gameWindow,
         );
         draggable.setDragEndCallback(async (newParent) => {
             if (newParent == this.handContainer) {
@@ -431,28 +452,27 @@ class TurnController {
             }
         });
         this.draggables.push(draggable);
+        */
     }
 
     // clean up
     endTurn() {
-        this.handContainer.childNodes.forEach((e) =>
-            e.classList.remove("animate-bounce")
-        );
+        this.handContainer.childNodes.forEach((e) => e.classList.remove('animate-bounce'));
         this.draggables.forEach((draggable) => {
             draggable.destroy();
         });
         this.draggables = [];
+        this.drawCard.toggleAttribute('disabled', true);
         // document.getElementById("wildFourUserEvent").innerHTML = "";
     }
 
     #animateCardPing(playContainer) {
         setTimeout(() => {
-            const cloneOfParent =
-                playContainer.childNodes[
-                    playContainer.childNodes.length - 1
-                ].cloneNode(true);
+            const cloneOfParent = playContainer.childNodes[
+                playContainer.childNodes.length - 1
+            ].cloneNode(true);
             playContainer.append(cloneOfParent);
-            cloneOfParent.classList.add("animate-ping");
+            cloneOfParent.classList.add('animate-ping');
             setTimeout(() => {
                 // cloneOfParent.classList.remove("animate-ping");
                 cloneOfParent.remove();
@@ -462,58 +482,57 @@ class TurnController {
 
     #handleBlackCardAction(cardData) {
         return new Promise((resolve, reject) => {
-            const wildFourUserEvent =
-                document.getElementById("wildFourUserEvent");
-            const yellow = document.createElement("div");
-            const green = document.createElement("div");
-            const blue = document.createElement("div");
-            const red = document.createElement("div");
+            const wildFourUserEvent = document.getElementById('wildFourUserEvent');
+            const yellow = document.createElement('div');
+            const green = document.createElement('div');
+            const blue = document.createElement('div');
+            const red = document.createElement('div');
 
             wildFourUserEvent.classList.add(
-                "fixed",
-                "z-10",
-                "grid",
-                "w-64",
-                "h-64",
-                "grid-cols-2",
-                "gap-1",
-                "bg-black",
-                "rounded-lg",
-                "custom-inset"
+                'fixed',
+                'z-10',
+                'grid',
+                'w-64',
+                'h-64',
+                'grid-cols-2',
+                'gap-1',
+                'bg-black',
+                'rounded-lg',
+                'custom-inset',
             );
             yellow.classList.add(
-                "col-span-1",
-                "mt-1",
-                "ml-1",
-                "bg-yellow-500",
-                "hover:bg-yellow-700"
+                'col-span-1',
+                'mt-1',
+                'ml-1',
+                'bg-yellow-500',
+                'hover:bg-yellow-700',
             );
             green.classList.add(
-                "col-span-1",
-                "mt-1",
-                "mr-1",
-                "bg-green-500",
-                "hover:bg-green-700"
+                'col-span-1',
+                'mt-1',
+                'mr-1',
+                'bg-green-500',
+                'hover:bg-green-700',
             );
             blue.classList.add(
-                "col-span-1",
-                "mb-1",
-                "ml-1",
-                "bg-blue-500",
-                "hover:bg-blue-700"
+                'col-span-1',
+                'mb-1',
+                'ml-1',
+                'bg-blue-500',
+                'hover:bg-blue-700',
             );
             red.classList.add(
-                "col-span-1",
-                "mb-1",
-                "mr-1",
-                "bg-red-500",
-                "hover:bg-red-700"
+                'col-span-1',
+                'mb-1',
+                'mr-1',
+                'bg-red-500',
+                'hover:bg-red-700',
             );
 
-            yellow.id = "yellow";
-            green.id = "green";
-            blue.id = "blue";
-            red.id = "red";
+            yellow.id = 'yellow';
+            green.id = 'green';
+            blue.id = 'blue';
+            red.id = 'red';
 
             wildFourUserEvent.append(yellow);
             wildFourUserEvent.append(green);
@@ -522,11 +541,11 @@ class TurnController {
 
             // wildFourUserEvent.classList.toggle("hidden", false);
             const colorSelectionChildren = document.querySelectorAll(
-                "#wildFourUserEvent div"
+                '#wildFourUserEvent div',
             );
             for (const colorSelectedByID of colorSelectionChildren) {
-                colorSelectedByID.addEventListener("click", async (e) => {
-                    const selectedColor = e.target.getAttribute("id");
+                colorSelectedByID.addEventListener('click', async (e) => {
+                    const selectedColor = e.target.getAttribute('id');
                     await axios
                         .post(`/game/${getGameId()}/playCard`, {
                             collection_index: cardData.collection_index,
@@ -534,9 +553,9 @@ class TurnController {
                         })
                         .then((res) => {
                             applyCurrentColorToGameScreen(selectedColor);
-                            wildFourUserEvent.innerHTML = "";
+                            wildFourUserEvent.innerHTML = '';
                             wildFourUserEvent.classList.remove(
-                                ...wildFourUserEvent.classList
+                                ...wildFourUserEvent.classList,
                             );
                             resolve();
                         });
@@ -562,7 +581,7 @@ class EventProcessor {
     process() {
         this.queue.push(arguments);
         console.log(
-            "Adding to queue, " + this.queue.length + " items in queue"
+            `Adding to queue, ${this.queue.length} items in queue`,
         );
         this.#startQueue();
     }
@@ -573,7 +592,7 @@ class EventProcessor {
     }
 
     #processEvent() {
-        console.log(this.queue.length + " events in queue");
+        console.log(`${this.queue.length} events in queue`);
         const args = this.queue.shift();
         this.processFunc.apply(null, args);
         setTimeout(() => {
@@ -581,7 +600,7 @@ class EventProcessor {
                 console.log(this.delay);
                 this.#processEvent();
             } else {
-                console.log("Inactive!");
+                console.log('Inactive!');
                 this.active = false;
             }
         }, this.delay);
@@ -589,7 +608,7 @@ class EventProcessor {
 
     #startQueue() {
         if (!this.active) {
-            console.log("Active!");
+            console.log('Active!');
             this.active = true;
             this.#processEvent();
         }
@@ -610,30 +629,30 @@ const gameStateProcessor = new EventProcessor(
         const localPlayer = (await axios.get(`/game/${getGameId()}/getPlayer`))
             .data.player;
 
-        const gameWindow = document.getElementById("game_window");
-        const playerList = document.getElementById("list_of_players");
+        const gameWindow = document.getElementById('game_window');
+        const playerList = document.getElementById('list_of_players');
 
         // Display the proper panel depending on game state
-        gameWindow.classList.toggle("invisible", !game_state.game.is_active);
-        gameWindow.classList.toggle("hidden", !game_state.game.is_active);
-        playerList.classList.toggle("invisible", game_state.game.is_active);
-        playerList.classList.toggle("hidden", game_state.game.is_active);
+        gameWindow.classList.toggle('invisible', !game_state.game.is_active);
+        gameWindow.classList.toggle('hidden', !game_state.game.is_active);
+        playerList.classList.toggle('invisible', game_state.game.is_active);
+        playerList.classList.toggle('hidden', game_state.game.is_active);
 
         if (game_state.game.is_active) {
             if (gameRenderer == null) {
-                const drawContainer = document.getElementById("drawCard");
-                const playContainer = document.getElementById("discard");
+                const drawContainer = document.getElementById('drawCard').parentElement;
+                const playContainer = document.getElementById('discard');
 
                 gameRenderer = new UnoGameRenderer(
                     drawContainer,
-                    playContainer
+                    playContainer,
                 );
 
                 turnController = new TurnController(
                     drawContainer,
                     playContainer,
-                    document.getElementById("player0"),
-                    gameWindow
+                    document.getElementById('player0'),
+                    gameWindow,
                 );
 
                 const { players } = game_state;
@@ -650,7 +669,7 @@ const gameStateProcessor = new EventProcessor(
                 const newPos = playerMapping.get(players.length);
                 for (let i = 0; i < newPos.length; i++) {
                     const handContainer = document.getElementById(
-                        `player${newPos[i]}`
+                        `player${newPos[i]}`,
                     );
                     const player = players[(i + offset) % players.length];
                     gameRenderer.addPlayer(player.player_id, handContainer);
@@ -661,12 +680,12 @@ const gameStateProcessor = new EventProcessor(
                 if (player.player_id == localPlayer.player_id) {
                     gameRenderer.updateHand(
                         player.player_id,
-                        playersHand.data.collection // eric added this for all cards
+                        playersHand.data.collection, // eric added this for all cards
                     );
                 } else {
                     gameRenderer.updateHand(
                         player.player_id,
-                        player.collection // eric added this for all cards
+                        player.collection, // eric added this for all cards
                     );
                 }
             });
@@ -675,7 +694,7 @@ const gameStateProcessor = new EventProcessor(
                 gameRenderer.updateTopCard(
                     game_state.collection_play[
                         game_state.collection_play.length - 1
-                    ]
+                    ],
                 );
             }
 
@@ -691,23 +710,27 @@ const gameStateProcessor = new EventProcessor(
             // console.log(game_state.game.player_id_turn);
 
             const findPlayer = game_state.players.find((player) => {
-                player.player_id === game_state.game.player_id_turn;
+                console.log(player + " " + player.player_id + " " + game_state.game.player_id_turn);
+                return player.player_id === game_state.game.player_id_turn;
             });
+
+            console.log("Found player: " + findPlayer);
+
             if (findPlayer !== undefined) {
                 display_current_player(findPlayer.display_name);
             }
-            document.getElementById("is_reverse").innerHTML = `Direction: ${
-                game_state.game.is_clockwise ? "Clockwise" : "Counter Clockwise"
+            document.getElementById('is_reverse').innerHTML = `Direction: ${
+                game_state.game.is_clockwise ? 'Clockwise' : 'Counter Clockwise'
             }`;
             if (game_state.game.draw_amount !== 0) {
                 document.getElementById(
-                    "draw_amount"
+                    'draw_amount',
                 ).innerHTML = `Draw amount: ${game_state.game.draw_amount}`;
             }
             if (game_state.game.player_id_turn == localPlayer.player_id) {
                 turnController.startTurn(
                     playersHand.data.collection,
-                    game_state // discard pile
+                    game_state, // discard pile
                 );
             }
             if (game_state.game.card_color_legal) {
@@ -715,7 +738,7 @@ const gameStateProcessor = new EventProcessor(
             }
         }
         forceScrollDown();
-    }
+    },
 );
 
 gameStateProcessor.setDelay(0.25);
@@ -723,8 +746,8 @@ gameStateProcessor.setDelay(0.25);
 // This function takes incoming game_states and shoves them into a queue to be processed synchronously
 async function renderGameState(game_state) {
     console.log(
-        "%cserver-game-game-id-game-state",
-        "color: black;background-color:lawngreen;font-size: 20px;"
+        '%cserver-game-game-id-game-state',
+        'color: black;background-color:lawngreen;font-size: 20px;',
     );
     console.log(game_state);
 
@@ -735,17 +758,16 @@ async function renderGameState(game_state) {
 }
 
 const forceScrollDown = () => {
-    document.querySelector("#sandbox_message_box").scrollTop =
-        document.querySelector("#sandbox_message_box").scrollHeight;
+    document.querySelector('#sandbox_message_box').scrollTop = document.querySelector('#sandbox_message_box').scrollHeight;
 };
 
 const display_current_player = (display_name) => {
-    const currentPlayerTarget = document.getElementById("currentPlayer");
+    const currentPlayerTarget = document.getElementById('currentPlayer');
     currentPlayerTarget.textContent = `Current Player: ${display_name}`;
 };
 
 const applyCurrentColorToGameScreen = async (color) => {
-    const currentColor = document.getElementById("currentColor");
+    const currentColor = document.getElementById('currentColor');
     for (let i = 0; i < currentColor.classList.length; i++) {
         if (currentColor.classList[i].match(/bg-\S+-\d+/)) {
             currentColor.classList.remove(currentColor.classList[i]);
@@ -757,49 +779,47 @@ const applyCurrentColorToGameScreen = async (color) => {
 const applyBounceAnimation = (card, game, cardData) => {
     if (game.draw_amount > 1) {
         if (cardData.content === game.card_content_legal) {
-            card.classList.add("animate-bounce");
+            card.classList.add('animate-bounce');
         } else {
-            card.classList.add("brightness-75");
-            card.toggleAttribute("disabled", true); // ERIC, added disabled as well.
+            card.classList.add('brightness-75');
+            card.toggleAttribute('disabled', true); // ERIC, added disabled as well.
 
-            card.addEventListener("click", (e) => {
+            card.addEventListener('click', (e) => {
                 // e.preventDefault();
-                card.classList.add("apply-shake");
+                card.classList.add('apply-shake');
                 setTimeout(() => {
-                    card.classList.remove("apply-shake");
+                    card.classList.remove('apply-shake');
                 }, 1300);
             });
         }
+    } else if (cardData.color === game.card_color_legal) {
+        card.classList.add('animate-bounce');
+    } else if (cardData.content === game.card_content_legal) {
+        card.classList.add('animate-bounce');
+    } else if (cardData.color === 'black') {
+        card.classList.add('animate-bounce');
     } else {
-        if (cardData.color === game.card_color_legal) {
-            card.classList.add("animate-bounce");
-        } else if (cardData.content === game.card_content_legal) {
-            card.classList.add("animate-bounce");
-        } else if (cardData.color === "black") {
-            card.classList.add("animate-bounce");
-        } else {
-            card.classList.add("brightness-75");
-            card.toggleAttribute("disabled", true); // ERIC, added disabled as well.
+        card.classList.add('brightness-75');
+        card.toggleAttribute('disabled', true); // ERIC, added disabled as well.
 
-            card.addEventListener("click", (e) => {
-                // e.preventDefault();
-                card.classList.add("apply-shake");
-                setTimeout(() => {
-                    card.classList.remove("apply-shake");
-                }, 1300);
-            });
-        }
+        card.addEventListener('click', (e) => {
+            // e.preventDefault();
+            card.classList.add('apply-shake');
+            setTimeout(() => {
+                card.classList.remove('apply-shake');
+            }, 1300);
+        });
     }
 };
 
 const removeBounceAnimation = (card) => {
-    card.classList.remove("animate-bounce");
+    card.classList.remove('animate-bounce');
 };
 
 async function setup() {
     // Set up a listener for future incoming game states (the next incoming state could be several seconds/minutes away)
-    socket.on("server-game-game-id-game-state", renderGameState);
-    socket.on("server-game-game-id-object", (object) => {
+    socket.on('server-game-game-id-game-state', renderGameState);
+    socket.on('server-game-game-id-object', (object) => {
         window.location.pathname = object.url;
     });
     // Request the game state right now because we need one now
@@ -811,7 +831,7 @@ async function setup() {
 }
 
 // Wait for the window to load so we have the DOM and access to socket from a script that loads later than this one
-window.addEventListener("load", setup);
+window.addEventListener('load', setup);
 
 // This is not as widely supported as window.onload
 // document.addEventListener("DOMContentLoaded", setup);
