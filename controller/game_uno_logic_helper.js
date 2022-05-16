@@ -61,7 +61,7 @@ async function getUserIDAndPlayerIDPreviousByGameRow(gameRowDetailed) {
     result.status_game_uno = constants.SUCCESS;
     result.message = `Game ${gameRowDetailed.game_id}, player (player_id ${result.player_id_previous}) was the previous player_id`;
 
-    return result
+    return result;
 }
 
 gameUnoLogicHelper.getUserIDAndPlayerIDPreviousByGameRow = getUserIDAndPlayerIDPreviousByGameRow;
