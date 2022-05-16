@@ -85,6 +85,11 @@ routerGameID.get(
 );
 
 routerGameID.post(
+    '/uno', 
+    controllerGameID.POSTUno,
+)
+
+routerGameID.post(
     '/challenge',
     controllerGameID.POSTChallenge,
 );

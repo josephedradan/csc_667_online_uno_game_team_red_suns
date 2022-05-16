@@ -15,6 +15,7 @@ const constants = require('../config/constants');
 const constantsGameUno = require('../config/constants_game_uno');
 
 const debugPrinter = require('../util/debug_printer');
+const { result } = require('../db');
 
 const gameUnoLogic = {};
 
@@ -1192,6 +1193,67 @@ async function setGamePlayerIDHost(user_id, game_id) {
 }
 
 gameUnoLogic.setGamePlayerIDHost = setGamePlayerIDHost;
+
+async function getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUno(user_id, game_id) {
+    debugPrinter.printFunction(getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUno.name);
+    const result = {
+        status_game_uno: null,
+        message: null,
+        game: null,
+        player: null,
+    }
+
+    const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
+    if(!playerRow) {
+        result.status_game_uno = constants.FAILURE;
+        result.message = `Could not retrieve the player information for user_id: ${user_id} for game: ${game_id}`;
+        return result;
+    }
+
+    const playerCollectionHand = await dbEngineGameUno.getCollectionRowsDetailedByPlayerID(playerRow.player_id); 
+
+    if(!playerCollectionHand) {
+        result.status_game_uno = constants.FAILURE;
+        result.message = `Player's hand could not be retrieved for player_id: ${playerRow.player_id}, in game: ${game_id}`;
+        return result;
+    }
+
+    if(playerRow.is_active && playerCollectionHand.length === 0) {
+        //check the hand
+        // if a single player's hand is of length zero
+        //      we set all players and the game to inActive, signifying end of the game.
+        const updateResultPlayer = await dbEngineGameUno.updatePlayersRowsInGameRows(game_id, false);
+        if(!updateResultPlayer) {
+            result.status_game_uno = constants.FAILURE;
+            result.message = `Could not set all player's inactive when someone 'wins' for player_id: ${playerRow.player_id} in game: ${game_id}`;
+            return result;
+        }
+
+        const updateResultGame = await dbEngineGameUno.updateGameRowIsActiveByGameID(game_id, false); 
+        if(!updateResultGame) {
+            result.status_game_uno = constants.FAILURE;
+            result.message = `Could not set game to be inactive for game: ${game_id}`;
+            return result;
+        }
+        
+        result.status_game_uno = constants.SUCCESS;
+        result.message = `Successfully made all players in game: ${game_id} inactive, congratulations player ${playerRow.player_id}, you've won.`
+        result.player = playerRow;
+    }
+
+    const gameRow = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
+    if(!gameRow) {
+        result.status_game_uno = constants.FAILURE;
+        result.message = `Could not retrieve the game_state for game: ${game_id}`;
+        return result;
+    }
+
+    result.game = gameRow; 
+    return result;
+}
+
+gameUnoLogic.getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUno = getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUno;
+
 
 async function challengePlayerHandler(gameRowDetailed, playerRowChallenger, playerRowChallenged, collectionRowsChallenged, callback_game_id) {
     debugPrinter.printFunction(challengePlayerHandler.name);
