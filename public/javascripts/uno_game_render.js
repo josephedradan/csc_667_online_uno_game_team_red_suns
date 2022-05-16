@@ -784,12 +784,8 @@ const applyBounceAnimation = (card, game, cardData) => {
             card.classList.add('brightness-75');
             card.toggleAttribute('disabled', true); // ERIC, added disabled as well.
 
-            card.addEventListener('click', (e) => {
-                // e.preventDefault();
-                card.classList.add('apply-shake');
-                setTimeout(() => {
-                    card.classList.remove('apply-shake');
-                }, 1300);
+            card.addEventListener("mousedown", (e) => {
+                shakeCard(card);
             });
         }
     } else if (cardData.color === game.card_color_legal) {
@@ -802,14 +798,17 @@ const applyBounceAnimation = (card, game, cardData) => {
         card.classList.add('brightness-75');
         card.toggleAttribute('disabled', true); // ERIC, added disabled as well.
 
-        card.addEventListener('click', (e) => {
-            // e.preventDefault();
-            card.classList.add('apply-shake');
-            setTimeout(() => {
-                card.classList.remove('apply-shake');
-            }, 1300);
+        card.addEventListener("mousedown", (e) => {
+            shakeCard(card);
         });
     }
+};
+
+const shakeCard = (card) => {
+    card.classList.add("apply-shake");
+    setTimeout(() => {
+        card.classList.remove("apply-shake");
+    }, 300);
 };
 
 const removeBounceAnimation = (card) => {
