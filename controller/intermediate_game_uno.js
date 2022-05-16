@@ -284,13 +284,14 @@ async function challengePlayerWrapped(game_id, playerRow) {
 
 intermediateGameUno.challengePlayerWrapped = challengePlayerWrapped;
 
-async function callUnoWrapped(game_id, playerRow) {
+async function callUnoWrapped(user_id, game_id) {
     debugPrinter.printFunction(challengePlayerWrapped.name);
 
-    const result = await gameUno.callUno(
+    const result = await gameUno.callUnoLogic(
         game_id,
-        playerRow,
+        user_id,
         intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState,
+        intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_MessageServer_Wrapped,
     );
 
     if (result.status_game_uno === constants.FAILURE) {
@@ -303,22 +304,5 @@ async function callUnoWrapped(game_id, playerRow) {
 }
 
 intermediateGameUno.callUnoWrapped = callUnoWrapped;
-
-async function getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUnoSocketWrapper(user_id, game_id) {
-    const result = await gameUno.getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUno(
-        user_id,
-        game_id,
-    );
-
-    if (result.status_game_uno === constants.FAILURE) {
-        debugPrinter.printError(result);
-    }
-
-    await intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState(game_id);
-
-    return result;
-}
-
-intermediateGameUno.getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUnoWrapper = getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUnoSocketWrapper;
 
 module.exports = intermediateGameUno;

@@ -1868,4 +1868,27 @@ async function updateGameDataRowIsChallengeAvailable(game_id, boolean) {
 
 dbEngineGameUno.updateGameDataRowIsChallengeAvailable = updateGameDataRowIsChallengeAvailable;
 
+async function updatePlayerRowIsUnoCheckedByGameIdAndPlayerId(game_id, player_id, boolean) {
+    debugPrinter.printFunction(updatePlayerRowIsUnoCheckedByGameIdAndPlayerId.name);
+
+    const result = await db.any(
+        `
+        UPDATE "Players"
+        SET 
+            uno_check = $3
+        WHERE "Players".game_id = $1 AND "Players".player_id = $2
+        RETURNING *;
+        `,
+        [
+            game_id,
+            player_id,
+            boolean,
+        ],
+    );
+
+    return result[0];
+}
+
+dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId = updatePlayerRowIsUnoCheckedByGameIdAndPlayerId; 
+
 module.exports = dbEngineGameUno;
