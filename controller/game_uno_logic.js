@@ -1187,6 +1187,7 @@ async function setGamePlayerIDHost(user_id, game_id) {
 
 gameUnoLogic.setGamePlayerIDHost = setGamePlayerIDHost;
 
+
 module.exports = gameUnoLogic;
 
 // TODO REASSIGN player_index WHEN A PLAYER IS OUT. BASCIALLY WHEN THEY CALLED UNO AND THEY ARE NOT A PLAYER IN THE ACTUAL PLAYING OF THE GAME

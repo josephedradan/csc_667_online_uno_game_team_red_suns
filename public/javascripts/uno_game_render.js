@@ -710,8 +710,12 @@ const gameStateProcessor = new EventProcessor(
             // console.log(game_state.game.player_id_turn);
 
             const findPlayer = game_state.players.find((player) => {
-                player.player_id === game_state.game.player_id_turn;
+                console.log(player + " " + player.player_id + " " + game_state.game.player_id_turn);
+                return player.player_id === game_state.game.player_id_turn;
             });
+
+            console.log("Found player: " + findPlayer);
+
             if (findPlayer !== undefined) {
                 display_current_player(findPlayer.display_name);
             }
