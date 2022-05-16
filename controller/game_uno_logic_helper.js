@@ -1,8 +1,8 @@
-const e = require('express');
-const debugPrinter = require('../util/debug_printer');
-const dbEngineGameUno = require('./db_engine_game_uno');
-const constants = require('../config/constants');
-const constantsGameUno = require('../config/constants_game_uno');
+const e = require("express");
+const debugPrinter = require("../util/debug_printer");
+const dbEngineGameUno = require("./db_engine_game_uno");
+const constants = require("../config/constants");
+const constantsGameUno = require("../config/constants_game_uno");
 
 const set = new Set(constantsGameUno.CARD_COLORS_SELECETABLE_LEGEAL);
 
@@ -66,13 +66,23 @@ async function changeTurnByGameRow(gameRowDetailed) {
         }
     });
 
-    const indexOfNextPlayerInPlayerRowsActive = ((indexOfCurrentPlayer + 1 + gameRowDetailed.skip_amount) % playerRowsActive.length);
-    await dbEngineGameUno.updateGameDataRowSkipAmount(gameRowDetailed.game_id, 0);
+    const indexOfNextPlayerInPlayerRowsActive =
+        (indexOfCurrentPlayer + 1 + gameRowDetailed.skip_amount) %
+        playerRowsActive.length;
+    await dbEngineGameUno.updateGameDataRowSkipAmount(
+        gameRowDetailed.game_id,
+        0
+    );
 
-    result.user_id_turn = playerRowsActive[indexOfNextPlayerInPlayerRowsActive].user_id;
-    result.player_id_turn = playerRowsActive[indexOfNextPlayerInPlayerRowsActive].player_id;
+    result.user_id_turn =
+        playerRowsActive[indexOfNextPlayerInPlayerRowsActive].user_id;
+    result.player_id_turn =
+        playerRowsActive[indexOfNextPlayerInPlayerRowsActive].player_id;
 
-    const gameData = await dbEngineGameUno.updateGameDatRowPlayerIDTurn(gameRowDetailed.game_id, result.player_id_turn);
+    const gameData = await dbEngineGameUno.updateGameDatRowPlayerIDTurn(
+        gameRowDetailed.game_id,
+        result.player_id_turn
+    );
 
     if (!gameData) {
         result.status_game_uno = constants.FAILURE;
@@ -92,7 +102,9 @@ gameUnoLogicHelper.changeTurnByGameRow = changeTurnByGameRow;
 
 async function changeTurnByGameID(game_id) {
     debugPrinter.printFunction(changeTurnByGameID.name);
-    const gameRowDetailed = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
+    const gameRowDetailed = await dbEngineGameUno.getGameRowDetailedByGameID(
+        game_id
+    );
 
     const result = {
         status: null,
@@ -185,28 +197,30 @@ async function updateGameData(gameRowDetailed, color) {
         if (gameRowDetailed.draw_amount > 1) {
             await dbEngineGameUno.updateGameDataRowDrawAmount(
                 gameRowDetailed.game_id,
-                gameRowDetailed.draw_amount + 4,
+                gameRowDetailed.draw_amount + 4
             );
         } else {
             await dbEngineGameUno.updateGameDataRowDrawAmount(
                 gameRowDetailed.game_id,
-                4,
+                4
             );
         }
     } else if (temp.content === constantsGameUno.CARD_CONTENT_DRAWTWO) {
         await dbEngineGameUno.updateGameDataRowDrawAmount(
             gameRowDetailed.game_id,
-            2,
+            gameRowDetailed.draw_amount > 1
+                ? gameRowDetailed.draw_amount + 2
+                : 2
         );
     } else if (temp.content === constantsGameUno.CARD_CONTENT_REVERSE) {
         await dbEngineGameUno.updateGameDataRowIsClockwise(
             gameRowDetailed.game_id,
-            !gameRowDetailed.is_clockwise,
+            !gameRowDetailed.is_clockwise
         );
     } else if (temp.content === constantsGameUno.CARD_CONTENT_SKIP) {
         await dbEngineGameUno.updateGameDataRowSkipAmount(
             gameRowDetailed.game_id,
-            1,
+            1
         );
     }
 
@@ -247,7 +261,12 @@ gameUnoLogicHelper.updateGameData = updateGameData;
 
 // Helpers for : doMoveCardHandToPlayByCollectionIndexLogic
 
-async function doMoveCardHandToPlayByCollectionIndexLogic(gameRowDetailed, playerRow, collection_index, color) {
+async function doMoveCardHandToPlayByCollectionIndexLogic(
+    gameRowDetailed,
+    playerRow,
+    collection_index,
+    color
+) {
     debugPrinter.printFunction(doMoveCardHandToPlayByCollectionIndexLogic.name);
 
     const result = {
@@ -318,7 +337,10 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRowDetailed, playe
     }
     result.collection = collectionRowsNew;
 
-    const gameData = await gameUnoLogicHelper.updateGameData(gameRowDetailed, color);
+    const gameData = await gameUnoLogicHelper.updateGameData(
+        gameRowDetailed,
+        color
+    );
 
     if (gameData.status_game_uno === constants.FAILURE) {
         result.status_game_uno = gameData.status;
@@ -326,7 +348,9 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRowDetailed, playe
         return result;
     }
 
-    const changeTurn = await gameUnoLogicHelper.changeTurnByGameRow(gameData.game);
+    const changeTurn = await gameUnoLogicHelper.changeTurnByGameRow(
+        gameData.game
+    );
 
     if (changeTurn.status_game_uno === constants.FAILURE) {
         result.status_game_uno = changeTurn.status;
@@ -342,6 +366,7 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRowDetailed, playe
     return result;
 }
 
-gameUnoLogicHelper.doMoveCardHandToPlayByCollectionIndexLogic = doMoveCardHandToPlayByCollectionIndexLogic;
+gameUnoLogicHelper.doMoveCardHandToPlayByCollectionIndexLogic =
+    doMoveCardHandToPlayByCollectionIndexLogic;
 
 module.exports = gameUnoLogicHelper;
