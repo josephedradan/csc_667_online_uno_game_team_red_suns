@@ -432,6 +432,8 @@ class TurnController {
             applyBounceAnimation(card, game_state.game, cardData);
         });
 
+        document.getElementById("challenge").toggleAttribute('disabled', !game_state.game.is_challenge_available);
+
         // const drawCard = document.getElementById('drawCard');
         // const drawParent = drawCard.parentElement;
         /*
@@ -707,7 +709,7 @@ const gameStateProcessor = new EventProcessor(
             }
             
             document.getElementById("callUno").toggleAttribute('disabled', !game_state.game.is_uno_available);
-            document.getElementById("challenge").toggleAttribute('disabled', !game_state.game.is_challenge_available);
+            document.getElementById("challenge").toggleAttribute('disabled', true);
 
             // If its my turn
             // make my cards draggable loop
