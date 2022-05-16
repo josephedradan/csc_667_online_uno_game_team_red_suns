@@ -321,7 +321,27 @@ class TurnController {
         this.handContainer = handContainer;
         this.gameWindow = gameWindow;
         this.draggables = [];
+        this.drawCard = document.getElementById('drawCard');
 
+        const draggable = new Draggable(
+            drawCard,
+            [this.handContainer],
+            this.gameWindow,
+        );
+        draggable.setDragEndCallback(async (newParent) => {
+            if (newParent == this.handContainer) {
+                this.drawContainer.appendChild(drawCard);
+
+                console.log("Drawing a card!!!");
+                const result = await axios.get(`/game/${getGameId()}/drawCard`);
+
+                console.log(result);
+
+                this.endTurn();
+            }
+        });
+        this.drawCard.toggleAttribute('disabled', true);
+        //this.draggables.push(draggable);
         // another hacky way to add/remove event listeners
         // this.handleBlackCardAction = this.#handleBlackCardAction.bind(this);
         // this.removeBlackCardEvent = this.#removeBlackCardEvent.bind(this);
@@ -330,6 +350,8 @@ class TurnController {
     // note for callbacks that you want to use arrow functions for any form of callbacks if you're using this keyword
     startTurn(cardCollection, game_state) {
         this.endTurn();
+
+        this.drawCard.toggleAttribute('disabled', false);
 
         cardCollection.forEach((cardData) => {
             // console.log(cardData); // card data last element has the discard card
@@ -410,8 +432,9 @@ class TurnController {
             applyBounceAnimation(card, game_state.game, cardData);
         });
 
-        const drawCard = document.getElementById('drawCard');
-        const drawParent = drawCard.parentElement;
+        //const drawCard = document.getElementById('drawCard');
+        //const drawParent = drawCard.parentElement;
+        /*
         const draggable = new Draggable(
             drawCard,
             [this.handContainer],
@@ -429,6 +452,7 @@ class TurnController {
             }
         });
         this.draggables.push(draggable);
+        */
     }
 
     // clean up
@@ -438,6 +462,7 @@ class TurnController {
             draggable.destroy();
         });
         this.draggables = [];
+        this.drawCard.toggleAttribute('disabled', true);
         // document.getElementById("wildFourUserEvent").innerHTML = "";
     }
 
@@ -615,7 +640,7 @@ const gameStateProcessor = new EventProcessor(
 
         if (game_state.game.is_active) {
             if (gameRenderer == null) {
-                const drawContainer = document.getElementById('drawCard');
+                const drawContainer = document.getElementById('drawCard').parentElement;
                 const playContainer = document.getElementById('discard');
 
                 gameRenderer = new UnoGameRenderer(
