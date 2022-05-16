@@ -45,7 +45,7 @@ async function POSTPlayCard(req, res, next) {
         color,
     );
 
-    debugPrinter.printBackendWhite(result);
+    debugPrinter.printRed(result);
 
     // debugPrinter.printDebug(result);
 
@@ -61,7 +61,7 @@ async function GETDrawCard(req, res, next) {
 
     // const result = await dbEngineGameUno.getCollectionRowDetailedByPlayerID(req.player.player_id);
 
-    // debugPrinter.printBackendWhite(result);
+    debugPrinter.printBackendWhite(result);
 
     res.json(result);
 }
@@ -158,7 +158,7 @@ async function GETGetHand(req, res, next) {
 
     const result = await gameUno.getHand(req.user.user_id, req.game.game_id);
 
-    debugPrinter.printBackendWhite(result);
+    // debugPrinter.printBackendWhite(result);
 
     res.json(result);
 }
@@ -191,7 +191,7 @@ async function POSTUno(req, res, next) {
     debugPrinter.printMiddleware(POSTUno.name);
 
     // TODO: emit to the socket with a wrapper????
-    const result = await intermediateGameUno.getGameStateByGameIDAndSetPlayersAndGameToInactiveWhenUno(req.user.user_id, req.game.game_id);
+    const result = await intermediateGameUno.callUnoWrapped(req.user.user_id, req.game.game_id);
 
     res.json(result);
 }
@@ -201,7 +201,7 @@ controllerGameID.POSTUno = POSTUno;
 async function POSTChallenge(req, res, next) {
     debugPrinter.printMiddleware(POSTChallenge.name);
 
-    const result = await intermediateGameUno.challengePlayer(
+    const result = await intermediateGameUno.challengePlayerWrapped(
         req.game.game_id,
         req.player,
     );

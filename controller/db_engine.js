@@ -190,4 +190,40 @@ async function createUserAndUserStatisticRow(username, password, display_name) {
 
 dbEngine.createUserAndUserStatisticRow = createUserAndUserStatisticRow;
 
+async function incrementUserStatisticRowNumWins(user_id) {
+    debugPrinter.printFunction(incrementUserStatisticRowNumWins.name);
+    const result = await db.any(
+        `
+        UPDATE "UserStatistic"
+        SET
+            num_wins = num_wins + 1
+        WHERE "UserStatistic".user_id = $1
+        RETURNING *;
+        `,
+        [user_id],
+    );
+
+    return result[0]; // Should be the new object
+}
+
+dbEngine.incrementUserStatisticRowNumWins = incrementUserStatisticRowNumWins;
+
+async function incrementUserStatisticRowNumLoss(user_id) {
+    debugPrinter.printFunction(incrementUserStatisticRowNumLoss.name);
+    const result = await db.any(
+        `
+        UPDATE "UserStatistic"
+        SET
+            num_loss = num_loss + 1
+        WHERE "UserStatistic".user_id = $1
+        RETURNING *;
+        `,
+        [user_id],
+    );
+
+    return result[0]; // Should be the new object
+}
+
+dbEngine.incrementUserStatisticRowNumLoss = incrementUserStatisticRowNumLoss;
+
 module.exports = dbEngine;

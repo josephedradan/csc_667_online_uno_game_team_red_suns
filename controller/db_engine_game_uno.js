@@ -1028,6 +1028,28 @@ async function getCollectionRowsDetailedByPlayerID(player_id) {
 
 dbEngineGameUno.getCollectionRowsDetailedByPlayerID = getCollectionRowsDetailedByPlayerID;
 
+
+async function getCollectionCountByPlayerID(player_id) {
+    debugPrinter.printFunction(getCollectionCountByPlayerID.name);
+    const result = await db.any(
+        `
+        SELECT 
+            COUNT(*)
+        FROM "Collection"
+        JOIN "Cards" ON "Collection".card_id = "Cards".card_id
+        JOIN "Card" ON "Collection".card_id = "Card".card_id
+        WHERE "Collection".player_id = $1
+        `,
+        [
+            player_id,
+        ],
+    );
+
+    return parseInt(result[0].count, 10);
+}
+
+dbEngineGameUno.getCollectionCountByPlayerID = getCollectionCountByPlayerID;
+
 /**
  * Get Collection by game_id and collection_info_id
  *
@@ -1091,7 +1113,7 @@ async function getCollectionCountByGameIDAndCollectionInfoID(game_id, collection
         ],
     );
 
-    return result[0].count;
+    return parseInt(result[0].count, 10);
 }
 
 dbEngineGameUno.getCollectionCountByGameIDAndCollectionInfoID = getCollectionCountByGameIDAndCollectionInfoID;
@@ -1345,7 +1367,7 @@ async function getPlayersCountByGameID(game_id) {
         [game_id],
     );
 
-    return result[0].count;
+    return parseInt(result[0].count, 10);
 }
 
 dbEngineGameUno.getPlayersCountByGameID = getPlayersCountByGameID;
@@ -1845,5 +1867,28 @@ async function updateGameDataRowIsChallengeAvailable(game_id, boolean) {
 }
 
 dbEngineGameUno.updateGameDataRowIsChallengeAvailable = updateGameDataRowIsChallengeAvailable;
+
+async function updatePlayerRowIsUnoCheckedByGameIdAndPlayerId(game_id, player_id, boolean) {
+    debugPrinter.printFunction(updatePlayerRowIsUnoCheckedByGameIdAndPlayerId.name);
+
+    const result = await db.any(
+        `
+        UPDATE "Players"
+        SET 
+            uno_check = $3
+        WHERE "Players".game_id = $1 AND "Players".player_id = $2
+        RETURNING *;
+        `,
+        [
+            game_id,
+            player_id,
+            boolean,
+        ],
+    );
+
+    return result[0];
+}
+
+dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId = updatePlayerRowIsUnoCheckedByGameIdAndPlayerId; 
 
 module.exports = dbEngineGameUno;

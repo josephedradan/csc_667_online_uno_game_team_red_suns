@@ -99,6 +99,9 @@ const routes = require('../routes/routes');
 const debugPrinter = require('../util/debug_printer');
 const middlewareExpressToSocketIO = require('../ignore/middleware_express_to_socket_io');
 
+const gameUnoSpecial = require('../controller/game_uno_special');
+const intermediateSocketIOGameUno = require('../controller/intermediate_socket_io_game_uno');
+
 /*
 ##############################################################################################################
 Setup and Settings
@@ -340,33 +343,54 @@ handlerSocketIOUseExpress.useExpressMiddleware(middlewareDebug.printDebugger('So
 
 application.use('/', routes);
 
-/* ############################## Error handling ############################## */
+/* ############################## Error handling and Special throws ############################## */
 
-// catch 404 and forward to error handler
 application.use((req, res, next) => {
     next(createError(404));
 });
 
 // error handler
 application.use((err, req, res, next) => {
-    debugPrinter.printError(err);
+    if (err instanceof gameUnoSpecial.GameUnoWinner) {
+        debugPrinter.printGreen('WINNER FUCK YOU');
 
-    debugPrinter.printBackendRed('req.method');
-    debugPrinter.printDebug(req.method);
-    debugPrinter.printBackendRed('req.url');
-    debugPrinter.printDebug(req.url);
-    debugPrinter.printBackendRed('req.body');
-    debugPrinter.printDebug(req.body);
-    debugPrinter.printBackendRed('req.user');
-    debugPrinter.printDebug(req.user);
+        debugPrinter.printGreen(err);
 
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
+        intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_MessageServer_Wrapped(err.game.game_id, err.message)
+            .then((x) => {})
+            .catch((error) => {
+                debugPrinter.printError('Special Error');
+                debugPrinter.printError(error);
+            });
 
-    // render the error page
-    res.status(err.status || 500);
-    res.render('error');
+        intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_Object(err.game.game_id, err.getJsonResponse())
+            .then((temp) => {})
+            .catch((error) => {
+                debugPrinter.printError('Special Error');
+                debugPrinter.printError(error);
+            });
+
+        res.json(err.getJsonResponse());
+    } else {
+        debugPrinter.printError(err);
+
+        debugPrinter.printBackendRed('req.method');
+        debugPrinter.printDebug(req.method);
+        debugPrinter.printBackendRed('req.url');
+        debugPrinter.printDebug(req.url);
+        debugPrinter.printBackendRed('req.body');
+        debugPrinter.printDebug(req.body);
+        debugPrinter.printBackendRed('req.user');
+        debugPrinter.printDebug(req.user);
+
+        // set locals, only providing error in development
+        res.locals.message = err.message;
+        res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+        // render the error page
+        res.status(err.status || 500);
+        res.render('error');
+    }
 });
 
 module.exports = application;
