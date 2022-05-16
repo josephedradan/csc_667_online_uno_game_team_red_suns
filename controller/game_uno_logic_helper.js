@@ -12,10 +12,6 @@ function isValidSlectableColor(color) {
 
 const gameUnoLogicHelper = {};
 
-async function getCollectionRowPlayPrevious(game_id) {
-
-}
-
 /**
  * IMPORTANT NOTES:
  *      THIS FUNCTION ASSUMES gameRowDetailed IS UP TO DATE OR ELSE LOGIC WILL FAIL
@@ -23,8 +19,8 @@ async function getCollectionRowPlayPrevious(game_id) {
  * @param gameRowDetailed
  * @returns {Promise<{players_active: null, status_game_uno: null, message: null, player_id_previous: null, user_id_turn: null}>}
  */
-async function getPlayerIDPrevious(gameRowDetailed) {
-    debugPrinter.printFunction(getPlayerIDPrevious.name);
+async function getUserIDAndPlayerIDPreviousByGameRow(gameRowDetailed) {
+    debugPrinter.printFunction(getUserIDAndPlayerIDPreviousByGameRow.name);
 
     const result = {
         status_game_uno: null,
@@ -35,13 +31,18 @@ async function getPlayerIDPrevious(gameRowDetailed) {
     };
 
     // May be empty
-    const playerRowsActive = await dbEngineGameUno.getPlayerRowsInGame(gameRowDetailed.game_id);
+    let playerRowsActive = await dbEngineGameUno.getPlayerRowsInGame(gameRowDetailed.game_id);
 
     if (!playerRowsActive.length) {
         result.status_game_uno = constants.FAILURE;
         result.message = `No active players in game ${gameRowDetailed.game_id}`;
         return result;
     }
+
+    if (gameRowDetailed.is_clockwise !== false) {
+        playerRowsActive = playerRowsActive.reverse();
+    }
+
     result.players_active = playerRowsActive;
 
     let indexOfCurrentPlayer = null; // FIXME ME, MIGHT BE DANGEROUS
@@ -52,16 +53,18 @@ async function getPlayerIDPrevious(gameRowDetailed) {
         }
     });
 
-    const indexOfPreviousPlayerInPlayerRowsActive = ((indexOfCurrentPlayer + -1) % playerRowsActive.length);
+    const indexOfPreviousPlayerInPlayerRowsActive = ((indexOfCurrentPlayer + 1) % playerRowsActive.length);
 
     result.player_id_previous = playerRowsActive[indexOfPreviousPlayerInPlayerRowsActive].player_id;
     result.user_id_previous = playerRowsActive[indexOfPreviousPlayerInPlayerRowsActive].user_id;
 
     result.status_game_uno = constants.SUCCESS;
     result.message = `Game ${gameRowDetailed.game_id}, player (player_id ${result.player_id_previous}) was the previous player_id`;
+
+    return result;
 }
 
-gameUnoLogicHelper.getPlayerIDPrevious = getPlayerIDPrevious;
+gameUnoLogicHelper.getUserIDAndPlayerIDPreviousByGameRow = getUserIDAndPlayerIDPreviousByGameRow;
 
 /**
  * IMPORTANT NOTES:
@@ -396,6 +399,8 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(gameRowDetailed, playe
 gameUnoLogicHelper.doMoveCardHandToPlayByCollectionIndexLogic = doMoveCardHandToPlayByCollectionIndexLogic;
 
 async function isWildFourPlayLegal(gameRowDetailed, collectionRowsChallenged) {
+    debugPrinter.printFunction(isWildFourPlayLegal.name);
+
     // const result = {
     //     status_game_uno: null,
     //     message: null,
@@ -412,6 +417,7 @@ async function isWildFourPlayLegal(gameRowDetailed, collectionRowsChallenged) {
         return false;
     }
 
+    // eslint-disable-next-line no-restricted-syntax
     for (const collectionRow of collectionRowsChallenged) {
         if (collectionRow.color === collectionRowPrevious.color) {
             return false;
@@ -423,7 +429,14 @@ async function isWildFourPlayLegal(gameRowDetailed, collectionRowsChallenged) {
 
 gameUnoLogicHelper.isWildFourPlayLegal = isWildFourPlayLegal;
 
-async function canPlayerChallenge(gameRow, playerRow) {
+async function canPlayerChallenge(gameRowDetailed, playerRow) {
+    debugPrinter.printFunction(canPlayerChallenge.name);
+
+    // Not player's turn
+    if (gameRowDetailed.player_id_turn !== playerRow.player_id) {
+        return false;
+    }
+
     // Get the top card of the PLAY collection
     const collectionRowPlayTop = await dbEngineGameUno.getCollectionRowTopDetailedByGameIDAndCollectionInfoID(gameRowDetailed.game_id, 2);
 
@@ -435,9 +448,10 @@ async function canPlayerChallenge(gameRow, playerRow) {
         return false;
     }
 
-    if (gameRow.player_id_turn !== playerRow.player_id) {
-        return false;
+    if (collectionRowPlayTop.content === constantsGameUno.CARD_CONTENT_WILDFOUR) {
+        return true;
     }
+    return false;
 }
 
 gameUnoLogicHelper.canPlayerChallenge = canPlayerChallenge;

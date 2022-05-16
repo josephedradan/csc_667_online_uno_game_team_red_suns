@@ -192,7 +192,10 @@ controllerGameID.GETGetPlayer = GETGetPlayer;
 async function POSTChallenge(req, res, next) {
     debugPrinter.printMiddleware(POSTChallenge.name);
 
-    const result = await gameUno.challengePlayer(req.user.user_id, req.player.player_id) // INTERMEDIATE
+    const result = await intermediateGameUno.challengePlayer(
+        req.game.game_id,
+        req.player,
+    );
 
     res.json(result);
 }

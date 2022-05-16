@@ -82,10 +82,9 @@ routerGameID.get(
     controllerGameID.GETDrawCard, // TODO
 );
 
-routerGameID.get(
+routerGameID.post(
     '/challenge',
     controllerGameID.POSTChallenge,
 );
-
 
 module.exports = routerGameID;
