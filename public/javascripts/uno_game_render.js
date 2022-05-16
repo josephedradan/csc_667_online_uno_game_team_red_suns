@@ -90,6 +90,7 @@ class Draggable {
     }
 
     dragMouseUp(event) {
+        console.log('Drag ended!!!');
         // If not left click, do nothing
         if (event.which != 1) {
             return;
@@ -126,6 +127,7 @@ class Draggable {
                 && mouseY < parseInt(rect.bottom, 10)
             ) {
                 container.appendChild(this.element);
+                console.log('Appended!!');
                 this.parent = this.element.parentElement;
                 parented = true;
                 if (this.dragEndCallback) {
@@ -135,13 +137,22 @@ class Draggable {
             }
         }
         if (!parented) {
-            this.parent.insertBefore(
-                this.element,
-                this.parent.children[this.childIndex],
-            );
-            if (this.dragEndCallback) {
-                this.dragEndCallback(this.parent);
-            }
+            this.cancelDrag();
+        }
+    }
+
+    cancelDrag() {
+        this.dragging = false;
+        this.element.style.top = null;
+        this.element.style.left = null;
+        this.element.style.position = null;
+        this.element.style.transform = null;
+        this.parent.insertBefore(
+            this.element,
+            this.parent.children[this.childIndex],
+        );
+        if (this.dragEndCallback) {
+            this.dragEndCallback(this.parent);
         }
     }
 
@@ -157,6 +168,9 @@ class Draggable {
         this.element.removeEventListener('mousedown', this.dragMouseDown);
         document.removeEventListener('mouseup', this.dragMouseUp);
         document.removeEventListener('mousemove', this.dragMouseMove);
+        if (this.dragging) {
+            this.cancelDrag();
+        }
     }
 }
 
@@ -307,7 +321,27 @@ class TurnController {
         this.handContainer = handContainer;
         this.gameWindow = gameWindow;
         this.draggables = [];
+        this.drawCard = document.getElementById('drawCard');
 
+        const draggable = new Draggable(
+            drawCard,
+            [this.handContainer],
+            this.gameWindow,
+        );
+        draggable.setDragEndCallback(async (newParent) => {
+            if (newParent == this.handContainer) {
+                this.drawContainer.appendChild(drawCard);
+
+                console.log("Drawing a card!!!");
+                const result = await axios.get(`/game/${getGameId()}/drawCard`);
+
+                console.log(result);
+
+                this.endTurn();
+            }
+        });
+        this.drawCard.toggleAttribute('disabled', true);
+        //this.draggables.push(draggable);
         // another hacky way to add/remove event listeners
         // this.handleBlackCardAction = this.#handleBlackCardAction.bind(this);
         // this.removeBlackCardEvent = this.#removeBlackCardEvent.bind(this);
@@ -316,6 +350,9 @@ class TurnController {
     // note for callbacks that you want to use arrow functions for any form of callbacks if you're using this keyword
     startTurn(cardCollection, game_state) {
         this.endTurn();
+
+        this.drawCard.toggleAttribute('disabled', false);
+
         cardCollection.forEach((cardData) => {
             // console.log(cardData); // card data last element has the discard card
             // console.log(cardData.collection_index);
@@ -346,10 +383,14 @@ class TurnController {
                 if (newParent == this.playContainer) {
                     // if card is a wild card, prompt with modal and request the move
                     // console.log(cardData);
+
+                    // this.#animateCardPing(this.playContainer);
                     if (cardData.color == 'black') {
                         // Modal!
                         // this.handleBlackCardAction(cardData);
-                        this.#handleBlackCardAction(cardData);
+                        this.#handleBlackCardAction(cardData).then((res) => {
+                            this.#animateCardPing(this.playContainer);
+                        });
                     } else {
                         // Make move request
                         // const moveResult = await axios.post(`/game/${getGameId()}/move`, {cardData.collection_index}); //or however the heck it's named
@@ -368,11 +409,12 @@ class TurnController {
                             },
                         );
 
-                        // debugger;
-                        console.log(result);
+                        // console.log(result);
+                        this.#animateCardPing(this.playContainer);
                         applyCurrentColorToGameScreen(cardData.color);
                     }
-                    // update legal color
+
+                    this.endTurn();
                 } else {
                     for (const [idx, reapplyCard] of Object.entries(
                         this.handContainer.children,
@@ -390,8 +432,9 @@ class TurnController {
             applyBounceAnimation(card, game_state.game, cardData);
         });
 
-        const drawCard = document.getElementById('drawCard');
-        const drawParent = drawCard.parentElement;
+        //const drawCard = document.getElementById('drawCard');
+        //const drawParent = drawCard.parentElement;
+        /*
         const draggable = new Draggable(
             drawCard,
             [this.handContainer],
@@ -409,6 +452,7 @@ class TurnController {
             }
         });
         this.draggables.push(draggable);
+        */
     }
 
     // clean up
@@ -418,86 +462,107 @@ class TurnController {
             draggable.destroy();
         });
         this.draggables = [];
+        this.drawCard.toggleAttribute('disabled', true);
         // document.getElementById("wildFourUserEvent").innerHTML = "";
     }
 
+    #animateCardPing(playContainer) {
+        setTimeout(() => {
+            const cloneOfParent = playContainer.childNodes[
+                playContainer.childNodes.length - 1
+            ].cloneNode(true);
+            playContainer.append(cloneOfParent);
+            cloneOfParent.classList.add('animate-ping');
+            setTimeout(() => {
+                // cloneOfParent.classList.remove("animate-ping");
+                cloneOfParent.remove();
+            }, 710);
+        }, 100);
+    }
+
     #handleBlackCardAction(cardData) {
-        const wildFourUserEvent = document.getElementById('wildFourUserEvent');
-        const yellow = document.createElement('div');
-        const green = document.createElement('div');
-        const blue = document.createElement('div');
-        const red = document.createElement('div');
+        return new Promise((resolve, reject) => {
+            const wildFourUserEvent = document.getElementById('wildFourUserEvent');
+            const yellow = document.createElement('div');
+            const green = document.createElement('div');
+            const blue = document.createElement('div');
+            const red = document.createElement('div');
 
-        wildFourUserEvent.classList.add(
-            'fixed',
-            'z-10',
-            'grid',
-            'w-64',
-            'h-64',
-            'grid-cols-2',
-            'gap-1',
-            'bg-black',
-            'rounded-lg',
-            'custom-inset',
-        );
-        yellow.classList.add(
-            'col-span-1',
-            'mt-1',
-            'ml-1',
-            'bg-yellow-500',
-            'hover:bg-yellow-700',
-        );
-        green.classList.add(
-            'col-span-1',
-            'mt-1',
-            'mr-1',
-            'bg-green-500',
-            'hover:bg-green-700',
-        );
-        blue.classList.add(
-            'col-span-1',
-            'mb-1',
-            'ml-1',
-            'bg-blue-500',
-            'hover:bg-blue-700',
-        );
-        red.classList.add(
-            'col-span-1',
-            'mb-1',
-            'mr-1',
-            'bg-red-500',
-            'hover:bg-red-700',
-        );
+            wildFourUserEvent.classList.add(
+                'fixed',
+                'z-10',
+                'grid',
+                'w-64',
+                'h-64',
+                'grid-cols-2',
+                'gap-1',
+                'bg-black',
+                'rounded-lg',
+                'custom-inset',
+            );
+            yellow.classList.add(
+                'col-span-1',
+                'mt-1',
+                'ml-1',
+                'bg-yellow-500',
+                'hover:bg-yellow-700',
+            );
+            green.classList.add(
+                'col-span-1',
+                'mt-1',
+                'mr-1',
+                'bg-green-500',
+                'hover:bg-green-700',
+            );
+            blue.classList.add(
+                'col-span-1',
+                'mb-1',
+                'ml-1',
+                'bg-blue-500',
+                'hover:bg-blue-700',
+            );
+            red.classList.add(
+                'col-span-1',
+                'mb-1',
+                'mr-1',
+                'bg-red-500',
+                'hover:bg-red-700',
+            );
 
-        yellow.id = 'yellow';
-        green.id = 'green';
-        blue.id = 'blue';
-        red.id = 'red';
+            yellow.id = 'yellow';
+            green.id = 'green';
+            blue.id = 'blue';
+            red.id = 'red';
 
-        wildFourUserEvent.append(yellow);
-        wildFourUserEvent.append(green);
-        wildFourUserEvent.append(blue);
-        wildFourUserEvent.append(red);
+            wildFourUserEvent.append(yellow);
+            wildFourUserEvent.append(green);
+            wildFourUserEvent.append(blue);
+            wildFourUserEvent.append(red);
 
-        // wildFourUserEvent.classList.toggle("hidden", false);
-        const colorSelectionChildren = document.querySelectorAll(
-            '#wildFourUserEvent div',
-        );
-        for (const colorSelectedByID of colorSelectionChildren) {
-            colorSelectedByID.addEventListener('click', async (e) => {
-                const selectedColor = e.target.getAttribute('id');
-                await axios.post(`/game/${getGameId()}/playCard`, {
-                    collection_index: cardData.collection_index,
-                    color: selectedColor, // selected color
+            // wildFourUserEvent.classList.toggle("hidden", false);
+            const colorSelectionChildren = document.querySelectorAll(
+                '#wildFourUserEvent div',
+            );
+            for (const colorSelectedByID of colorSelectionChildren) {
+                colorSelectedByID.addEventListener('click', async (e) => {
+                    const selectedColor = e.target.getAttribute('id');
+                    await axios
+                        .post(`/game/${getGameId()}/playCard`, {
+                            collection_index: cardData.collection_index,
+                            color: selectedColor, // selected color
+                        })
+                        .then((res) => {
+                            applyCurrentColorToGameScreen(selectedColor);
+                            wildFourUserEvent.innerHTML = '';
+                            wildFourUserEvent.classList.remove(
+                                ...wildFourUserEvent.classList,
+                            );
+                            resolve();
+                        });
+                    // wildFourUserEvent.classList.toggle("hidden", true);
                 });
-                applyCurrentColorToGameScreen(selectedColor);
-                wildFourUserEvent.innerHTML = '';
-                wildFourUserEvent.classList.remove(
-                    ...wildFourUserEvent.classList,
-                );
-                // wildFourUserEvent.classList.toggle("hidden", true);
-            });
-        }
+            }
+        });
     }
 }
 
@@ -515,7 +580,9 @@ class EventProcessor {
     // Call this function as if it's the function we passed to the constructor
     process() {
         this.queue.push(arguments);
-        console.log(`Adding to queue, ${this.queue.length} items in queue`);
+        console.log(
+            `Adding to queue, ${this.queue.length} items in queue`,
+        );
         this.#startQueue();
     }
 
@@ -573,7 +640,7 @@ const gameStateProcessor = new EventProcessor(
 
         if (game_state.game.is_active) {
             if (gameRenderer == null) {
-                const drawContainer = document.getElementById('drawCard');
+                const drawContainer = document.getElementById('drawCard').parentElement;
                 const playContainer = document.getElementById('discard');
 
                 gameRenderer = new UnoGameRenderer(
@@ -642,15 +709,24 @@ const gameStateProcessor = new EventProcessor(
             // pass also the current player at the start of turn so we can display that current player
             // console.log(game_state.game.player_id_turn);
 
-            // search game state for current player id, match and return name
-            display_current_player(
-                game_state.players.find(
-                    (player) => player.player_id === game_state.game.player_id_turn,
-                ).display_name,
-            );
-            // console.log(game_state.game.player_id_turn);
-            // console.log(localPlayer.player_id);
-            // console.log(game_state);
+            const findPlayer = game_state.players.find((player) => {
+                console.log(player + " " + player.player_id + " " + game_state.game.player_id_turn);
+                return player.player_id === game_state.game.player_id_turn;
+            });
+
+            console.log("Found player: " + findPlayer);
+
+            if (findPlayer !== undefined) {
+                display_current_player(findPlayer.display_name);
+            }
+            document.getElementById('is_reverse').innerHTML = `Direction: ${
+                game_state.game.is_clockwise ? 'Clockwise' : 'Counter Clockwise'
+            }`;
+            if (game_state.game.draw_amount !== 0) {
+                document.getElementById(
+                    'draw_amount',
+                ).innerHTML = `Draw amount: ${game_state.game.draw_amount}`;
+            }
             if (game_state.game.player_id_turn == localPlayer.player_id) {
                 turnController.startTurn(
                     playersHand.data.collection,
@@ -690,7 +766,6 @@ const display_current_player = (display_name) => {
     currentPlayerTarget.textContent = `Current Player: ${display_name}`;
 };
 
-// not pretty i'm sorry...
 const applyCurrentColorToGameScreen = async (color) => {
     const currentColor = document.getElementById('currentColor');
     for (let i = 0; i < currentColor.classList.length; i++) {
