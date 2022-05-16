@@ -817,10 +817,10 @@ async function moveCardDrawTopToHandHelper(gameRowDetailed, playerRowDetailed, d
 
         // eslint-disable-next-line no-await-in-loop
         const collectionCountDraw = await dbEngineGameUno.getCollectionCountByGameIDAndCollectionInfoID(gameRowDetailed.game_id, 1);
-        debugPrinter.printRed('collectionCountDraw === 0');
-        debugPrinter.printRed(typeof collectionCountDraw);
-        debugPrinter.printRed(collectionCountDraw);
-        debugPrinter.printGreen(collectionCountDraw);
+        // debugPrinter.printRed('collectionCountDraw === 0');
+        // debugPrinter.printRed(typeof collectionCountDraw);
+        // debugPrinter.printRed(collectionCountDraw);
+        // debugPrinter.printGreen(collectionCountDraw);
 
         // If there are no cards in the Collection DRAW, reshuffle Collection PLAY to Collection DRAW
         if (collectionCountDraw === 0) {
@@ -891,6 +891,12 @@ async function moveCardDrawTopToHandHelper(gameRowDetailed, playerRowDetailed, d
         }
 
         cardsDrew += 1;
+    }
+
+    const collectionCountHand = await dbEngineGameUno.getCollectionCountByPlayerID(playerRowDetailed.player_id);
+
+    if (collectionCountHand === 1) {
+        await dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId(gameRowDetailed.game_id, playerRowDetailed.player_id, true);
     }
 
     return collectionRowHand;
@@ -1366,36 +1372,7 @@ async function callUnoLogic(user_id, game_id, callback_game_id, callback_game_id
         message: null,
     };
 
-    const playerRowDetailed = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
-    if (!playerRowDetailed) {
-        result.status_game_uno = constants.FAILURE;
-        result.message = `Player does not exist for game ${game_id}`;
-        return result;
-    }
-
-    const playerHandCollection = await dbEngineGameUno.getCollectionRowsDetailedByPlayerID(playerRowDetailed.player_id);
-    if (!playerHandCollection) {
-        result.status_game_uno = constants.FAILURE;
-        result.message = `Cannot grab the player's hand in game_id: ${game_id} for player_id: ${playerRowDetailed.player_id}`;
-        return result;
-    }
-
-    if (playerHandCollection.length === 1) {
-        const updateResultUnoChecked = await dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId(game_id, playerRowDetailed.player_id, true);
-        if (!updateResultUnoChecked) {
-            result.status_game_uno = constants.FAILURE;
-            result.message = `could not flag a player for uno_check game_id: ${game_id} for player_id: ${playerRowDetailed.player_id}`;
-            return result;
-        }
-    }
-
-    const playerRowsInGame = await dbEngineGameUno.getPlayerRowsDetailedByGameID(game_id);
-    if (!playerRowsInGame) {
-        result.status_game_uno = constants.FAILURE;
-        result.message = `Could not retrieve the list of players in game_id: ${game_id} for player_id: ${playerRowDetailed.player_id}`;
-        return result;
-    }
-
+    // Get Game
     const gameRowDetailed = await dbEngineGameUno.getGameRowDetailedByGameID(game_id);
     if (!gameRowDetailed) {
         result.status_game_uno = constants.FAILURE;
@@ -1403,19 +1380,48 @@ async function callUnoLogic(user_id, game_id, callback_game_id, callback_game_id
         return result;
     }
 
-    // Finding players who are marked with unoChecked = true; // FIXME: THIS IS NOT ACTIVE PLAYERS, CHANGE IT TO ACTIVE PLAYERS WHEN THE CODE SUPPORTS IT
-    for (let i = 0; i < playerRowsInGame.length; i++) {
-        const currentPlayerHand = await dbEngineGameUno.getCollectionRowsDetailedByPlayerID(playerRowsInGame[i].player_id);
-        if (!currentPlayerHand) {
-            result.status_game_uno = constants.FAILURE;
-            result.message = `Could not retrieve the hand for the current player_id ${playerRowsInGame[i].player_id} in game ${game_id}`;
-            return result;
-        }
-        if (playerRowsInGame[i].uno_check === false && currentPlayerHand.length === 1) {
+    // Check if can call UNO
+    if (gameRowDetailed.is_uno_available === false) {
+        result.status_game_uno = constants.FAILURE;
+        result.message = `Cannot call UNO at this time for game_id: ${game_id}`;
+        return result;
+    }
+
+    // Get players in the game (TODO CHANGE IT TO ACTIVE PLAYERS)
+    const playerRowsInGame = await dbEngineGameUno.getPlayerRowsDetailedByGameID(game_id);
+    if (!playerRowsInGame) {
+        result.status_game_uno = constants.FAILURE;
+        result.message = `Could not retrieve the list of players in game_id: ${game_id}`;
+        return result;
+    }
+
+    for (const playerRowDetailed of playerRowsInGame) {
+        if (playerRowDetailed.uno_check === true) {
             // eslint-disable-next-line no-await-in-loop
-            await moveCardDrawTopToHandHelper(gameRowDetailed, playerRowsInGame[i], 2, callback_game_id, callback_game_id_message);
+            await moveCardDrawTopToHandHelper(
+                gameRowDetailed,
+                playerRowDetailed,
+                2,
+                callback_game_id,
+                callback_game_id_message,
+            );
         }
     }
+
+    // // Finding players who are marked with unoChecked = true; // FIXME: THIS IS NOT ACTIVE PLAYERS, CHANGE IT TO ACTIVE PLAYERS WHEN THE CODE SUPPORTS IT
+    // for (let i = 0; i < playerRowsInGame.length; i++) {
+    //     // eslint-disable-next-line no-await-in-loop
+    //     const currentPlayerHand = await dbEngineGameUno.getCollectionRowsDetailedByPlayerID(playerRowsInGame[i].player_id);
+    //     if (!currentPlayerHand) {
+    //         result.status_game_uno = constants.FAILURE;
+    //         result.message = `Could not retrieve the hand for the current player_id ${playerRowsInGame[i].player_id} in game ${game_id}`;
+    //         return result;
+    //     }
+    //     if (playerRowsInGame[i].uno_check === false && currentPlayerHand.length === 1) {
+    //         // eslint-disable-next-line no-await-in-loop
+    //         await moveCardDrawTopToHandHelper(gameRowDetailed, playerRowsInGame[i], 2, callback_game_id, callback_game_id_message);
+    //     }
+    // }
 
     // Update gameData
     await gameUnoLogicHelper.updateGameDataByGameRow(gameRowDetailed, null);

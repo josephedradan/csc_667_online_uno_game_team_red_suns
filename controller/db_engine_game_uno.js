@@ -1028,7 +1028,6 @@ async function getCollectionRowsDetailedByPlayerID(player_id) {
 
 dbEngineGameUno.getCollectionRowsDetailedByPlayerID = getCollectionRowsDetailedByPlayerID;
 
-
 async function getCollectionCountByPlayerID(player_id) {
     debugPrinter.printFunction(getCollectionCountByPlayerID.name);
     const result = await db.any(
@@ -1889,6 +1888,6 @@ async function updatePlayerRowIsUnoCheckedByGameIdAndPlayerId(game_id, player_id
     return result[0];
 }
 
-dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId = updatePlayerRowIsUnoCheckedByGameIdAndPlayerId; 
+dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId = updatePlayerRowIsUnoCheckedByGameIdAndPlayerId;
 
 module.exports = dbEngineGameUno;
