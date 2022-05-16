@@ -1137,7 +1137,7 @@ async function getPlayerDetailedByGameIDAndUserID(user_id, game_id) {
 
     result.status_game_uno = constants.SUCCESS;
     result.message = `Player ${playerRowDetailed.display_name} (player_id ${playerRowDetailed.player_id}) returned`;
-    
+
     return result;
 }
 
@@ -1191,8 +1191,6 @@ async function setGamePlayerIDHost(user_id, game_id) {
 }
 
 gameUnoLogic.setGamePlayerIDHost = setGamePlayerIDHost;
-
-
 
 async function challengePlayerHandler(gameRowDetailed, playerRowChallenger, playerRowChallenged, collectionRowsChallenged, callback_game_id) {
     debugPrinter.printFunction(challengePlayerHandler.name);
