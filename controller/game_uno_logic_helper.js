@@ -98,7 +98,7 @@ async function changeTurnByGameRow(gameRowDetailed) {
 
     // If there is no player_id for the game
     if (gameRowDetailed.player_id_turn === null) { // TODO: Maybe use "Players".player_index in the future
-        await dbEngineGameUno.updateGameDatRowPlayerIDTurn(gameRowDetailed.game_id, playerRowsActive[0].player_id);
+        await dbEngineGameUno.updateGameDataRowPlayerIDTurn(gameRowDetailed.game_id, playerRowsActive[0].player_id);
         result.status_game_uno = constants.SUCCESS;
         result.message = `Game ${gameRowDetailed.game_id}'s player_id_turn was null, player ${playerRowsActive[0].player_id} will have the turn`;
         result.player_id_turn = playerRowsActive[0].player_id;
@@ -130,7 +130,7 @@ async function changeTurnByGameRow(gameRowDetailed) {
     result.user_id_turn = playerRowsActive[indexOfNextPlayerInPlayerRowsActive].user_id;
     result.player_id_turn = playerRowsActive[indexOfNextPlayerInPlayerRowsActive].player_id;
 
-    const gameData = await dbEngineGameUno.updateGameDatRowPlayerIDTurn(
+    const gameData = await dbEngineGameUno.updateGameDataRowPlayerIDTurn(
         gameRowDetailed.game_id,
         result.player_id_turn,
     );
@@ -244,7 +244,13 @@ async function updateGameData(gameRowDetailed, color) {
 
     // Assume that the db queries will be successful since the player does not have a input
     if (temp.content === constantsGameUno.CARD_CONTENT_WILDFOUR) {
-        // await dbEngineGameUno.updateGameDataDrawAmount(gameRowDetailed.game_id, 4);
+        await dbEngineGameUno.updateGameDataRowIsChallengeAvailable(gameDataRow.game_id, true);
+    } else {
+        await dbEngineGameUno.updateGameDataRowIsChallengeAvailable(gameDataRow.game_id, false);
+    }
+
+    // Assume that the db queries will be successful since the player does not have a input
+    if (temp.content === constantsGameUno.CARD_CONTENT_WILDFOUR) {
         if (gameRowDetailed.draw_amount > 1) {
             await dbEngineGameUno.updateGameDataRowDrawAmount(
                 gameRowDetailed.game_id,
@@ -413,9 +419,6 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(
     // if (){
     //
     // }
-
-
-
 
     result.change_turn = changeTurn;
 

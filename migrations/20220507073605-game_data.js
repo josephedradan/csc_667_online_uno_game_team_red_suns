@@ -70,7 +70,14 @@ module.exports = {
                 unique: false,
             },
 
-            uno_available: {
+            is_uno_available: {
+                type: Sequelize.DataTypes.BOOLEAN,
+                defaultValue: false,
+                allowNull: false,
+                unique: false,
+            },
+
+            is_challenge_available: {
                 type: Sequelize.DataTypes.BOOLEAN,
                 defaultValue: false,
                 allowNull: false,

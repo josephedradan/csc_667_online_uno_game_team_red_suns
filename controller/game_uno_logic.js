@@ -792,7 +792,7 @@ async function moveCardDrawTopToHandHelper(gameRowDetailed, playerRowDetailed, d
     while (cardsDrew < draw_amount) {
         // If the server crashes, the player still needs to draw the appropriate amount of cards (May be undefined)
         // eslint-disable-next-line no-await-in-loop
-        const gameDataRow = await dbEngineGameUno.updateGameDataRowDrawAmount(gameRowDetailed.game_id, cardsDrew);
+        const gameDataRow = await dbEngineGameUno.updateGameDataRowDrawAmount(gameRowDetailed.game_id, draw_amount - cardsDrew);
 
         if (!gameDataRow) {
             // result.status_game_uno = constants.FAILURE;
@@ -987,7 +987,8 @@ gameUnoLogic.moveCardDrawToPlay = moveCardDrawToPlay;
  *
  * @param game_id
  * @param user_id
- * @param playObject
+ * @param collection_index
+ * @param color
  * @returns {Promise<{player_current_turn_new: null, game: null, collection: null, message: null, status: null, player: null}>}
  */
 async function moveCardHandToPlayByCollectionIndex(user_id, game_id, collection_index, color) {
@@ -1217,9 +1218,9 @@ async function challengePlayerHandler(gameRowDetailed, playerRowChallenger, play
         result.message = `Player ${playerRowChallenger.display_name} (player_id ${playerRowChallenger.player_id})'s `
             + `challenge against Player ${playerRowChallenged.display_name} (player_id ${playerRowChallenged.player_id}) failed`;
     } else {
+        // TODO GUARD
         const collectionRowHand = await moveCardDrawTopToHandHelper(gameRowDetailed, playerRowChallenged, 6, callback_game_id);
 
-        // TODO GUARD
         // Put the top card back in the original player's hand (Wild +4 back to original player's hand)
         // const collectionRow = await dbEngineGameUno.updateCollectionRowPlayToHandTop(gameRowDetailed.game_id, playerRowChallenged.player_id);
         //
@@ -1232,6 +1233,10 @@ async function challengePlayerHandler(gameRowDetailed, playerRowChallenger, play
         result.message = `Player ${playerRowChallenger.display_name} (player_id ${playerRowChallenger.player_id})'s `
             + `challenge against Player ${playerRowChallenged.display_name} (player_id ${playerRowChallenged.player_id}) was successful`;
     }
+
+    // Reset the draw amount
+    await dbEngineGameUno.updateGameDataRowDrawAmount(gameRowDetailed.game_id, 1);
+
     result.status_game_uno = constants.SUCCESS;
 
     return result;
@@ -1282,7 +1287,7 @@ async function challengePlayer(game_id, playerRow, callback_game_id) {
     }
     result.collection = resultHandObject.collection;
 
-    // TODO THE CHALLENGE STUFF HERE
+    // TODO CHALLENGE IS RIGHT HERE
 
     // TODO GUARD
     const resultChallengePlayerHandlerObject = await challengePlayerHandler(
