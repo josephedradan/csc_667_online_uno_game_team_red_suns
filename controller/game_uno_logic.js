@@ -983,7 +983,7 @@ async function moveCardDrawTopToHandFullByGameIDAndPlayerRow(game_id, playerRowD
 
     result.collection = collectionRowHand;
 
-    await gameUnoLogicHelper.updateGameDataByGameRow(gameRowDetailed, null);
+    await gameUnoLogicHelper.updateGameData(gameRowDetailed.game_id, null);
 
     result.status_game_uno = constants.SUCCESS;
     result.message = `A card from DRAW's collection moved to player ${playerRowDetailed.display_name} (player_id ${playerRowDetailed.player_id})'s collection's top for Game ${game_id}`;
@@ -1001,16 +1001,16 @@ gameUnoLogic.moveCardDrawTopToHandFullByGameIDAndPlayerRow = moveCardDrawTopToHa
     collection,
 }
  */
-async function moveCardDrawToHandTopByGameIdAndUseID(user_id, game_id, callback_user_ie) {
-    debugPrinter.printFunction(moveCardDrawToHandTopByGameIdAndUseID.name);
+async function moveCardDrawTopToHandFull(user_id, game_id, callback_user_id) {
+    debugPrinter.printFunction(moveCardDrawTopToHandFull.name);
 
     // Get player given game_id and user_id (May be undefined)
     const playerRow = await dbEngineGameUno.getPlayerRowDetailedByGameIDAndUserID(user_id, game_id);
 
-    return moveCardDrawTopToHandFullByGameIDAndPlayerRow(game_id, playerRow, callback_user_ie);
+    return moveCardDrawTopToHandFullByGameIDAndPlayerRow(game_id, playerRow, callback_user_id);
 }
 
-gameUnoLogic.moveCardDrawToHandTopByGameIdAndUseID = moveCardDrawToHandTopByGameIdAndUseID;
+gameUnoLogic.moveCardDrawTopToHandFull = moveCardDrawTopToHandFull;
 
 async function moveCardDrawToPlay(game_id) { // TODO ADD MORE GUARDING AND ERROR CHECKING ETC
     debugPrinter.printFunction(moveCardDrawToPlay.name);
@@ -1363,7 +1363,8 @@ async function challengePlayer(game_id, playerRow, callback_game_id) {
     );
 
     // Update gameData
-    await gameUnoLogicHelper.updateGameDataByGameRow(gameRowDetailed, null);
+    // await gameUnoLogicHelper.updateGameDataByGameRow(gameRowDetailed, null);
+    await gameUnoLogicHelper.updateGameData(gameRowDetailed.game_id, null);
 
     result.status_game_uno = resultChallengePlayerHandlerObject.status_game_uno;
     result.message = resultChallengePlayerHandlerObject.message;
@@ -1415,7 +1416,6 @@ async function callUnoLogic(user_id, game_id, callback_game_id, callback_game_id
 
     // TODO CAN OPTIMIZE AWAIT
     for (const playerRowDetailed of playerRowsInGame) {
-
         // Draw for player who have one card except for the caller of this function
         if (playerRowDetailed.uno_check === true && playerRowDetailedCaller.player_id !== playerRowDetailed.player_id) {
             // eslint-disable-next-line no-await-in-loop
@@ -1448,9 +1448,8 @@ async function callUnoLogic(user_id, game_id, callback_game_id, callback_game_id
     // }
 
     // Update gameData
-    await gameUnoLogicHelper.updateGameDataByGameRow(gameRowDetailed, null);
-
-    const first = dbEngineGameUno.updateGameDataRowIsUnoAvailable(gameRowDetailed.game_id, true);
+    // await gameUnoLogicHelper.updateGameDataByGameRow(gameRowDetailed, null);
+    await gameUnoLogicHelper.updateGameData(gameRowDetailed.game_id, null);
 
     result.status_game_uno = constants.SUCCESS;
     result.message = `uno_check successfully flagged for player_id: ${playerRowDetailedCaller.player_id} in game ${game_id}`;

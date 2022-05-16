@@ -289,7 +289,7 @@ async function updateGameDataByGameRow(gameRowDetailed, color) {
 
     let player_id_winner = null;
 
-    let isUnoAvailable = false;
+    const isUnoAvailable = false;
 
     // May be empty (TODO GUARD)
     const playerRowsActive = await dbEngineGameUno.getPlayerRowsSimpleInGame(gameRowDetailed.game_id);
@@ -305,8 +305,7 @@ async function updateGameDataByGameRow(gameRowDetailed, color) {
 
             // eslint-disable-next-line no-await-in-loop
             // await Promise.all([first]);
-
-            isUnoAvailable = true;
+            // isUnoAvailable = true;
         } else if (collectionCountHand === 0) { // Required
             player_id_winner = playerRow.player_id;
             break;
@@ -328,6 +327,7 @@ async function updateGameDataByGameRow(gameRowDetailed, color) {
         }));
     }
 
+    // TODO: NOT CALLED WHICH IS CORRECT
     // Reset is_uno_available back to false if there is no Uno Available
     if (!isUnoAvailable) {
         await dbEngineGameUno.updateGameDataRowIsUnoAvailable(gameRowDetailed.game_id, false);
@@ -490,6 +490,16 @@ async function doMoveCardHandToPlayByCollectionIndexLogic(
     }
 
     const playerCollectionCount = await dbEngineGameUno.getCollectionCountByPlayerID(playerRowDetailed.player_id);
+
+    const arrayPromises = [];
+
+    if (playerCollectionCount === 1) {
+        arrayPromises.push(dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId(gameRowDetailed.game_id, playerRowDetailed.player_id, true));
+        arrayPromises.push(dbEngineGameUno.updateGameDataRowIsUnoAvailable(gameRowDetailed.game_id, true));
+    } else {
+        arrayPromises.push(dbEngineGameUno.updatePlayerRowIsUnoCheckedByGameIdAndPlayerId(gameRowDetailed.game_id, playerRowDetailed.player_id, false));
+    }
+    await Promise.all(arrayPromises);
 
     result.message = `Game ${gameRowDetailed.game_id}, player ${playerRowDetailed.display_name} (player_id ${playerRowDetailed.player_id}) `
         + `has successfully played their Card (collection_index ${collection_index})'`;
