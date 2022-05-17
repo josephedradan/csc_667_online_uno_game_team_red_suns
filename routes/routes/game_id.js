@@ -89,7 +89,6 @@ routerGameID.get(
     controllerGameID.GETDrawCard,
 );
 
-
 routerGameID.post(
     '/challenge',
     controllerGameID.POSTChallenge,

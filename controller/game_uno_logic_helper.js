@@ -577,6 +577,10 @@ async function canPlayerChallenge(gameRowDetailed, playerRow) {
         return false;
     }
 
+    if (gameRowDetailed.is_challenge_available === false) {
+        return false;
+    }
+
     if (collectionRowPlayTop.content === constantsGameUno.CARD_CONTENT_WILDFOUR) {
         return true;
     }

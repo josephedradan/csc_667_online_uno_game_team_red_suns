@@ -1378,6 +1378,7 @@ async function challengePlayer(game_id, playerRow, callback_game_id) {
     // await gameUnoLogicHelper.updateGameDataByGameRow(gameRowDetailed, null);
     // await gameUnoLogicHelper.updateGameDataFull(gameRowDetailed.game_id, null); // TODO DO NOT CALL THIS HERE
 
+    // Reset Challenge
     await dbEngineGameUno.updateGameDataRowIsChallengeAvailable(gameRowDetailed.game_id, false);
 
     result.status_game_uno = resultChallengePlayerHandlerObject.status_game_uno;
