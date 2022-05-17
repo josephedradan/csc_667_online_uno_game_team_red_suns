@@ -212,7 +212,7 @@ async function startGameWrapped(user_id, game_id) {
         user_id,
         game_id,
         1,
-        1,
+        7,
         intermediateSocketIOGameUno.emitInRoom_ServerGameGameID_GameState,
     );
 

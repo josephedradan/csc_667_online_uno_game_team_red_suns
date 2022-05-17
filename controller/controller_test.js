@@ -7,8 +7,8 @@ controllerTest.initializeDrawStack = async (req, res, next) => {
     const newDeck = [];
     const coloredNumCards = await dbEngine.getCardTableOnType('NUMBER');
     const blackWildCards = await dbEngine.getCardTableOnType('SPECIAL');
-    console.log(coloredNumCards);
-    console.log(blackWildCards);
+    // console.log(coloredNumCards);
+    // console.log(blackWildCards);
 
     res.render('index');
 };

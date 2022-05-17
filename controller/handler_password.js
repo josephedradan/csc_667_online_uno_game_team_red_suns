@@ -35,7 +35,7 @@ handlerPassword.hash = hash;
  * @returns {Promise<Boolean>}
  */
 async function compare(passwordHashed, passwordNormal) {
-    console.log(`inside compare; ${passwordHashed} : ${passwordNormal}`);
+    // console.log(`inside compare; ${passwordHashed} : ${passwordNormal}`);
     return bcrypt.compare(passwordHashed, passwordNormal);
 }
 

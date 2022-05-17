@@ -134,7 +134,6 @@ async function verifyCallback(username, password, doneCallback) {
 
         try {
             // If password is valid by comparing password from the req to the password in the db
-            console.log(`form information; ${username} : ${password}`);
             if (await handlerPassword.compare(password, await account.password)) {
                 // This doneCallback will attach the account object to req
                 return doneCallback(
@@ -158,8 +157,10 @@ async function verifyCallback(username, password, doneCallback) {
             return doneCallback(error);
         }
     } catch (err) {
-        console.log('failure to query getUserJoinUserStatisticsRowByUsername');
-        console.log(err);
+        if (process.env.NODE_ENV === 'development') {
+            console.log('failure to query getUserJoinUserStatisticsRowByUsername');
+            console.log(err);
+        }
     }
 }
 

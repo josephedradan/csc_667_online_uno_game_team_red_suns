@@ -1285,7 +1285,7 @@ async function challengePlayerHandler(gameRowDetailed, playerRowChallenger, play
 
     // If Wild +4 is legal
     if (isWildFourLegal) {
-        // eslint-disable-next-line no-plusplus
+        debugPrinter.printDebug('CHALLENGER LOSS');
 
         // TODO GUARD
         const collectionRowHand = await moveCardDrawTopToHandHelper(gameRowDetailed, playerRowChallenger, 2, callback_game_id);
@@ -1295,6 +1295,7 @@ async function challengePlayerHandler(gameRowDetailed, playerRowChallenger, play
     } else {
         // TODO GUARD
         const collectionRowHand = await moveCardDrawTopToHandHelper(gameRowDetailed, playerRowChallenged, 6, callback_game_id);
+        debugPrinter.printDebug('CHALLENGER WIN');
 
         // Put the top card back in the original player's hand (Wild +4 back to original player's hand)
         // const collectionRow = await dbEngineGameUno.updateCollectionRowPlayToHandTop(gameRowDetailed.game_id, playerRowChallenged.player_id);
