@@ -175,22 +175,24 @@ socket.on('server-game-game-id-players', async (gameWithPlayersRows) => {
         }
         for (let i = 0; i < 3; i++) {
             if (i == 0 || i == 2) {
-                const div = document.createElement('div');
+                const div = document.createElement("div");
                 parent_div_list_of_players.append(div);
                 continue;
             }
             // we could just leave this here since it'll run once anyways.
             const currentPlayer = await axios.get(
                 `/game/${getGameId()}/getPlayer`,
-                {},
+                {}
             );
-            if (
-                gameWithPlayersRows.game.player_id_host
-                === currentPlayer.data.player.player_id
-            ) {
-                parent_div_list_of_players.append(
-                    create_start_button(gameWithPlayersRows.game.game_id),
-                );
+            if (currentPlayer !== undefined) {
+                if (
+                    gameWithPlayersRows.game.player_id_host ===
+                    currentPlayer.data.player.player_id
+                ) {
+                    parent_div_list_of_players.append(
+                        create_start_button(gameWithPlayersRows.game.game_id)
+                    );
+                }
             }
         }
     }
