@@ -7,15 +7,17 @@ const debugPrinter = require('../util/debug_printer');
 const middlewareUnoGameSettings = {};
 
 async function checkIfPlayersMaxIsReached(req, res, next) {
-    const result = await dbEngineGameUno.getPlayersCountByGameID(req.game.game_id); // TODO WARNING, DANGEROUS NEED TO CHECK IF RESULT IS UNDEFINED
+    const result = await dbEngineGameUno.getPlayersCountByGameID(
+        req.game.game_id
+    ); // TODO WARNING, DANGEROUS NEED TO CHECK IF RESULT IS UNDEFINED
 
-    if (result >= gameUnoSettings.PLAYERS_MAX) {
-        const jsonResponse = utilCommon.getJsonResponseAndAttachMessageToSessionMessageIfPossible(
-            req,
-            constants.FAILURE,
-            `Max players reached for game ${req.game.game_id}`,
-        );
-
+    if (result > gameUnoSettings.PLAYERS_MAX) {
+        const jsonResponse =
+            utilCommon.getJsonResponseAndAttachMessageToSessionMessageIfPossible(
+                req,
+                constants.FAILURE,
+                `Max players reached for game ${req.game.game_id}`
+            );
         res.redirect(jsonResponse.url);
     } else {
         next();
