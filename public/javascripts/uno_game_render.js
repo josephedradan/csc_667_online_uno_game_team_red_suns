@@ -31,15 +31,15 @@ class Draggable {
 
         if (this.boundary) {
             const boundaryRect = this.boundary.getBoundingClientRect();
-            if (posX < boundaryRect.left) {
-                posX = boundaryRect.left;
-            } else if (posX > boundaryRect.right + 2 * offsetX) {
-                posX = boundaryRect.right + 2 * offsetX;
+            if (posX < boundaryRect.left + window.scrollX) {
+                posX = boundaryRect.left + window.scrollX;
+            } else if (posX > boundaryRect.right + window.scrollX + 2 * offsetX) {
+                posX = boundaryRect.right + window.scrollX + 2 * offsetX;
             }
-            if (posY < boundaryRect.top) {
-                posY = boundaryRect.top;
-            } else if (posY > boundaryRect.bottom + 2 * offsetY) {
-                posY = boundaryRect.bottom + 2 * offsetY;
+            if (posY < boundaryRect.top + window.scrollY) {
+                posY = boundaryRect.to + window.scrollY;
+            } else if (posY > boundaryRect.bottom + window.scrollY + 2 * offsetY) {
+                posY = boundaryRect.bottom + window.scrollY + 2 * offsetY;
             }
         }
 
@@ -74,7 +74,7 @@ class Draggable {
         this.element.style.transform = "none";
         document.body.appendChild(this.element);
 
-        this.moveToPosition(event.clientX, event.clientY);
+        this.moveToPosition(event.clientX + window.scrollX, event.clientY + window.scrollY);
 
         if (this.dragBeginCallback) {
             this.dragBeginCallback();
@@ -88,7 +88,8 @@ class Draggable {
         }
         event.preventDefault();
         // console.log(`${event.clientX} ${event.clientY}`);
-        this.moveToPosition(event.clientX, event.clientY);
+
+        this.moveToPosition(event.clientX + window.scrollX, event.clientY + window.scrollY);
     }
 
     dragMouseUp(event) {
