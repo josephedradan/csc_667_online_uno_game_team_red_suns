@@ -1,4 +1,6 @@
 
+_Original Repo_: https://github.com/sfsu-csc-667-spring-2022-roberts/term-project-team-red-suns
+
 ### Prerequisite
 
 1. Install postgres
@@ -19,6 +21,7 @@ of this project
 
     npm start
     npm run start:dev
+
 
 
 
