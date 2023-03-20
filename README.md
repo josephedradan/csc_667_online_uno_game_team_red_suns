@@ -1,12 +1,21 @@
 # Online Uno Game
 
-__Description__: Multiplayer Uno Game in JavaScript
+__Description__: Multiplayer Uno Game in JavaScript, This project can run on the local network and can be hosted on Heroku
+if setup properly.
 
 _Original Repo_: https://github.com/sfsu-csc-667-spring-2022-roberts/term-project-team-red-suns
 
 ### Demo Images
 
-
+![image_game.png](https://raw.githubusercontent.com/josephedradan/csc_667_online_uno_game_team_red_suns/main/_images/image_0.png)
+![image_game.png](https://raw.githubusercontent.com/josephedradan/csc_667_online_uno_game_team_red_suns/main/_images/image_1.png)
+![image_game.png](https://raw.githubusercontent.com/josephedradan/csc_667_online_uno_game_team_red_suns/main/_images/image_2.png)
+![image_game.png](https://raw.githubusercontent.com/josephedradan/csc_667_online_uno_game_team_red_suns/main/_images/image_3.png)
+![image_game.png](https://raw.githubusercontent.com/josephedradan/csc_667_online_uno_game_team_red_suns/main/_images/image_4.png)
+![image_game.png](https://raw.githubusercontent.com/josephedradan/csc_667_online_uno_game_team_red_suns/main/_images/image_5.png)
+![image_game.png](https://raw.githubusercontent.com/josephedradan/csc_667_online_uno_game_team_red_suns/main/_images/image_6.png)
+![image_game.png](https://raw.githubusercontent.com/josephedradan/csc_667_online_uno_game_team_red_suns/main/_images/image_7.png)
+![image_game.png](https://raw.githubusercontent.com/josephedradan/csc_667_online_uno_game_team_red_suns/main/_images/image_8.png)
 
 
 ### Prerequisite
