@@ -1,5 +1,13 @@
+# Online Uno Game
+
+__Description__: Multiplayer Uno Game in JavaScript
 
 _Original Repo_: https://github.com/sfsu-csc-667-spring-2022-roberts/term-project-team-red-suns
+
+### Demo Images
+
+
+
 
 ### Prerequisite
 
@@ -22,7 +30,7 @@ of this project
     npm start
     npm run start:dev
 
-
+5. http://localhost:3000/
 
 
 # Memes
